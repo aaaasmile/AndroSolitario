@@ -1,7 +1,7 @@
 #ifndef __GFX_UTIL__H
 #define __GFX_UTIL__H
 
-#include <SDL2/SDL.h>
+#include <SDL.h>
 #include <SDL_ttf.h>
 
 #include <string>

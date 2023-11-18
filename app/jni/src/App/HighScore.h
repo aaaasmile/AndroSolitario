@@ -1,7 +1,7 @@
 #ifndef _HIGHSCORE_H__
 #define _HIGHSCORE_H__
 
-#include <SDL2/SDL.h>
+#include <SDL.h>
 #include <SDL_ttf.h>
 
 #include <string>
