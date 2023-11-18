@@ -55,3 +55,6 @@ Sono partito da SDL-release-2.26.5.tar.gz e ho copiato i files di root
 le directory src e include. Tutte le altre no.
 Nel file app/jni/src/Android.mk ho messo tutti i sorgenti che vengono compilati nel progetto.
 
+L'applicazione Android parte dai file in java messi all'interno di src/main/java.
+Qui viene instaziata la SDLActivity che al suo interno crea la SDL_Surface dove viene eseguito
+il game loop del solitario.
