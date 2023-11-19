@@ -21,6 +21,7 @@ In Admin Powershell uso
 
     usbipd wsl list
     usbipd wsl attach --busid 5-1 --distribution UbuntuMinitoro
+    usbipd wsl detach --busid 5-1  (per scollegare)
 In WSL
 
     lsusb
@@ -75,3 +76,51 @@ Dove vanno messi tutti gli assets?
 Secondo questo tizio https://georgik.rocks/sdl2_image-for-android-with-png-image-format/
 vanno messi in The location for graphic assets is app/src/main/assets.
 Qui ho copiato la directory data del progetto solitario.
+
+## Compile e Link clean
+Sono riuscito a compilare e linkare i sorgenti. Ho avuto delle difficoltà con STL in fase di link
+che ho risolto usando 
+
+    arguments "APP_STL=c++_static"
+nel file build.gradle. Nota come in questo file ogni argomento aggiuntivo viene semplicemente inserito
+sotto.
+Per compilare la libini a livello statico non è stato affatto semplice. Più che altro è la
+creazione del file Andorid.mk che non è così intuitiva partendo dal file CLanguages.txt.
+Ho dovuto anche cambiare il nome del modulo in inimod per evitare magie sul nome libini.
+Ho incluso solo il file cpp per via del suffix. La direttiva include $(BUILD_STATIC_LIBRARY)
+compila la libreria in modo statico. Essa va poi referenziato con LOCAL_STATIC_LIBRARIES := inimod,
+mentre tutte le altre librerie di SDL sono qui LOCAL_SHARED_LIBRARIES := SDL2 SDL2_ttf SDL2_mixer SDL2_image.
+
+## Adb Device è una lista vuota
+Se il comando
+
+    adb devices
+fornisce una lista vuota, mentre usbipd wsl attach funziona così come lsusb, allora è meglio
+cercare un altra soluzione. 
+Quando collego il telefono, oppure faccio un reboot di windows11 con il telefono collegato, se
+apro file explorer riesco a vedere RedMiNote 11. In windows Explorer posso poi navigare su tutti i files.
+Seguendo questo link https://stackoverflow.com/questions/60166965/adb-device-list-empty-using-wsl2,
+in fondo al post viene elencato un modo per far funzionare adb devices su ubuntu-minitoro.
+Per prima cosa apro una powershell->cmd in D:\Xiaomi\platform-tools_r34.0.5-windows\platform-tools e lancio:
+
+    adb kill-server
+    adb -a nodaemon server start
+Poi faccio partire una bash di ubuntu-minitoro e qui lancio:
+
+    export WSL_HOST_IP="$(tail -1 /etc/resolv.conf | cut -d' ' -f2)"
+    socat TCP-LISTEN:5037,reuseaddr,fork TCP:$WSL_HOST_IP:5037
+
+Ora apro un'altra bash su WSL2 e lancio la sequenza:
+
+    export ANDROID_SDK_ROOT=$HOME/android/
+    export PATH=${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin:${ANDROID_SDK_ROOT}/platform-tools:${PATH}
+    adb devices
+Il risultato è ora:  
+List of devices attached
+f5c24a47        device
+Il tutto senza usare usbipd, che non mi sembra molto stabile, in quanto funziona solo a tratti.
+Ora posso usare:
+
+    ./gradlew compileDebugSources
+    ./gradlew installDebug
+    adb shell am start -n org.libsdl.app/.SDLActivity

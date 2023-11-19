@@ -1,4 +1,3 @@
-
 # Save the local path
 INI_LOCAL_PATH := $(call my-dir)
 include $(CLEAR_VARS)
