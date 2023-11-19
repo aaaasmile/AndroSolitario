@@ -31,21 +31,20 @@
 #include "libini.h"
 
 static const char *g_lpszIniFileName = "options.ini";
-static const char *g_lpszDefaultIniFileName = DATA_PREFIX "default_options.ini";
-static const char *g_lpszHelpFileName = DATA_PREFIX "solitario.pdf";
+static const char *g_lpszDefaultIniFileName = "default_options.ini";
+static const char *g_lpszHelpFileName = "solitario.pdf";
 static const char *g_lpszSectAll = "global";
 static const char *g_lpszKeyLang = "Language";
 static const char *g_lpszKeyDeck = "DeckCurrent";
 static const char *g_lpszKeyMusic = "Musicenabled";
 static const char *g_lpszKeyBackground = "Background";
 
-static const char *g_lpszIconProgFile = DATA_PREFIX "images/icona_asso.bmp";
-static const char *g_lpszTitleFile = DATA_PREFIX "images/title.png";
-static const char *g_lpszIniFontAriblk = DATA_PREFIX "font/ariblk.ttf";
-static const char *g_lpszIniFontVera = DATA_PREFIX "font/vera.ttf";
-static const char *g_lpszImageSplashComm =
-    DATA_PREFIX "images/commessaggio.jpg";
-static const char *g_lpszImageSplashMantova = DATA_PREFIX "images/mantova.jpg";
+static const char *g_lpszIconProgFile = "images/icona_asso.bmp";
+static const char *g_lpszTitleFile = "images/title.png";
+static const char *g_lpszIniFontAriblk = "font/ariblk.ttf";
+static const char *g_lpszIniFontVera = "font/vera.ttf";
+static const char *g_lpszImageSplashComm = "images/commessaggio.jpg";
+static const char *g_lpszImageSplashMantova = "images/mantova.jpg";
 
 AppGfx::AppGfx() {
     _p_Window = NULL;

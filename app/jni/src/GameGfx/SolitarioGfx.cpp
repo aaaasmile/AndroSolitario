@@ -22,7 +22,7 @@ int g_SymbolHeight = 0;
 #define FRAMETICKS (1000 / FPS)
 #define THINKINGS_PER_TICK 1
 
-static const char *g_lpszSymbDir = DATA_PREFIX "images/";
+static const char *g_lpszSymbDir = "images/";
 extern const char *g_lpszDeckDir;
 
 const int MYIDQUIT = 0;

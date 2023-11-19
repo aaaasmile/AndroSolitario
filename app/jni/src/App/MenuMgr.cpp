@@ -16,7 +16,7 @@
 
 static const char* g_lpszMsgUrl = "Go to invido.it";
 static const char* g_lpszVersion = "Ver 2.0.2 20230919";
-static const char* g_lpszIniFontVera = DATA_PREFIX "font/vera.ttf";
+static const char* g_lpszIniFontVera = "font/vera.ttf";
 
 static const SDL_Color g_color_on = {253, 252, 250};
 static const SDL_Color g_color_off = {128, 128, 128};

@@ -7,4 +7,5 @@ app/jni/SDL_Image
 app/jni/SDL_ttf
 app/jni/harfbuzz
 app/jni/freetype
+app/src/main/assets
 *.o

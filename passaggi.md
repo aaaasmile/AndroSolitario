@@ -64,3 +64,14 @@ Ho bisogno anche delle altre librerie.
 1) SDL_Image: https://github.com/libsdl-org/SDL_image/releases
 2) SDL_mixer: https://github.com/libsdl-org/SDL_mixer/releases
 3) SDL_ttf: https://github.com/libsdl-org/SDL_ttf/releases
+
+Per quanto riguarda le librerie esterne (esempio ttf usa freetype e harfbuzz) esse vanno messe
+in external. Non si mette la copia della release come  ho fatto per le 4 librerie sdl, ma si segue
+su github il link external che è un fork. All'interno del fork (si vede perché c'è il file Android.mk)
+si scarica il sorgente attraverso lo zip.
+
+## Assets
+Dove vanno messi tutti gli assets?
+Secondo questo tizio https://georgik.rocks/sdl2_image-for-android-with-png-image-format/
+vanno messi in The location for graphic assets is app/src/main/assets.
+Qui ho copiato la directory data del progetto solitario.

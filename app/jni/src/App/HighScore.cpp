@@ -74,11 +74,8 @@ LPErrInApp HighScore::SaveScore(int score, int numCard) {
     }
     if (j > -1) {
         char bufName[256];
-#ifdef WIN32
-        sprintf(bufName, "%s", getenv("USERNAME"), getenv("HOMEPATH"));
-#else
-        sprintf(_settingsRootDir, "%s/.solitario", getenv("HOME"));
-#endif
+        sprintf(bufName, "%s", getenv("USERNAME"));
+        
         ScoreInfo prev;
         for (int i = j; i < NUMOFSCORE; i++) {
             if (i == j) {
