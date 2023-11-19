@@ -58,3 +58,9 @@ Nel file app/jni/src/Android.mk ho messo tutti i sorgenti che vengono compilati 
 L'applicazione Android parte dai file in java messi all'interno di src/main/java.
 Qui viene instaziata la SDLActivity che al suo interno crea la SDL_Surface dove viene eseguito
 il game loop del solitario.
+
+## SDL_Images & Co.
+Ho bisogno anche delle altre librerie. 
+1) SDL_Image: https://github.com/libsdl-org/SDL_image/releases
+2) SDL_mixer: https://github.com/libsdl-org/SDL_mixer/releases
+3) SDL_ttf: https://github.com/libsdl-org/SDL_ttf/releases

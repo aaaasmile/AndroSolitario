@@ -2,4 +2,9 @@ build
 gradle
 .gradle
 app/jni/SDL
+app/jni/SDL_Mixer
+app/jni/SDL_Image
+app/jni/SDL_ttf
+app/jni/harfbuzz
+app/jni/freetype
 *.o
