@@ -43,7 +43,8 @@ LOCAL_SRC_FILES := $(APP_PATH)/Main.cpp \
             $(COMPGFX_PATH)/MesgBoxGfx.cpp \
             $(COMPGFX_PATH)/LabelGfx.cpp
 
-LOCAL_SHARED_LIBRARIES := SDL2 SDL2_ttf SDL2_mixer SDL2_image
+LOCAL_SHARED_LIBRARIES := SDL2 SDL2_ttf SDL2_mixer SDL2_image 
+LOCAL_STATIC_LIBRARIES := inimod
 
 LOCAL_LDLIBS := -lGLESv1_CM -lGLESv2 -lOpenSLES -llog -landroid
 

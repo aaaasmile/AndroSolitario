@@ -1,13 +1,14 @@
 
-LOCAL_MODULE := libini_static
-LOCAL_MODULE_FILENAME := libini
+# Save the local path
+INI_LOCAL_PATH := $(call my-dir)
+include $(CLEAR_VARS)
 
-LOCAL_C_INCLUDES := $(LOCAL_PATH)
+LOCAL_MODULE := inimod
 
-LOCAL_SRC_FILES := headings.h \
-                   ini.cpp \
-				   ini.h \
-				   keys.h \
-				   list.h	
+LOCAL_C_INCLUDES = \
+    $(INI_LOCAL_PATH)/ \
+	$(INI_LOCAL_PATH)/include \
+
+LOCAL_SRC_FILES := $(INI_LOCAL_PATH)/ini.cpp
 
 include $(BUILD_STATIC_LIBRARY)

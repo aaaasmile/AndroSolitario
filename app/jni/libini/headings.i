@@ -27,7 +27,7 @@
 #endif
 
 #ifndef HAVE_STRCASECMP
-#define strcasecmp stricmp
+#define strcasecmp strcmp
 #endif
 
 /********************************************************************************************************************
