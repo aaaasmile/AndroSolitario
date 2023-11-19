@@ -17,7 +17,7 @@ e devono essere presenti nel progetto con tutti i suoi sorgenti.
 ## Target RedMe Note 11
 Il device che utilizzo ha un Cortex-A73 (Snapdragon 680) un arm 64 bit v8.
 Il RedMe, per il deployment, deve essere collegato ed accessibile in WSL2 con il cavo USB.
-In Admin Powershell uso
+In Admin Powershell uso (non più, vedi sotto)
 
     usbipd wsl list
     usbipd wsl attach --busid 5-1 --distribution UbuntuMinitoro
@@ -101,6 +101,8 @@ Quando collego il telefono, oppure faccio un reboot di windows11 con il telefono
 apro file explorer riesco a vedere RedMiNote 11. In windows Explorer posso poi navigare su tutti i files.
 Seguendo questo link https://stackoverflow.com/questions/60166965/adb-device-list-empty-using-wsl2,
 in fondo al post viene elencato un modo per far funzionare adb devices su ubuntu-minitoro.
+Su telefono ho abilitato il transfer USB dei files, che mi fa comparire il telefono in windows explorer.
+
 Per prima cosa apro una powershell->cmd in D:\Xiaomi\platform-tools_r34.0.5-windows\platform-tools e lancio:
 
     adb kill-server
@@ -124,3 +126,4 @@ Ora posso usare:
     ./gradlew compileDebugSources
     ./gradlew installDebug
     adb shell am start -n org.libsdl.app/.SDLActivity
+Alla fine ho deinstallato usbipd.
