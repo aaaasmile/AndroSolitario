@@ -140,9 +140,24 @@ che funziona splendidamente. Per usare un file di log, come utilizzo in msys2, c
 delle difficoltà nel creare il file di log (vedi https://www.gamedev.net/forums/topic/690641-android-ndk-logging-with-sdl/), anche se non l'ho provato.
 SDL_Log mi sembra, per ora, superfluo.
 
+## Android.mk
+Per capire la sintassi di Andoid.mk vedi il link ufficiale https://developer.android.com/ndk/guides/android_mk.
+Esso serve per compilare con ndk. In Visual Code c_cpp_properties.json ho messo il path dove si trovano gli 
+include utilizzati da ndk (esempio <android/log.h>).
+Per esempio non so come definire due defines che mi vanno ad influenzare WinTypeGlobal.h e il meccanismo
+di Trace. Esse si possono definire con 
+    
+    LOCAL_CFLAGS += -D<mia def>   
+con una sequenza multipla separata da spazi.
+
 ## Problemi del Solitario su Android
 Il primo errore che ricevo è: 
 SoltarioIta: Fatal: Cannot create dir (null)/.solitario
+
+## Spegnere lo Smartphone via adb
+
+    adb reboot -p
+Che spegne il device istantaneamente.
 
 ## Compile, Deploy, Start
 
