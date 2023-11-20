@@ -1,6 +1,9 @@
 #ifndef _WINTYPEGLOBAL__H_
 #define _WINTYPEGLOBAL__H_
 
+#define TRACEINSERVICE
+#define _DEBUG
+
 #if _MSC_VER > 1000
 #pragma warning(disable : 4786)
 #pragma warning(disable : 4996)

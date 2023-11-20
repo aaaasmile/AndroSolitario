@@ -127,3 +127,13 @@ Ora posso usare:
     ./gradlew installDebug
     adb shell am start -n org.libsdl.app/.SDLActivity
 Alla fine ho deinstallato usbipd.
+Ho creato start_adb_server.bat in D:\Xiaomi\platform-tools_r34.0.5-windows\platform-tools e 
+./start_adb_service.sh nel WSL di Minitoro per sveltire un po' la prassi.
+
+## Logs
+Ho messo nel progetto il file AndroTrace.cpp che esegue un redirect dei TRACE su
+__android_log_print. Poi in un terminal si può usare logcat
+
+    adb logcat -s "SoltarioIta"
+che funziona splendidamente. Per usare un file di log, come utilizzo in msys2, ci dovrebbero essere
+delle difficoltà nel creare il file di log (vedi https://www.gamedev.net/forums/topic/690641-android-ndk-logging-with-sdl/), anche se non l'ho provato.

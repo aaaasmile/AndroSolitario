@@ -7,21 +7,21 @@
 
 int main(int argc, char* argv[]) {
     TRACE("*** [Main] - start *** \n");
-
-    AppGfx* app = new AppGfx();
-    app->ParseCmdLine(argc, argv);
-    LPErrInApp err = app->Init();
-    if (err != NULL) {
-        fprintf(stderr, "Init error: %s\n", err->ErrorText.c_str());
-        TRACE("Fatal: %s\n", err->ErrorText.c_str());
-        exit(1);
-    }
-    err = app->MainLoop();
-    if (err != NULL) {
-        fprintf(stderr, "App error: %s\n", err->ErrorText.c_str());
-        TRACE("Fatal: %s\n", err->ErrorText.c_str());
-        exit(1);
-    }
-    TRACE("App terminated with success\n");
+    //SDL_Log("This is a log from app - main and error should be empty: %s\n", SDL_GetError());
+    // AppGfx* app = new AppGfx();
+    // app->ParseCmdLine(argc, argv);
+    // LPErrInApp err = app->Init();
+    // if (err != NULL) {
+    //     fprintf(stderr, "Init error: %s\n", err->ErrorText.c_str());
+    //     TRACE("Fatal: %s\n", err->ErrorText.c_str());
+    //     exit(1);
+    // }
+    // err = app->MainLoop();
+    // if (err != NULL) {
+    //     fprintf(stderr, "App error: %s\n", err->ErrorText.c_str());
+    //     TRACE("Fatal: %s\n", err->ErrorText.c_str());
+    //     exit(1);
+    // }
+    // TRACE("App terminated with success\n");
     return EXIT_SUCCESS;
 }

@@ -187,6 +187,8 @@ MenuItemEnum previousMenu(MenuItemEnum currMenu) {
             return MenuItemEnum::MENU_HELP;
         case MenuItemEnum::QUIT:
             return MenuItemEnum::MENU_HIGHSCORE;
+        default:
+            return currMenu;
     }
     return currMenu;
 }
@@ -205,6 +207,8 @@ MenuItemEnum nextMenu(MenuItemEnum currMenu) {
             return MenuItemEnum::QUIT;
         case MenuItemEnum::QUIT:
             return MenuItemEnum::QUIT;
+        default:
+            return currMenu;
     }
     return currMenu;
 }

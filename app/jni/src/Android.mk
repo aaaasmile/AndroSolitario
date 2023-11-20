@@ -8,12 +8,13 @@ SDL_PATH := ../SDL
 SDLIMAGE_PATH := ../SDL_Image
 SDLMIXER_PATH := ../SDL_Mixer
 SDLTTF_PATH := ../SDL_ttf
+LIBINI_PATH := ../libini
 APP_PATH := ./App
 COMPGFX_PATH := ./CompGfx
 GAMEGFX_PATH := ./GameGfx
-LIBINI_PATH := ../libini
+ANDRO_SPEC_PATH := ./Android
 
-LOCAL_C_INCLUDES := $(LOCAL_PATH)/$(SDL_PATH)/include $(LOCAL_PATH)/$(SDLIMAGE_PATH) $(LOCAL_PATH)/$(SDLMIXER_PATH)/include $(LOCAL_PATH)/$(SDLTTF_PATH) $(LOCAL_PATH)/$(APP_PATH) $(LOCAL_PATH)/$(COMPGFX_PATH) $(LOCAL_PATH)/$(GAMEGFX_PATH) $(LOCAL_PATH)/$(LIBINI_PATH)/include
+LOCAL_C_INCLUDES := $(LOCAL_PATH)/$(SDL_PATH)/include $(LOCAL_PATH)/$(SDLIMAGE_PATH) $(LOCAL_PATH)/$(SDLMIXER_PATH)/include $(LOCAL_PATH)/$(SDLTTF_PATH) $(LOCAL_PATH)/$(APP_PATH) $(LOCAL_PATH)/$(COMPGFX_PATH) $(LOCAL_PATH)/$(GAMEGFX_PATH) $(LOCAL_PATH)/$(LIBINI_PATH)/include $(LOCAL_PATH)/$(ANDRO_SPEC_PATH)
 
 # Add your application source files here...
 LOCAL_SRC_FILES := $(APP_PATH)/Main.cpp \
@@ -41,7 +42,8 @@ LOCAL_SRC_FILES := $(APP_PATH)/Main.cpp \
             $(COMPGFX_PATH)/CheckBoxGfx.cpp \
             $(COMPGFX_PATH)/ComboGfx.cpp \
             $(COMPGFX_PATH)/MesgBoxGfx.cpp \
-            $(COMPGFX_PATH)/LabelGfx.cpp
+            $(COMPGFX_PATH)/LabelGfx.cpp \
+            $(ANDRO_SPEC_PATH)/AndroTrace.cpp
 
 LOCAL_SHARED_LIBRARIES := SDL2 SDL2_ttf SDL2_mixer SDL2_image 
 LOCAL_STATIC_LIBRARIES := inimod
