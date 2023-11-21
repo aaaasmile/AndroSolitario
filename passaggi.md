@@ -12,7 +12,12 @@ Le librerie da compilare sono:
 - "SDL2_mixer"
 - "SDL2_ttf"
 
-e devono essere presenti nel progetto con tutti i suoi sorgenti.
+e devono essere presenti nel progetto con tutti i suoi sorgenti. Come IDE uso Visual Code. Ho installato l'SDK di
+Android, NDK e gradle (Prerequisiti: openjdk-11-jdk ant android-sdk-platform-tools-common). 
+Con sdkmanager a liena di comando ho scaricato:
+
+    sdkmanager "platforms;android-33" "build-tools;33.0.2"
+sdkmanager fa parte di commandlinetools-linux-9477386_latest.zip che ho scaricato da https://developer.android.com/studio#downloads dalla sezione _Command line tools only_.
 
 ## Target RedMe Note 11
 Il device che utilizzo ha un Cortex-A73 (Snapdragon 680) un arm 64 bit v8.
@@ -27,14 +32,14 @@ In WSL
     lsusb
     Bus 001 Device 006: ID 2717:ff48 Xiaomi Inc. Mi/Redmi series (MTP + ADB)
 
-Per compilare
+Per compilare (meglio vedi l'ultima sezione)
 Nel terminal di Visual Code:
 
     export ANDROID_SDK_ROOT=$HOME/android/
 	export PATH=${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin:${ANDROID_SDK_ROOT}/platform-tools:${PATH}
 	sudo $ANDROID_SDK_ROOT/platform-tools/adb start-server
 	adb devices
-Qui l'output deve essere qualcosa di simile a questo:
+Qui l'output deve essere qualcosa di simile a questo (la lista vuota non va):
 
     List of devices attached
     f5c24a47        device
@@ -85,23 +90,23 @@ che ho risolto usando
 nel file build.gradle. Nota come in questo file ogni argomento aggiuntivo viene semplicemente inserito
 sotto.
 Per compilare la libini a livello statico non è stato affatto semplice. Più che altro è la
-creazione del file Andorid.mk che non è così intuitiva partendo dal file CLanguages.txt.
-Ho dovuto anche cambiare il nome del modulo in inimod per evitare magie sul nome libini.
+creazione del file Andorid.mk che non è così intuitiva partendo dal mio file CLanguages.txt del progetto solitario di mysys2.
+Ho dovuto anche cambiare il nome del modulo in inimod per evitare magie sul nome libini (prefisso automatico lib).
 Ho incluso solo il file cpp per via del suffix. La direttiva include $(BUILD_STATIC_LIBRARY)
 compila la libreria in modo statico. Essa va poi referenziato con LOCAL_STATIC_LIBRARIES := inimod,
-mentre tutte le altre librerie di SDL sono qui LOCAL_SHARED_LIBRARIES := SDL2 SDL2_ttf SDL2_mixer SDL2_image.
+mentre tutte le altre librerie di SDL sono qui: LOCAL_SHARED_LIBRARIES := SDL2 SDL2_ttf SDL2_mixer SDL2_image.
 
 ## Adb Device è una lista vuota
 Se il comando
 
     adb devices
-fornisce una lista vuota, mentre usbipd wsl attach funziona così come lsusb, allora è meglio
+fornisce una lista vuota con _usbipd wsl attach_ che funziona così come il comando lsusb, allora è meglio
 cercare un altra soluzione. 
-Quando collego il telefono, oppure faccio un reboot di windows11 con il telefono collegato, se
+Quando collego il teleRedMi, oppure faccio un reboot di windows11 con il RedMi collegato, se
 apro file explorer riesco a vedere RedMiNote 11. In windows Explorer posso poi navigare su tutti i files.
 Seguendo questo link https://stackoverflow.com/questions/60166965/adb-device-list-empty-using-wsl2,
 in fondo al post viene elencato un modo per far funzionare adb devices su ubuntu-minitoro.
-Su telefono ho abilitato il transfer USB dei files, che mi fa comparire il telefono in windows explorer.
+Sul RedMe ho abilitato il transfer USB dei files, che mi fa comparire il telefono _RedMe 11_ in windows explorer.
 
 Per prima cosa apro una powershell->cmd in D:\Xiaomi\platform-tools_r34.0.5-windows\platform-tools e lancio:
 
@@ -122,29 +127,31 @@ List of devices attached
 f5c24a47        device
 Il tutto senza usare usbipd, che non mi sembra molto stabile, in quanto funziona solo a tratti.
 Ora posso compilare ed eseguire un deployment (vedi sotto).
-Alla fine ho deinstallato usbipd.
-Ho creato in D:\Xiaomi\platform-tools_r34.0.5-windows\platform-tools
+Alla fine ho deinstallato usbipd perché proprio non mi ha convinto (quando è attivo non mi funzionano i tools in windows).
+Ho creato in D:\Xiaomi\platform-tools_r34.0.5-windows\platform-tools il bat:
     
     start_adb_server.bat 
- Poi su MiniToro nel WSL di Minitoro su ~:
+ Poi su MiniToro nel WSL di Minitoro su ~ lo script:
     
     ./start_adb_service.sh 
-per sveltire un po' la prassi iniziale.
+per sveltire un po' la prassi iniziale. Sono due finsestre sempre aperte in sottofondo, ma
+la comunicazione col device attaccato al cavo USB funziona che è una meraviglia.
 
 ## Logs
-Ho messo nel progetto il file AndroTrace.cpp che esegue un redirect dei TRACE su
+Far funzionare un progetto come Solitario su Android senza traces è una chimera.
+Ho creato nel progetto il file AndroTrace.cpp che esegue un redirect dei TRACE su
 __android_log_print. Poi in un terminal si può usare logcat
 
     adb logcat -s "SoltarioIta"
 che funziona splendidamente. Per usare un file di log, come utilizzo in msys2, ci dovrebbero essere
 delle difficoltà nel creare il file di log (vedi https://www.gamedev.net/forums/topic/690641-android-ndk-logging-with-sdl/), anche se non l'ho provato.
-SDL_Log mi sembra, per ora, superfluo.
+SDL_Log mi sembra, per ora, superfluo anche perché non so bene che cosa faccia.
 
 ## Android.mk
-Per capire la sintassi di Andoid.mk vedi il link ufficiale https://developer.android.com/ndk/guides/android_mk.
-Esso serve per compilare con ndk. In Visual Code c_cpp_properties.json ho messo il path dove si trovano gli 
+Per capire la sintassi di Andoid.mk ho usato il link ufficiale https://developer.android.com/ndk/guides/android_mk.
+Esso serve per compilare i sorgenti c/cpp con ndk. In Visual Code c_cpp_properties.json ho messo il path dove si trovano gli 
 include utilizzati da ndk (esempio <android/log.h>).
-Per esempio non so come definire due defines che mi vanno ad influenzare WinTypeGlobal.h e il meccanismo
+Per esempio, non so come definire due defines che mi vanno ad influenzare WinTypeGlobal.h e il meccanismo
 di Trace. Esse si possono definire con 
     
     LOCAL_CFLAGS += -D<mia def>   
