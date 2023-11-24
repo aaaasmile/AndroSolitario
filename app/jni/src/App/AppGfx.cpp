@@ -291,7 +291,33 @@ LPErrInApp CopyFile(const char *src_path_raw, const char *dst_path_raw) {
     std::string str_src = src_path_raw;
     std::string str_dst = dst_path_raw;
     TRACE("Copy file %s into %s\n", str_src.c_str(), str_dst.c_str());
+#ifdef ANDROID
+    SDL_RWops *oldFile = SDL_RWFromFile(str_src.c_str(), "rb");
+    if (oldFile == NULL) {
+        return ERR_UTIL::ErrorCreate("Uable to read file %s", str_src.c_str());
+    }
+    SDL_RWops *newFile = SDL_RWFromFile(str_dst.c_str(), "wb");
 
+    if (!newFile)
+        return ERR_UTIL::ErrorCreate("Unable to create dst file %s, %s",
+                                     str_dst.c_str(), SDL_GetError());
+
+    char c;
+    int size = SDL_RWread(oldFile, &c, 1, 1);
+
+    while (size > 0) {
+        if (SDL_RWwrite(newFile, &c, 1, size) == 0) {
+            SDL_RWclose(oldFile);
+            SDL_RWclose(newFile);
+            return ERR_UTIL::ErrorCreate("Source file %s is empty",
+                                         str_src.c_str());
+        }
+        size = SDL_RWread(oldFile, &c, 1, 1);
+    }
+
+    SDL_RWclose(oldFile);
+    SDL_RWclose(newFile);
+#else
     struct stat st = {0};
     if (stat(str_src.c_str(), &st) == -1) {
         return ERR_UTIL::ErrorCreate("Source file %s not found",
@@ -302,7 +328,8 @@ LPErrInApp CopyFile(const char *src_path_raw, const char *dst_path_raw) {
     unsigned char buffer[4096];
     src_fd = open(str_src.c_str(), O_RDONLY);
     if (src_fd == -1) {
-        return ERR_UTIL::ErrorCreate("Cannot open file for read  %s", str_src.c_str());
+        return ERR_UTIL::ErrorCreate("Cannot open file for read  %s",
+                                     str_src.c_str());
     }
     dst_fd = open(str_dst.c_str(), O_CREAT | O_WRONLY | O_EXCL, 0666);
     if (dst_fd == -1) {
@@ -313,7 +340,8 @@ LPErrInApp CopyFile(const char *src_path_raw, const char *dst_path_raw) {
     while (1) {
         io_res = read(src_fd, buffer, 4096);
         if (io_res == -1) {
-            return ERR_UTIL::ErrorCreate("Error reading file %s.\n", str_src.c_str());
+            return ERR_UTIL::ErrorCreate("Error reading file %s.\n",
+                                         str_src.c_str());
         }
         n = io_res;
 
@@ -327,7 +355,8 @@ LPErrInApp CopyFile(const char *src_path_raw, const char *dst_path_raw) {
     }
     close(src_fd);
     close(dst_fd);
-
+#endif
+    TRACE("File %s created OK\n", str_dst.c_str());
     return NULL;
 }
 
@@ -351,7 +380,7 @@ LPErrInApp AppGfx::loadProfile() {
     snprintf(filepath, sizeof(filepath), "%s/%s", dirpath, g_lpszIniFileName);
 
     if (stat(filepath, &st) == -1) {
-        err = CopyFile(GAMESET::GetNameWithAssets(g_lpszDefaultIniFileName), filepath);
+        err = CopyFile(g_lpszDefaultIniFileName, filepath);
         if (err != NULL) {
             return err;
         }

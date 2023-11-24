@@ -157,10 +157,6 @@ di Trace. Esse si possono definire con
     LOCAL_CFLAGS += -D<mia def>   
 con una sequenza multipla separata da spazi.
 
-## Problemi del Solitario su Android
-Il primo errore che ricevo è: 
-SoltarioIta: Fatal: Cannot create dir (null)/.solitario
-
 ## Spegnere lo Smartphone via adb
 
     adb reboot -p
@@ -205,6 +201,23 @@ Le funzioni di SDL vanno bene. Per esempio per creare la directory .solitario us
 
     SDL_AndroidGetInternalStoragePath()
     Created dir /data/data/org.libsdl.app/files/.solitario
+    File /data/data/org.libsdl.app/files/.solitario/options.ini created OK
+Sembra che per le funzioni che accedono agli assets, vale a dire tutti i files e directories 
+della directory assets, sono accessibili dalle funzioni SDL senza alcun prefisso.
+Per creare una directory, oppure un file, bisogna invece usare SDL_AndroidGetInternalStoragePath().
+
+
+## Editor C++
+Uso Visual Code con il plugin c/c++. Esso formatta in modalità Visual studio di Default.
+Questo non è il mio modo preferito di formattare il codice, ma uso questa stringa 
+nella proprietà: C_Cpp:Clang_format_style
+
+    { BasedOnStyle: Google, UseTab: Never, IndentWidth: 4, TabWidth: 4, AllowShortIfStatementsOnASingleLine: false }
+
+## Problemi del Solitario su Android
+Questi sono i problemi e todo della conversione in Android.
+SoltarioIta: Fatal: Cannot create dir (null)/.solitario [DONE]
+Fatal: loadProfile: Ini file error /data/data/org.libsdl.app/files/.solitario/options.ini
 
 ## Compile, Deploy, Start
 

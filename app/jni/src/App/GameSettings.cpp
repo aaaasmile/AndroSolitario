@@ -57,8 +57,9 @@ const char* GAMESET::GetNameWithAssets(const char *src_path){
     snprintf(fpath, sizeof(fpath), "%s/%s", SDL_AndroidGetInternalStoragePath(), src_path);
     std::string fwithAsset = fpath;
     return fwithAsset.c_str();
-#endif
+#else
     return src_path;
+#endif
 }
 
 const char* GAMESET::GetHomeSolitarioFolder() {
