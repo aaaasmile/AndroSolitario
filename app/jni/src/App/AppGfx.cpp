@@ -309,8 +309,8 @@ LPErrInApp CopyFile(const char *src_path_raw, const char *dst_path_raw) {
         if (SDL_RWwrite(newFile, &c, 1, size) == 0) {
             SDL_RWclose(oldFile);
             SDL_RWclose(newFile);
-            return ERR_UTIL::ErrorCreate("Source file %s is empty",
-                                         str_src.c_str());
+            return ERR_UTIL::ErrorCreate("Unable to write into the file %s",
+                                         str_dst.c_str());
         }
         size = SDL_RWread(oldFile, &c, 1, 1);
     }
@@ -386,7 +386,7 @@ LPErrInApp AppGfx::loadProfile() {
         }
         TRACE("Default ini file created in %s\n", filepath);
     }
-    TRACE("Load option %s\n", filepath);
+    TRACE("Load options %s\n", filepath);
     ini_fd_t pIni = ini_open(filepath, "r", "#");
 
     if (pIni == NULL)
