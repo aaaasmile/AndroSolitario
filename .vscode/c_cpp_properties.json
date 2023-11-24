@@ -6,7 +6,7 @@
                 "${workspaceFolder}/**",
                 "/home/igor/android/ndk-bundle/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include"
             ],
-            "defines": [],
+            "defines": ["ANDROID", "TRACEINSERVICE", "_DEBUG"],
             "compilerPath": "/usr/bin/gcc",
             "cppStandard": "gnu++17",
             "intelliSenseMode": "linux-gcc-x64"

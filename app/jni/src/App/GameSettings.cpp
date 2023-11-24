@@ -1,4 +1,5 @@
 #include "GameSettings.h"
+#include <SDL.h>
 
 #include <string.h>
 #include <sys/stat.h>
@@ -50,10 +51,24 @@ const char* GAMESET::GetExeSolitarioFolder() {
     return _exeRootDir;
 }
 
+const char* GAMESET::GetNameWithAssets(const char *src_path){
+#ifdef ANDROID
+    char fpath[PATH_MAX];
+    snprintf(fpath, sizeof(fpath), "%s/%s", SDL_AndroidGetInternalStoragePath(), src_path);
+    std::string fwithAsset = fpath;
+    return fwithAsset.c_str();
+#endif
+    return src_path;
+}
+
 const char* GAMESET::GetHomeSolitarioFolder() {
     if (strlen(_settingsRootDir) > 0) {
         return _settingsRootDir;
     }
+#ifdef ANDROID
+    sprintf(_settingsRootDir, "%s/.solitario", SDL_AndroidGetInternalStoragePath());
+    return _settingsRootDir;
+#endif
 #ifdef WIN32
     sprintf(_settingsRootDir, "%s/%s/.solitario", getenv("HOMEDRIVE"),
             getenv("HOMEPATH"));
@@ -64,9 +79,9 @@ const char* GAMESET::GetHomeSolitarioFolder() {
 }
 
 LPErrInApp GAMESET::CreateHomeSolitarioFolderIfNotExists(bool& dirCreated) {
+    dirCreated = false;
     struct stat st = {0};
     int io_res;
-    dirCreated = false;
     GetHomeSolitarioFolder();
     if (stat(_settingsRootDir, &st) == -1) {
 #ifdef WIN32

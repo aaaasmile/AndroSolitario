@@ -166,10 +166,53 @@ SoltarioIta: Fatal: Cannot create dir (null)/.solitario
     adb reboot -p
 Che spegne il device istantaneamente.
 
+## Shell sul device
+
+    adb shell
+In questo modo si vede che non è possibile accedere a files sul device.
+
+## Profilo e File System
+Con adb si possono creare e spostare dei files tra wsl e il device. Per esempio creo un profilo 
+del mio package e poi lo scarico. Questa la sequenza:
+
+    adb shell cmd package dump-profiles org.libsdl.app
+    adb pull /data/misc/profman/org.libsdl.app-primary.prof.txt
+
+Sul mio device riesco a scrivere sulla directory /sdcard/Documents/ e in linea di principio su /sdcard
+Ora non so dove si trova l'eseguibile e neanche se gli assets sono copiati nella directory di deployment.
+Non sembra che il comando installDebug trasferisca anche gli assets, perlomeno non nella stessa directory
+dove si trova il programma.
+Se guardo il contenuto del file generato app-debug.apk si nota questa struttura:
+
+    app-debug
+    \assets
+        default_options.ini
+        \mazzi
+        \images
+        ...
+    \lib
+        \arm64-v8a
+            libmain.so
+            libSDL2.so
+            ...
+quindi per accedere al file default_options.ini bisogna aggiungere la directory assets.
+Il comando copy è qualcosa di simile a:
+
+    Copy file from assets/default_options.ini to /sdcard/Documents/.solitario/options.ini
+La funzione SDL_AndroidGetInternalStoragePath mi restituisce /data/data/org.libsdl.app/files/
+però non sembra esserci il file default_options.ini.
+Le funzioni di SDL vanno bene. Per esempio per creare la directory .solitario uso:
+
+    SDL_AndroidGetInternalStoragePath()
+    Created dir /data/data/org.libsdl.app/files/.solitario
+
 ## Compile, Deploy, Start
 
+    source ./setup_env.sh
     ./gradlew compileDebugSources
     ./gradlew installDebug
     adb shell am start -n org.libsdl.app/.SDLActivity
-
+    adb logcat -s "SoltarioIta"
+Nota il comando source. Esso viene usato in quanto le variabili definite rimangono definite all'interno
+dello script.
 

@@ -38,5 +38,6 @@ namespace GAMESET {
     const char* GetHomeSolitarioFolder();
     LPErrInApp CreateHomeSolitarioFolderIfNotExists(bool& dirCreated);
     const char* GetExeSolitarioFolder();
+    const char* GetNameWithAssets(const char *src_path);
 }
 #endif

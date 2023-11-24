@@ -287,25 +287,33 @@ void AppGfx::terminate() {
     SDL_Quit();
 }
 
-LPErrInApp CopyFile(const char *src_path, const char *dst_path) {
-    TRACE("Copy file from %s to %s\n", src_path, dst_path);
+LPErrInApp CopyFile(const char *src_path_raw, const char *dst_path_raw) {
+    std::string str_src = src_path_raw;
+    std::string str_dst = dst_path_raw;
+    TRACE("Copy file %s into %s\n", str_src.c_str(), str_dst.c_str());
+
+    struct stat st = {0};
+    if (stat(str_src.c_str(), &st) == -1) {
+        return ERR_UTIL::ErrorCreate("Source file %s not found",
+                                     str_src.c_str());
+    }
 
     int src_fd, dst_fd, n, io_res;
     unsigned char buffer[4096];
-    src_fd = open(src_path, O_RDONLY);
+    src_fd = open(str_src.c_str(), O_RDONLY);
     if (src_fd == -1) {
-        return ERR_UTIL::ErrorCreate("Cannot open file for read  %s", src_path);
+        return ERR_UTIL::ErrorCreate("Cannot open file for read  %s", str_src.c_str());
     }
-    dst_fd = open(dst_path, O_CREAT | O_WRONLY | O_EXCL, 0666);
+    dst_fd = open(str_dst.c_str(), O_CREAT | O_WRONLY | O_EXCL, 0666);
     if (dst_fd == -1) {
         return ERR_UTIL::ErrorCreate("Cannot open file for write  %s",
-                                     dst_path);
+                                     str_dst.c_str());
     }
 
     while (1) {
         io_res = read(src_fd, buffer, 4096);
         if (io_res == -1) {
-            return ERR_UTIL::ErrorCreate("Error reading file %s.\n", src_path);
+            return ERR_UTIL::ErrorCreate("Error reading file %s.\n", str_src.c_str());
         }
         n = io_res;
 
@@ -327,6 +335,7 @@ LPErrInApp AppGfx::loadProfile() {
     struct stat st = {0};
     LPErrInApp err;
     bool dirCreated;
+    TRACE("Load profile\n");
 
     char dirpath[PATH_MAX];
     char filepath[PATH_MAX + strlen(g_lpszIniFileName)];
@@ -336,13 +345,13 @@ LPErrInApp AppGfx::loadProfile() {
         return err;
     }
     if (dirCreated) {
-        TRACE("Create dir %s\n", dirpath);
+        TRACE("Created dir %s\n", dirpath);
     }
     _p_GameSettings->SettingsDir = dirpath;
     snprintf(filepath, sizeof(filepath), "%s/%s", dirpath, g_lpszIniFileName);
 
     if (stat(filepath, &st) == -1) {
-        err = CopyFile(g_lpszDefaultIniFileName, filepath);
+        err = CopyFile(GAMESET::GetNameWithAssets(g_lpszDefaultIniFileName), filepath);
         if (err != NULL) {
             return err;
         }
