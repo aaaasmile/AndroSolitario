@@ -1,11 +1,5 @@
 build
 gradle
 .gradle
-app/jni/SDL
-app/jni/SDL_mixer
-app/jni/SDL_image
-app/jni/SDL_ttf
-app/jni/harfbuzz
-app/jni/freetype
 app/src/main/assets
 *.o
