@@ -549,7 +549,9 @@ LPErrInApp AppGfx::MainLoop() {
 
     MenuMgr *pMenuMgr = new MenuMgr();
     MenuDelegator delegator = prepMenuDelegator();
-    pMenuMgr->Initialize(_p_Screen, _p_sdlRenderer, delegator);
+    err = pMenuMgr->Initialize(_p_Screen, _p_sdlRenderer, delegator);
+    if (err != NULL)
+        goto error;
 
     // set main menu
     _histMenu.push(MenuItemEnum::QUIT);

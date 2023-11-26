@@ -16,7 +16,7 @@
 
 static const char* g_lpszMsgUrl = "Go to invido.it";
 static const char* g_lpszVersion = "Ver 2.0.2 20230919";
-static const char* g_lpszIniFontVera = "font/vera.ttf";
+static const char* g_lpszIniFontVera = DATA_PREFIX "font/vera.ttf";
 
 static const SDL_Color g_color_on = {253, 252, 250};
 static const SDL_Color g_color_off = {128, 128, 128};
@@ -36,6 +36,7 @@ MenuMgr::MenuMgr() {
     _p_SceneBackground = 0;
     _bMouseInside = false;
     _p_homeUrl = NULL;
+    _p_LabelVersion = NULL;
 }
 
 MenuMgr::~MenuMgr() {
@@ -77,7 +78,7 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
                                          SDL_TEXTUREACCESS_STREAMING,
                                          _p_Screen->w, _p_Screen->h);
     if (_p_ScreenTexture == NULL) {
-        return ERR_UTIL::ErrorCreate("Cannot create texture: %s\n",
+        return ERR_UTIL::ErrorCreate("MenuMgr: Cannot create texture: %s\n",
                                      SDL_GetError());
     }
 
@@ -95,7 +96,7 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
     // link to invido.it
     _p_fontVeraUnderscore = TTF_OpenFont(g_lpszIniFontVera, 11);
     if (_p_fontVeraUnderscore == 0) {
-        return ERR_UTIL::ErrorCreate("Unable to load font %s, error: %s\n",
+        return ERR_UTIL::ErrorCreate("MenuMgr: Unable to load font %s, error: %s\n",
                                      g_lpszIniFontVera, SDL_GetError());
     }
     TTF_SetFontStyle(_p_fontVeraUnderscore, TTF_STYLE_UNDERLINE);

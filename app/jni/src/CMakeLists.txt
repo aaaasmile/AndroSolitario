@@ -59,7 +59,7 @@ if(CMAKE_SYSTEM MATCHES Windows)
     endif()
 else()
     message(STATUS "Target system is: " ${CMAKE_SYSTEM})
-    target_compile_definitions(${PROJECT_NAME} PRIVATE TRACEINSERVICE)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE TRACEINSERVICE _DEBUG)
     target_link_libraries(${PROJECT_NAME} SDL2 SDL2_image SDL2_mixer SDL2_ttf)
 endif()
 
