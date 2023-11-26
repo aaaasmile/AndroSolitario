@@ -35,11 +35,11 @@ STRING EntryTraceDetail::ToString() {
         strOnlyFileName = m_strFileName;
     }
     if (m_iID >= 0) {
-        sprintf(buff, "%d, %d, %s, %s, %d, %s", m_ulTimeStamp, m_iID,
+        sprintf(buff, "%d, %d, %s, %s, %d, %s", (int)m_ulTimeStamp, m_iID,
                 alpszDetTypeName[m_eTrType], strOnlyFileName.c_str(),
                 m_iLineNumber, m_strComment.c_str());
     } else {
-        sprintf(buff, "[%d][%s]%s", m_ulTimeStamp, alpszDetTypeName[m_eTrType],
+        sprintf(buff, "[%d][%s]%s", (int)m_ulTimeStamp, alpszDetTypeName[m_eTrType],
                 m_strComment.c_str());
     }
 

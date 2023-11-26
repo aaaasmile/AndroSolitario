@@ -54,7 +54,7 @@ void MusicManager::Init() {
 }
 
 LPErrInApp MusicManager::LoadMusicRes() {
-    STRING exeDirPath = GAMESET::GetExeSolitarioFolder();
+    STRING exeDirPath = GAMESET::GetExeAppFolder();
 
     for (int i = 0; i < NUM_OF_SOUNDS; i++) {
         STRING strFileTmp2 = lpszaSound_filenames[i];

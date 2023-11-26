@@ -17,6 +17,7 @@ public:
     Languages::eLangId CurrentLanguage;
     bool MusicEnabled;
     std::string SettingsDir;
+    std::string GameName;
     BackgroundTypeEnum BackgroundType;
 
 public:
@@ -25,19 +26,23 @@ public:
         Level = 1;
         DeckTypeVal.SetType(eDeckType::PIACENTINA);
         CurrentLanguage = Languages::LANG_ITA;
-        MusicEnabled = false;
+        MusicEnabled = true;
         SettingsDir = "";
         BackgroundType = BackgroundTypeEnum::Commessaggio;
     }
+    LPErrInApp LoadSettings();
+    LPErrInApp SaveSettings();
+private:
+    void setSettingFileName();
 };
 
 typedef GameSettings* LPGameSettings;
 
 namespace GAMESET {
     LPGameSettings GetSettings();
-    const char* GetHomeSolitarioFolder();
-    LPErrInApp CreateHomeSolitarioFolderIfNotExists(bool& dirCreated);
-    const char* GetExeSolitarioFolder();
+    const char* GetHomeFolder();
+    LPErrInApp CreateHomeFolderIfNotExists(bool& dirCreated);
+    const char* GetExeAppFolder();
     const char* GetNameWithAssets(const char *src_path);
 }
 #endif

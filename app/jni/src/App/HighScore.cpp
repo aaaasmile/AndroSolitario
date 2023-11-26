@@ -11,7 +11,7 @@
 
 using namespace std;
 
-static const char* g_lpszScore = "solitario_score.bin";
+
 static char g_filepath[1024];
 
 HighScore::HighScore() {
@@ -30,9 +30,13 @@ HighScore::HighScore() {
 
 LPErrInApp HighScore::Save() {
     LPGameSettings pGameSettings = GAMESET::GetSettings();
+    if (pGameSettings->SettingsDir == "" || pGameSettings->GameName == "") {
+        return ERR_UTIL::ErrorCreate(
+            "User dir for high score is not defined");
+    }
     
-    snprintf(g_filepath, sizeof(g_filepath), "%s/%s",
-             pGameSettings->SettingsDir.c_str(), g_lpszScore);
+    snprintf(g_filepath, sizeof(g_filepath), "%s/%s-score.bin",
+             pGameSettings->SettingsDir.c_str(), pGameSettings->GameName.c_str());
     TRACE("Save high score file %s\n", g_filepath);
 
     SDL_RWops* dst = SDL_RWFromFile(g_filepath, "wb");
@@ -97,8 +101,8 @@ LPErrInApp HighScore::SaveScore(int score, int numCard) {
 LPErrInApp HighScore::Load() {
     LPGameSettings pGameSettings = GAMESET::GetSettings();
     
-    snprintf(g_filepath, sizeof(g_filepath), "%s/%s",
-             pGameSettings->SettingsDir.c_str(), g_lpszScore);
+    snprintf(g_filepath, sizeof(g_filepath), "%s/%s-score.bin",
+             pGameSettings->SettingsDir.c_str(), pGameSettings->GameName.c_str());
     TRACE("Load high score file %s\n", g_filepath);
     SDL_RWops* src = SDL_RWFromFile(g_filepath, "rb");
     if (src == 0) {

@@ -28,16 +28,8 @@
 
 #include "Credits.h"
 #include "Fading.h"
-#include "libini.h"
 
-static const char *g_lpszIniFileName = "options.ini";
-static const char *g_lpszDefaultIniFileName = DATA_PREFIX "default_options.ini";
 static const char *g_lpszHelpFileName = DATA_PREFIX "solitario.pdf";
-static const char *g_lpszSectAll = "global";
-static const char *g_lpszKeyLang = "Language";
-static const char *g_lpszKeyDeck = "DeckCurrent";
-static const char *g_lpszKeyMusic = "Musicenabled";
-static const char *g_lpszKeyBackground = "Background";
 
 static const char *g_lpszIconProgFile = DATA_PREFIX "images/icona_asso.bmp";
 static const char *g_lpszTitleFile = DATA_PREFIX "images/title.png";
@@ -67,8 +59,9 @@ AppGfx::~AppGfx() { terminate(); }
 
 LPErrInApp AppGfx::Init() {
     TRACE("Init App\n");
-    LPCSTR exeDirPath = GAMESET::GetExeSolitarioFolder();
+    LPCSTR exeDirPath = GAMESET::GetExeAppFolder();
     TRACE("Exe directory is %s\n", exeDirPath);
+    _p_GameSettings->GameName = "Solitario";
 #ifdef WIN32
     if (chdir(exeDirPath) < 0) {
         return ERR_UTIL::ErrorCreate("Unable to change to the exe directory");
@@ -93,7 +86,7 @@ LPErrInApp AppGfx::Init() {
         return err;
     }
 
-    _p_MusicManager = new MusicManager;
+    _p_MusicManager = new MusicManager();
     _p_MusicManager->Init();
 
     _p_HighScore = new HighScore();
@@ -200,9 +193,9 @@ LPErrInApp AppGfx::createWindow() {
         flagwin = SDL_WINDOW_SHOWN;
     }
 
-    _p_Window = SDL_CreateWindow("Solitario", SDL_WINDOWPOS_UNDEFINED,
-                                 SDL_WINDOWPOS_UNDEFINED, _iScreenW, _iScreenH,
-                                 flagwin);
+    _p_Window = SDL_CreateWindow(
+        _p_GameSettings->GameName.c_str(), SDL_WINDOWPOS_UNDEFINED,
+        SDL_WINDOWPOS_UNDEFINED, _iScreenW, _iScreenH, flagwin);
     if (_p_Window == NULL) {
         return ERR_UTIL::ErrorCreate("Error SDL_CreateWindow: %s\n",
                                      SDL_GetError());
@@ -288,89 +281,11 @@ void AppGfx::terminate() {
     SDL_Quit();
 }
 
-LPErrInApp CopyFile(const char *src_path_raw, const char *dst_path_raw) {
-    std::string str_src = src_path_raw;
-    std::string str_dst = dst_path_raw;
-    TRACE("Copy file %s into %s\n", str_src.c_str(), str_dst.c_str());
-#ifdef ANDROID
-    SDL_RWops *oldFile = SDL_RWFromFile(str_src.c_str(), "rb");
-    if (oldFile == NULL) {
-        return ERR_UTIL::ErrorCreate("Uable to read file %s", str_src.c_str());
-    }
-    SDL_RWops *newFile = SDL_RWFromFile(str_dst.c_str(), "wb");
-
-    if (!newFile)
-        return ERR_UTIL::ErrorCreate("Unable to create dst file %s, %s",
-                                     str_dst.c_str(), SDL_GetError());
-
-    char c;
-    int size = SDL_RWread(oldFile, &c, 1, 1);
-
-    while (size > 0) {
-        if (SDL_RWwrite(newFile, &c, 1, size) == 0) {
-            SDL_RWclose(oldFile);
-            SDL_RWclose(newFile);
-            return ERR_UTIL::ErrorCreate("Unable to write into the file %s",
-                                         str_dst.c_str());
-        }
-        size = SDL_RWread(oldFile, &c, 1, 1);
-    }
-
-    SDL_RWclose(oldFile);
-    SDL_RWclose(newFile);
-#else
-    struct stat st = {0};
-    if (stat(str_src.c_str(), &st) == -1) {
-        return ERR_UTIL::ErrorCreate("Source file %s not found",
-                                     str_src.c_str());
-    }
-
-    int src_fd, dst_fd, n, io_res;
-    unsigned char buffer[4096];
-    src_fd = open(str_src.c_str(), O_RDONLY);
-    if (src_fd == -1) {
-        return ERR_UTIL::ErrorCreate("Cannot open file for read  %s",
-                                     str_src.c_str());
-    }
-    dst_fd = open(str_dst.c_str(), O_CREAT | O_WRONLY | O_EXCL, 0666);
-    if (dst_fd == -1) {
-        return ERR_UTIL::ErrorCreate("Cannot open file for write  %s",
-                                     str_dst.c_str());
-    }
-
-    while (1) {
-        io_res = read(src_fd, buffer, 4096);
-        if (io_res == -1) {
-            return ERR_UTIL::ErrorCreate("Error reading file %s.\n",
-                                         str_src.c_str());
-        }
-        n = io_res;
-
-        if (n == 0)
-            break;
-
-        io_res = write(dst_fd, buffer, n);
-        if (io_res == -1) {
-            return ERR_UTIL::ErrorCreate("Error writing to file.\n");
-        }
-    }
-    close(src_fd);
-    close(dst_fd);
-#endif
-    TRACE("File %s created OK\n", str_dst.c_str());
-    return NULL;
-}
-
 LPErrInApp AppGfx::loadProfile() {
-    struct stat st = {0};
-    LPErrInApp err;
     bool dirCreated;
-    TRACE("Load profile\n");
-
     char dirpath[PATH_MAX];
-    char filepath[PATH_MAX + strlen(g_lpszIniFileName)];
-    snprintf(dirpath, sizeof(dirpath), "%s", GAMESET::GetHomeSolitarioFolder());
-    err = GAMESET::CreateHomeSolitarioFolderIfNotExists(dirCreated);
+    snprintf(dirpath, sizeof(dirpath), "%s", GAMESET::GetHomeFolder());
+    LPErrInApp err = GAMESET::CreateHomeFolderIfNotExists(dirCreated);
     if (err != NULL) {
         return err;
     }
@@ -378,96 +293,14 @@ LPErrInApp AppGfx::loadProfile() {
         TRACE("Created dir %s\n", dirpath);
     }
     _p_GameSettings->SettingsDir = dirpath;
-    snprintf(filepath, sizeof(filepath), "%s/%s", dirpath, g_lpszIniFileName);
 
-    if (stat(filepath, &st) == -1) {
-        err = CopyFile(g_lpszDefaultIniFileName, filepath);
-        if (err != NULL) {
-            return err;
-        }
-        TRACE("Default ini file created in %s\n", filepath);
-    }
-    TRACE("Load options %s\n", filepath);
-    ini_fd_t pIni = ini_open(filepath, "r", "#");
-
-    if (pIni == NULL)
-        return ERR_UTIL::ErrorCreate("loadProfile: Ini file error %s",
-                                     filepath);
-
-    int iVal;
-
-    // deck type
-    iVal = _p_GameSettings->DeckTypeVal.GetTypeIndex();
-    if (pIni) {
-        ini_locateHeading(pIni, g_lpszSectAll);
-        ini_locateKey(pIni, g_lpszKeyDeck);
-        ini_readInt(pIni, &iVal);
-    }
-    _p_GameSettings->DeckTypeVal.SetTypeIndex(iVal);
-    // language
-    iVal = _p_GameSettings->CurrentLanguage;
-    if (pIni) {
-        ini_locateHeading(pIni, g_lpszSectAll);
-        ini_locateKey(pIni, g_lpszKeyLang);
-        ini_readInt(pIni, &iVal);
-    }
-    _p_GameSettings->CurrentLanguage = (Languages::eLangId)iVal;
-    // music
-    iVal = false;
-    if (pIni) {
-        ini_locateHeading(pIni, g_lpszSectAll);
-        ini_locateKey(pIni, g_lpszKeyMusic);
-        ini_readInt(pIni, &iVal);
-    }
-    if (!_bOverride) {
-        _p_GameSettings->MusicEnabled = iVal;
-    }
-    // background
-    iVal = _p_GameSettings->BackgroundType;
-    if (pIni) {
-        ini_locateHeading(pIni, g_lpszSectAll);
-        ini_locateKey(pIni, g_lpszKeyBackground);
-        ini_readInt(pIni, &iVal);
-    }
-    _p_GameSettings->BackgroundType = (BackgroundTypeEnum)iVal;
-
-    ini_close(pIni);
-    return NULL;
+    TRACE("Load profile\n");
+    return _p_GameSettings->LoadSettings();
 }
 
 LPErrInApp AppGfx::writeProfile() {
-    char filepath[PATH_MAX];
-    snprintf(filepath, PATH_MAX, "%s/%s", GAMESET::GetHomeSolitarioFolder(),
-             g_lpszIniFileName);
-
-    ini_fd_t pIni = ini_open(filepath, "w", "#");
-    if (pIni == 0)
-        return ERR_UTIL::ErrorCreate("Unable to openfile ror write %s\n",
-                                     filepath);
-
-    // deck type
-    ini_locateHeading(pIni, g_lpszSectAll);
-    ini_locateKey(pIni, g_lpszKeyDeck);
-    ini_writeInt(pIni, (int)_p_GameSettings->DeckTypeVal.GetTypeIndex());
-
-    // language
-    ini_locateHeading(pIni, g_lpszSectAll);
-    ini_locateKey(pIni, g_lpszKeyLang);
-    ini_writeInt(pIni, _p_GameSettings->CurrentLanguage);
-
-    // music
-    ini_locateHeading(pIni, g_lpszSectAll);
-    ini_locateKey(pIni, g_lpszKeyMusic);
-    ini_writeInt(pIni, _p_GameSettings->MusicEnabled);
-
-    // background
-    ini_locateHeading(pIni, g_lpszSectAll);
-    ini_locateKey(pIni, g_lpszKeyBackground);
-    ini_writeInt(pIni, (int)_p_GameSettings->BackgroundType);
-
-    ini_close(pIni);
-    TRACE("Settings file %s written\n", filepath);
-    return NULL;
+    TRACE("Save profile \n");
+    return _p_GameSettings->SaveSettings();
 }
 
 TTF_Font *fncBind_GetFontVera(void *self) {
