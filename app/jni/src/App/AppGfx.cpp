@@ -734,7 +734,7 @@ void AppGfx::ParseCmdLine(int argc, char *argv[]) {
     for (int i = 1; i < argc; i++) {
         if (strcmp(argv[i], "--help") == 0 || strcmp(argv[i], "-h") == 0) {
             printf(
-                "Solitario versione %s (c) 2004-2022 Invido.it\nFai "
+                "Solitario versione %s (c) 2004-2023 Invido.it\nFai "
                 "partire "
                 "il "
                 "solitario con le seguenti opzioni:\n"

@@ -75,7 +75,7 @@ LPErrInApp HighScore::SaveScore(int score, int numCard) {
     if (j > -1) {
         char bufName[256];
         sprintf(bufName, "%s", getenv("USERNAME"));
-        
+        TRACE("Saving score for user %s\n", bufName);
         ScoreInfo prev;
         for (int i = j; i < NUMOFSCORE; i++) {
             if (i == j) {

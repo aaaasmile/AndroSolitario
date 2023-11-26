@@ -220,16 +220,22 @@ SoltarioIta: Fatal: Cannot create dir (null)/.solitario [DONE]
 Fatal: loadProfile: Ini file error /data/data/org.libsdl.app/files/.solitario/options.ini
 
 ## Compilzzione con target wsl
-Uso Cmake
+Uso CMake per compilare il target su WSL, mentre ndk con gradle (Android.mk) per quanto
+riguarda il target Android.
 
     mkdir build
     cd build
     cmake ../app/jni/
 
 Problemi con wayland
-dpkg -L libwayland-dev
- #include "primary-selection-unstable-v1-client-protocol.h"
-gli header si trovano in /usr/include e nella mia distribuzione non li ho.
+
+    dpkg -L libwayland-dev
+    #include "primary-selection-unstable-v1-client-protocol.h"
+gli header si trovano in /usr/include e nella mia distribuzione non li ho. Ho semplicemente disattivato libwayland
+nella lista CMakeList.txt. Le librerie di SDL le ho compilate in modo statico. Per il file
+di musica watermusic.it l'ho convertito in watermusic.ogg in quanto la mia libreria statica sdl_mixer non 
+supporta il formato it. CMake
+
 
 ## Compile, Deploy, Start
 
