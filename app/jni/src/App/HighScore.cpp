@@ -12,6 +12,7 @@
 using namespace std;
 
 static const char* g_lpszScore = "solitario_score.bin";
+static char g_filepath[1024];
 
 HighScore::HighScore() {
     for (int k = 0; k < 10; k++) {
@@ -29,16 +30,15 @@ HighScore::HighScore() {
 
 LPErrInApp HighScore::Save() {
     LPGameSettings pGameSettings = GAMESET::GetSettings();
-    char filepath[PATH_MAX + strlen(g_lpszScore)];
-
-    snprintf(filepath, sizeof(filepath), "%s/%s",
+    
+    snprintf(g_filepath, sizeof(g_filepath), "%s/%s",
              pGameSettings->SettingsDir.c_str(), g_lpszScore);
-    TRACE("Save high score file %s\n", filepath);
+    TRACE("Save high score file %s\n", g_filepath);
 
-    SDL_RWops* dst = SDL_RWFromFile(filepath, "wb");
+    SDL_RWops* dst = SDL_RWFromFile(g_filepath, "wb");
     if (dst == 0) {
         return ERR_UTIL::ErrorCreate("Unable to save high score file %s",
-                                     filepath);
+                                     g_filepath);
     }
 
     for (int k = 0; k < NUMOFSCORE; k++) {
@@ -96,12 +96,11 @@ LPErrInApp HighScore::SaveScore(int score, int numCard) {
 
 LPErrInApp HighScore::Load() {
     LPGameSettings pGameSettings = GAMESET::GetSettings();
-    char filepath[PATH_MAX + strlen(g_lpszScore)];
-
-    snprintf(filepath, sizeof(filepath), "%s/%s",
+    
+    snprintf(g_filepath, sizeof(g_filepath), "%s/%s",
              pGameSettings->SettingsDir.c_str(), g_lpszScore);
-    TRACE("Load high score file %s\n", filepath);
-    SDL_RWops* src = SDL_RWFromFile(filepath, "rb");
+    TRACE("Load high score file %s\n", g_filepath);
+    SDL_RWops* src = SDL_RWFromFile(g_filepath, "rb");
     if (src == 0) {
         TRACE("No score file found, ignore it and use default\n");
         return NULL;
@@ -113,13 +112,13 @@ LPErrInApp HighScore::Load() {
         uint8_t numCard;
         if (SDL_RWread(src, name, 16, 1) == 0) {
             return ERR_UTIL::ErrorCreate(
-                "SDL_RWread on highscore file error (file %s): %s\n", filepath,
+                "SDL_RWread on highscore file error (file %s): %s\n", g_filepath,
                 SDL_GetError());
         }
         score = SDL_ReadLE16(src);
         if (SDL_RWread(src, &numCard, 1, 1) == 0) {
             return ERR_UTIL::ErrorCreate(
-                "SDL_RWread on highscore file error (file %s): %s\n", filepath,
+                "SDL_RWread on highscore file error (file %s): %s\n", g_filepath,
                 SDL_GetError());
         }
 

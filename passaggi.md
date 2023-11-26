@@ -67,9 +67,9 @@ il game loop del solitario.
 
 ## SDL_Images & Co.
 Ho bisogno anche delle altre librerie. 
-1) SDL_Image: https://github.com/libsdl-org/SDL_image/releases
-2) SDL_mixer: https://github.com/libsdl-org/SDL_mixer/releases
-3) SDL_ttf: https://github.com/libsdl-org/SDL_ttf/releases
+1) SDL_Image: https://github.com/libsdl-org/SDL_image/releases (SDL2_image-2.6.3)
+2) SDL_mixer: https://github.com/libsdl-org/SDL_mixer/releases (SDL2_mixer-2.6.3)
+3) SDL_ttf: https://github.com/libsdl-org/SDL_ttf/releases (SDL2_ttf-2.20.2)
 
 Per quanto riguarda le librerie esterne (esempio ttf usa freetype e harfbuzz) esse vanno messe
 in external. Non si mette la copia della release come  ho fatto per le 4 librerie sdl, ma si segue
@@ -218,6 +218,18 @@ nella proprietà: C_Cpp:Clang_format_style
 Questi sono i problemi e todo della conversione in Android.
 SoltarioIta: Fatal: Cannot create dir (null)/.solitario [DONE]
 Fatal: loadProfile: Ini file error /data/data/org.libsdl.app/files/.solitario/options.ini
+
+## Compilzzione con target wsl
+Uso Cmake
+
+    mkdir build
+    cd build
+    cmake ../app/jni/
+
+Problemi con wayland
+dpkg -L libwayland-dev
+ #include "primary-selection-unstable-v1-client-protocol.h"
+gli header si trovano in /usr/include e nella mia distribuzione non li ho.
 
 ## Compile, Deploy, Start
 
