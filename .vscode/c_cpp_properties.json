@@ -1,12 +1,31 @@
 {
     "configurations": [
         {
-            "name": "Linux",
+            "name": "Android",
             "includePath": [
                 "${workspaceFolder}/**",
                 "/home/igor/android/ndk-bundle/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include"
             ],
-            "defines": ["ANDROID", "TRACEINSERVICE", "_DEBUG"],
+            "defines": [
+                "ANDROID",
+                "TRACEINSERVICE",
+                "_DEBUG"
+            ],
+            "compilerPath": "/usr/bin/gcc",
+            "cppStandard": "gnu++17",
+            "intelliSenseMode": "linux-gcc-x64"
+        },
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "/usr/include"
+            ],
+            "defines": [
+                "TRACEINSERVICE",
+                "_DEBUG",
+                "USE_EMPTY_DATA_PREFIX"
+            ],
             "compilerPath": "/usr/bin/gcc",
             "cppStandard": "gnu++17",
             "intelliSenseMode": "linux-gcc-x64"

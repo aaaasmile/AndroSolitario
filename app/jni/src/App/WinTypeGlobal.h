@@ -79,3 +79,7 @@ typedef std::vector<std::string> VCT_STRING;
 #endif
 
 #endif
+
+#if USE_EMPTY_DATA_PREFIX
+    #define DATA_PREFIX
+#endif
