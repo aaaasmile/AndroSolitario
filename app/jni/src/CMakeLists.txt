@@ -1,6 +1,13 @@
 cmake_minimum_required(VERSION 3.20)
 project(solitario)
 
+# Don't mistake osx for unix
+if(UNIX AND NOT ANDROID AND NOT APPLE AND NOT RISCOS)
+  set(UNIX_SYS ON)
+else()
+  set(UNIX_SYS OFF)
+endif()
+
 # Solitario program
 set(SOURCES GameGfx/CardRegionGfx.cpp
             GameGfx/CardStackGfx.cpp
@@ -28,8 +35,11 @@ set(SOURCES GameGfx/CardRegionGfx.cpp
             CompGfx/ComboGfx.cpp
             CompGfx/MesgBoxGfx.cpp
             CompGfx/LabelGfx.cpp)
+if (${UNIX_SYS})
+    set(SOURCES2 UnixSys/UnixsysTrace.cpp)
+endif()
 
-add_executable(${PROJECT_NAME} ${SOURCES})
+add_executable(${PROJECT_NAME} ${SOURCES} ${SOURCES2})
 
 target_include_directories(${PROJECT_NAME} PRIVATE App . GameGfx CompGfx)
 target_compile_definitions(${PROJECT_NAME} PRIVATE DATA_PREFIX="data/")
@@ -49,6 +59,7 @@ if(CMAKE_SYSTEM MATCHES Windows)
     endif()
 else()
     message(STATUS "Target system is: " ${CMAKE_SYSTEM})
+    target_compile_definitions(${PROJECT_NAME} PRIVATE TRACEINSERVICE)
     target_link_libraries(${PROJECT_NAME} SDL2 SDL2_image SDL2_mixer SDL2_ttf)
 endif()
 
