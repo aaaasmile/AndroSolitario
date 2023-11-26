@@ -3,3 +3,4 @@ gradle
 .gradle
 app/src/main/assets
 *.o
+asset_data_forwsl
