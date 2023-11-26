@@ -18,6 +18,7 @@ Con sdkmanager a liena di comando ho scaricato:
 
     sdkmanager "platforms;android-33" "build-tools;33.0.2"
 sdkmanager fa parte di commandlinetools-linux-9477386_latest.zip che ho scaricato da https://developer.android.com/studio#downloads dalla sezione _Command line tools only_.
+Nota che SDL la compilo in modo statico su tutti i target.
 
 ## Target RedMe Note 11
 Il device che utilizzo ha un Cortex-A73 (Snapdragon 680) un arm 64 bit v8.
@@ -81,6 +82,9 @@ Dove vanno messi tutti gli assets?
 Secondo questo tizio https://georgik.rocks/sdl2_image-for-android-with-png-image-format/
 vanno messi in The location for graphic assets is app/src/main/assets.
 Qui ho copiato la directory data del progetto solitario.
+Il problema è che ho creato il progetto su wsl usando il define DATA_PREFIX.
+Ora in wsl/windows è la directory Data, su Android è vuota. Per avere questo distinguo
+uso il define USE_EMPTY_DATA_PREFIX che è definito nel make file di app/jni/src/Android.mk
 
 ## Compile e Link clean
 Sono riuscito a compilare e linkare i sorgenti. Ho avuto delle difficoltà con STL in fase di link
@@ -96,11 +100,15 @@ Ho incluso solo il file cpp per via del suffix. La direttiva include $(BUILD_STA
 compila la libreria in modo statico. Essa va poi referenziato con LOCAL_STATIC_LIBRARIES := inimod,
 mentre tutte le altre librerie di SDL sono qui: LOCAL_SHARED_LIBRARIES := SDL2 SDL2_ttf SDL2_mixer SDL2_image.
 
-### libini
+### libini e settings files
 Alla fine l'ho tolta dal progetto in quanto non mi funzionava su Android (permission denied?).
 Ho deciso di usare lo stesso principio di HighScore dove salvo la lista in formato binario usando le
 le funzioni di SDL che funzionano anche su Android. In questo modo rinuncio alla possibilità di 
 editare facilmente il file usando notepad. 
+Dove vanno a finire i files che vengono creati quando cambiano i settings oppure lo High Score?
+Su wsl vanno nella home directory nella nuova directory .solitario. Su windows è la directory User.
+Su Android è l'internal storage che SDL riesce a cambiare. Però accedere a questi nuovi files,
+bisogna utilizzare le funzioni di SDL.
 
 ## Adb Device è una lista vuota
 Se il comando
@@ -212,7 +220,6 @@ Sembra che per le funzioni che accedono agli assets, vale a dire tutti i files e
 della directory assets, sono accessibili dalle funzioni SDL senza alcun prefisso.
 Per creare una directory, oppure un file, bisogna invece usare SDL_AndroidGetInternalStoragePath().
 
-
 ## Editor C++
 Uso Visual Code con il plugin c/c++. Esso formatta in modalità Visual studio di Default.
 Questo non è il mio modo preferito di formattare il codice, ma uso questa stringa 
@@ -240,8 +247,17 @@ Problemi con wayland
 gli header si trovano in /usr/include e nella mia distribuzione non li ho. Ho semplicemente disattivato libwayland
 nella lista CMakeList.txt. Le librerie di SDL le ho compilate in modo statico. Per il file
 di musica watermusic.it l'ho convertito in watermusic.ogg in quanto la mia libreria statica sdl_mixer non 
-supporta il formato it. CMake
+supporta il formato it. 
+Quando si cambia un file della configuarzione di SDL (il suo CMakeLists.txt) per escludere qualche libreria
+che non uso tipo wayland, devo poi ricostruire la directory build.
 
+    cd ..
+    rm -r -R build
+    mkdir build
+    cd build
+    cmake ../app/jni/
+Nota che il programma va a finire nella directory ./build/src ed lì dove ho poi messo le 
+risorse nella directory data. 
 
 ## Compile, Deploy, Start
 
