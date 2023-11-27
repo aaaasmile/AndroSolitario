@@ -8,18 +8,18 @@ else {
 }
 
 android {
+    if (buildAsApplication) {
+        namespace "org.libsdl.app"
+    }
     compileSdkVersion 34
     defaultConfig {
-        if (buildAsApplication) {
-            applicationId "org.libsdl.app"
-        }
         minSdkVersion 19
         targetSdkVersion 34
         versionCode 1
         versionName "1.0"
         externalNativeBuild {
             ndkBuild {
-                arguments "APP_PLATFORM=android-16" 
+                arguments "APP_PLATFORM=android-19" 
                 arguments "APP_STL=c++_static"
                 //abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
                 //abiFilters 'armeabi-v7a'

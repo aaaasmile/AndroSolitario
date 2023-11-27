@@ -4,16 +4,17 @@ Questo progetto è il tentativo di compilare il progetto https://github.com/aaaa
 Nota che ho già scritto alcune notte per lo sviluppo nel file https://github.com/aaaasmile/Solitario/blob/main/android.md
 
 ## Sviluppo
+(Vedi sotto per le versioni)
 Lo sviluppo l'ho eseguito su UbuntuMinitoro del mio Mini-k7. Sono partito dal progetto sdl-android-prj-hello
 in scratch ed ho poi aggiunto tutti i sorgenti.
 Le librerie da compilare sono:
-- "SDL2"
+- "SDL2" (2.28.5)
 - "SDL2_image"
 - "SDL2_mixer"
 - "SDL2_ttf"
 
 e devono essere presenti nel progetto con tutti i suoi sorgenti. Come IDE uso Visual Code. Ho installato l'SDK di
-Android, NDK e gradle (Prerequisiti: openjdk-11-jdk ant android-sdk-platform-tools-common). 
+Android, NDK e gradle (Prerequisiti: openjdk-17-jdk ant android-sdk-platform-tools-common). 
 Con sdkmanager a liena di comando ho scaricato:
 
     sdkmanager "platforms;android-33" "build-tools;33.0.2"
@@ -58,7 +59,7 @@ Per lanciare l'app dal terminal di Visual Code:
 ## Struttura del progetto
 Riferimento: https://wiki.libsdl.org/SDL2/Android#install_sdl_in_a_gcc_toolchain
 Ho messo i sorgenti di SDL nella directory app/jni/SDL
-Sono partito da SDL-release-2.26.5.tar.gz e ho copiato i files di root 
+Sono partito da SDL-release-2.26.5.tar.gz (che poi ho aggiornato a 2.28.5, vedi sotto) e ho copiato i files di root 
 le directory src e include. Tutte le altre no.
 Nel file app/jni/src/Android.mk ho messo tutti i sorgenti che vengono compilati nel progetto.
 
@@ -76,6 +77,26 @@ Per quanto riguarda le librerie esterne (esempio ttf usa freetype e harfbuzz) es
 in external. Non si mette la copia della release come  ho fatto per le 4 librerie sdl, ma si segue
 su github il link external che è un fork. All'interno del fork (si vede perché c'è il file Android.mk)
 si scarica il sorgente attraverso lo zip.
+
+## SDL Versione Update
+Ho fatto un update della versione SDL2 alla versione 2.28.5. Ho scaricato il tar dal sito
+https://github.com/libsdl-org/SDL/releases, e poi ho copiato quasi tutte le directory nel mio progetto.
+Ho rinominato la vecchia per fare posto alla nuova nella sottodirectory SDL.
+Ho anche cambiato il min compileSdkVersion 34 nel file app/build.gradle.
+Nota che il nuovo sdk34 viene scaricato automaticamente da gradle.
+Però ho poi avuto il problema che Gradle 7.0.3 non è più compatibile. Allora sono passato alla versione
+8.1.1 messa nel file build.gradle. Ho poi seguito questo messaggio, che mi è comparso quando ho fatto partire
+il compilatore:
+
+    Minimum supported Gradle version is 8.0. Current version is 7.3. If using the gradle wrapper, try editing the distributionUrl in /home/igor/projects/AndroSolitario/gradle/wrapper/gradle-wrapper.properties to gradle-8.0-all.zip
+che mi scaricato un nuovo wrapper.
+Ho dovuto poi fare un aggiornamento del jdk alla versione 17 ( sudo apt install openjdk-17-jdk openjdk-17-jre).
+Dove ho preso il numero 8.1.1? Sono andato a vedere main latest della repository sdl, per vedere il progetto
+di Android come è composto. Li ho anche cambiato build.gradle di app/src/main. 
+Lì si vede che il namespace è cambiato. 
+Ho dovuto spostare la vecchia directory SDL_2_26_5 da jini in quanto veniva compilata lo stesso. L'ho messa in 
+D:\tmp\sdl-source\LastUsed_working\SDL_2_26_5 nel caso servisse.
+Poi finalmente ho avuto almeno un compile clean.
 
 ## Assets
 Dove vanno messi tutti gli assets?
