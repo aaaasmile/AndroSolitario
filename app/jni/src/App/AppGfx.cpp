@@ -194,7 +194,9 @@ LPErrInApp AppGfx::createWindow() {
     } else {
         flagwin = SDL_WINDOW_SHOWN;
     }
+#ifdef ANDROID
     flagwin = SDL_WINDOW_FULLSCREEN;
+#endif
 
     _p_Window = SDL_CreateWindow(
         _p_GameSettings->GameName.c_str(), SDL_WINDOWPOS_UNDEFINED,
@@ -203,11 +205,11 @@ LPErrInApp AppGfx::createWindow() {
         return ERR_UTIL::ErrorCreate("Error SDL_CreateWindow: %s\n",
                                      SDL_GetError());
     }
-    //SDL_SetWindowFullscreen(_p_Window, SDL_WINDOW_FULLSCREEN);
-
+    // SDL_SetWindowFullscreen(_p_Window, SDL_WINDOW_FULLSCREEN);
+    // TODO get some landscape mode
     SDL_Rect rc;
     SDL_GetDisplayBounds(0, &rc);
-    TRACE_DEBUG("Display bound for size is %d, %d", rc.w, rc.h);
+    TRACE_DEBUG("Display bound for size is width %d, height %d", rc.w, rc.h);
     _iScreenH = rc.h;
     _iScreenW = rc.w;
 

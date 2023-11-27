@@ -20,9 +20,13 @@ Con sdkmanager a liena di comando ho scaricato:
     sdkmanager "platforms;android-33" "build-tools;33.0.2"
 sdkmanager fa parte di commandlinetools-linux-9477386_latest.zip che ho scaricato da https://developer.android.com/studio#downloads dalla sezione _Command line tools only_.
 Nota che SDL la compilo in modo statico su tutti i target.
+Nota che gradle, che ho aggiornato alla versione 8.1.1 installa tutti gli sdk e ndk
+automaticamente senza dover usare sdkmanager. In questo progetto ho aggiornato tutti i tools così
+come il progetto Android di default di Sdl che avevo costruito in scrach hellosdl.
 
 ## Target RedMe Note 11
 Il device che utilizzo ha un Cortex-A73 (Snapdragon 680) un arm 64 bit v8.
+Ha una risoluzione di 1080 x 2400
 Il RedMe, per il deployment, deve essere collegato ed accessibile in WSL2 con il cavo USB.
 In Admin Powershell uso (non più, vedi sotto)
 
