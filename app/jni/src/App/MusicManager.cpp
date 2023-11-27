@@ -58,7 +58,11 @@ LPErrInApp MusicManager::LoadMusicRes() {
 
     for (int i = 0; i < NUM_OF_SOUNDS; i++) {
         STRING strFileTmp2 = lpszaSound_filenames[i];
+#ifdef ANDROID
+        STRING strFileFullPath = strFileTmp2;
+#else
         STRING strFileFullPath = exeDirPath + '/' + strFileTmp2;
+#endif
         TRACE_DEBUG("Loading music part %s\n", strFileFullPath.c_str());
         _p_Musics[i] = Mix_LoadMUS(strFileFullPath.c_str());
         if (_p_Musics[i] == NULL) {

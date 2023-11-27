@@ -231,6 +231,7 @@ nella proprietà: C_Cpp:Clang_format_style
 Questi sono i problemi e todo della conversione in Android.
 SoltarioIta: Fatal: Cannot create dir (null)/.solitario [DONE]
 Fatal: loadProfile: Ini file error /data/data/org.libsdl.app/files/.solitario/options.ini
+Se vuoi una nuova compilazione clean del target Android, allora basta cancellare la directory app/build
 
 ## Compilzzione con target wsl
 Uso CMake per compilare il target su WSL, mentre ndk con gradle (Android.mk) per quanto
@@ -261,11 +262,11 @@ risorse nella directory data.
 
 ## Compile, Deploy, Start
 
-    source ./setup_env.sh
+    source ./start_env.sh
     ./gradlew compileDebugSources
     ./gradlew installDebug
-    adb shell am start -n org.libsdl.app/.SDLActivity
     adb logcat -s "SoltarioIta"
+    adb shell am start -n org.libsdl.app/.SDLActivity
 Nota il comando source. Esso viene usato in quanto le variabili definite rimangono definite all'interno
 dello script.
 
