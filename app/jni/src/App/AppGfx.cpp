@@ -45,6 +45,8 @@ AppGfx::AppGfx() {
     _p_SolitarioGfx = NULL;
     _p_SceneBackground = NULL;
     _p_Screen = NULL;
+    // _iScreenW = 2400 / 2;
+    // _iScreenH = 1080 / 2;
     _iScreenW = 1024;
     _iScreenH = 768;
     _iBpp = 0;
@@ -192,6 +194,7 @@ LPErrInApp AppGfx::createWindow() {
     } else {
         flagwin = SDL_WINDOW_SHOWN;
     }
+    flagwin = SDL_WINDOW_FULLSCREEN;
 
     _p_Window = SDL_CreateWindow(
         _p_GameSettings->GameName.c_str(), SDL_WINDOWPOS_UNDEFINED,
@@ -200,6 +203,13 @@ LPErrInApp AppGfx::createWindow() {
         return ERR_UTIL::ErrorCreate("Error SDL_CreateWindow: %s\n",
                                      SDL_GetError());
     }
+    //SDL_SetWindowFullscreen(_p_Window, SDL_WINDOW_FULLSCREEN);
+
+    SDL_Rect rc;
+    SDL_GetDisplayBounds(0, &rc);
+    TRACE_DEBUG("Display bound for size is %d, %d", rc.w, rc.h);
+    _iScreenH = rc.h;
+    _iScreenW = rc.w;
 
     _p_sdlRenderer =
         SDL_CreateRenderer(_p_Window, -1, SDL_RENDERER_ACCELERATED);
@@ -382,7 +392,7 @@ LPErrInApp AppGfx::MainLoop() {
 
     MenuMgr *pMenuMgr = new MenuMgr();
     MenuDelegator delegator = prepMenuDelegator();
-    err = pMenuMgr->Initialize(_p_Screen, _p_sdlRenderer, delegator);
+    err = pMenuMgr->Initialize(_p_Screen, _p_sdlRenderer, _p_Window, delegator);
     if (err != NULL)
         goto error;
 

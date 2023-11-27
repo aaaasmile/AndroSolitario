@@ -9,6 +9,7 @@
             "defines": [
                 "ANDROID",
                 "TRACEINSERVICE",
+                "USE_EMPTY_DATA_PREFIX",
                 "_DEBUG"
             ],
             "compilerPath": "/usr/bin/gcc",

@@ -159,8 +159,8 @@ create_aar_androidmanifest() {
     xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.libsdl.android" android:versionCode="1"
     android:versionName="1.0">
-	<uses-sdk android:minSdkVersion="16"
-              android:targetSdkVersion="29"/>
+	<uses-sdk android:minSdkVersion="19"
+              android:targetSdkVersion="34"/>
 </manifest>
 EOF
 }

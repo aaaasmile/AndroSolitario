@@ -18,29 +18,30 @@ class LabelGfx;
 using namespace traits;
 
 class MenuMgr {
-public:
+   public:
     enum { MYIDLABELURL = 0 };
 
     MenuMgr();
     virtual ~MenuMgr();
     LPErrInApp Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
-                          MenuDelegator& menuDelegator);
+                          SDL_Window* pWindow, MenuDelegator& menuDelegator);
     LPErrInApp HandleRootMenu();
     void SetBackground(SDL_Surface* pVal) { _p_SceneBackground = pVal; }
 
-private:
+   private:
     void drawBackground(SDL_Surface* psurf);
     LPErrInApp drawMenuText(SDL_Surface* psurf, const char* text, int x, int y,
                             SDL_Color& color, TTF_Font* customfont);
     void rootMenuNext();
     void updateTextureAsFlipScreen();
 
-private:
+   private:
     MenuDelegator _menuDlgt;
     Languages* _p_Languages;
     TTF_Font* _p_fontAriblk;
     TTF_Font* _p_fontVera;
     TTF_Font* _p_fontVeraUnderscore;
+    SDL_Window* _p_Window;
     SDL_Surface* _p_Screen;
     SDL_Surface* _p_ScreenBackbuffer;
     SDL_Surface* _p_MenuBox;

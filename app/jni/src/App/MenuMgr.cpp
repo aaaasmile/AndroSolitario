@@ -57,10 +57,12 @@ MenuMgr::~MenuMgr() {
 }
 
 LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
+                               SDL_Window* pWindow,
                                MenuDelegator& menuDelegator) {
     _menuDlgt = menuDelegator;
     _p_Screen = pScreen;
     _p_sdlRenderer = pRenderer;
+    _p_Window = pWindow;
 
     _screenW = _p_Screen->clip_rect.w;
     _box_X = _screenW / 6;
@@ -96,8 +98,9 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
     // link to invido.it
     _p_fontVeraUnderscore = TTF_OpenFont(g_lpszIniFontVera, 11);
     if (_p_fontVeraUnderscore == 0) {
-        return ERR_UTIL::ErrorCreate("MenuMgr: Unable to load font %s, error: %s\n",
-                                     g_lpszIniFontVera, SDL_GetError());
+        return ERR_UTIL::ErrorCreate(
+            "MenuMgr: Unable to load font %s, error: %s\n", g_lpszIniFontVera,
+            SDL_GetError());
     }
     TTF_SetFontStyle(_p_fontVeraUnderscore, TTF_STYLE_UNDERLINE);
     SDL_Rect rctBt1;
@@ -316,6 +319,13 @@ LPErrInApp MenuMgr::HandleRootMenu() {
         if (event.type == SDL_QUIT) {
             (_menuDlgt.tc)->LeaveMenu(_menuDlgt.self);
             break;
+        }
+
+        if (event.type == SDL_FINGERDOWN) {
+            float x = event.tfinger.x;
+            float y = event.tfinger.y;
+            //_p_Window. get_AbsPixels(&x, &y);
+            TRACE_DEBUG("Tap in x=%f, y=%f\n", x, y);
         }
 
         if (event.type == SDL_KEYDOWN) {
