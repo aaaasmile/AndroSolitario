@@ -162,8 +162,9 @@ Ora apro un'altra bash su WSL2 e lancio la sequenza:
     export PATH=${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin:${ANDROID_SDK_ROOT}/platform-tools:${PATH}
     adb devices
 Il risultato è ora:  
-List of devices attached
-f5c24a47        device
+
+    List of devices attached
+    f5c24a47        device
 Il tutto senza usare usbipd, che non mi sembra molto stabile, in quanto funziona solo a tratti.
 Ora posso compilare ed eseguire un deployment (vedi sotto).
 Alla fine ho deinstallato usbipd perché proprio non mi ha convinto (quando è attivo non mi funzionano i tools in windows).
@@ -244,6 +245,8 @@ Le funzioni di SDL vanno bene. Per esempio per creare la directory .solitario us
 Sembra che per le funzioni che accedono agli assets, vale a dire tutti i files e directories 
 della directory assets, sono accessibili dalle funzioni SDL senza alcun prefisso.
 Per creare una directory, oppure un file, bisogna invece usare SDL_AndroidGetInternalStoragePath().
+Siccome non ho più ini file, non devo copiare nulla. Semplicemente il file viene generato
+nella directory di Android quando cambiano i settings oppure high score.
 
 ## Editor C++
 Uso Visual Code con il plugin c/c++. Esso formatta in modalità Visual studio di Default.
@@ -257,6 +260,12 @@ Questi sono i problemi e todo della conversione in Android.
 SoltarioIta: Fatal: Cannot create dir (null)/.solitario [DONE]
 Fatal: loadProfile: Ini file error /data/data/org.libsdl.app/files/.solitario/options.ini
 Se vuoi una nuova compilazione clean del target Android, allora basta cancellare la directory app/build
+Niente ini.
+- Problema con il formato dello schermo
+- Non mi funzionano poi i pulsanti
+- Nei credits e hight score non si può tornare indietro, qui serve un "back by tap" in High Score
+- shuffle_random è marcato obsoleto in ndk, il risultato è che non mescola un bel nulla
+- A livello generale direi che il tap non ce l'ho sotto controllo
 
 ## Compilzzione con target wsl
 Uso CMake per compilare il target su WSL, mentre ndk con gradle (Android.mk) per quanto
@@ -283,7 +292,7 @@ che non uso tipo wayland, devo poi ricostruire la directory build.
     cd build
     cmake ../app/jni/
 Nota che il programma va a finire nella directory ./build/src ed lì dove ho poi messo le 
-risorse nella directory data. 
+risorse nella directory data. Gli asset li ho anche copiati nella directory asset_data_forwsl.
 
 ## Compile, Deploy, Start
 
