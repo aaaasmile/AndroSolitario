@@ -116,7 +116,7 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
     _p_MenuBox = SDL_CreateRGBSurface(SDL_SWSURFACE, _rctPanelRedBox.w,
                                       _rctPanelRedBox.h, 32, 0, 0, 0, 0);
     SDL_FillRect(_p_MenuBox, NULL,
-                 SDL_MapRGBA(_p_Screen->format, 255, 0, 0, 0));
+                 SDL_MapRGBA(_p_Screen->format, 235, 60, 60, 0));
     SDL_SetSurfaceBlendMode(_p_MenuBox, SDL_BLENDMODE_BLEND);
     SDL_SetSurfaceAlphaMod(_p_MenuBox, 127);
 
@@ -179,30 +179,32 @@ LPErrInApp MenuMgr::drawStaticScene() {
                                  _rctPanelRedBox.y, _p_MenuBox);
 
     // header bar
-    int hbar = 38;
-    GFX_UTIL::FillRect(_p_ScreenBackbuffer, _box_X, _box_Y - (2 + hbar),
+    int hbarOffset = 0;
+    int hbar = 46;
+    GFX_UTIL::FillRect(_p_ScreenBackbuffer, _box_X, _box_Y - (2 + hbarOffset),
                        _rctPanelRedBox.w, hbar, colorBarTitle);
-
-    GFX_UTIL::DrawRect(_p_ScreenBackbuffer, _box_X - 1, _box_Y - 1 - hbar,
+    // wire
+    GFX_UTIL::DrawRect(_p_ScreenBackbuffer, _box_X - 1, _box_Y - 1 - hbarOffset,
                        _rctPanelRedBox.w + _box_X + 1,
-                       _rctPanelRedBox.h + _box_Y - hbar, g_color_white);
+                       _rctPanelRedBox.h + _box_Y - hbarOffset, g_color_white);
 
-    GFX_UTIL::DrawRect(_p_ScreenBackbuffer, _box_X - 2, _box_Y - 2 - hbar,
+    GFX_UTIL::DrawRect(_p_ScreenBackbuffer, _box_X - 2, _box_Y - 2 - hbarOffset,
                        _rctPanelRedBox.w + _box_X + 2,
-                       _rctPanelRedBox.h + 2 + _box_Y - hbar, g_color_black);
+                       _rctPanelRedBox.h + 2 + _box_Y - hbarOffset,
+                       g_color_black);
 
     GFX_UTIL::DrawRect(_p_ScreenBackbuffer, _box_X, _box_Y,
                        _rctPanelRedBox.w + _box_X,
-                       _rctPanelRedBox.h + _box_Y - hbar, g_color_white);
-    GFX_UTIL::DrawRect(_p_ScreenBackbuffer, _box_X, _box_Y - hbar,
-                       _rctPanelRedBox.w + _box_X, _box_Y - hbar + (hbar - 2),
-                       g_color_white);
-    // Draw title bar
+                       _rctPanelRedBox.h + _box_Y - hbarOffset, g_color_white);
+    GFX_UTIL::DrawRect(_p_ScreenBackbuffer, _box_X, _box_Y - hbarOffset,
+                       _rctPanelRedBox.w + _box_X,
+                       _box_Y - hbarOffset + (hbarOffset - 2), g_color_white);
+    // text title bar
     SDL_Color color = g_color_white;
     err = drawMenuText(
         _p_ScreenBackbuffer,
         _p_Languages->GetStringId(Languages::ID_WELCOMETITLEBAR).c_str(),
-        _box_X + 10, _box_Y + 5 - hbar, color, _p_fontAriblk);
+        _box_X + 30, _box_Y + 25 - hbar / 2, color, _p_fontAriblk);
     return err;
 }
 
@@ -220,14 +222,15 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     } else {
         color = g_color_on;
     }
-    err =
-        drawMenuText(_p_ScreenBackbuffer,
-                     _p_Languages->GetStringId(Languages::ID_START).c_str(),
-                     _box_X + offsetX, _box_Y + offsetY, color, _p_fontAriblk);
+    int currY = _box_Y + offsetY + 30;
+    err = drawMenuText(_p_ScreenBackbuffer,
+                       _p_Languages->GetStringId(Languages::ID_START).c_str(),
+                       _box_X + offsetX, currY, color, _p_fontAriblk);
     if (err != NULL) {
         return err;
     }
     // Options
+    currY = currY + intraOffset;
     if (_focusedMenuItem != MenuItemEnum::MENU_OPTIONS) {
         color = g_color_off;
     } else {
@@ -236,12 +239,13 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     err = drawMenuText(
         _p_ScreenBackbuffer,
         _p_Languages->GetStringId(Languages::ID_MEN_OPTIONS).c_str(),
-        _box_X + offsetX, _box_Y + 1 * intraOffset + offsetY, color,
+        _box_X + offsetX, currY, color,
         _p_fontAriblk);
     if (err != NULL) {
         return err;
     }
     // Credits
+    currY = currY + intraOffset;
     if (_focusedMenuItem != MenuItemEnum::MENU_CREDITS) {
         color = g_color_off;
     } else {
@@ -249,13 +253,14 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     }
     err = drawMenuText(_p_ScreenBackbuffer,
                        _p_Languages->GetStringId(Languages::ID_CREDITS).c_str(),
-                       _box_X + offsetX, _box_Y + 2 * intraOffset + offsetY,
+                       _box_X + offsetX, currY,
                        color, _p_fontAriblk);
     if (err != NULL) {
         return err;
     }
 
     // Help
+    currY = currY + intraOffset;
     if (_focusedMenuItem != MenuItemEnum::MENU_HELP) {
         color = g_color_off;
     } else {
@@ -263,13 +268,14 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     }
     err = drawMenuText(_p_ScreenBackbuffer,
                        _p_Languages->GetStringId(Languages::ID_MN_HELP).c_str(),
-                       _box_X + offsetX, _box_Y + 3 * intraOffset + offsetY,
+                       _box_X + offsetX, currY,
                        color, _p_fontAriblk);
     if (err != NULL) {
         return err;
     }
 
     // highscore
+    currY = currY + intraOffset;
     if (_focusedMenuItem != MenuItemEnum::MENU_HIGHSCORE) {
         color = g_color_off;
     } else {
@@ -278,13 +284,16 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     err =
         drawMenuText(_p_ScreenBackbuffer,
                      _p_Languages->GetStringId(Languages::ID_HIGHSCORE).c_str(),
-                     _box_X + offsetX, _box_Y + 4 * intraOffset + offsetY,
+                     _box_X + offsetX, currY,
                      color, _p_fontAriblk);
     if (err != NULL) {
         return err;
     }
 
     // Quit
+    currY = currY + intraOffset + 20;
+    int lastY = _box_Y + _rctPanelRedBox.h - intraOffset - offsetY + 30;
+    lastY = max(lastY, currY);
     if (_focusedMenuItem != MenuItemEnum::QUIT) {
         color = g_color_off;
     } else {
@@ -293,7 +302,7 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     err = drawMenuText(_p_ScreenBackbuffer,
                        _p_Languages->GetStringId(Languages::ID_EXIT).c_str(),
                        _box_X + offsetX,
-                       _box_Y + _rctPanelRedBox.h - intraOffset - offsetY + 30,
+                       lastY,
                        color, _p_fontAriblk);
     if (err != NULL) {
         return err;
