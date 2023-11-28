@@ -25,6 +25,10 @@ static const SDL_Color g_color_white = {255, 255, 255};
 static const SDL_Color g_color_ombre = {87, 87, 87, 50};
 static const SDL_Color g_color_black = {0, 0, 0};
 static const SDL_Color g_color_gray = {128, 128, 128};
+static const SDL_Color g_color_red = {255, 0, 0};
+
+MenuItemEnum nextMenu(MenuItemEnum currMenu);
+MenuItemEnum previousMenu(MenuItemEnum currMenu);
 
 MenuMgr::MenuMgr() {
     _p_fontAriblk = 0;
@@ -139,15 +143,16 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
     _p_LabelVersion->SetState(LabelGfx::INVISIBLE);
     _p_LabelVersion->SetWindowText(g_lpszVersion);
 
-    // SDL_FillRect(_p_ScreenBackbuffer, &_p_ScreenBackbuffer->clip_rect,
-    //              SDL_MapRGBA(_p_ScreenBackbuffer->format, 0, 0, 0, 0));
-    // SDL_BlitSurface(_p_Screen, NULL, _p_ScreenBackbuffer, NULL);
+    SDL_FillRect(_p_ScreenBackbuffer, &_p_ScreenBackbuffer->clip_rect,
+                 SDL_MapRGBA(_p_ScreenBackbuffer->format, 60, 60, 60, 0));
+    SDL_BlitSurface(_p_Screen, NULL, _p_ScreenBackbuffer, NULL);
 
     return NULL;
 }
 
 LPErrInApp MenuMgr::drawStaticScene() {
     // function called in loop
+    // TEST IGSA
     SDL_Rect rctTarget;
     LPErrInApp err = NULL;
     rctTarget.x = (_p_ScreenBackbuffer->w - _p_SceneBackground->w) / 2;
@@ -155,29 +160,36 @@ LPErrInApp MenuMgr::drawStaticScene() {
     rctTarget.w = _p_SceneBackground->w;
     rctTarget.h = _p_SceneBackground->h;
 
-    // sfondo img
+    // background img
     // SDL_BlitSurface(_p_SceneBackground, NULL, psurf, &rctTarget);
-    Uint32 colorBarTitle = SDL_MapRGB(_p_ScreenBackbuffer->format, 153, 202, 51);
+    Uint32 colorBarTitle =
+        SDL_MapRGB(_p_ScreenBackbuffer->format, 153, 202, 51);
 
     // content
-    GFX_UTIL::DrawStaticSpriteEx(_p_ScreenBackbuffer, 0, 0, _rctPanelRedBox.w,
-                                 _rctPanelRedBox.h, _rctPanelRedBox.x,
-                                 _rctPanelRedBox.y, _p_MenuBox);
+    // GFX_UTIL::DrawStaticSpriteEx(_p_ScreenBackbuffer, 0, 0,
+    // _rctPanelRedBox.w,
+    //                              _rctPanelRedBox.h, _rctPanelRedBox.x,
+    //                              _rctPanelRedBox.y, _p_MenuBox);
 
     // header bar
     int hbar = 38;
-    GFX_UTIL::FillRect(_p_ScreenBackbuffer, _box_X, _box_Y - (2 + hbar), _rctPanelRedBox.w,
-                       hbar, colorBarTitle);
+    GFX_UTIL::FillRect(_p_ScreenBackbuffer, _box_X, _box_Y - (2 + hbar),
+                       _rctPanelRedBox.w, hbar, colorBarTitle);
 
-    // GFX_UTIL::DrawRect(_p_ScreenBackbuffer, _box_X - 1, _box_Y - 1 - hbar,
-    //                    _rctPanelRedBox.w + 1, _rctPanelRedBox.h + 1,
-    //                    g_color_gray);
-    // GFX_UTIL::DrawRect(_p_ScreenBackbuffer, _box_X - 2, _box_Y - 2, _rctPanelRedBox.w + 2,
-    //                    _rctPanelRedBox.h + 2, g_color_black);
-    // GFX_UTIL::DrawRect(_p_ScreenBackbuffer, _box_X, _box_Y, _rctPanelRedBox.w,
-    //                    _rctPanelRedBox.h, g_color_white);
-    // GFX_UTIL::DrawRect(_p_ScreenBackbuffer, _box_X, _box_Y, _rctPanelRedBox.w, _box_Y + 36,
-    //                    g_color_white);
+    GFX_UTIL::DrawRect(_p_ScreenBackbuffer, _box_X - 1, _box_Y - 1 - hbar,
+                       _rctPanelRedBox.w + _box_X + 1,
+                       _rctPanelRedBox.h + _box_Y - hbar, g_color_white);
+
+    GFX_UTIL::DrawRect(_p_ScreenBackbuffer, _box_X - 2, _box_Y - 2 - hbar,
+                       _rctPanelRedBox.w + _box_X + 2,
+                       _rctPanelRedBox.h + 2 + _box_Y - hbar, g_color_black);
+
+    GFX_UTIL::DrawRect(_p_ScreenBackbuffer, _box_X, _box_Y,
+                       _rctPanelRedBox.w + _box_X,
+                       _rctPanelRedBox.h + _box_Y - hbar, g_color_white);
+    GFX_UTIL::DrawRect(_p_ScreenBackbuffer, _box_X, _box_Y - hbar,
+                       _rctPanelRedBox.w + _box_X, _box_Y - hbar + (hbar - 2),
+                       g_color_white);
     // Draw title bar
     SDL_Color color = g_color_white;
     err = drawMenuText(
@@ -185,56 +197,6 @@ LPErrInApp MenuMgr::drawStaticScene() {
         _p_Languages->GetStringId(Languages::ID_WELCOMETITLEBAR).c_str(),
         _box_X + 10, _box_Y + 5 - hbar, color, _p_fontAriblk);
     return err;
-}
-
-LPErrInApp MenuMgr::drawMenuText(SDL_Surface* psurf, const char* text, int x,
-                                 int y, SDL_Color& color,
-                                 TTF_Font* customfont) {
-    LPErrInApp err = GFX_UTIL::DrawString(psurf, text, x + 2, y + 2,
-                                          g_color_ombre, customfont);
-    if (err != NULL)
-        return err;
-    return GFX_UTIL::DrawString(psurf, text, x, y, color, customfont);
-}
-
-MenuItemEnum previousMenu(MenuItemEnum currMenu) {
-    switch (currMenu) {
-        case MenuItemEnum::MENU_GAME:
-            return MenuItemEnum::MENU_GAME;
-        case MenuItemEnum::MENU_OPTIONS:
-            return MenuItemEnum::MENU_GAME;
-        case MenuItemEnum::MENU_CREDITS:
-            return MenuItemEnum::MENU_OPTIONS;
-        case MenuItemEnum::MENU_HELP:
-            return MenuItemEnum::MENU_CREDITS;
-        case MenuItemEnum::MENU_HIGHSCORE:
-            return MenuItemEnum::MENU_HELP;
-        case MenuItemEnum::QUIT:
-            return MenuItemEnum::MENU_HIGHSCORE;
-        default:
-            return currMenu;
-    }
-    return currMenu;
-}
-
-MenuItemEnum nextMenu(MenuItemEnum currMenu) {
-    switch (currMenu) {
-        case MenuItemEnum::MENU_GAME:
-            return MenuItemEnum::MENU_OPTIONS;
-        case MenuItemEnum::MENU_OPTIONS:
-            return MenuItemEnum::MENU_CREDITS;
-        case MenuItemEnum::MENU_CREDITS:
-            return MenuItemEnum::MENU_HELP;
-        case MenuItemEnum::MENU_HELP:
-            return MenuItemEnum::MENU_HIGHSCORE;
-        case MenuItemEnum::MENU_HIGHSCORE:
-            return MenuItemEnum::QUIT;
-        case MenuItemEnum::QUIT:
-            return MenuItemEnum::QUIT;
-        default:
-            return currMenu;
-    }
-    return currMenu;
 }
 
 LPErrInApp MenuMgr::drawMenuTextList() {
@@ -431,6 +393,16 @@ LPErrInApp MenuMgr::HandleRootMenu() {
     return NULL;
 }
 
+LPErrInApp MenuMgr::drawMenuText(SDL_Surface* psurf, const char* text, int x,
+                                 int y, SDL_Color& color,
+                                 TTF_Font* customfont) {
+    LPErrInApp err = GFX_UTIL::DrawString(psurf, text, x + 2, y + 2,
+                                          g_color_ombre, customfont);
+    if (err != NULL)
+        return err;
+    return GFX_UTIL::DrawString(psurf, text, x, y, color, customfont);
+}
+
 void MenuMgr::updateTextureAsFlipScreen() {
     SDL_UpdateTexture(_p_ScreenTexture, NULL, _p_Screen->pixels,
                       _p_Screen->pitch);
@@ -445,4 +417,44 @@ void MenuMgr::rootMenuNext() {
     } else {
         (_menuDlgt.tc)->SetNextMenu(_menuDlgt.self, _focusedMenuItem);
     }
+}
+
+MenuItemEnum previousMenu(MenuItemEnum currMenu) {
+    switch (currMenu) {
+        case MenuItemEnum::MENU_GAME:
+            return MenuItemEnum::MENU_GAME;
+        case MenuItemEnum::MENU_OPTIONS:
+            return MenuItemEnum::MENU_GAME;
+        case MenuItemEnum::MENU_CREDITS:
+            return MenuItemEnum::MENU_OPTIONS;
+        case MenuItemEnum::MENU_HELP:
+            return MenuItemEnum::MENU_CREDITS;
+        case MenuItemEnum::MENU_HIGHSCORE:
+            return MenuItemEnum::MENU_HELP;
+        case MenuItemEnum::QUIT:
+            return MenuItemEnum::MENU_HIGHSCORE;
+        default:
+            return currMenu;
+    }
+    return currMenu;
+}
+
+MenuItemEnum nextMenu(MenuItemEnum currMenu) {
+    switch (currMenu) {
+        case MenuItemEnum::MENU_GAME:
+            return MenuItemEnum::MENU_OPTIONS;
+        case MenuItemEnum::MENU_OPTIONS:
+            return MenuItemEnum::MENU_CREDITS;
+        case MenuItemEnum::MENU_CREDITS:
+            return MenuItemEnum::MENU_HELP;
+        case MenuItemEnum::MENU_HELP:
+            return MenuItemEnum::MENU_HIGHSCORE;
+        case MenuItemEnum::MENU_HIGHSCORE:
+            return MenuItemEnum::QUIT;
+        case MenuItemEnum::QUIT:
+            return MenuItemEnum::QUIT;
+        default:
+            return currMenu;
+    }
+    return currMenu;
 }
