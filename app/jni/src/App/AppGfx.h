@@ -59,7 +59,7 @@ private:
     LPErrInApp showOptionGeneral();
 
     MenuDelegator prepMenuDelegator();
-    void drawSceneBackground();
+    void clearBackground();
     LPErrInApp loadSceneBackground();
 
 private:

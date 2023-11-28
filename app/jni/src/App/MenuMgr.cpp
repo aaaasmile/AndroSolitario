@@ -16,7 +16,7 @@
 #include "WinTypeGlobal.h"
 
 static const char* g_lpszMsgUrl = "Go to invido.it";
-static const char* g_lpszVersion = "Ver 2.0.2 20230919";
+static const char* g_lpszVersion = "Ver 2.3.1 20231128";
 static const char* g_lpszIniFontVera = DATA_PREFIX "font/vera.ttf";
 
 static const SDL_Color g_color_on = {253, 252, 250};
@@ -63,16 +63,29 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
     _p_Screen = pScreen;
     _p_sdlRenderer = pRenderer;
     _p_Window = pWindow;
+    int sizeBigFactorH = 1;
+    int sizeBigFactorW = 1;
+    if (_p_Screen->h > 1200) {
+        sizeBigFactorH = 2;
+    }
+    if (_p_Screen->w > 1200) {
+        sizeBigFactorW = 2;
+    }
 
     _screenW = _p_Screen->clip_rect.w;
     _box_X = _screenW / 6;
     _screenH = _p_Screen->clip_rect.h;
     _box_Y = _screenH / 5;
 
-    _rctPanel.w = _screenW - _box_X * 2;
-    _rctPanel.h = _screenH - _box_Y * 2;
-    _rctPanel.x = _box_X;
-    _rctPanel.y = _box_Y;
+    _rctPanelRedBox.w = _screenW - _box_X * 2;
+    _rctPanelRedBox.h = _screenH - _box_Y * 2;
+    _rctPanelRedBox.w = min(_rctPanelRedBox.w, 800);
+    _rctPanelRedBox.h = min(_rctPanelRedBox.h, 600);
+
+    _rctPanelRedBox.x = (_screenW - _rctPanelRedBox.w) / 2;
+    _rctPanelRedBox.y = (_screenH - _rctPanelRedBox.h) / 2;
+    _box_X = _rctPanelRedBox.x;
+    _box_Y = _rctPanelRedBox.y;
 
     _p_ScreenBackbuffer = SDL_CreateRGBSurface(SDL_SWSURFACE, _p_Screen->w,
                                                _p_Screen->h, 32, 0, 0, 0, 0);
@@ -88,12 +101,12 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
     _p_fontVera = (_menuDlgt.tc)->GetFontVera(_menuDlgt.self);
     _p_Languages = (_menuDlgt.tc)->GetLanguageMan(_menuDlgt.self);
 
-    _p_MenuBox = SDL_CreateRGBSurface(SDL_SWSURFACE, _rctPanel.w, _rctPanel.h,
-                                      32, 0, 0, 0, 0);
+    _p_MenuBox = SDL_CreateRGBSurface(SDL_SWSURFACE, _rctPanelRedBox.w,
+                                      _rctPanelRedBox.h, 32, 0, 0, 0, 0);
     SDL_FillRect(_p_MenuBox, NULL,
                  SDL_MapRGBA(_p_Screen->format, 255, 0, 0, 0));
     SDL_SetSurfaceBlendMode(_p_MenuBox, SDL_BLENDMODE_BLEND);
-    SDL_SetSurfaceAlphaMod(_p_MenuBox, 127);  // SDL 2.0
+    SDL_SetSurfaceAlphaMod(_p_MenuBox, 127);
 
     // link to invido.it
     _p_fontVeraUnderscore = TTF_OpenFont(g_lpszIniFontVera, 11);
@@ -106,8 +119,8 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
     SDL_Rect rctBt1;
     rctBt1.h = 28;
     rctBt1.w = 150;
-    rctBt1.y = _p_Screen->h - rctBt1.h - 20;
-    rctBt1.x = _p_Screen->w - rctBt1.w - 20;
+    rctBt1.y = _p_Screen->h - rctBt1.h - 20 * sizeBigFactorH;
+    rctBt1.x = _p_Screen->w - rctBt1.w - 20 * sizeBigFactorW;
     _p_homeUrl = new LabelLinkGfx;
     ClickCb cbNUll = ClickCb{.tc = NULL, .self = NULL};
     _p_homeUrl->Initialize(&rctBt1, _p_ScreenBackbuffer, _p_fontVeraUnderscore,
@@ -120,51 +133,58 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
     _p_LabelVersion = new LabelGfx;
     rctBt1.h = 28;
     rctBt1.w = 150;
-    rctBt1.y = _p_homeUrl->PosY() - 20;
+    rctBt1.y = _p_homeUrl->PosY() - 20 * sizeBigFactorH;
     rctBt1.x = _p_homeUrl->PosX();
     _p_LabelVersion->Initialize(&rctBt1, _p_ScreenBackbuffer, _p_fontVera);
     _p_LabelVersion->SetState(LabelGfx::INVISIBLE);
     _p_LabelVersion->SetWindowText(g_lpszVersion);
 
-    SDL_FillRect(_p_ScreenBackbuffer, &_p_ScreenBackbuffer->clip_rect,
-                 SDL_MapRGBA(_p_ScreenBackbuffer->format, 0, 0, 0, 0));
-    SDL_BlitSurface(_p_Screen, NULL, _p_ScreenBackbuffer, NULL);
+    // SDL_FillRect(_p_ScreenBackbuffer, &_p_ScreenBackbuffer->clip_rect,
+    //              SDL_MapRGBA(_p_ScreenBackbuffer->format, 0, 0, 0, 0));
+    // SDL_BlitSurface(_p_Screen, NULL, _p_ScreenBackbuffer, NULL);
 
     return NULL;
 }
 
-void MenuMgr::drawBackground(SDL_Surface* psurf) {
+LPErrInApp MenuMgr::drawStaticScene() {
+    // function called in loop
     SDL_Rect rctTarget;
-    rctTarget.x = (psurf->w - _p_SceneBackground->w) / 2;
-    rctTarget.y = (psurf->h - _p_SceneBackground->h) / 2;
+    LPErrInApp err = NULL;
+    rctTarget.x = (_p_ScreenBackbuffer->w - _p_SceneBackground->w) / 2;
+    rctTarget.y = (_p_ScreenBackbuffer->h - _p_SceneBackground->h) / 2;
     rctTarget.w = _p_SceneBackground->w;
     rctTarget.h = _p_SceneBackground->h;
 
-    SDL_BlitSurface(_p_SceneBackground, NULL, psurf, &rctTarget);
-
-    _screenW = psurf->clip_rect.w;
-    _box_X = _screenW / 6;
-    _screenH = psurf->clip_rect.h;
-    _box_Y = _screenH / 5;
-
-    Uint32 c_redfg = SDL_MapRGB(psurf->format, 153, 202, 51);
+    // sfondo img
+    // SDL_BlitSurface(_p_SceneBackground, NULL, psurf, &rctTarget);
+    Uint32 colorBarTitle = SDL_MapRGB(_p_ScreenBackbuffer->format, 153, 202, 51);
 
     // content
-    GFX_UTIL::DrawStaticSpriteEx(psurf, 0, 0, _rctPanel.w, _rctPanel.h,
-                                 _rctPanel.x, _rctPanel.y, _p_MenuBox);
+    GFX_UTIL::DrawStaticSpriteEx(_p_ScreenBackbuffer, 0, 0, _rctPanelRedBox.w,
+                                 _rctPanelRedBox.h, _rctPanelRedBox.x,
+                                 _rctPanelRedBox.y, _p_MenuBox);
 
     // header bar
-    GFX_UTIL::FillRect(psurf, _box_X, _box_Y - 2, _screenW - _box_X * 2, 38,
-                       c_redfg);
+    int hbar = 38;
+    GFX_UTIL::FillRect(_p_ScreenBackbuffer, _box_X, _box_Y - (2 + hbar), _rctPanelRedBox.w,
+                       hbar, colorBarTitle);
 
-    GFX_UTIL::DrawRect(psurf, _box_X - 1, _box_Y - 1, _screenW - _box_X + 1,
-                       _screenH - _box_Y + 1, g_color_gray);
-    GFX_UTIL::DrawRect(psurf, _box_X - 2, _box_Y - 2, _screenW - _box_X + 2,
-                       _screenH - _box_Y + 2, g_color_black);
-    GFX_UTIL::DrawRect(psurf, _box_X, _box_Y, _screenW - _box_X,
-                       _screenH - _box_Y, g_color_white);
-    GFX_UTIL::DrawRect(psurf, _box_X, _box_Y, _screenW - _box_X, _box_Y + 36,
-                       g_color_white);
+    // GFX_UTIL::DrawRect(_p_ScreenBackbuffer, _box_X - 1, _box_Y - 1 - hbar,
+    //                    _rctPanelRedBox.w + 1, _rctPanelRedBox.h + 1,
+    //                    g_color_gray);
+    // GFX_UTIL::DrawRect(_p_ScreenBackbuffer, _box_X - 2, _box_Y - 2, _rctPanelRedBox.w + 2,
+    //                    _rctPanelRedBox.h + 2, g_color_black);
+    // GFX_UTIL::DrawRect(_p_ScreenBackbuffer, _box_X, _box_Y, _rctPanelRedBox.w,
+    //                    _rctPanelRedBox.h, g_color_white);
+    // GFX_UTIL::DrawRect(_p_ScreenBackbuffer, _box_X, _box_Y, _rctPanelRedBox.w, _box_Y + 36,
+    //                    g_color_white);
+    // Draw title bar
+    SDL_Color color = g_color_white;
+    err = drawMenuText(
+        _p_ScreenBackbuffer,
+        _p_Languages->GetStringId(Languages::ID_WELCOMETITLEBAR).c_str(),
+        _box_X + 10, _box_Y + 5 - hbar, color, _p_fontAriblk);
+    return err;
 }
 
 LPErrInApp MenuMgr::drawMenuText(SDL_Surface* psurf, const char* text, int x,
@@ -217,24 +237,9 @@ MenuItemEnum nextMenu(MenuItemEnum currMenu) {
     return currMenu;
 }
 
-LPErrInApp MenuMgr::HandleRootMenu() {
+LPErrInApp MenuMgr::drawMenuTextList() {
+    SDL_Color color;
     LPErrInApp err;
-    // show the link url label
-    _p_homeUrl->SetState(LabelLinkGfx::VISIBLE);
-    _p_LabelVersion->SetState(LabelGfx::VISIBLE);
-
-    SDL_Color color = g_color_white;
-    drawBackground(_p_ScreenBackbuffer);
-
-    // Draw title bar
-    err = drawMenuText(
-        _p_ScreenBackbuffer,
-        _p_Languages->GetStringId(Languages::ID_WELCOMETITLEBAR).c_str(),
-        _box_X + 10, _box_Y + 5, color, _p_fontAriblk);
-    if (err != NULL) {
-        return err;
-    }
-
     // Play
     if (_focusedMenuItem != MenuItemEnum::MENU_GAME) {
         color = g_color_off;
@@ -313,12 +318,31 @@ LPErrInApp MenuMgr::HandleRootMenu() {
     if (err != NULL) {
         return err;
     }
+    return NULL;
+}
+
+LPErrInApp MenuMgr::HandleRootMenu() {
+    LPErrInApp err;
+    // show the link url label
+    _p_homeUrl->SetState(LabelLinkGfx::VISIBLE);
+    _p_LabelVersion->SetState(LabelGfx::VISIBLE);
+
+    SDL_Color color = g_color_white;
+    err = drawStaticScene();
+    if (err != NULL) {
+        return err;
+    }
+    err = drawMenuTextList();
+    if (err != NULL) {
+        return err;
+    }
 
     SDL_Point touchLocation;
     bool mouseInside;
     SDL_Event event;
     LPGameSettings pGameSettings = GAMESET::GetSettings();
-    bool ignoreMouseEvent = pGameSettings->InputType == InputTypeEnum::TouchWithoutMouse;
+    bool ignoreMouseEvent =
+        pGameSettings->InputType == InputTypeEnum::TouchWithoutMouse;
     while (SDL_PollEvent(&event)) {
         if (event.type == SDL_QUIT) {
             (_menuDlgt.tc)->LeaveMenu(_menuDlgt.self);
@@ -354,10 +378,10 @@ LPErrInApp MenuMgr::HandleRootMenu() {
             if (ignoreMouseEvent) {
                 break;
             }
-            if (event.motion.x >= _rctPanel.x &&
-                event.motion.x <= _rctPanel.x + _rctPanel.h &&
-                event.motion.y >= _rctPanel.y &&
-                event.motion.y <= _rctPanel.y + _rctPanel.h) {
+            if (event.motion.x >= _rctPanelRedBox.x &&
+                event.motion.x <= _rctPanelRedBox.x + _rctPanelRedBox.h &&
+                event.motion.y >= _rctPanelRedBox.y &&
+                event.motion.y <= _rctPanelRedBox.y + _rctPanelRedBox.h) {
                 // mouse is inner to the box
                 if (event.motion.y < _box_Y + 100) {
                     _focusedMenuItem = MenuItemEnum::MENU_GAME;

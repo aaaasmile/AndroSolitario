@@ -29,9 +29,10 @@ class MenuMgr {
     void SetBackground(SDL_Surface* pVal) { _p_SceneBackground = pVal; }
 
    private:
-    void drawBackground(SDL_Surface* psurf);
     LPErrInApp drawMenuText(SDL_Surface* psurf, const char* text, int x, int y,
                             SDL_Color& color, TTF_Font* customfont);
+    LPErrInApp drawStaticScene();
+    LPErrInApp drawMenuTextList();
     void rootMenuNext();
     void updateTextureAsFlipScreen();
 
@@ -53,7 +54,7 @@ class MenuMgr {
     int _box_X;
     int _screenW;
     int _screenH;
-    SDL_Rect _rctPanel;
+    SDL_Rect _rctPanelRedBox;
     LabelGfx* _p_LabelVersion;
     LabelLinkGfx* _p_homeUrl;
 };

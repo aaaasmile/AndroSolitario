@@ -136,7 +136,7 @@ LPErrInApp AppGfx::Init() {
         return err;
     }
 
-    drawSceneBackground();
+    clearBackground();
 
     err = _p_MusicManager->LoadMusicRes();
     if (err != NULL) {
@@ -361,7 +361,7 @@ MenuDelegator AppGfx::prepMenuDelegator() {
 }
 
 void AppGfx::LeaveMenu() {
-    drawSceneBackground();
+    clearBackground();
     _histMenu.pop();
 }
 
@@ -374,18 +374,10 @@ LPErrInApp AppGfx::SettingsChanged(bool backGroundChanged,
     return writeProfile();
 }
 
-void AppGfx::drawSceneBackground() {
-    TRACE_DEBUG("drawSceneBackground %dx%d\n", _p_SceneBackground->w,
-                _p_SceneBackground->h);
+void AppGfx::clearBackground() {
+    TRACE_DEBUG("Clear background\n");
     SDL_FillRect(_p_Screen, &_p_Screen->clip_rect,
                  SDL_MapRGBA(_p_Screen->format, 0, 0, 0, 0));
-    SDL_Rect rctTarget;
-    rctTarget.x = (_p_Screen->w - _p_SceneBackground->w) / 2;
-    rctTarget.y = (_p_Screen->h - _p_SceneBackground->h) / 2;
-    rctTarget.w = _p_SceneBackground->w;
-    rctTarget.h = _p_SceneBackground->h;
-
-    SDL_BlitSurface(_p_SceneBackground, NULL, _p_Screen, &rctTarget);
     updateScreenTexture();
 }
 
