@@ -267,6 +267,12 @@ Niente ini.
 - shuffle_random è marcato obsoleto in ndk, il risultato è che non mescola un bel nulla
 - A livello generale direi che il tap non ce l'ho sotto controllo
 
+## Mouse e Touch
+Una discussione interessante sull'argomento si trova su 
+https://discourse.libsdl.org/t/mouse-emulation-of-touch-events/19255/6
+Il fatto è che il touch event viene rimbalzato anche come mouse event. Solo che il rimbalzo
+non è assolutamente preciso. Quindi su Android scelgo di ignorare gli eventi del mouse.
+
 ## Compilzzione con target wsl
 Uso CMake per compilare il target su WSL, mentre ndk con gradle (Android.mk) per quanto
 riguarda il target Android.

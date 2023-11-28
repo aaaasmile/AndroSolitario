@@ -11,9 +11,9 @@
 #include "CompGfx/LabelLinkGfx.h"
 #include "Config.h"
 #include "ErrorInfo.h"
+#include "GameSettings.h"
 #include "GfxUtil.h"
 #include "WinTypeGlobal.h"
-#include "GameSettings.h"
 
 static const char* g_lpszMsgUrl = "Go to invido.it";
 static const char* g_lpszVersion = "Ver 2.0.2 20230919";
@@ -318,6 +318,7 @@ LPErrInApp MenuMgr::HandleRootMenu() {
     bool mouseInside;
     SDL_Event event;
     LPGameSettings pGameSettings = GAMESET::GetSettings();
+    bool ignoreMouseEvent = pGameSettings->InputType == InputTypeEnum::TouchWithoutMouse;
     while (SDL_PollEvent(&event)) {
         if (event.type == SDL_QUIT) {
             (_menuDlgt.tc)->LeaveMenu(_menuDlgt.self);
@@ -328,7 +329,10 @@ LPErrInApp MenuMgr::HandleRootMenu() {
             float x = event.tfinger.x;
             float y = event.tfinger.y;
             pGameSettings->GetTouchPoint(event.tfinger, &touchLocation);
-            TRACE_DEBUG("Tap in x=%d, y=%d\n", touchLocation.x, touchLocation.y);
+            TRACE_DEBUG("Tap in x=%d, y=%d\n", touchLocation.x,
+                        touchLocation.y);
+            mouseInside = false;
+            // TODO get mouseInside
         }
 
         if (event.type == SDL_KEYDOWN) {
@@ -347,6 +351,9 @@ LPErrInApp MenuMgr::HandleRootMenu() {
             }
         }
         if (event.type == SDL_MOUSEMOTION) {
+            if (ignoreMouseEvent) {
+                break;
+            }
             if (event.motion.x >= _rctPanel.x &&
                 event.motion.x <= _rctPanel.x + _rctPanel.h &&
                 event.motion.y >= _rctPanel.y &&
@@ -377,11 +384,17 @@ LPErrInApp MenuMgr::HandleRootMenu() {
             _p_homeUrl->MouseMove(event);
         }
         if (event.type == SDL_MOUSEBUTTONDOWN) {
+            if (ignoreMouseEvent) {
+                break;
+            }
             if (mouseInside) {
                 TRACE_DEBUG("Select menu from mouse down\n");
                 rootMenuNext();
             }
         } else if (event.type == SDL_MOUSEBUTTONUP) {
+            if (ignoreMouseEvent) {
+                break;
+            }
             _p_homeUrl->MouseUp(event);
         }
     }

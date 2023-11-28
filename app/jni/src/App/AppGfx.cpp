@@ -71,6 +71,9 @@ LPErrInApp AppGfx::Init() {
         TRACE("Dir changed to %s\n", exeDirPath);
     }
 #endif
+#ifdef ANDROID
+    _p_GameSettings->InputType = InputTypeEnum::TouchWithoutMouse;
+#endif
 
     LPErrInApp err = loadProfile();
     if (err != NULL) {

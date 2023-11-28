@@ -8,6 +8,7 @@
 #include "Languages.h"
 
 enum BackgroundTypeEnum { Commessaggio = 0, Mantova = 1, Black = 2 };
+enum InputTypeEnum {Mouse = 0, TouchWithoutMouse = 1};
 
 class GameSettings {
    public:
@@ -19,6 +20,7 @@ class GameSettings {
     std::string SettingsDir;
     std::string GameName;
     BackgroundTypeEnum BackgroundType;
+    InputTypeEnum InputType;
 
    public:
     GameSettings() {
