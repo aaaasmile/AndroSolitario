@@ -207,11 +207,9 @@ LPErrInApp AppGfx::createWindow() {
     }
     // SDL_SetWindowFullscreen(_p_Window, SDL_WINDOW_FULLSCREEN);
     // TODO get some landscape mode
-    SDL_Rect rc;
-    SDL_GetDisplayBounds(0, &rc);
-    TRACE_DEBUG("Display bound for size is width %d, height %d", rc.w, rc.h);
-    _iScreenH = rc.h;
-    _iScreenW = rc.w;
+    _p_GameSettings->CalcDisplaySize();
+    _iScreenH = _p_GameSettings->GetScreenHeight();
+    _iScreenW = _p_GameSettings->GetScreenWidth();
 
     _p_sdlRenderer =
         SDL_CreateRenderer(_p_Window, -1, SDL_RENDERER_ACCELERATED);
@@ -579,15 +577,13 @@ void AppGfx::ParseCmdLine(int argc, char *argv[]) {
     for (int i = 1; i < argc; i++) {
         if (strcmp(argv[i], "--help") == 0 || strcmp(argv[i], "-h") == 0) {
             printf(
-                "Solitario versione %s (c) 2004-2023 Invido.it\nFai "
-                "partire "
-                "il "
-                "solitario con le seguenti opzioni:\n"
+                "Solitario version %s (c) 2004-2023 Invido.it\nOptions "
+                "available: \n"
                 "--nosound      - to disable sound/music\n"
                 "--fullscreen   - to run in fullscreen, if possible "
                 "(vs. "
                 "windowed)\n"
-                "--size x,y Fa partire il programma ad una risoluzione "
+                "--size x,y starts the Solitario at given resolution "
                 "x,y \n",
                 VERSION);
 
@@ -634,19 +630,18 @@ void AppGfx::ParseCmdLine(int argc, char *argv[]) {
         } else if (strcmp(argv[i], "--size") == 0 ||
                    strcmp(argv[i], "-s") == 0) {
             if (i >= argc - 1) {
-                fprintf(stderr, "%s opzione  richiede 2 argomenti\n", argv[i]);
+                fprintf(stderr, "%s two arguments needed\n", argv[i]);
                 usage(1, argv[0]);
             } else {
                 if (parseScreenSize(argv[i + 1])) {
                 } else {
-                    fprintf(stderr, "Parametri non corretti: %s\n",
-                            argv[i + 1]);
+                    fprintf(stderr, "parameter incorrect: %s\n", argv[i + 1]);
                     usage(1, argv[0]);
                 }
                 i++;
             }
         } else {
-            fprintf(stderr, "Unknown option: %s\n", argv[i]);
+            fprintf(stderr, "unknown option: %s\n", argv[i]);
             usage(1, argv[0]);
         }
     }

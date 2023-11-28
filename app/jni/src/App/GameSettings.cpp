@@ -28,49 +28,13 @@ LPGameSettings GAMESET::GetSettings() {
     return _p_GameSettings;
 }
 
-const char* GAMESET::GetExeAppFolder() {
-    if (strlen(_exeRootDir) > 0) {
-        return _exeRootDir;
-    }
-
-    int dirname_length;
-    int length = wai_getExecutablePath(NULL, 0, NULL);
-    char* path = (char*)malloc(length + 1);
-    wai_getExecutablePath(path, length, &dirname_length);
-    path[length] = '\0';
-
-    TRACE("Exe path: %s\n", path);
-
-    std::string exeFolder = path;
-    std::replace(exeFolder.begin(), exeFolder.end(), '\\', '/');
-
-    size_t iPos = exeFolder.find_last_of('/');
-    exeFolder = exeFolder.substr(0, iPos);
-    snprintf(_exeRootDir, sizeof(_exeRootDir), "%s", exeFolder.c_str());
-
-    free(path);
-    return _exeRootDir;
-}
-
-const char* GAMESET::GetNameWithAssets(const char* src_path) {
-#ifdef ANDROID
-    char fpath[PATH_MAX];
-    snprintf(fpath, sizeof(fpath), "%s/%s", SDL_AndroidGetInternalStoragePath(),
-             src_path);
-    std::string fwithAsset = fpath;
-    return fwithAsset.c_str();
-#else
-    return src_path;
-#endif
-}
-
 LPErrInApp GameSettings::LoadSettings() {
     if (SettingsDir == "" || GameName == "") {
         return ERR_UTIL::ErrorCreate(
             "Setting dir for user settings is not defined");
     }
     setSettingFileName();
-    
+
     TRACE("Load setting file %s\n", g_filepath);
     SDL_RWops* src = SDL_RWFromFile(g_filepath, "rb");
     if (src == 0) {
@@ -112,7 +76,7 @@ LPErrInApp GameSettings::LoadSettings() {
     return NULL;
 }
 
-void  GameSettings::setSettingFileName(void){
+void GameSettings::setSettingFileName(void) {
     snprintf(g_filepath, sizeof(g_filepath), "%s/%s.bin", SettingsDir.c_str(),
              GameName.c_str());
 }
@@ -122,7 +86,7 @@ LPErrInApp GameSettings::SaveSettings() {
         return ERR_UTIL::ErrorCreate("User dir for setting is not defined");
     }
     setSettingFileName();
-    
+
     TRACE("Save setting file %s\n", g_filepath);
     uint8_t deckId;
     uint8_t langId;
@@ -133,7 +97,7 @@ LPErrInApp GameSettings::SaveSettings() {
     langId = (uint8_t)CurrentLanguage;
     musEnabled = (uint8_t)MusicEnabled;
     backgroudType = (uint8_t)BackgroundType;
-    
+
     SDL_RWops* dst = SDL_RWFromFile(g_filepath, "wb");
     if (dst == 0) {
         return ERR_UTIL::ErrorCreate("Unable to save setting file %s",
@@ -161,6 +125,57 @@ LPErrInApp GameSettings::SaveSettings() {
     }
     SDL_RWclose(dst);
     return NULL;
+}
+
+void GameSettings::GetTouchPoint(SDL_TouchFingerEvent& tfinger,
+                                 SDL_Point* pPoint) {
+    TRACE_DEBUG("tap on %f, %f - w/h %d/%d\n", tfinger.x, tfinger.y,
+                _screenRect.w, _screenRect.h);
+    pPoint->x = tfinger.x * _screenRect.w;
+    pPoint->y = tfinger.y * _screenRect.h;
+}
+
+void GameSettings::CalcDisplaySize() {
+    SDL_GetDisplayBounds(0, &_screenRect);
+    TRACE_DEBUG("Display bound for size is width %d, height %d", _screenRect.w,
+                _screenRect.h);
+}
+
+//  Namespace GAMESET
+
+void GAMESET::GetNameWithAssets(const char* src_path, std::string& res) {
+#ifdef ANDROID
+    char fpath[PATH_MAX];
+    snprintf(fpath, sizeof(fpath), "%s/%s", SDL_AndroidGetInternalStoragePath(),
+             src_path);
+    res = fpath;
+#else
+    res = src_path;
+#endif
+}
+
+const char* GAMESET::GetExeAppFolder() {
+    if (strlen(_exeRootDir) > 0) {
+        return _exeRootDir;
+    }
+
+    int dirname_length;
+    int length = wai_getExecutablePath(NULL, 0, NULL);
+    char* path = (char*)malloc(length + 1);
+    wai_getExecutablePath(path, length, &dirname_length);
+    path[length] = '\0';
+
+    TRACE("Exe path: %s\n", path);
+
+    std::string exeFolder = path;
+    std::replace(exeFolder.begin(), exeFolder.end(), '\\', '/');
+
+    size_t iPos = exeFolder.find_last_of('/');
+    exeFolder = exeFolder.substr(0, iPos);
+    snprintf(_exeRootDir, sizeof(_exeRootDir), "%s", exeFolder.c_str());
+
+    free(path);
+    return _exeRootDir;
 }
 
 const char* GAMESET::GetHomeFolder() {

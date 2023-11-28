@@ -13,6 +13,7 @@
 #include "ErrorInfo.h"
 #include "GfxUtil.h"
 #include "WinTypeGlobal.h"
+#include "GameSettings.h"
 
 static const char* g_lpszMsgUrl = "Go to invido.it";
 static const char* g_lpszVersion = "Ver 2.0.2 20230919";
@@ -34,7 +35,6 @@ MenuMgr::MenuMgr() {
     _p_Languages = 0;
     _p_MenuBox = 0;
     _p_SceneBackground = 0;
-    _bMouseInside = false;
     _p_homeUrl = NULL;
     _p_LabelVersion = NULL;
 }
@@ -314,7 +314,10 @@ LPErrInApp MenuMgr::HandleRootMenu() {
         return err;
     }
 
+    SDL_Point touchLocation;
+    bool mouseInside;
     SDL_Event event;
+    LPGameSettings pGameSettings = GAMESET::GetSettings();
     while (SDL_PollEvent(&event)) {
         if (event.type == SDL_QUIT) {
             (_menuDlgt.tc)->LeaveMenu(_menuDlgt.self);
@@ -324,8 +327,8 @@ LPErrInApp MenuMgr::HandleRootMenu() {
         if (event.type == SDL_FINGERDOWN) {
             float x = event.tfinger.x;
             float y = event.tfinger.y;
-            //_p_Window. get_AbsPixels(&x, &y);
-            TRACE_DEBUG("Tap in x=%f, y=%f\n", x, y);
+            pGameSettings->GetTouchPoint(event.tfinger, &touchLocation);
+            TRACE_DEBUG("Tap in x=%d, y=%d\n", touchLocation.x, touchLocation.y);
         }
 
         if (event.type == SDL_KEYDOWN) {
@@ -336,6 +339,7 @@ LPErrInApp MenuMgr::HandleRootMenu() {
                 _focusedMenuItem = nextMenu(_focusedMenuItem);
             }
             if (event.key.keysym.sym == SDLK_RETURN) {
+                TRACE_DEBUG("Select menu from return\n");
                 rootMenuNext();
             }
             if (event.key.keysym.sym == SDLK_ESCAPE) {
@@ -365,15 +369,16 @@ LPErrInApp MenuMgr::HandleRootMenu() {
                 } else if (event.motion.y >= _screenH - _box_Y - 40) {
                     _focusedMenuItem = MenuItemEnum::QUIT;
                 }
-                _bMouseInside = true;
+                mouseInside = true;
             } else {
                 // mouse outside, no focus
-                _bMouseInside = false;
+                mouseInside = false;
             }
             _p_homeUrl->MouseMove(event);
         }
         if (event.type == SDL_MOUSEBUTTONDOWN) {
-            if (_bMouseInside) {
+            if (mouseInside) {
+                TRACE_DEBUG("Select menu from mouse down\n");
                 rootMenuNext();
             }
         } else if (event.type == SDL_MOUSEBUTTONUP) {

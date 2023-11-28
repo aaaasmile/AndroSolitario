@@ -56,7 +56,6 @@ class MenuMgr {
     SDL_Rect _rctPanel;
     LabelGfx* _p_LabelVersion;
     LabelLinkGfx* _p_homeUrl;
-    bool _bMouseInside;
 };
 
 #endif
