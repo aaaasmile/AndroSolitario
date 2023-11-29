@@ -78,6 +78,7 @@ typedef struct MenuItemBoxes {
             _menuInfoBoxes[pos].SetY(sY, eY);
         }
     }
+    void SetPos0Y(int sY, int eY) { _menuInfoBoxes[0].SetY(sY, eY); }
 }* PMenuItemBoxes;
 
 static MenuItemBoxes g_MenuItemBoxes = {{{0, 0, MenuItemEnum::MENU_GAME},
@@ -297,6 +298,7 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     LPErrInApp err;
     int offsetX = 30;
     int offsetY = 60;
+    int morePlaceY = 40;
     int intraOffset = (_rctPanelRedBox.h - 80) / 5;
     int minIntraOffsetY = 80;
     intraOffset = min(minIntraOffsetY, intraOffset);
@@ -313,7 +315,8 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     if (err != NULL) {
         return err;
     }
-    g_MenuItemBoxes._menuInfoBoxes[0].SetY(_box_Y, currY);
+    currY += morePlaceY;
+    g_MenuItemBoxes.SetPos0Y(_box_Y, currY);
     // Options
     currY = currY + intraOffset;
     if (_focusedMenuItem != MenuItemEnum::MENU_OPTIONS) {
@@ -328,6 +331,7 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     if (err != NULL) {
         return err;
     }
+    currY += morePlaceY;
     g_MenuItemBoxes.SetYInPos(1, currY);
     // Credits
     currY = currY + intraOffset;
@@ -342,6 +346,7 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     if (err != NULL) {
         return err;
     }
+    currY += morePlaceY;
     g_MenuItemBoxes.SetYInPos(2, currY);
 
     // Help
@@ -357,6 +362,7 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     if (err != NULL) {
         return err;
     }
+    currY += morePlaceY;
     g_MenuItemBoxes.SetYInPos(3, currY);
 
     // highscore
@@ -373,6 +379,7 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     if (err != NULL) {
         return err;
     }
+    currY += morePlaceY;
     g_MenuItemBoxes.SetYInPos(4, currY);
 
     // Quit
@@ -390,7 +397,7 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     if (err != NULL) {
         return err;
     }
-    g_MenuItemBoxes._menuInfoBoxes[5].SetY(lastY, _box_Y + _rctPanelRedBox.h);
+    g_MenuItemBoxes.SetYInPos(5, _box_Y + _rctPanelRedBox.h);
     return NULL;
 }
 
