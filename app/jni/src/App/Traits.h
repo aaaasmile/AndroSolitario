@@ -14,6 +14,7 @@ enum MenuItemEnum {
     MENU_HIGHSCORE = 4,
     QUIT = 5,
     MENU_ROOT = 6,
+    NOTHING = 99
 };
 
 namespace traits {

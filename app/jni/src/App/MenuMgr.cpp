@@ -30,6 +30,89 @@ static const SDL_Color g_color_red = {255, 0, 0};
 MenuItemEnum nextMenu(MenuItemEnum currMenu);
 MenuItemEnum previousMenu(MenuItemEnum currMenu);
 
+typedef struct MenuItemBox {
+    int StartY;
+    int EndY;
+    MenuItemEnum MenuItem;
+    void SetY(int sy, int ey) {
+        StartY = sy;
+        EndY = ey;
+    }
+}* PMenuItemBox;
+
+const int NumOfMenuItems = 6;
+typedef struct MenuItemBoxes {
+    MenuItemBox _menuInfoBoxes[NumOfMenuItems];
+    int MinX;
+    int MaxX;
+    int MinY;
+    int MaxY;
+    bool IsTapInside(const SDL_Point& tap, MenuItemBox& tapped) {
+        tapped = {0, 0, MenuItemEnum::NOTHING};
+        if (tap.x > MaxX || tap.x < MinX) {
+            return false;
+        }
+        if (tap.y > MaxY || tap.y < MinY) {
+            return false;
+        }
+        for (int i = 0; i < NumOfMenuItems; i++) {
+            tapped.MenuItem = _menuInfoBoxes[i].MenuItem;
+            if (tap.y >= _menuInfoBoxes[i].StartY &&
+                tap.y <= _menuInfoBoxes[i].EndY) {
+                return true;
+            }
+        }
+        tapped.MenuItem = _menuInfoBoxes[4].MenuItem;
+        return true;
+    }
+    void SetBox(const SDL_Rect& rct) {
+        MinX = rct.x;
+        MinY = rct.y;
+        MaxX = rct.x + rct.w;
+        MaxY = rct.y + rct.h;
+        TRACE_DEBUG("Menubox is %d -> %d, %d -> %d \n", MinX, MaxX, MinY, MaxY);
+    }
+    void SetYInPos(int pos, int eY) {
+        if (pos >= 1 && pos < NumOfMenuItems) {
+            int sY = _menuInfoBoxes[pos - 1].EndY + 1;
+            _menuInfoBoxes[pos].SetY(sY, eY);
+        }
+    }
+}* PMenuItemBoxes;
+
+static MenuItemBoxes g_MenuItemBoxes = {{{0, 0, MenuItemEnum::MENU_GAME},
+                                         {0, 0, MenuItemEnum::MENU_OPTIONS},
+                                         {0, 0, MenuItemEnum::MENU_CREDITS},
+                                         {0, 0, MenuItemEnum::MENU_HELP},
+                                         {0, 0, MenuItemEnum::MENU_HIGHSCORE},
+                                         {0, 0, MenuItemEnum::QUIT}},
+                                        0,
+                                        0,
+                                        0,
+                                        0};
+
+constexpr const char* MenuItemEnumToString(MenuItemEnum e) {
+    switch (e) {
+        case MenuItemEnum::MENU_GAME:
+            return "MENU_GAME";
+        case MenuItemEnum::MENU_OPTIONS:
+            return "MENU_OPTIONS";
+        case MenuItemEnum::MENU_CREDITS:
+            return "MENU_CREDITS";
+        case MenuItemEnum::MENU_HELP:
+            return "MENU_HELP";
+        case MenuItemEnum::MENU_HIGHSCORE:
+            return "MENU_HIGHSCORE";
+        case MenuItemEnum::QUIT:
+            return "QUIT";
+        case MenuItemEnum::NOTHING:
+            return "NOTHING";
+        default:
+            return "undef";
+    }
+}
+
+////////////////////
 MenuMgr::MenuMgr() {
     _p_fontAriblk = 0;
     _p_fontVera = 0;
@@ -98,6 +181,7 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
     _box_Y = _rctPanelRedBox.y;
     TRACE("Menu Window dim: x: %d, y: %d - w: %d, h: %d\n", _box_X, _box_Y,
           _rctPanelRedBox.w, _rctPanelRedBox.h);
+    g_MenuItemBoxes.SetBox(_rctPanelRedBox);
 
     _p_ScreenBackbuffer = SDL_CreateRGBSurface(SDL_SWSURFACE, _p_Screen->w,
                                                _p_Screen->h, 32, 0, 0, 0, 0);
@@ -229,6 +313,7 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     if (err != NULL) {
         return err;
     }
+    g_MenuItemBoxes._menuInfoBoxes[0].SetY(_box_Y, currY);
     // Options
     currY = currY + intraOffset;
     if (_focusedMenuItem != MenuItemEnum::MENU_OPTIONS) {
@@ -239,11 +324,11 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     err = drawMenuText(
         _p_ScreenBackbuffer,
         _p_Languages->GetStringId(Languages::ID_MEN_OPTIONS).c_str(),
-        _box_X + offsetX, currY, color,
-        _p_fontAriblk);
+        _box_X + offsetX, currY, color, _p_fontAriblk);
     if (err != NULL) {
         return err;
     }
+    g_MenuItemBoxes.SetYInPos(1, currY);
     // Credits
     currY = currY + intraOffset;
     if (_focusedMenuItem != MenuItemEnum::MENU_CREDITS) {
@@ -253,11 +338,11 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     }
     err = drawMenuText(_p_ScreenBackbuffer,
                        _p_Languages->GetStringId(Languages::ID_CREDITS).c_str(),
-                       _box_X + offsetX, currY,
-                       color, _p_fontAriblk);
+                       _box_X + offsetX, currY, color, _p_fontAriblk);
     if (err != NULL) {
         return err;
     }
+    g_MenuItemBoxes.SetYInPos(2, currY);
 
     // Help
     currY = currY + intraOffset;
@@ -268,11 +353,11 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     }
     err = drawMenuText(_p_ScreenBackbuffer,
                        _p_Languages->GetStringId(Languages::ID_MN_HELP).c_str(),
-                       _box_X + offsetX, currY,
-                       color, _p_fontAriblk);
+                       _box_X + offsetX, currY, color, _p_fontAriblk);
     if (err != NULL) {
         return err;
     }
+    g_MenuItemBoxes.SetYInPos(3, currY);
 
     // highscore
     currY = currY + intraOffset;
@@ -284,11 +369,11 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     err =
         drawMenuText(_p_ScreenBackbuffer,
                      _p_Languages->GetStringId(Languages::ID_HIGHSCORE).c_str(),
-                     _box_X + offsetX, currY,
-                     color, _p_fontAriblk);
+                     _box_X + offsetX, currY, color, _p_fontAriblk);
     if (err != NULL) {
         return err;
     }
+    g_MenuItemBoxes.SetYInPos(4, currY);
 
     // Quit
     currY = currY + intraOffset + 20;
@@ -301,12 +386,11 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     }
     err = drawMenuText(_p_ScreenBackbuffer,
                        _p_Languages->GetStringId(Languages::ID_EXIT).c_str(),
-                       _box_X + offsetX,
-                       lastY,
-                       color, _p_fontAriblk);
+                       _box_X + offsetX, lastY, color, _p_fontAriblk);
     if (err != NULL) {
         return err;
     }
+    g_MenuItemBoxes._menuInfoBoxes[5].SetY(lastY, _box_Y + _rctPanelRedBox.h);
     return NULL;
 }
 
@@ -344,8 +428,21 @@ LPErrInApp MenuMgr::HandleRootMenu() {
             pGameSettings->GetTouchPoint(event.tfinger, &touchLocation);
             TRACE_DEBUG("Tap in x=%d, y=%d\n", touchLocation.x,
                         touchLocation.y);
-            mouseInside = false;
-            // TODO get mouseInside
+            // mouseInside = checkTapInsideBox(touchLocation);
+            // if (mouseInside && isFocusedItemConfirmed(touchLocation)) {
+            MenuItemBox tapInfoBox;
+            if (g_MenuItemBoxes.IsTapInside(touchLocation, tapInfoBox)) {
+                if (tapInfoBox.MenuItem == _focusedMenuItem) {
+                    TRACE_DEBUG("Select menu from Tap down\n");
+                    rootMenuNext();
+                } else {
+                    _focusedMenuItem = tapInfoBox.MenuItem;
+                    TRACE_DEBUG("Tap Focus on Menu item %s\n",
+                                MenuItemEnumToString(_focusedMenuItem));
+                }
+            } else {
+                TRACE_DEBUG("Tap outside the menu list\n");
+            }
         }
 
         if (event.type == SDL_KEYDOWN) {
@@ -438,7 +535,8 @@ void MenuMgr::updateTextureAsFlipScreen() {
 }
 
 void MenuMgr::rootMenuNext() {
-    TRACE_DEBUG("Menu selected %d\n", _focusedMenuItem);
+    TRACE_DEBUG("Menu selected %s\n", MenuItemEnumToString(_focusedMenuItem));
+    return;  // TODO remove it
     if (_focusedMenuItem == MenuItemEnum::QUIT) {
         (_menuDlgt.tc)->LeaveMenu(_menuDlgt.self);
     } else {
