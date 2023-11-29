@@ -545,7 +545,6 @@ void MenuMgr::updateTextureAsFlipScreen() {
 
 void MenuMgr::rootMenuNext() {
     TRACE_DEBUG("Menu selected %s\n", MenuItemEnumToString(_focusedMenuItem));
-    return;  // TODO remove it
     if (_focusedMenuItem == MenuItemEnum::QUIT) {
         (_menuDlgt.tc)->LeaveMenu(_menuDlgt.self);
     } else {
