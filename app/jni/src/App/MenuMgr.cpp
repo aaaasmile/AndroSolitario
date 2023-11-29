@@ -33,6 +33,7 @@ MenuItemEnum previousMenu(MenuItemEnum currMenu);
 typedef struct MenuItemBox {
     int StartY;
     int EndY;
+
     MenuItemEnum MenuItem;
     void SetY(int sy, int ey) {
         StartY = sy;
@@ -40,19 +41,29 @@ typedef struct MenuItemBox {
     }
 }* PMenuItemBox;
 
-const int NumOfMenuItems = 6;
-typedef struct MenuItemBoxes {
+static const int NumOfMenuItems = 6;
+typedef class MenuItemBoxes {
     MenuItemBox _menuInfoBoxes[NumOfMenuItems];
-    int MinX;
-    int MaxX;
-    int MinY;
-    int MaxY;
+    int _minX;
+    int _maxX;
+    int _minY;
+    int _maxY;
+
+   public:
+    MenuItemBoxes() {
+        _menuInfoBoxes[0] = {0, 0, MenuItemEnum::MENU_GAME};
+        _menuInfoBoxes[1] = {0, 0, MenuItemEnum::MENU_OPTIONS};
+        _menuInfoBoxes[2] = {0, 0, MenuItemEnum::MENU_CREDITS};
+        _menuInfoBoxes[3] = {0, 0, MenuItemEnum::MENU_HELP};
+        _menuInfoBoxes[4] = {0, 0, MenuItemEnum::MENU_HIGHSCORE};
+        _menuInfoBoxes[5] = {0, 0, MenuItemEnum::QUIT};
+    }
     bool IsTapInside(const SDL_Point& tap, MenuItemBox& tapped) {
         tapped = {0, 0, MenuItemEnum::NOTHING};
-        if (tap.x > MaxX || tap.x < MinX) {
+        if (tap.x > _maxX || tap.x < _minX) {
             return false;
         }
-        if (tap.y > MaxY || tap.y < MinY) {
+        if (tap.y > _maxY || tap.y < _minY) {
             return false;
         }
         for (int i = 0; i < NumOfMenuItems; i++) {
@@ -66,11 +77,11 @@ typedef struct MenuItemBoxes {
         return true;
     }
     void SetBox(const SDL_Rect& rct) {
-        MinX = rct.x;
-        MinY = rct.y;
-        MaxX = rct.x + rct.w;
-        MaxY = rct.y + rct.h;
-        TRACE_DEBUG("Menubox is %d -> %d, %d -> %d \n", MinX, MaxX, MinY, MaxY);
+        _minX = rct.x;
+        _minY = rct.y;
+        _maxX = rct.x + rct.w;
+        _maxY = rct.y + rct.h;
+        TRACE_DEBUG("Menubox is %d -> %d, %d -> %d \n", _minX, _maxX, _minY, _maxY);
     }
     void SetYInPos(int pos, int eY) {
         if (pos >= 1 && pos < NumOfMenuItems) {
@@ -81,16 +92,7 @@ typedef struct MenuItemBoxes {
     void SetPos0Y(int sY, int eY) { _menuInfoBoxes[0].SetY(sY, eY); }
 }* PMenuItemBoxes;
 
-static MenuItemBoxes g_MenuItemBoxes = {{{0, 0, MenuItemEnum::MENU_GAME},
-                                         {0, 0, MenuItemEnum::MENU_OPTIONS},
-                                         {0, 0, MenuItemEnum::MENU_CREDITS},
-                                         {0, 0, MenuItemEnum::MENU_HELP},
-                                         {0, 0, MenuItemEnum::MENU_HIGHSCORE},
-                                         {0, 0, MenuItemEnum::QUIT}},
-                                        0,
-                                        0,
-                                        0,
-                                        0};
+static MenuItemBoxes g_MenuItemBoxes = MenuItemBoxes();
 
 constexpr const char* MenuItemEnumToString(MenuItemEnum e) {
     switch (e) {
