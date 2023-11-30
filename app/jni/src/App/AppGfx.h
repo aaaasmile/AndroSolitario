@@ -44,7 +44,6 @@ public:
     LPErrInApp SettingsChanged(bool backGroundChanged, bool languageChanged);
 
 private:
-    int waitKeyLoop();
     LPErrInApp startGameLoop();
     LPErrInApp createWindow();
     void terminate();
@@ -77,8 +76,8 @@ private:
     HighScore* _p_HighScore;
     Languages _Languages;
 
-    int _iScreenW;
-    int _iScreenH;
+    int _screenW;
+    int _screenH;
     int _iBpp;
 
     bool _bFullScreen;

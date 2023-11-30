@@ -81,7 +81,8 @@ typedef class MenuItemBoxes {
         _minY = rct.y;
         _maxX = rct.x + rct.w;
         _maxY = rct.y + rct.h;
-        TRACE_DEBUG("Menubox is %d -> %d, %d -> %d \n", _minX, _maxX, _minY, _maxY);
+        TRACE_DEBUG("Menubox is %d -> %d, %d -> %d \n", _minX, _maxX, _minY,
+                    _maxY);
     }
     void SetYInPos(int pos, int eY) {
         if (pos >= 1 && pos < NumOfMenuItems) {
@@ -150,12 +151,13 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
                                SDL_Window* pWindow,
                                MenuDelegator& menuDelegator) {
     _menuDlgt = menuDelegator;
+    LPGameSettings pGameSettings = GAMESET::GetSettings();
     _p_Screen = pScreen;
     _p_sdlRenderer = pRenderer;
     _p_Window = pWindow;
     int sizeBigFactorH = 1;
     int sizeBigFactorW = 1;
-    if (_p_Screen->h > 1200) {
+    if (pGameSettings->NeedScreenMagnify()) {
         sizeBigFactorH = 2;
     }
     if (_p_Screen->w > 1200) {
@@ -208,7 +210,7 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
     SDL_SetSurfaceAlphaMod(_p_MenuBox, 127);
 
     // link to invido.it
-    _p_fontVeraUnderscore = TTF_OpenFont(g_lpszIniFontVera, 11);
+    _p_fontVeraUnderscore = TTF_OpenFont(g_lpszIniFontVera, pGameSettings->GetSizeFontSmall());
     if (_p_fontVeraUnderscore == 0) {
         return ERR_UTIL::ErrorCreate(
             "MenuMgr: Unable to load font %s, error: %s\n", g_lpszIniFontVera,
@@ -216,10 +218,17 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
     }
     TTF_SetFontStyle(_p_fontVeraUnderscore, TTF_STYLE_UNDERLINE);
     SDL_Rect rctBt1;
-    rctBt1.h = 28;
-    rctBt1.w = 150;
-    rctBt1.y = _p_Screen->h - rctBt1.h - 20 * sizeBigFactorH;
-    rctBt1.x = _p_Screen->w - rctBt1.w - 20 * sizeBigFactorW;
+    if (pGameSettings->NeedScreenMagnify()) {
+        rctBt1.h = 56;
+        rctBt1.w = 200;
+        rctBt1.y = _p_Screen->h - rctBt1.h - 50;
+        rctBt1.x = _p_Screen->w - rctBt1.w - 90;
+    } else {
+        rctBt1.h = 28;
+        rctBt1.w = 150;
+        rctBt1.y = _p_Screen->h - rctBt1.h - 20;
+        rctBt1.x = _p_Screen->w - rctBt1.w - 20;
+    }
     _p_homeUrl = new LabelLinkGfx;
     ClickCb cbNUll = ClickCb{.tc = NULL, .self = NULL};
     _p_homeUrl->Initialize(&rctBt1, _p_ScreenBackbuffer, _p_fontVeraUnderscore,
@@ -230,10 +239,17 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
 
     // label version
     _p_LabelVersion = new LabelGfx;
-    rctBt1.h = 28;
-    rctBt1.w = 150;
-    rctBt1.y = _p_homeUrl->PosY() - 20 * sizeBigFactorH;
-    rctBt1.x = _p_homeUrl->PosX();
+    if (pGameSettings->NeedScreenMagnify()) {
+        rctBt1.h = 56;
+        rctBt1.w = 200;
+        rctBt1.y = _p_homeUrl->PosY() - 60;
+        rctBt1.x = _p_homeUrl->PosX();
+    } else {
+        rctBt1.h = 28;
+        rctBt1.w = 150;
+        rctBt1.y = _p_homeUrl->PosY() - 20;
+        rctBt1.x = _p_homeUrl->PosX();
+    }
     _p_LabelVersion->Initialize(&rctBt1, _p_ScreenBackbuffer, _p_fontVera);
     _p_LabelVersion->SetState(LabelGfx::INVISIBLE);
     _p_LabelVersion->SetWindowText(g_lpszVersion);

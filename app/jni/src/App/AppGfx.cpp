@@ -47,8 +47,8 @@ AppGfx::AppGfx() {
     _p_Screen = NULL;
     // _iScreenW = 2400 / 2;
     // _iScreenH = 1080 / 2;
-    _iScreenW = 1024;
-    _iScreenH = 768;
+    _screenW = 1024;
+    _screenH = 768;
     _iBpp = 0;
     _p_MusicManager = 0;
     _p_HighScore = 0;
@@ -102,14 +102,19 @@ LPErrInApp AppGfx::Init() {
     if (TTF_Init() == -1) {
         return ERR_UTIL::ErrorCreate("Font init error");
     }
+    if (_p_GameSettings->NeedScreenMagnify()){
+        _p_GameSettings->UseBigFontSize();
+    }
+    int sizeFontBig = _p_GameSettings->GetSizeFontBig();
+    int sizeFontSmall = _p_GameSettings->GetSizeFontSmall();
     std::string strFileFontStatus = g_lpszIniFontAriblk;
-    _p_fontAriblk = TTF_OpenFont(strFileFontStatus.c_str(), 22);
+    _p_fontAriblk = TTF_OpenFont(strFileFontStatus.c_str(), sizeFontBig);
     if (_p_fontAriblk == 0) {
         return ERR_UTIL::ErrorCreate("Unable to load font %s, error: %s\n",
                                      strFileFontStatus.c_str(), SDL_GetError());
     }
     strFileFontStatus = g_lpszIniFontVera;
-    _p_fontVera = TTF_OpenFont(strFileFontStatus.c_str(), 11);
+    _p_fontVera = TTF_OpenFont(strFileFontStatus.c_str(), sizeFontSmall);
     if (_p_fontVera == 0) {
         return ERR_UTIL::ErrorCreate("Unable to load font %s, error: %s\n",
                                      strFileFontStatus.c_str(), SDL_GetError());
@@ -203,7 +208,7 @@ LPErrInApp AppGfx::createWindow() {
 
     _p_Window = SDL_CreateWindow(
         _p_GameSettings->GameName.c_str(), SDL_WINDOWPOS_UNDEFINED,
-        SDL_WINDOWPOS_UNDEFINED, _iScreenW, _iScreenH, flagwin);
+        SDL_WINDOWPOS_UNDEFINED, _screenW, _screenH, flagwin);
     if (_p_Window == NULL) {
         return ERR_UTIL::ErrorCreate("Error SDL_CreateWindow: %s\n",
                                      SDL_GetError());
@@ -211,8 +216,8 @@ LPErrInApp AppGfx::createWindow() {
     // SDL_SetWindowFullscreen(_p_Window, SDL_WINDOW_FULLSCREEN);
     // TODO get some landscape mode
     _p_GameSettings->CalcDisplaySize();
-    _iScreenH = _p_GameSettings->GetScreenHeight();
-    _iScreenW = _p_GameSettings->GetScreenWidth();
+    _screenH = _p_GameSettings->GetScreenHeight();
+    _screenW = _p_GameSettings->GetScreenWidth();
 
     _p_sdlRenderer =
         SDL_CreateRenderer(_p_Window, -1, SDL_RENDERER_ACCELERATED);
@@ -222,7 +227,7 @@ LPErrInApp AppGfx::createWindow() {
                                      SDL_GetError());
     }
 
-    _p_Screen = SDL_CreateRGBSurface(0, _iScreenW, _iScreenH, 32, 0x00FF0000,
+    _p_Screen = SDL_CreateRGBSurface(0, _screenW, _screenH, 32, 0x00FF0000,
                                      0x0000FF00, 0x000000FF, 0xFF000000);
     if (_p_Screen == NULL) {
         return ERR_UTIL::ErrorCreate("Error SDL_CreateRGBSurface: %s\n",
@@ -233,7 +238,7 @@ LPErrInApp AppGfx::createWindow() {
     }
     _p_ScreenTexture =
         SDL_CreateTexture(_p_sdlRenderer, SDL_PIXELFORMAT_ARGB8888,
-                          SDL_TEXTUREACCESS_STREAMING, _iScreenW, _iScreenH);
+                          SDL_TEXTUREACCESS_STREAMING, _screenW, _screenH);
     if (_p_ScreenTexture == NULL) {
         return ERR_UTIL::ErrorCreate("Error SDL_CreateTexture: %s\n",
                                      SDL_GetError());
@@ -383,7 +388,7 @@ void AppGfx::clearBackground() {
 
 LPErrInApp AppGfx::MainLoop() {
     LPErrInApp err;
-    bool bquit = false;
+    bool quit = false;
 
     MenuMgr *pMenuMgr = new MenuMgr();
     MenuDelegator delegator = prepMenuDelegator();
@@ -397,7 +402,7 @@ LPErrInApp AppGfx::MainLoop() {
 
     pMenuMgr->SetBackground(_p_SceneBackground);
 
-    while (!bquit && !_histMenu.empty()) {
+    while (!quit && !_histMenu.empty()) {
         switch (_histMenu.top()) {
             case MenuItemEnum::MENU_ROOT:
                 if (_p_GameSettings->MusicEnabled &&
@@ -450,7 +455,7 @@ LPErrInApp AppGfx::MainLoop() {
 
             case MenuItemEnum::QUIT:
             default:
-                bquit = true;
+                quit = true;
                 break;
         }
 
@@ -469,13 +474,17 @@ LPErrInApp AppGfx::showHelp() {
 #ifdef WIN32
     cmd = "start";
     snprintf(cmdpath, sizeof(cmdpath), "%s .\\%s", cmd, g_lpszHelpFileName);
+#endif
+#ifdef ANDROID 
+    // TODO open the pdf file
+    TRACE_DEBUG("Wanna open file %s\n", g_lpszHelpFileName);
 #else
     cmd = "zathura";
     snprintf(cmdpath, sizeof(cmdpath), "%s ./%s", cmd, g_lpszHelpFileName);
 #endif
-
+#ifndef ANDROID
     system(cmdpath);
-
+#endif
     LeaveMenu();
     return NULL;
 }
@@ -540,22 +549,6 @@ LPErrInApp AppGfx::showOptionGeneral() {
 
     LeaveMenu();
     return NULL;
-}
-
-int AppGfx::waitKeyLoop() {
-    SDL_Event event;
-    while (1) {
-        if (SDL_WaitEvent(&event) == 1) {
-            switch (event.type) {
-                case SDL_KEYDOWN:
-                    return event.key.keysym.scancode;
-                    break;
-                case SDL_MOUSEBUTTONUP:
-                    return event.button.button;
-                    break;
-            }
-        }
-    }
 }
 
 void AppGfx::updateScreenTexture() {
@@ -661,8 +654,8 @@ bool AppGfx::parseScreenSize(LPCSTR strInput) {
     int iNumElemntArr = vct_String.size();
 
     if (iNumElemntArr == 2) {
-        sscanf((LPCSTR)vct_String[0].c_str(), "%d", &_iScreenW);
-        sscanf((LPCSTR)vct_String[1].c_str(), "%d", &_iScreenH);
+        sscanf((LPCSTR)vct_String[0].c_str(), "%d", &_screenW);
+        sscanf((LPCSTR)vct_String[1].c_str(), "%d", &_screenH);
         bRet = true;
     }
     return bRet;
