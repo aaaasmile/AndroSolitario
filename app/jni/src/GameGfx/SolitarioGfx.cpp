@@ -159,7 +159,7 @@ LPErrInApp SolitarioGfx::DrawCardStack(SDL_Surface *s,
     if (pcardRegion == NULL) {
         return ERR_UTIL::ErrorCreate("DrawCardStack region is NULL");
     }
-    TRACE_DEBUG("Draw card stack %d\n", pcardRegion->RegionTypeId());
+    //TRACE_DEBUG("Draw card stack %d\n", pcardRegion->RegionTypeId());
 
     LPErrInApp err;
     if (!pcardRegion->IsVisible())

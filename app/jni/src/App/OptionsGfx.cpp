@@ -447,10 +447,12 @@ LPErrInApp OptionsGfx::ButEndOPtClicked(int iButID) {
 
 void OptionsGfx::CheckboxMusicClicked(bool state) {
     if (state) {
+        TRACE_DEBUG("Enable music by option \n");
         _p_MusicManager->EnableMusic();
         _p_MusicManager->PlayCurrentMusic();
     } else {
         _p_MusicManager->StopMusic(500);
         _p_MusicManager->DisableMusic();
+        TRACE_DEBUG("Disable music by option \n");
     }
 }
