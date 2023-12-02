@@ -87,19 +87,19 @@ ClickCb SolitarioGfx::prepClickNewGameCb() {
     return (ClickCb){.tc = &tc, .self = this};
 }
 
-LPErrInApp SolitarioGfx::Initialize(SDL_Surface *s, SDL_Renderer *r,
-                                    SDL_Window *w, DeckType &dt,
-                                    LPLanguages planguages, TTF_Font *pfontText,
-                                    SDL_Surface *pSceneBackground,
-                                    MusicManager *pMusicManager, bool isBlack,
-                                    HighScore *pHighScore) {
+LPErrInApp SolitarioGfx::Initialize(
+    SDL_Surface *s, SDL_Renderer *r, SDL_Window *w, DeckType &dt,
+    LPLanguages planguages, TTF_Font *pfontSmallText, TTF_Font *pfontBigText, 
+    SDL_Surface *pSceneBackground, MusicManager *pMusicManager, bool isBlack,
+    HighScore *pHighScore) {
     TRACE("Initialize Solitario\n");
     setDeckType(dt);
     _p_MusicManager = pMusicManager;
     _p_HighScore = pHighScore;
     _sceneBackgroundIsBlack = isBlack;
     _p_Languages = planguages;
-    _p_FontText = pfontText;
+    _p_FontBigText = pfontBigText;
+    _p_FontSmallText = pfontSmallText;
     LPErrInApp err;
     _p_Screen = s;
     _p_sdlRenderer = r;
@@ -526,14 +526,15 @@ LPErrInApp SolitarioGfx::DrawInitialScene() {
     rctBt1.h = bth;
     rctBt1.y = _p_Screen->h - btoffsetY;
     rctBt1.x = btposx;
-    _p_BtQuit->Initialize(&rctBt1, _p_Screen, _p_FontText, MYIDQUIT, cbBtQuit);
+    _p_BtQuit->Initialize(&rctBt1, _p_Screen, _p_FontBigText, MYIDQUIT,
+                          cbBtQuit);
     _p_BtQuit->SetVisibleState(ButtonGfx::INVISIBLE);
 
     // button new game
     ClickCb cbBtNewGame = prepClickNewGameCb();
     _p_BtNewGame = new ButtonGfx();
     rctBt1.x = rctBt1.x + rctBt1.w + btintraX;
-    _p_BtNewGame->Initialize(&rctBt1, _p_Screen, _p_FontText, MYIDNEWGAME,
+    _p_BtNewGame->Initialize(&rctBt1, _p_Screen, _p_FontBigText, MYIDNEWGAME,
                              cbBtNewGame);
     _p_BtNewGame->SetVisibleState(ButtonGfx::INVISIBLE);
     return NULL;
@@ -1143,8 +1144,8 @@ int SolitarioGfx::showYesNoMsgBox(LPCSTR strText) {
     rctBox.x = (_p_Screen->w - rctBox.w) / 2;
 
     MsgBox.ChangeAlpha(150);
-    MsgBox.Initialize(&rctBox, _p_Screen, _p_FontText, MesgBoxGfx::TY_MB_YES_NO,
-                      _p_sdlRenderer);
+    MsgBox.Initialize(&rctBox, _p_Screen, _p_FontSmallText,
+                      MesgBoxGfx::TY_MB_YES_NO, _p_sdlRenderer);
     DrawStaticScene();
     SDL_FillRect(_p_AlphaDisplay, &_p_AlphaDisplay->clip_rect,
                  SDL_MapRGBA(_p_AlphaDisplay->format, 0, 0, 0, 0));
@@ -1166,7 +1167,7 @@ void SolitarioGfx::showOkMsgBox(LPCSTR strText) {
     rctBox.x = (_p_Screen->w - rctBox.w) / 2;
 
     MsgBox.ChangeAlpha(150);
-    MsgBox.Initialize(&rctBox, _p_Screen, _p_FontText, MesgBoxGfx::TY_MBOK,
+    MsgBox.Initialize(&rctBox, _p_Screen, _p_FontSmallText, MesgBoxGfx::TY_MBOK,
                       _p_sdlRenderer);
     DrawStaticScene();
     SDL_FillRect(_p_AlphaDisplay, &_p_AlphaDisplay->clip_rect,
@@ -1216,7 +1217,7 @@ LPErrInApp SolitarioGfx::drawScore(SDL_Surface *pScreen) {
     SDL_FillRect(_p_Screen, &rcs, SDL_MapRGBA(pScreen->format, 0, 0, 0, 0));
 
     LPErrInApp err =
-        GFX_UTIL::DrawString(pScreen, buff, tx, ty, colorText, _p_FontText);
+        GFX_UTIL::DrawString(pScreen, buff, tx, ty, colorText, _p_FontBigText);
     if (err != NULL) {
         return err;
     }

@@ -15,15 +15,15 @@
 #endif
 
 #include "Config.h"
+#include "Credits.h"
 #include "ErrorInfo.h"
+#include "Fading.h"
 #include "GfxUtil.h"
 #include "HighScore.h"
 #include "MenuMgr.h"
 #include "MusicManager.h"
 #include "OptionsGfx.h"
 #include "WinTypeGlobal.h"
-#include "Credits.h"
-#include "Fading.h"
 
 static const char *g_lpszHelpFileName = DATA_PREFIX "solitario.pdf";
 
@@ -248,7 +248,8 @@ LPErrInApp AppGfx::startGameLoop() {
 
     err = _p_SolitarioGfx->Initialize(
         _p_Screen, _p_sdlRenderer, _p_Window, _p_GameSettings->DeckTypeVal,
-        &_Languages, _p_fontAriblk, _p_SceneBackground, _p_MusicManager,
+        &_Languages, _p_fontVera, _p_fontAriblk, _p_SceneBackground,
+        _p_MusicManager,
         _p_GameSettings->BackgroundType == BackgroundTypeEnum::Black,
         _p_HighScore);
     if (err != NULL)
