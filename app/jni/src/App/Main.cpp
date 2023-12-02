@@ -21,6 +21,7 @@ int main(int argc, char* argv[]) {
         TRACE("Fatal: %s\n", err->ErrorText.c_str());
         exit(1);
     }
+    delete app; // othewise (error=Try to release egl_surface with context probably still active)
     TRACE("App terminated with success\n");
     return EXIT_SUCCESS;
 }

@@ -306,7 +306,11 @@ che non uso tipo wayland, devo poi ricostruire la directory build.
 Nota che il programma va a finire nella directory ./build/src ed lì dove ho poi messo le 
 risorse nella directory data. Gli asset li ho anche copiati nella directory asset_data_forwsl.
 
+## SDL Activity log
+Se ci sono dei problemi nello startup oppure nella chiusura della App (per esempio mancano dei delete)
+si possono vedere i traces di SDL prima e dopo la chiamata di main() del mio programma con la seguente:
 
+    adb logcat -s "SDL"
 
 ## Compile, Deploy, Start
 
