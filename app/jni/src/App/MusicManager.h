@@ -7,7 +7,7 @@
 
 class MusicManager {
 public:
-    enum { MUSIC_INIT_SND, MUSIC_GAME_SND, NUM_OF_SOUNDS };
+    enum { MUSIC_INIT_SND, MUSIC_CREDITS_SND, MUSIC_PLAY_SND, NUM_OF_SOUNDS };
     enum eLoopType { LOOP_ON, LOOP_OFF };
     enum { NOTHING, NUM_OF_WAV };
     MusicManager();

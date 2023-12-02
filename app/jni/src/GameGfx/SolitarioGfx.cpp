@@ -10,6 +10,7 @@
 #include "Fading.h"
 #include "GfxUtil.h"
 #include "HighScore.h"
+#include "MusicManager.h"
 #include "WinTypeGlobal.h"
 
 // card graphics
@@ -17,10 +18,6 @@ int g_CardWidth = 0;
 int g_CardHeight = 0;
 int g_SymbolWidth = 0;
 int g_SymbolHeight = 0;
-
-#define FPS 30
-#define FRAMETICKS (1000 / FPS)
-#define THINKINGS_PER_TICK 1
 
 static const char *g_lpszSymbDir = DATA_PREFIX "images/";
 extern const char *g_lpszDeckDir;
@@ -93,10 +90,11 @@ ClickCb SolitarioGfx::prepClickNewGameCb() {
 LPErrInApp SolitarioGfx::Initialize(SDL_Surface *s, SDL_Renderer *r,
                                     SDL_Window *w, DeckType &dt,
                                     LPLanguages planguages, TTF_Font *pfontText,
-                                    SDL_Surface *pSceneBackground, bool isBlack,
+                                    SDL_Surface *pSceneBackground, MusicManager* pMusicManager, bool isBlack,
                                     HighScore *pHighScore) {
     TRACE("Initialize Solitario\n");
     setDeckType(dt);
+    _p_MusicManager = pMusicManager;
     _p_HighScore = pHighScore;
     _sceneBackgroundIsBlack = isBlack;
     _p_Languages = planguages;
@@ -463,7 +461,7 @@ LPCardRegionGfx SolitarioGfx::FindDropRegion(int id, LPCardStackGfx pStack) {
 }
 
 void SolitarioGfx::DrawStaticScene() {
-    // static scene is drawn direct into the screen.
+    // static scene is drawn directly into the screen.
     // Then the screen is copied into the back buffer for animations
     SDL_FillRect(_p_Screen, &_p_Screen->clip_rect,
                  SDL_MapRGBA(_p_Screen->format, 0, 0, 0, 0));
@@ -484,7 +482,7 @@ void SolitarioGfx::DrawStaticScene() {
     _p_BtQuit->DrawButton(_p_Screen);
     _scoreChanged = true;
     drawScore(_p_Screen);
-    // it seam here that SDL_BlitSurface copy only the bitmap and not the fill
+    // it seems here that SDL_BlitSurface copy only the bitmap and not the fill
     // rect, do it also into the backbuffer
     SDL_FillRect(_p_ScreenBackbufferDrag, &_p_ScreenBackbufferDrag->clip_rect,
                  SDL_MapRGBA(_p_ScreenBackbufferDrag->format, 0, 0, 0, 0));
@@ -999,6 +997,7 @@ LPErrInApp SolitarioGfx::handleGameLoopMouseUpEvent(SDL_Event &event) {
 }
 
 LPErrInApp SolitarioGfx::StartGameLoop() {
+    _p_MusicManager->PlayMusic(MusicManager::MUSIC_PLAY_SND, MusicManager::eLoopType::LOOP_ON);
     // button Quit
     STRING strTextBt;
     strTextBt = _p_Languages->GetStringId(Languages::ID_EXIT);
@@ -1104,6 +1103,9 @@ LPErrInApp SolitarioGfx::StartGameLoop() {
             }
             DrawStaticScene();
         }
+    }
+    if (_p_MusicManager->IsPlayingMusic()) {
+        _p_MusicManager->StopMusic(300);
     }
     return NULL;
 }

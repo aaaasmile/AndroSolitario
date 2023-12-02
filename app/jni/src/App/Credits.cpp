@@ -152,10 +152,8 @@ int credits(SDL_Surface* p_surf_screen, SDL_Surface* pSurfTitle,
         SDL_CreateTextureFromSurface(psdlRenderer, p_surf_screen);
 
     fade(p_surf_screen, p_surf_screen, 2, 1, psdlRenderer, NULL);
-    if (pMusicManager != NULL) {
-        pMusicManager->PlayMusic(MusicManager::MUSIC_GAME_SND,
-                                 MusicManager::LOOP_ON);
-    }
+    pMusicManager->PlayMusic(MusicManager::MUSIC_CREDITS_SND,
+                             MusicManager::LOOP_ON);
 
     dest.x = (p_surf_screen->w - pSurfTitle->w) / 2;
     dest.y = 0;

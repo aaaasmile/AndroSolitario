@@ -14,6 +14,7 @@ using namespace traits;
 class ButtonGfx;
 class CurrentTime;
 class HighScore;
+class MusicManager;
 
 typedef std::vector<CardRegionGfx>::iterator regionVI;
 
@@ -47,14 +48,15 @@ class SolitarioGfx {
         Ace_Ix4 = 12
     };
 
-public:
+   public:
     SolitarioGfx();
     ~SolitarioGfx();
 
     LPErrInApp Initialize(SDL_Surface *s, SDL_Renderer *r, SDL_Window *w,
                           DeckType &dt, LPLanguages planguages,
                           TTF_Font *pfontText, SDL_Surface *pSceneBackground,
-                          bool isBlack, HighScore *pHighScore);
+                          MusicManager *pMusicManager, bool isBlack,
+                          HighScore *pHighScore);
     LPErrInApp StartGameLoop();
 
     int RegionSize(int regionNo) { return _cardRegionList[regionNo].Size(); }
@@ -146,7 +148,7 @@ public:
     void BtQuitClick();
     void BtNewGameClick();
 
-private:
+   private:
     void updateTextureAsFlipScreen();
     void zoomDropCard(int &sx, int &sy, LPCardGfx pCard, int width, int height);
     void setDeckType(DeckType &dt) { _deckType.CopyFrom(dt); }
@@ -172,7 +174,7 @@ private:
     int showYesNoMsgBox(LPCSTR strText);
     void showOkMsgBox(LPCSTR strText);
 
-private:
+   private:
     CardStackGfx _dragStack;
     DragPileInfo _dragPileInfo;
     LPCardRegionGfx _p_selectedCardRegion;
@@ -188,6 +190,7 @@ private:
     LPLanguages _p_Languages;
     TTF_Font *_p_FontText;
     HighScore *_p_HighScore;
+    MusicManager* _p_MusicManager;
 
     int _oldx;
     int _oldy;

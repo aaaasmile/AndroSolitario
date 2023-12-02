@@ -150,7 +150,7 @@ LPErrInApp HighScore::Show(SDL_Surface* p_surf_screen, SDL_Surface* pSurfTitle,
 
     fade(p_surf_screen, p_surf_screen, 2, 1, psdlRenderer, NULL);
     if (pMusicManager != NULL) {
-        pMusicManager->PlayMusic(MusicManager::MUSIC_GAME_SND,
+        pMusicManager->PlayMusic(MusicManager::MUSIC_CREDITS_SND,
                                  MusicManager::LOOP_ON);
     }
 

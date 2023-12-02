@@ -5,7 +5,7 @@
 #include "GameSettings.h"
 
 static const char* lpszaSound_filenames[MusicManager::NUM_OF_SOUNDS] = {
-    DATA_PREFIX "music/wolmer-invido.ogg", DATA_PREFIX "music/watermusic.ogg"};
+    DATA_PREFIX "music/wolmer-invido.ogg", DATA_PREFIX "music/watermusic.ogg", DATA_PREFIX "music/wings-of-the-wind.ogg"};
 
 static const char* lpszaEffects_filenames[MusicManager::NUM_OF_WAV] = {NULL};
 

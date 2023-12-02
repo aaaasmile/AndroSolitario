@@ -259,7 +259,7 @@ LPErrInApp AppGfx::startGameLoop() {
 
     err = _p_SolitarioGfx->Initialize(
         _p_Screen, _p_sdlRenderer, _p_Window, _p_GameSettings->DeckTypeVal,
-        &_Languages, _p_fontAriblk, _p_SceneBackground,
+        &_Languages, _p_fontAriblk, _p_SceneBackground, _p_MusicManager,
         _p_GameSettings->BackgroundType == BackgroundTypeEnum::Black,
         _p_HighScore);
     if (err != NULL)
