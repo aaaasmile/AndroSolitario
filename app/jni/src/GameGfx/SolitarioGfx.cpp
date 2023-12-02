@@ -517,7 +517,7 @@ LPErrInApp SolitarioGfx::DrawInitialScene() {
 
     // button new game
     ClickCb cbBtNewGame = prepClickNewGameCb();
-    _p_BtNewGame = new ButtonGfx;
+    _p_BtNewGame = new ButtonGfx();
     rctBt1.x = rctBt1.x + rctBt1.w + 30;
     _p_BtNewGame->Initialize(&rctBt1, _p_Screen, _p_FontText, MYIDNEWGAME,
                              cbBtNewGame);

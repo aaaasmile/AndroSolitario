@@ -75,7 +75,7 @@ TraceService::~TraceService() {
 
 TraceService* TraceService::Instance() {
     if (pinstance == 0) {
-        pinstance = new TraceService;
+        pinstance = new TraceService();
     }
     return pinstance;
 }

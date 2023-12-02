@@ -230,7 +230,7 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
         rctBt1.y = _p_Screen->h - rctBt1.h - 20;
         rctBt1.x = _p_Screen->w - rctBt1.w - 20;
     }
-    _p_homeUrl = new LabelLinkGfx;
+    _p_homeUrl = new LabelLinkGfx();
     ClickCb cbNUll = ClickCb{.tc = NULL, .self = NULL};
     _p_homeUrl->Initialize(&rctBt1, _p_ScreenBackbuffer, _p_fontVeraUnderscore,
                            MYIDLABELURL, cbNUll);
@@ -239,7 +239,7 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
     _p_homeUrl->SetWindowText(g_lpszMsgUrl);
 
     // label version
-    _p_LabelVersion = new LabelGfx;
+    _p_LabelVersion = new LabelGfx();
     if (pGameSettings->NeedScreenMagnify()) {
         rctBt1.h = 56;
         rctBt1.w = 200;

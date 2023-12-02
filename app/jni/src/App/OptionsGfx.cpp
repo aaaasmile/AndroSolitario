@@ -112,7 +112,7 @@ LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
 
     ClickCb cbBtOK = prepClickCb();
     // button OK
-    _p_buttonOK = new ButtonGfx;
+    _p_buttonOK = new ButtonGfx();
     rctBt1.w = 120;
     rctBt1.h = 28;
     int offsetBtY = 30;
@@ -144,7 +144,7 @@ LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
     // Combo language
     ClickCb nullCb = {NULL, NULL};
 
-    _p_comboLang = new ComboGfx;
+    _p_comboLang = new ComboGfx();
     rctBt1.w = comboW;
     rctBt1.h = comboH;
     rctBt1.y = _rctOptBox.y + comboOffsetY;
@@ -155,7 +155,7 @@ LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
     // Music
     // check box music
     CheckboxClickCb cbCheckboxMusic = prepCheckBoxClickMusic();
-    _p_checkMusic = new CheckBoxGfx;
+    _p_checkMusic = new CheckBoxGfx();
     rctBt1.w = comboW;
     rctBt1.h = comboH;
     rctBt1.y = _p_comboLang->PosY() + _p_comboLang->Height() + combo2OffsetY;
@@ -164,7 +164,7 @@ LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
                               cbCheckboxMusic);
     _p_checkMusic->SetVisibleState(CheckBoxGfx::INVISIBLE);
     // background
-    _p_comboBackground = new ComboGfx;
+    _p_comboBackground = new ComboGfx();
     rctBt1.w = comboW;
     rctBt1.h = comboH;
     rctBt1.y = _p_checkMusic->PosY() + _p_checkMusic->Height() + combo2OffsetY;
@@ -174,7 +174,7 @@ LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
     _p_comboBackground->SetVisibleState(ComboGfx::INVISIBLE);
     // Deck
     // combo deck selection
-    _p_comboDeck = new ComboGfx;
+    _p_comboDeck = new ComboGfx();
     rctBt1.w = comboW;
     rctBt1.h = comboH;
     rctBt1.y = _p_comboBackground->PosY() + _p_comboBackground->Height() +

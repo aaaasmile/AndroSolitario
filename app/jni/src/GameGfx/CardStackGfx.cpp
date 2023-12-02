@@ -68,7 +68,7 @@ LPCardStackGfx CardStackGfx::PopStack(int items) {
     if (items > Size())
         items = Size();
 
-    LPCardStackGfx pCardStack = new CardStackGfx;
+    LPCardStackGfx pCardStack = new CardStackGfx();
 
     while (items > 0) {
         LPCardGfx pCard = PopCard();
