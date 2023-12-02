@@ -22,10 +22,6 @@
 #include "MusicManager.h"
 #include "OptionsGfx.h"
 #include "WinTypeGlobal.h"
-
-#define OPT_WIN_GENERAL_WIDTH 500
-#define OPT_WIN_GENERAL_HEIGHT 560
-
 #include "Credits.h"
 #include "Fading.h"
 
@@ -486,8 +482,9 @@ LPErrInApp AppGfx::showHighScore() {
     if (_p_MusicManager->IsPlayingMusic()) {
         _p_MusicManager->StopMusic(600);
     }
-    _p_HighScore->Show(_p_Screen, _p_CreditTitle, _p_sdlRenderer, _p_MusicManager,
-                       _p_fontAriblk, _p_fontVera, &_Languages);
+    _p_HighScore->Show(_p_Screen, _p_CreditTitle, _p_sdlRenderer,
+                       _p_MusicManager, _p_fontAriblk, _p_fontVera,
+                       &_Languages);
 
     LeaveMenu();
 
@@ -515,14 +512,9 @@ LPErrInApp AppGfx::showOptionGeneral() {
     TRACE("Show option general\n");
     OptionsGfx optGfx;
 
-    SDL_Rect rctOptionWin;
-    rctOptionWin.w = OPT_WIN_GENERAL_WIDTH;
-    rctOptionWin.h = OPT_WIN_GENERAL_HEIGHT;
-    rctOptionWin.x = (_p_Screen->w - rctOptionWin.w) / 2;
-    rctOptionWin.y = (_p_Screen->h - rctOptionWin.h) / 2;
     MenuDelegator delegator = prepMenuDelegator();
     STRING caption = _Languages.GetStringId(Languages::ID_MEN_OPTIONS);
-    LPErrInApp err = optGfx.Initialize(&rctOptionWin, _p_Screen, _p_sdlRenderer,
+    LPErrInApp err = optGfx.Initialize(_p_Screen, _p_sdlRenderer,
                                        _p_MusicManager, delegator);
     if (err) {
         return err;

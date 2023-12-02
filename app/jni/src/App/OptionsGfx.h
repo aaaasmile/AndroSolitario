@@ -34,7 +34,7 @@ public:
     OptionsGfx();
     ~OptionsGfx();
 
-    LPErrInApp Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
+    LPErrInApp Initialize(SDL_Surface* pScreen,
                           SDL_Renderer* pRenderer, MusicManager* pMusicMgr,
                           MenuDelegator& menuDlg);
     LPErrInApp Show(SDL_Surface* pScene_background, STRING& strCaption);

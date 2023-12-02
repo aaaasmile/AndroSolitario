@@ -75,20 +75,27 @@ CheckboxClickCb OptionsGfx::prepCheckBoxClickMusic() {
 #endif
 }
 
-LPErrInApp OptionsGfx::Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
-                                  SDL_Renderer* pRenderer,
+LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
                                   MusicManager* pMusicMgr,
                                   MenuDelegator& menuDlg) {
-    if (pRect == NULL) {
-        return ERR_UTIL::ErrorCreate("Rect is null");
-    }
     if (pScreen == NULL) {
         return ERR_UTIL::ErrorCreate("pScreen is null");
     }
+    LPGameSettings pGameSettings = GAMESET::GetSettings();
+    _rctOptBox.w = 500;
+    _rctOptBox.h = 560;
+    if (pGameSettings->NeedScreenMagnify()) {
+        _rctOptBox.w = 800;
+        _rctOptBox.h = 1024;
+    }
+    _rctOptBox.x = (pScreen->w - _rctOptBox.w) / 2;
+    _rctOptBox.y = (pScreen->h - _rctOptBox.h) / 2;
+    TRACE_DEBUG("rctOptBox is x: %d, y: %d w: %d, h: %d \n", _rctOptBox.x,
+                _rctOptBox.y, _rctOptBox.w, _rctOptBox.h);
+
+    _p_screen = pScreen;
     _menuDlgt = menuDlg;
     _p_MusicManager = pMusicMgr;
-    _rctOptBox = *pRect;
-    _p_screen = pScreen;
     _p_fontText = _menuDlgt.tc->GetFontVera(_menuDlgt.self);
     _p_fontCtrl = _menuDlgt.tc->GetFontAriblk(_menuDlgt.self);
     _p_sdlRenderer = pRenderer;
@@ -99,7 +106,7 @@ LPErrInApp OptionsGfx::Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
     SDL_FillRect(_p_surfBar, NULL,
                  SDL_MapRGBA(pScreen->format, 10, 100, 10, 0));
     SDL_SetSurfaceBlendMode(_p_surfBar, SDL_BLENDMODE_BLEND);
-    SDL_SetSurfaceAlphaMod(_p_surfBar, 200);  // SDL 2.0
+    SDL_SetSurfaceAlphaMod(_p_surfBar, 200);
 
     SDL_Rect rctBt1;
     int iSpace2bt = 20;
@@ -193,12 +200,13 @@ LPErrInApp OptionsGfx::Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
                                          y_pos);
         _cardOnEachDeck[2][i].SetDeckSurface(_p_deckAll[i]);
     }
-
+    TRACE_DEBUG("Options - Initialized OK\n");
     return NULL;
 }
 
 LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
                             STRING& strCaption) {
+    TRACE_DEBUG("Options - Show\n");
     _headerText = strCaption;
     _terminated = false;
     Uint32 uiInitialTick = SDL_GetTicks();
