@@ -515,8 +515,8 @@ LPErrInApp SolitarioGfx::DrawInitialScene() {
     if (pGameSettings->NeedScreenMagnify()) {
         btw = 200;
         bth = 62;
-        btoffsetY = 120;
-        btposx = 180;
+        btoffsetY = 400;
+        btposx = 500;
         btintraX = 50;
     }
     // button Quit
@@ -1159,10 +1159,17 @@ int SolitarioGfx::showYesNoMsgBox(LPCSTR strText) {
 }
 
 void SolitarioGfx::showOkMsgBox(LPCSTR strText) {
+    LPGameSettings pGameSettings = GAMESET::GetSettings();
+    int offsetW = 100;
+    int offsetH = 130;
+    if (pGameSettings->NeedScreenMagnify()) {
+        offsetW = 150;
+        offsetH = 260;
+    }
     MesgBoxGfx MsgBox;
     SDL_Rect rctBox;
-    rctBox.w = _p_Screen->w - 100;
-    rctBox.h = 130;
+    rctBox.w = _p_Screen->w - offsetW;
+    rctBox.h = offsetH;
     rctBox.y = (_p_Screen->h - rctBox.h) / 2;
     rctBox.x = (_p_Screen->w - rctBox.w) / 2;
 
@@ -1198,12 +1205,20 @@ LPErrInApp SolitarioGfx::drawScore(SDL_Surface *pScreen) {
     if (!_scoreChanged) {
         return NULL;
     }
+    LPGameSettings pGameSettings = GAMESET::GetSettings();
+    int tx = 10;
+    int offsetY = 30;
+    if (pGameSettings->NeedScreenMagnify()) {
+        tx = 100;
+        offsetY = 400;
+    }
+    int ty = pScreen->h - offsetY;
     char buff[256];
     snprintf(buff, sizeof(buff), "%s : %d",
              _p_Languages->GetCStringId(Languages::ID_SCORE), _scoreGame);
 
-    int tx = 10;
-    int ty = pScreen->h - 30;
+    
+    
     SDL_Color colorText = GFX_UTIL_COLOR::White;
     if (_scoreGame < 0) {
         colorText = GFX_UTIL_COLOR::Red;

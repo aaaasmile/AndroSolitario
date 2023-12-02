@@ -269,8 +269,8 @@ Se vuoi una nuova compilazione clean del target Android, allora basta cancellare
 Niente ini.
 - Problema con il formato dello schermo
 - Non mi funzionano poi i pulsanti
-- Nei credits e hight score non si può tornare indietro, qui serve un "back by tap" in High Score
-- shuffle_random è marcato obsoleto in ndk, il risultato è che non mescola un bel nulla
+- Nei credits e hight score non si può tornare indietro, qui serve un "back by tap" in High Score [DONE]
+- shuffle_random è marcato obsoleto in ndk, il risultato è che non mescola un bel nulla [DONE]
 - A livello generale direi che il tap non ce l'ho sotto controllo
 
 ## Mouse e Touch
