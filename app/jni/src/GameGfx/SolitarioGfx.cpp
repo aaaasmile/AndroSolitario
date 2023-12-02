@@ -90,7 +90,8 @@ ClickCb SolitarioGfx::prepClickNewGameCb() {
 LPErrInApp SolitarioGfx::Initialize(SDL_Surface *s, SDL_Renderer *r,
                                     SDL_Window *w, DeckType &dt,
                                     LPLanguages planguages, TTF_Font *pfontText,
-                                    SDL_Surface *pSceneBackground, MusicManager* pMusicManager, bool isBlack,
+                                    SDL_Surface *pSceneBackground,
+                                    MusicManager *pMusicManager, bool isBlack,
                                     HighScore *pHighScore) {
     TRACE("Initialize Solitario\n");
     setDeckType(dt);
@@ -159,7 +160,7 @@ LPErrInApp SolitarioGfx::DrawCardStack(SDL_Surface *s,
     if (pcardRegion == NULL) {
         return ERR_UTIL::ErrorCreate("DrawCardStack region is NULL");
     }
-    //TRACE_DEBUG("Draw card stack %d\n", pcardRegion->RegionTypeId());
+    // TRACE_DEBUG("Draw card stack %d\n", pcardRegion->RegionTypeId());
 
     LPErrInApp err;
     if (!pcardRegion->IsVisible())
@@ -505,20 +506,33 @@ LPErrInApp SolitarioGfx::DrawInitialScene() {
     }
 
     SDL_Rect rctBt1;
+    int btw = 120;
+    int bth = 28;
+    int btoffsetY = 70;
+    int btposx = 150;
+    int btintraX = 30;
+    LPGameSettings pGameSettings = GAMESET::GetSettings();
+    if (pGameSettings->NeedScreenMagnify()) {
+        btw = 200;
+        bth = 62;
+        btoffsetY = 120;
+        btposx = 180;
+        btintraX = 50;
+    }
     // button Quit
     ClickCb cbBtQuit = prepClickQuitCb();
-    _p_BtQuit = new ButtonGfx;
-    rctBt1.w = 120;
-    rctBt1.h = 28;
-    rctBt1.y = _p_Screen->h - 70;
-    rctBt1.x = 150;
+    _p_BtQuit = new ButtonGfx();
+    rctBt1.w = btw;
+    rctBt1.h = bth;
+    rctBt1.y = _p_Screen->h - btoffsetY;
+    rctBt1.x = btposx;
     _p_BtQuit->Initialize(&rctBt1, _p_Screen, _p_FontText, MYIDQUIT, cbBtQuit);
     _p_BtQuit->SetVisibleState(ButtonGfx::INVISIBLE);
 
     // button new game
     ClickCb cbBtNewGame = prepClickNewGameCb();
     _p_BtNewGame = new ButtonGfx();
-    rctBt1.x = rctBt1.x + rctBt1.w + 30;
+    rctBt1.x = rctBt1.x + rctBt1.w + btintraX;
     _p_BtNewGame->Initialize(&rctBt1, _p_Screen, _p_FontText, MYIDNEWGAME,
                              cbBtNewGame);
     _p_BtNewGame->SetVisibleState(ButtonGfx::INVISIBLE);
@@ -671,7 +685,7 @@ LPErrInApp SolitarioGfx::DrawSymbolPac(int x, int y, int nSymbol,
 LPErrInApp SolitarioGfx::VictoryAnimation() {
     srand((unsigned)time(NULL));
     LPErrInApp err;
-    int rot;
+    int rotation;
     int id;
     int x;
     unsigned int y;
@@ -684,12 +698,12 @@ LPErrInApp SolitarioGfx::VictoryAnimation() {
     SDL_Event event;
 
     while (1) {
-        rot = rand() % 2;
+        rotation = rand() % 2;
         id = rand() % _deckType.GetNumCards();
         x = rand() % _p_Screen->w;
         y = rand() % _p_Screen->h / 2;
 
-        if (rot)
+        if (rotation)
             xspeed = -4;
         else
             xspeed = 4;
@@ -707,6 +721,8 @@ LPErrInApp SolitarioGfx::VictoryAnimation() {
                         }
                         break;
                     case SDL_MOUSEBUTTONDOWN:
+                        return NULL;
+                    case SDL_FINGERDOWN:
                         return NULL;
                 }
             }
@@ -997,7 +1013,8 @@ LPErrInApp SolitarioGfx::handleGameLoopMouseUpEvent(SDL_Event &event) {
 }
 
 LPErrInApp SolitarioGfx::StartGameLoop() {
-    _p_MusicManager->PlayMusic(MusicManager::MUSIC_PLAY_SND, MusicManager::eLoopType::LOOP_ON);
+    _p_MusicManager->PlayMusic(MusicManager::MUSIC_PLAY_SND,
+                               MusicManager::eLoopType::LOOP_ON);
     // button Quit
     STRING strTextBt;
     strTextBt = _p_Languages->GetStringId(Languages::ID_EXIT);
@@ -1111,10 +1128,17 @@ LPErrInApp SolitarioGfx::StartGameLoop() {
 }
 
 int SolitarioGfx::showYesNoMsgBox(LPCSTR strText) {
+    LPGameSettings pGameSettings = GAMESET::GetSettings();
     MesgBoxGfx MsgBox;
+    int offsetW = 100;
+    int offsetH = 130;
+    if (pGameSettings->NeedScreenMagnify()) {
+        offsetW = 150;
+        offsetH = 260;
+    }
     SDL_Rect rctBox;
-    rctBox.w = _p_Screen->w - 100;
-    rctBox.h = 130;
+    rctBox.w = _p_Screen->w - offsetW;
+    rctBox.h = offsetH;
     rctBox.y = (_p_Screen->h - rctBox.h) / 2;
     rctBox.x = (_p_Screen->w - rctBox.w) / 2;
 

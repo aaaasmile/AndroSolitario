@@ -2,6 +2,7 @@
 
 #include "ButtonGfx.h"
 #include "GfxUtil.h"
+#include "GameSettings.h"
 
 MesgBoxGfx::MesgBoxGfx(void) {
     _p_Screen = 0;
@@ -44,14 +45,23 @@ LPErrInApp MesgBoxGfx::Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
     _colCurrent = GFX_UTIL_COLOR::White;
     SDL_Rect rctBt1;
     ClickCb cbBt = prepClickBtCb();
+    LPGameSettings pGameSettings = GAMESET::GetSettings();
+    int btw = 120;
+    int bth = 28;
+    int btoffsetY = 10;
+    if (pGameSettings->NeedScreenMagnify()) {
+        btw = 200;
+        bth = 62;
+        btoffsetY = 20;
+    }
 
     if (_typeMsg == TY_MB_YES_NO) {
         int space2bt = 20;
         // button yes
         _p_BtButt1 = new ButtonGfx();
-        rctBt1.w = 120;
-        rctBt1.h = 28;
-        rctBt1.y = _rctMsgBox.y + _rctMsgBox.h - 10 - rctBt1.h;
+        rctBt1.w = btw;
+        rctBt1.h = bth;
+        rctBt1.y = _rctMsgBox.y + _rctMsgBox.h - btoffsetY - rctBt1.h;
         rctBt1.x =
             (_rctMsgBox.w - (2 * rctBt1.w + space2bt)) / 2 + _rctMsgBox.x;
         _p_BtButt1->Initialize(&rctBt1, pScreen, pFont, ID_BUTT_YES, cbBt);
@@ -61,8 +71,8 @@ LPErrInApp MesgBoxGfx::Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
         SDL_Rect rctBt1;
         _p_BtButt1->GetRect(rctBt1);
         _p_BtButt2 = new ButtonGfx();
-        rctBt1.w = 120;
-        rctBt1.h = 28;
+        rctBt1.w = btw;
+        rctBt1.h = bth;
         rctBt1.y = rctBt1.y;
         rctBt1.x = rctBt1.x + rctBt1.w + space2bt;
         _p_BtButt2->Initialize(&rctBt1, pScreen, pFont, ID_BUTT_NO, cbBt);
@@ -70,9 +80,9 @@ LPErrInApp MesgBoxGfx::Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
 
     } else if (_typeMsg == TY_MBOK) {
         _p_BtButt1 = new ButtonGfx();
-        rctBt1.w = 120;
-        rctBt1.h = 28;
-        rctBt1.y = _rctMsgBox.y + _rctMsgBox.h - 10 - rctBt1.h;
+        rctBt1.w = btw;
+        rctBt1.h = bth;
+        rctBt1.y = _rctMsgBox.y + _rctMsgBox.h - btoffsetY - rctBt1.h;
         rctBt1.x = (_rctMsgBox.w - rctBt1.w) / 2 + _rctMsgBox.x;
         _p_BtButt1->Initialize(&rctBt1, pScreen, pFont, ID_OK, cbBt);
         _p_BtButt1->SetVisibleState(ButtonGfx::INVISIBLE);

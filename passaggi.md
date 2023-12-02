@@ -255,6 +255,12 @@ nella proprietà: C_Cpp:Clang_format_style
 
     { BasedOnStyle: Google, UseTab: Never, IndentWidth: 4, TabWidth: 4, AllowShortIfStatementsOnASingleLine: false }
 
+### Ricerca all'interno del progetto
+Per evitare di cercare ovunque, posso limitare la ricerca all'interno solo dei miei sorgenti con
+questo _files to include_
+
+    app/jni/src/**/
+
 ## Problemi del Solitario su Android
 Questi sono i problemi e todo della conversione in Android.
 SoltarioIta: Fatal: Cannot create dir (null)/.solitario [DONE]
@@ -299,6 +305,8 @@ che non uso tipo wayland, devo poi ricostruire la directory build.
     cmake ../app/jni/
 Nota che il programma va a finire nella directory ./build/src ed lì dove ho poi messo le 
 risorse nella directory data. Gli asset li ho anche copiati nella directory asset_data_forwsl.
+
+
 
 ## Compile, Deploy, Start
 
