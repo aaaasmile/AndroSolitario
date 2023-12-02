@@ -205,7 +205,7 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
     _p_MenuBox = SDL_CreateRGBSurface(SDL_SWSURFACE, _rctPanelRedBox.w,
                                       _rctPanelRedBox.h, 32, 0, 0, 0, 0);
     SDL_FillRect(_p_MenuBox, NULL,
-                 SDL_MapRGBA(_p_Screen->format, 235, 60, 60, 0));
+                 SDL_MapRGBA(_p_Screen->format, 136, 60, 60, 0));
     SDL_SetSurfaceBlendMode(_p_MenuBox, SDL_BLENDMODE_BLEND);
     SDL_SetSurfaceAlphaMod(_p_MenuBox, 127);
 
