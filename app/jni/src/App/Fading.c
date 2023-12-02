@@ -17,7 +17,7 @@ void fade(SDL_Surface* p_surf_screen, SDL_Surface* p_surf_img,
     Uint32 ui_old_time, ui_curr_time, ui_time_ms;
     float f_alpha;
     /* Becomes flag to pass when creating a Surface */
-    Uint32 ui_flags = SDL_SWSURFACE;  // SDL 2.0
+    Uint32 ui_flags = SDL_SWSURFACE;
     if ((p_surf_black = SDL_CreateRGBSurface(
              ui_flags, p_surf_screen->w, p_surf_screen->h,
              p_surf_screen->format->BitsPerPixel, p_surf_screen->format->Rmask,
@@ -69,7 +69,7 @@ void fade(SDL_Surface* p_surf_screen, SDL_Surface* p_surf_img,
             /* Draw the image onto the screen */
             SDL_BlitSurface(p_surf_img, NULL, p_surf_screen, prctTarget);
             /* Draw the black surface onto the screen */
-            SDL_SetSurfaceAlphaMod(p_surf_black, (Uint8)f_alpha);  // SDL 2.0
+            SDL_SetSurfaceAlphaMod(p_surf_black, (Uint8)f_alpha);
 
             SDL_BlitSurface(p_surf_black, NULL, p_surf_screen, NULL);
             /* Update the timer variables */
@@ -90,7 +90,7 @@ void fade(SDL_Surface* p_surf_screen, SDL_Surface* p_surf_img,
             /* Draw the image onto the screen */
             SDL_BlitSurface(p_surf_img, NULL, p_surf_screen, prctTarget);
             /* Draw the black surface onto the screen */
-            SDL_SetSurfaceAlphaMod(p_surf_black, (Uint8)f_alpha);  // SDL 2.0
+            SDL_SetSurfaceAlphaMod(p_surf_black, (Uint8)f_alpha);
 
             SDL_BlitSurface(p_surf_black, NULL, p_surf_screen, NULL);
             /* Update the timer variables */

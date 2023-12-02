@@ -24,8 +24,8 @@ public:
     enum {
         RES_NO = 0,
         RES_YES = 1,
-        ID_BUTT_YES = 2,
-        ID_BUTT_NO = 3,
+        ID_BT_YES = 2,
+        ID_BT_NO = 3,
         ID_OK = 4
     };
 

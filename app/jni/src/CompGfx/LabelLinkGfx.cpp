@@ -29,7 +29,7 @@ void LabelLinkGfx::Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
                                       0, 0, 0, 0);
     SDL_FillRect(_p_SurfBar, NULL, SDL_MapRGBA(pScreen->format, 255, 0, 0, 0));
     SDL_SetSurfaceBlendMode(_p_SurfBar, SDL_BLENDMODE_BLEND);
-    SDL_SetSurfaceAlphaMod(_p_SurfBar, 127);  // SDL 2.0
+    SDL_SetSurfaceAlphaMod(_p_SurfBar, 127);
 
     _p_FontText = pFont;
 

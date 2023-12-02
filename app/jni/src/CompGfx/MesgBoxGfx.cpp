@@ -64,7 +64,7 @@ LPErrInApp MesgBoxGfx::Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
         rctBt1.y = _rctMsgBox.y + _rctMsgBox.h - btoffsetY - rctBt1.h;
         rctBt1.x =
             (_rctMsgBox.w - (2 * rctBt1.w + space2bt)) / 2 + _rctMsgBox.x;
-        _p_BtButt1->Initialize(&rctBt1, pScreen, pFont, ID_BUTT_YES, cbBt);
+        _p_BtButt1->Initialize(&rctBt1, pScreen, pFont, ID_BT_YES, cbBt);
         _p_BtButt1->SetVisibleState(ButtonGfx::INVISIBLE);
 
         // button no
@@ -75,7 +75,7 @@ LPErrInApp MesgBoxGfx::Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
         rctBt1.h = bth;
         rctBt1.y = rctBt1.y;
         rctBt1.x = rctBt1.x + rctBt1.w + space2bt;
-        _p_BtButt2->Initialize(&rctBt1, pScreen, pFont, ID_BUTT_NO, cbBt);
+        _p_BtButt2->Initialize(&rctBt1, pScreen, pFont, ID_BT_NO, cbBt);
         _p_BtButt2->SetVisibleState(ButtonGfx::INVISIBLE);
 
     } else if (_typeMsg == TY_MBOK) {
@@ -106,9 +106,9 @@ void MesgBoxGfx::ButCmdClicked(int butID) {
     if (!_terminated) {
         _terminated = true;
         if (_typeMsg == TY_MB_YES_NO) {
-            if (ID_BUTT_YES == butID) {
+            if (ID_BT_YES == butID) {
                 _result = RES_YES;
-            } else if (ID_BUTT_NO == butID) {
+            } else if (ID_BT_NO == butID) {
                 _result = RES_NO;
             }
         } else {
@@ -134,25 +134,20 @@ int MesgBoxGfx::Show(SDL_Surface* pScene_background, LPCSTR lpsBut1Txt,
         _p_BtButt2->SetButtonText(lpsBut2Txt);
         _p_BtButt2->SetVisibleState(ButtonGfx::VISIBLE);
     }
-    // create a shadow surface
     SDL_Surface* pShadowSrf = SDL_CreateRGBSurface(
         SDL_SWSURFACE, _p_Screen->w, _p_Screen->h, 32, 0, 0, 0, 0);
     SDL_Texture* pScreenTexture =
-        SDL_CreateTextureFromSurface(_p_sdlRenderer, pShadowSrf);  // SDL 2.0
+        SDL_CreateTextureFromSurface(_p_sdlRenderer, pShadowSrf);
 
     while (!_terminated) {
-        // background
         SDL_BlitSurface(pScene_background, NULL, pShadowSrf, NULL);
 
-        // wait until the user click on button
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_KEYDOWN) {
                 if (event.key.keysym.sym == SDLK_RETURN) {
-                    // key on focus
                     if (_typeMsg == TY_MB_YES_NO) {
-                        // default key is yes
-                        ButCmdClicked(ID_BUTT_YES);
+                        ButCmdClicked(ID_BT_YES);
                     } else {
                         ButCmdClicked(0);
                     }
@@ -183,7 +178,7 @@ int MesgBoxGfx::Show(SDL_Surface* pScene_background, LPCSTR lpsBut1Txt,
         if (_dataStrings.size() > 0) {
             int iYinitial = 10;
             int iEmptySpaceOn_Y = 4;
-            // draw the text
+            // draw text lines
             for (int i = 0; i < _dataStrings.size(); i++) {
                 STRING strText = _dataStrings[i];
                 TTF_SizeText(_p_FontText, strText.c_str(), &tx, &ty);
@@ -230,9 +225,8 @@ int MesgBoxGfx::Show(SDL_Surface* pScene_background, LPCSTR lpsBut1Txt,
         }
 
         SDL_BlitSurface(pShadowSrf, NULL, _p_Screen, NULL);
-        // SDL_Flip(_p_Screen); //SDL 1.2
         SDL_UpdateTexture(pScreenTexture, NULL, _p_Screen->pixels,
-                          _p_Screen->pitch);  // SDL 2.0
+                          _p_Screen->pitch); 
         SDL_RenderCopy(_p_sdlRenderer, pScreenTexture, NULL, NULL);
         SDL_RenderPresent(_p_sdlRenderer);
 
