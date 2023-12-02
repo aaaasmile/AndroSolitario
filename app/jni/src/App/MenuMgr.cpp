@@ -58,7 +58,7 @@ typedef class MenuItemBoxes {
         _menuInfoBoxes[4] = {0, 0, MenuItemEnum::MENU_HIGHSCORE};
         _menuInfoBoxes[5] = {0, 0, MenuItemEnum::QUIT};
     }
-    bool IsTapInside(const SDL_Point& tap, MenuItemBox& tapped) {
+    bool IsPointInside(const SDL_Point& tap, MenuItemBox& tapped) {
         tapped = {0, 0, MenuItemEnum::NOTHING};
         if (tap.x > _maxX || tap.x < _minX) {
             return false;
@@ -210,7 +210,8 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
     SDL_SetSurfaceAlphaMod(_p_MenuBox, 127);
 
     // link to invido.it
-    _p_fontVeraUnderscore = TTF_OpenFont(g_lpszIniFontVera, pGameSettings->GetSizeFontSmall());
+    _p_fontVeraUnderscore =
+        TTF_OpenFont(g_lpszIniFontVera, pGameSettings->GetSizeFontSmall());
     if (_p_fontVeraUnderscore == 0) {
         return ERR_UTIL::ErrorCreate(
             "MenuMgr: Unable to load font %s, error: %s\n", g_lpszIniFontVera,
@@ -262,6 +263,7 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
 }
 
 LPErrInApp MenuMgr::drawStaticScene() {
+    LPGameSettings pGameSettings = GAMESET::GetSettings();
     // function called in loop
     SDL_Rect rctTarget;
     LPErrInApp err = NULL;
@@ -284,6 +286,9 @@ LPErrInApp MenuMgr::drawStaticScene() {
     // header bar
     int hbarOffset = 0;
     int hbar = 46;
+    if (pGameSettings->NeedScreenMagnify()){
+        hbar = 65;
+    }
     GFX_UTIL::FillRect(_p_ScreenBackbuffer, _box_X, _box_Y - (2 + hbarOffset),
                        _rctPanelRedBox.w, hbar, colorBarTitle);
     // wire
@@ -303,11 +308,14 @@ LPErrInApp MenuMgr::drawStaticScene() {
                        _rctPanelRedBox.w + _box_X,
                        _box_Y - hbarOffset + (hbarOffset - 2), g_color_white);
     // text title bar
+    int bar_x = 30;
+    int bar_y = 25;
+    
     SDL_Color color = g_color_white;
     err = drawMenuText(
         _p_ScreenBackbuffer,
         _p_Languages->GetStringId(Languages::ID_WELCOMETITLEBAR).c_str(),
-        _box_X + 30, _box_Y + 25 - hbar / 2, color, _p_fontAriblk);
+        _box_X + bar_x, _box_Y + bar_y - hbar / 2, color, _p_fontAriblk);
     return err;
 }
 
@@ -320,6 +328,10 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     int intraOffset = (_rctPanelRedBox.h - 80) / 5;
     int minIntraOffsetY = 80;
     intraOffset = min(minIntraOffsetY, intraOffset);
+    LPGameSettings pGameSettings = GAMESET::GetSettings();
+    if (pGameSettings->NeedScreenMagnify()){
+        intraOffset += 50;
+    }
     // Play
     if (_focusedMenuItem != MenuItemEnum::MENU_GAME) {
         color = g_color_off;
@@ -415,6 +427,7 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     if (err != NULL) {
         return err;
     }
+    g_MenuItemBoxes.SetYInPos(4, lastY - 1); // fill the space until quit with menu 4, not the 5
     g_MenuItemBoxes.SetYInPos(5, _box_Y + _rctPanelRedBox.h);
     return NULL;
 }
@@ -456,7 +469,7 @@ LPErrInApp MenuMgr::HandleRootMenu() {
             // mouseInside = checkTapInsideBox(touchLocation);
             // if (mouseInside && isFocusedItemConfirmed(touchLocation)) {
             MenuItemBox tapInfoBox;
-            if (g_MenuItemBoxes.IsTapInside(touchLocation, tapInfoBox)) {
+            if (g_MenuItemBoxes.IsPointInside(touchLocation, tapInfoBox)) {
                 if (tapInfoBox.MenuItem == _focusedMenuItem) {
                     TRACE_DEBUG("Select menu from Tap down\n");
                     rootMenuNext();
@@ -489,31 +502,12 @@ LPErrInApp MenuMgr::HandleRootMenu() {
             if (ignoreMouseEvent) {
                 break;
             }
-            if (event.motion.x >= _rctPanelRedBox.x &&
-                event.motion.x <= _rctPanelRedBox.x + _rctPanelRedBox.h &&
-                event.motion.y >= _rctPanelRedBox.y &&
-                event.motion.y <= _rctPanelRedBox.y + _rctPanelRedBox.h) {
-                // mouse is inner to the box
-                if (event.motion.y < _box_Y + 100) {
-                    _focusedMenuItem = MenuItemEnum::MENU_GAME;
-                } else if (event.motion.y >= _box_Y + 100 &&
-                           event.motion.y < _box_Y + 150) {
-                    _focusedMenuItem = MenuItemEnum::MENU_OPTIONS;
-                } else if (event.motion.y >= _box_Y + 150 &&
-                           event.motion.y < _box_Y + 200) {
-                    _focusedMenuItem = MenuItemEnum::MENU_CREDITS;
-                } else if (event.motion.y >= _box_Y + 200 &&
-                           event.motion.y < _box_Y + 250) {
-                    _focusedMenuItem = MenuItemEnum::MENU_HELP;
-                } else if (event.motion.y >= _box_Y + 250 &&
-                           event.motion.y < _box_Y + 300) {
-                    _focusedMenuItem = MenuItemEnum::MENU_HIGHSCORE;
-                } else if (event.motion.y >= _screenH - _box_Y - 40) {
-                    _focusedMenuItem = MenuItemEnum::QUIT;
-                }
+            SDL_Point motionLocation = {event.motion.x, event.motion.y};
+            MenuItemBox mouseInfoBox;
+            if (g_MenuItemBoxes.IsPointInside(motionLocation, mouseInfoBox)) {
+                _focusedMenuItem = mouseInfoBox.MenuItem;
                 mouseInside = true;
             } else {
-                // mouse outside, no focus
                 mouseInside = false;
             }
             _p_homeUrl->MouseMove(event);

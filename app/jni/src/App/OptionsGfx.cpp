@@ -359,7 +359,7 @@ LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
         _p_comboDeck->DrawButton(pShadowSrf);
 
         // Deck example Cards
-        int iCurrIndex = _p_comboDeck->GetSlectedIndex();
+        int iCurrIndex = _p_comboDeck->GetSelectedIndex();
         _cardOnEachDeck[0][iCurrIndex].DrawCardPac(pShadowSrf);
         _cardOnEachDeck[1][iCurrIndex].DrawCardPac(pShadowSrf);
         _cardOnEachDeck[2][iCurrIndex].DrawCardPac(pShadowSrf);
@@ -396,7 +396,7 @@ LPErrInApp OptionsGfx::ButEndOPtClicked(int iButID) {
         return NULL;
     }
 
-    switch (_p_comboLang->GetSlectedIndex()) {
+    switch (_p_comboLang->GetSelectedIndex()) {
         case 0:
             _p_GameSettings->CurrentLanguage = Languages::eLangId::LANG_ITA;
             break;
@@ -411,7 +411,7 @@ LPErrInApp OptionsGfx::ButEndOPtClicked(int iButID) {
             break;
     }
 
-    switch (_p_comboBackground->GetSlectedIndex()) {
+    switch (_p_comboBackground->GetSelectedIndex()) {
         case 0:
             _p_GameSettings->BackgroundType = BackgroundTypeEnum::Commessaggio;
             break;
@@ -426,7 +426,7 @@ LPErrInApp OptionsGfx::ButEndOPtClicked(int iButID) {
     }
 
     DeckType dt;
-    dt.SetTypeIndex(_p_comboDeck->GetSlectedIndex());
+    dt.SetTypeIndex(_p_comboDeck->GetSelectedIndex());
     _p_GameSettings->DeckTypeVal.CopyFrom(dt);
     _p_GameSettings->MusicEnabled = _p_checkMusic->GetCheckState();
     if ((_p_GameSettings->MusicEnabled != prevMusicEnabled) ||
@@ -447,8 +447,10 @@ LPErrInApp OptionsGfx::ButEndOPtClicked(int iButID) {
 
 void OptionsGfx::CheckboxMusicClicked(bool state) {
     if (state) {
+        _p_MusicManager->EnableMusic();
         _p_MusicManager->PlayCurrentMusic();
     } else {
         _p_MusicManager->StopMusic(500);
+        _p_MusicManager->DisableMusic();
     }
 }

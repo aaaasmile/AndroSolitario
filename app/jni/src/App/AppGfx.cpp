@@ -90,7 +90,7 @@ LPErrInApp AppGfx::Init() {
     }
 
     _p_MusicManager = new MusicManager();
-    _p_MusicManager->Init();
+    _p_MusicManager->Initialize(_p_GameSettings->MusicEnabled);
 
     _p_HighScore = new HighScore();
     _p_HighScore->Load();
@@ -128,8 +128,6 @@ LPErrInApp AppGfx::Init() {
     SDL_SetColorKey(psIcon, true, SDL_MapRGB(psIcon->format, 0, 128, 0));
     SDL_SetWindowIcon(_p_Window, psIcon);
 
-    srand((unsigned)time(0));
-
     _p_CreditTitle = IMG_Load(g_lpszTitleFile);
     if (_p_CreditTitle == 0) {
         return ERR_UTIL::ErrorCreate("Title image not found");
@@ -142,10 +140,7 @@ LPErrInApp AppGfx::Init() {
     clearBackground();
 
     err = _p_MusicManager->LoadMusicRes();
-    if (err != NULL) {
-        return err;
-    }
-    return NULL;
+    return err;
 }
 
 LPErrInApp AppGfx::loadSceneBackground() {
@@ -403,8 +398,7 @@ LPErrInApp AppGfx::MainLoop() {
     while (!quit && !_histMenu.empty()) {
         switch (_histMenu.top()) {
             case MenuItemEnum::MENU_ROOT:
-                if (_p_GameSettings->MusicEnabled &&
-                    !_p_MusicManager->IsPlayingMusic()) {
+                if (!_p_MusicManager->IsPlayingMusic()) {
                     _p_MusicManager->PlayMusic(MusicManager::MUSIC_INIT_SND,
                                                MusicManager::LOOP_ON);
                 }
@@ -491,9 +485,8 @@ LPErrInApp AppGfx::showHighScore() {
     MusicManager *pMusicManager = NULL;
     if (_p_MusicManager->IsPlayingMusic()) {
         _p_MusicManager->StopMusic(600);
-        pMusicManager = _p_MusicManager;
     }
-    _p_HighScore->Show(_p_Screen, _p_CreditTitle, _p_sdlRenderer, pMusicManager,
+    _p_HighScore->Show(_p_Screen, _p_CreditTitle, _p_sdlRenderer, _p_MusicManager,
                        _p_fontAriblk, _p_fontVera, &_Languages);
 
     LeaveMenu();

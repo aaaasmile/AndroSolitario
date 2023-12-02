@@ -27,7 +27,7 @@ public:
                       SDL_Texture* pScreenTexture);
     void AddLineText(LPCSTR strLine);
     void SelectIndex(int iIndex);
-    int GetSlectedIndex() { return _currDataIndex; }
+    int GetSelectedIndex() { return _currDataIndex; }
     LPCSTR GetSelectedText() { return _vctDataStrings[_currDataIndex].c_str(); }
     int PosX() { return _rctCtrl.x; }
     int PosY() { return _rctCtrl.y; }
