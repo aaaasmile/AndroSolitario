@@ -5,6 +5,7 @@
 
 #include "Fading.h"
 #include "MusicManager.h"
+#include "GameSettings.h"
 
 char const* credit_text[] = {
     "-SOLITARIO", /* '-' at beginning makes highlighted: */
@@ -57,8 +58,6 @@ char const* credit_text[] = {
     "",
     "",
     NULL};
-
-/* Some simple pixel-based characters we can blit quickly: */
 
 char const chars[38][5][6] = {{".###.", "#..##", "#.#.#", "##..#", ".###."},
 
@@ -136,13 +135,14 @@ char const chars[38][5][6] = {{".###.", "#..##", "#.#.#", "##..#", ".###."},
 
                               {"..#..", "..#..", ".....", ".....", "....."}};
 
-static void draw_text(const char* str, int offset, SDL_Surface* screen);
+static void draw_text(const char* str, int scroll, SDL_Surface* screen);
 
 static int g_line = 0;
 
-int credits(SDL_Surface* p_surf_screen, SDL_Surface* pSurfTitle,
-            SDL_Renderer* psdlRenderer, MusicManager* pMusicManager) {
-    int done, quit, scroll;
+void credits(SDL_Surface* p_surf_screen, SDL_Surface* pSurfTitle,
+             SDL_Renderer* psdlRenderer, MusicManager* pMusicManager) {
+    bool done;
+    uint32_t scroll;
     SDL_Rect src, dest;
     SDL_Event event;
     Uint32 last_time, now_time;
@@ -152,6 +152,7 @@ int credits(SDL_Surface* p_surf_screen, SDL_Surface* pSurfTitle,
         SDL_CreateTextureFromSurface(psdlRenderer, p_surf_screen);
 
     fade(p_surf_screen, p_surf_screen, 2, 1, psdlRenderer, NULL);
+
     pMusicManager->PlayMusic(MusicManager::MUSIC_CREDITS_SND,
                              MusicManager::LOOP_ON);
 
@@ -162,36 +163,23 @@ int credits(SDL_Surface* p_surf_screen, SDL_Surface* pSurfTitle,
 
     SDL_BlitSurface(pSurfTitle, NULL, p_surf_screen, &dest);
 
-    /* --- MAIN OPTIONS SCREEN LOOP: --- */
-
+    LPGameSettings pGameSettings = GAMESET::GetSettings();
     done = 0;
-    quit = 0;
     scroll = 0;
     g_line = 0;
-
     do {
         last_time = SDL_GetTicks();
-
-        /* Handle any incoming events: */
-
         while (SDL_PollEvent(&event) > 0) {
-            if (event.type == SDL_QUIT) {
-                /* Window close event - quit! */
-
-                quit = 1;
-                done = 1;
-            } else if (event.type == SDL_KEYDOWN) {
+            if (event.type == SDL_KEYDOWN) {
                 key = event.key.keysym.sym;
-
                 if (key == SDLK_ESCAPE) {
-                    /* Escape key - quit! */
-
                     done = 1;
                 }
             }
+            if (event.type == SDL_FINGERDOWN) {
+                done = true;
+            }
         }
-
-        /* Scroll: */
 
         src.x = 0;
         src.y = (pSurfTitle->h) + 2;
@@ -229,8 +217,6 @@ int credits(SDL_Surface* p_surf_screen, SDL_Surface* pSurfTitle,
         SDL_RenderCopy(psdlRenderer, pScreenTexture, NULL, NULL);
         SDL_RenderPresent(psdlRenderer);
 
-        /* Pause (keep frame-rate event) */
-
         now_time = SDL_GetTicks();
         if (now_time < last_time + (1000 / 20)) {
             SDL_Delay(last_time + (1000 / 20) - now_time);
@@ -239,10 +225,12 @@ int credits(SDL_Surface* p_surf_screen, SDL_Surface* pSurfTitle,
 
     fade(p_surf_screen, p_surf_screen, 1, 1, psdlRenderer, NULL);
 
-    return quit;
+    if (pMusicManager->IsPlayingMusic()) {
+        pMusicManager->StopMusic(300);
+    }
 }
 
-static void draw_text(char const* str, int offset, SDL_Surface* screen) {
+static void draw_text(char const* str, int scroll, SDL_Surface* screen) {
     int i, c, x, y, cur_x, start, hilite;
     SDL_Rect dest;
     Uint8 r, g, b;
@@ -285,7 +273,7 @@ static void draw_text(char const* str, int offset, SDL_Surface* screen) {
                     if (chars[c][y][x] == '#') {
                         dest.x = cur_x + (x * 3);
                         dest.y = ((screen->h - (5 * 3)) + (y * 3) +
-                                  (18 - offset * 2));
+                                  (18 - scroll * 2));
                         dest.w = 3;
                         dest.h = 3;
 
@@ -295,9 +283,6 @@ static void draw_text(char const* str, int offset, SDL_Surface* screen) {
                 }
             }
         }
-
-        /* Move virtual cursor: */
-
         cur_x = cur_x + 18;
     }
 }

@@ -184,7 +184,7 @@ LPErrInApp HighScore::Show(SDL_Surface* p_surf_screen, SDL_Surface* pSurfTitle,
         int ex = 50;
         if (pGameSettings->NeedScreenMagnify()) {
             ax = 100;
-            bx = 600;
+            bx = 550;
             cx = 180;
             dx = 50;
             ex = 100;

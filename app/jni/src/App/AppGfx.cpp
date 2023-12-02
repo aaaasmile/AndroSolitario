@@ -508,19 +508,13 @@ LPErrInApp AppGfx::showHighScore() {
 }
 
 LPErrInApp AppGfx::showCredits() {
-    MusicManager *pMusicManager = NULL;
     if (_p_MusicManager->IsPlayingMusic()) {
         _p_MusicManager->StopMusic(600);
-        pMusicManager = _p_MusicManager;
     }
-
-    credits(_p_Screen, _p_CreditTitle, _p_sdlRenderer, pMusicManager);
+    credits(_p_Screen, _p_CreditTitle, _p_sdlRenderer, _p_MusicManager);
     LeaveMenu();
-    if (_p_MusicManager->IsPlayingMusic()) {
-        _p_MusicManager->StopMusic(300);
-        _p_MusicManager->PlayMusic(MusicManager::MUSIC_INIT_SND,
-                                   MusicManager::LOOP_ON);
-    }
+    _p_MusicManager->PlayMusic(MusicManager::MUSIC_INIT_SND,
+                               MusicManager::LOOP_ON);
     return NULL;
 }
 
