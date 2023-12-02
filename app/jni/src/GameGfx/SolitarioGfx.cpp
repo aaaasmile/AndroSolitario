@@ -581,13 +581,13 @@ LPErrInApp SolitarioGfx::DrawCardPac(int x, int y, int nCdIndex,
         return ERR_UTIL::ErrorCreate("DrawCardPac %d index out of range",
                                      nCdIndex);
 
-    int iSegnoIx = nCdIndex / _deckType.GetNumCardInSuit();
-    int iCartaIx = nCdIndex % _deckType.GetNumCardInSuit();
-    TRACE_DEBUG("Suit %d, card: %d\n", iSegnoIx, iCartaIx);
+    int suitIx = nCdIndex / _deckType.GetNumCardInSuit();
+    int cardIx = nCdIndex % _deckType.GetNumCardInSuit();
+    TRACE_DEBUG("Suit %d, card: %d\n", suitIx, cardIx);
 
     SDL_Rect srcCard;
-    srcCard.x = iSegnoIx * g_CardWidth;
-    srcCard.y = iCartaIx * g_CardHeight;
+    srcCard.x = suitIx * g_CardWidth;
+    srcCard.y = cardIx * g_CardHeight;
     srcCard.w = g_CardWidth;
     srcCard.h = g_CardHeight;
 

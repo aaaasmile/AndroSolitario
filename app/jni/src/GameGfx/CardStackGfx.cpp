@@ -1,5 +1,7 @@
 #include "CardStackGfx.h"
 
+#include <random>
+
 #include "WinTypeGlobal.h"
 
 LPErrInApp CardStackGfx::NewDeck(DeckType& deckType, int widthEmpty,
@@ -32,7 +34,9 @@ void CardStackGfx::CleanUp() {
 }
 
 void CardStackGfx::Shuffle() {
-    std::random_shuffle(_vct_lpCardGfx.begin(), _vct_lpCardGfx.end());
+    std::random_device rd;
+    std::mt19937 g(rd());
+    std::shuffle(_vct_lpCardGfx.begin(), _vct_lpCardGfx.end(), g);
 }
 void CardStackGfx::Reverse() {
     std::reverse(_vct_lpCardGfx.begin(), _vct_lpCardGfx.end());
