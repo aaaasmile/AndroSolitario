@@ -78,10 +78,9 @@ private:
 
     int _screenW;
     int _screenH;
-    int _iBpp;
+    int _Bpp;
 
-    bool _bFullScreen;
-    bool _bOverride;
+    bool _fullScreen;
     bool _backGroundChanged;
 
     std::stack<MenuItemEnum> _histMenu;

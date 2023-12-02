@@ -45,15 +45,13 @@ AppGfx::AppGfx() {
     _p_SolitarioGfx = NULL;
     _p_SceneBackground = NULL;
     _p_Screen = NULL;
-    // _iScreenW = 2400 / 2;
-    // _iScreenH = 1080 / 2;
     _screenW = 1024;
     _screenH = 768;
-    _iBpp = 0;
+    _Bpp = 0;
     _p_MusicManager = 0;
     _p_HighScore = 0;
     _p_CreditTitle = 0;
-    _bFullScreen = false;
+    _fullScreen = false;
     _p_GameSettings = GAMESET::GetSettings();
 }
 
@@ -102,7 +100,7 @@ LPErrInApp AppGfx::Init() {
     if (TTF_Init() == -1) {
         return ERR_UTIL::ErrorCreate("Font init error");
     }
-    if (_p_GameSettings->NeedScreenMagnify()){
+    if (_p_GameSettings->NeedScreenMagnify()) {
         _p_GameSettings->UseBigFontSize();
     }
     int sizeFontBig = _p_GameSettings->GetSizeFontBig();
@@ -197,7 +195,7 @@ LPErrInApp AppGfx::createWindow() {
         SDL_FreeSurface(_p_Screen);
         _p_Screen = NULL;
     }
-    if (_bFullScreen) {
+    if (_fullScreen) {
         flagwin = SDL_WINDOW_FULLSCREEN_DESKTOP;
     } else {
         flagwin = SDL_WINDOW_SHOWN;
@@ -475,7 +473,7 @@ LPErrInApp AppGfx::showHelp() {
     cmd = "start";
     snprintf(cmdpath, sizeof(cmdpath), "%s .\\%s", cmd, g_lpszHelpFileName);
 #endif
-#ifdef ANDROID 
+#ifdef ANDROID
     // TODO open the pdf file
     TRACE_DEBUG("Wanna open file %s\n", g_lpszHelpFileName);
 #else
@@ -560,14 +558,11 @@ void AppGfx::updateScreenTexture() {
 }
 
 void AppGfx::ParseCmdLine(int argc, char *argv[]) {
-    _bOverride = false;
-
     for (int i = 1; i < argc; i++) {
         if (strcmp(argv[i], "--help") == 0 || strcmp(argv[i], "-h") == 0) {
             printf(
                 "Solitario version %s (c) 2004-2023 Invido.it\nOptions "
                 "available: \n"
-                "--nosound      - to disable sound/music\n"
                 "--fullscreen   - to run in fullscreen, if possible "
                 "(vs. "
                 "windowed)\n"
@@ -579,7 +574,7 @@ void AppGfx::ParseCmdLine(int argc, char *argv[]) {
         } else if (strcmp(argv[i], "--copyright") == 0 ||
                    strcmp(argv[i], "-c") == 0) {
             printf(
-                "\n\"Solitario\" version %s, Copyright (C) 2004-2023 "
+                "\n\"Solitario\" version %s, Copyright (C) 2004-2024 "
                 "Invido.it\n"
                 "This program is free software; you can redistribute "
                 "it "
@@ -605,12 +600,7 @@ void AppGfx::ParseCmdLine(int argc, char *argv[]) {
             usage(0, argv[0]);
         } else if (strcmp(argv[i], "--fullscreen") == 0 ||
                    strcmp(argv[i], "-f") == 0) {
-            _bFullScreen = true;
-        } else if (strcmp(argv[i], "--nosound") == 0 ||
-                   strcmp(argv[i], "--quiet") == 0 ||
-                   strcmp(argv[i], "-q") == 0) {
-            _p_GameSettings->MusicEnabled = false;
-            _bOverride = true;
+            _fullScreen = true;
         } else if (strcmp(argv[i], "--version") == 0 ||
                    strcmp(argv[i], "-v") == 0) {
             printf("Solitario versione %s\n", VERSION);
@@ -671,7 +661,7 @@ void AppGfx::usage(int errOut, char *cmd) {
 
     fprintf(f,
             "\nUsage: %s {--help | --usage | --copyright}\n"
-            "       %s [--fullscreen] [--nosound] [--size x,y] "
+            "       %s [--fullscreen] [--size x,y] "
             "\n",
             cmd, cmd);
 
