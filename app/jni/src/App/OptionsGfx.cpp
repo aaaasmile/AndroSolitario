@@ -81,10 +81,9 @@ LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
     if (pScreen == NULL) {
         return ERR_UTIL::ErrorCreate("pScreen is null");
     }
-    LPGameSettings pGameSettings = GAMESET::GetSettings();
     _rctOptBox.w = 500;
     _rctOptBox.h = 560;
-    if (pGameSettings->NeedScreenMagnify()) {
+    if (_p_GameSettings->NeedScreenMagnify()) {
         _rctOptBox.w = 800;
         _rctOptBox.h = 1024;
     }
@@ -117,7 +116,7 @@ LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
     rctBt1.w = 120;
     rctBt1.h = 28;
     int offsetBtY = 30;
-    if (pGameSettings->NeedScreenMagnify()) {
+    if (_p_GameSettings->NeedScreenMagnify()) {
         rctBt1.w = 180;
         rctBt1.h = 56;
         offsetBtY = 50;
@@ -134,7 +133,7 @@ LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
     int combo2OffsetY = 20;
     int combo3OffsetY = 30;
     int comboOffsetX = 50;
-    if (pGameSettings->NeedScreenMagnify()) {
+    if (_p_GameSettings->NeedScreenMagnify()) {
         comboW = 300;
         comboH = 56;
         comboOffsetY = 120;
@@ -285,6 +284,15 @@ LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
     _p_comboDeck->SetVisibleState(ComboGfx::VISIBLE);
     _p_comboDeck->SelectIndex(_p_GameSettings->DeckTypeVal.GetTypeIndex());
 
+    int hbar = 30;
+    int captionOffsetX = 10;
+    int labelOffsetY = 20;
+    if (_p_GameSettings->NeedScreenMagnify()) {
+        hbar = 65;
+        captionOffsetX = 20;
+        labelOffsetY = 40;
+    }
+
     SDL_Surface* pShadowSrf = SDL_CreateRGBSurface(
         SDL_SWSURFACE, _p_screen->w, _p_screen->h, 32, 0, 0, 0, 0);
     SDL_Texture* pScreenTexture =
@@ -351,7 +359,7 @@ LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
         Uint32 colorHeader = SDL_MapRGB(_p_screen->format, 153, 202, 51);
         rectHeader.x = _rctOptBox.x + 1;
         rectHeader.y = _rctOptBox.y + 1;
-        rectHeader.h = 30;
+        rectHeader.h = hbar;
         rectHeader.w = _rctOptBox.w - 1;
         SDL_FillRect(pShadowSrf, &rectHeader, colorHeader);
         GFX_UTIL::DrawStaticLine(
@@ -359,7 +367,7 @@ LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
             rectHeader.x + rectHeader.w, rectHeader.y + rectHeader.h,
             GFX_UTIL_COLOR::White);
         // text header
-        GFX_UTIL::DrawString(pShadowSrf, _headerText.c_str(), rectHeader.x + 10,
+        GFX_UTIL::DrawString(pShadowSrf, _headerText.c_str(), rectHeader.x + captionOffsetX,
                              rectHeader.y, GFX_UTIL_COLOR::White, _p_fontCtrl);
 
         // Button OK
@@ -367,7 +375,7 @@ LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
 
         // Combo Language: Label and crontrol
         GFX_UTIL::DrawString(pShadowSrf, strSelectLanguage.c_str(),
-                             _p_comboLang->PosX(), _p_comboLang->PosY() - 20,
+                             _p_comboLang->PosX(), _p_comboLang->PosY() - labelOffsetY,
                              GFX_UTIL_COLOR::Orange, _p_fontText);
 
         _p_comboLang->DrawButton(pShadowSrf);
@@ -378,13 +386,13 @@ LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
         // Combo Background: Label and control
         GFX_UTIL::DrawString(pShadowSrf, strSelectBackGround.c_str(),
                              _p_comboBackground->PosX(),
-                             _p_comboBackground->PosY() - 20,
+                             _p_comboBackground->PosY() - labelOffsetY,
                              GFX_UTIL_COLOR::Orange, _p_fontText);
         _p_comboBackground->DrawButton(pShadowSrf);
 
         // Combo Deck: Label and control
         GFX_UTIL::DrawString(pShadowSrf, strDeckSelectTitle.c_str(),
-                             _p_comboDeck->PosX(), _p_comboDeck->PosY() - 20,
+                             _p_comboDeck->PosX(), _p_comboDeck->PosY() - labelOffsetY,
                              GFX_UTIL_COLOR::Orange, _p_fontText);
 
         _p_comboDeck->DrawButton(pShadowSrf);
