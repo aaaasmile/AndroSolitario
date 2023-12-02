@@ -11,7 +11,6 @@
 
 using namespace std;
 
-
 static char g_filepath[1024];
 
 HighScore::HighScore() {
@@ -31,12 +30,12 @@ HighScore::HighScore() {
 LPErrInApp HighScore::Save() {
     LPGameSettings pGameSettings = GAMESET::GetSettings();
     if (pGameSettings->SettingsDir == "" || pGameSettings->GameName == "") {
-        return ERR_UTIL::ErrorCreate(
-            "User dir for high score is not defined");
+        return ERR_UTIL::ErrorCreate("User dir for high score is not defined");
     }
-    
+
     snprintf(g_filepath, sizeof(g_filepath), "%s/%s-score.bin",
-             pGameSettings->SettingsDir.c_str(), pGameSettings->GameName.c_str());
+             pGameSettings->SettingsDir.c_str(),
+             pGameSettings->GameName.c_str());
     TRACE("Save high score file %s\n", g_filepath);
 
     SDL_RWops* dst = SDL_RWFromFile(g_filepath, "wb");
@@ -100,9 +99,10 @@ LPErrInApp HighScore::SaveScore(int score, int numCard) {
 
 LPErrInApp HighScore::Load() {
     LPGameSettings pGameSettings = GAMESET::GetSettings();
-    
+
     snprintf(g_filepath, sizeof(g_filepath), "%s/%s-score.bin",
-             pGameSettings->SettingsDir.c_str(), pGameSettings->GameName.c_str());
+             pGameSettings->SettingsDir.c_str(),
+             pGameSettings->GameName.c_str());
     TRACE("Load high score file %s\n", g_filepath);
     SDL_RWops* src = SDL_RWFromFile(g_filepath, "rb");
     if (src == 0) {
@@ -116,14 +116,14 @@ LPErrInApp HighScore::Load() {
         uint8_t numCard;
         if (SDL_RWread(src, name, 16, 1) == 0) {
             return ERR_UTIL::ErrorCreate(
-                "SDL_RWread on highscore file error (file %s): %s\n", g_filepath,
-                SDL_GetError());
+                "SDL_RWread on highscore file error (file %s): %s\n",
+                g_filepath, SDL_GetError());
         }
         score = SDL_ReadLE16(src);
         if (SDL_RWread(src, &numCard, 1, 1) == 0) {
             return ERR_UTIL::ErrorCreate(
-                "SDL_RWread on highscore file error (file %s): %s\n", g_filepath,
-                SDL_GetError());
+                "SDL_RWread on highscore file error (file %s): %s\n",
+                g_filepath, SDL_GetError());
         }
 
         _scoreInfo[k].Name = name;
@@ -139,7 +139,6 @@ LPErrInApp HighScore::Show(SDL_Surface* p_surf_screen, SDL_Surface* pSurfTitle,
                            SDL_Renderer* psdlRenderer,
                            MusicManager* pMusicManager, TTF_Font* pFont,
                            TTF_Font* pFont2, Languages* pLanguages) {
-    bool done;
     SDL_Rect dest;
     SDL_Event event;
     Uint32 last_time, now_time;
@@ -149,10 +148,8 @@ LPErrInApp HighScore::Show(SDL_Surface* p_surf_screen, SDL_Surface* pSurfTitle,
         SDL_CreateTextureFromSurface(psdlRenderer, p_surf_screen);
 
     fade(p_surf_screen, p_surf_screen, 2, 1, psdlRenderer, NULL);
-    if (pMusicManager != NULL) {
-        pMusicManager->PlayMusic(MusicManager::MUSIC_CREDITS_SND,
-                                 MusicManager::LOOP_ON);
-    }
+    pMusicManager->PlayMusic(MusicManager::MUSIC_CREDITS_SND,
+                             MusicManager::LOOP_ON);
 
     dest.x = (p_surf_screen->w - pSurfTitle->w) / 2;
     dest.y = 0;
@@ -160,9 +157,9 @@ LPErrInApp HighScore::Show(SDL_Surface* p_surf_screen, SDL_Surface* pSurfTitle,
     dest.h = pSurfTitle->h;
 
     SDL_BlitSurface(pSurfTitle, NULL, p_surf_screen, &dest);
-
-    done = false;
-
+    LPGameSettings pGameSettings = GAMESET::GetSettings();
+    bool done = false;
+    Uint32 start_time = SDL_GetTicks();
     do {
         last_time = SDL_GetTicks();
 
@@ -176,28 +173,43 @@ LPErrInApp HighScore::Show(SDL_Surface* p_surf_screen, SDL_Surface* pSurfTitle,
                     done = true;
                 }
             }
+            if (event.type == SDL_FINGERDOWN) {
+                done = true;
+            }
         }
-        int xIni = (p_surf_screen->w - (70 + 300 + 100 + 30 + 50)) / 2;
+        int ax = 70;
+        int bx = 300;
+        int cx = 100;
+        int dx = 30;
+        int ex = 50;
+        if (pGameSettings->NeedScreenMagnify()) {
+            ax = 100;
+            bx = 600;
+            cx = 180;
+            dx = 50;
+            ex = 100;
+        }
+        int xIni = (p_surf_screen->w - (ax + bx + cx + dx + ex)) / 2;
         int yIni = 200;
         int xOff, yOff;
         char buff[256];
         xOff = 0;
         yOff = 0;
 
-        xOff += 70;
+        xOff += ax;
         SDL_Color txtColor = GFX_UTIL_COLOR::Gray;
         GFX_UTIL::DrawString(p_surf_screen,
                              pLanguages->GetCStringId(Languages::NAME),
                              xIni + xOff, yIni + yOff, txtColor, pFont2);
-        xOff += 300;
+        xOff += bx;
         GFX_UTIL::DrawString(p_surf_screen,
                              pLanguages->GetCStringId(Languages::POINTS),
                              xIni + xOff, yIni + yOff, txtColor, pFont2);
-        xOff += 100;
+        xOff += cx;
         GFX_UTIL::DrawString(p_surf_screen,
                              pLanguages->GetCStringId(Languages::CARDDECK),
                              xIni + xOff, yIni + yOff, txtColor, pFont2);
-        yOff += 30;
+        yOff += dx;
         xOff = 0;
 
         for (int i = 0; i < NUMOFSCORE; i++) {
@@ -213,18 +225,18 @@ LPErrInApp HighScore::Show(SDL_Surface* p_surf_screen, SDL_Surface* pSurfTitle,
             }
             GFX_UTIL::DrawString(p_surf_screen, buff, xIni + xOff, yIni + yOff,
                                  txtColor, pFont);
-            xOff += 70;
+            xOff += ax;
             GFX_UTIL::DrawString(p_surf_screen, _scoreInfo[i].Name.c_str(),
                                  xIni + xOff, yIni + yOff, txtColor, pFont);
-            xOff += 300;
+            xOff += bx;
             snprintf(buff, sizeof(buff), "%d", _scoreInfo[i].Score);
             GFX_UTIL::DrawString(p_surf_screen, buff, xIni + xOff, yIni + yOff,
                                  txtColor, pFont);
-            xOff += 100;
+            xOff += cx;
             snprintf(buff, sizeof(buff), "%d", _scoreInfo[i].NumCard);
             GFX_UTIL::DrawString(p_surf_screen, buff, xIni + xOff, yIni + yOff,
                                  txtColor, pFont);
-            yOff += 50;
+            yOff += ex;
             xOff = 0;
         }
 
@@ -236,6 +248,11 @@ LPErrInApp HighScore::Show(SDL_Surface* p_surf_screen, SDL_Surface* pSurfTitle,
         now_time = SDL_GetTicks();
         if (now_time < last_time + (1000 / 20)) {
             SDL_Delay(last_time + (1000 / 20) - now_time);
+        }
+        uint32_t elapsed_sec = (now_time / 1000) - (start_time / 1000);
+        if (elapsed_sec > 30) {
+            TRACE_DEBUG("after 30 sec, time to exit from high score\n");
+            done = true;
         }
     } while (!done);
 
