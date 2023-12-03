@@ -136,9 +136,9 @@ LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
     if (_p_GameSettings->NeedScreenMagnify()) {
         comboW = 300;
         comboH = 56;
-        comboOffsetY = 120;
-        combo2OffsetY = 30;
-        combo3OffsetY = 50;
+        comboOffsetY = 180;
+        combo2OffsetY = 70;
+        combo3OffsetY = 120;
         comboOffsetX = 70;
     }
     // Combo language

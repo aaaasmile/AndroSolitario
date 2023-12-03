@@ -1,5 +1,6 @@
 #include "ComboGfx.h"
 
+#include "GameSettings.h"
 #include "GfxUtil.h"
 
 static const char* LP_PLUS = "+";
@@ -37,21 +38,25 @@ void ComboGfx::Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
     _fncbClickEvent = fncbClickEvent;
     _rctCtrl = *pRect;
     _p_sdlRenderer = psdlRenderer;
+    LPGameSettings pGameSettings = GAMESET::GetSettings();
 
     int boxIncW = 20;
-    int boxIncH = _rctCtrl.h;  //_rctCtrl.h / 2;
+    int boxIncH = _rctCtrl.h;
+    if (pGameSettings->NeedScreenMagnify()) {
+        boxIncW = 50;
+    }
     _rctText.x = _rctCtrl.x + boxIncW;
     _rctText.y = _rctCtrl.y;
     _rctText.w = _rctCtrl.w - 2 * boxIncW;
     _rctText.h = _rctCtrl.h;
 
-    _rctBoxUp.x = _rctText.x - boxIncW;  //_rctText.x + _rctText.w;
+    _rctBoxUp.x = _rctText.x - boxIncW;
     _rctBoxUp.y = _rctText.y;
     _rctBoxUp.w = boxIncW;
     _rctBoxUp.h = boxIncH;
 
-    _rctBoxDown.x = _rctBoxUp.x + _rctText.w + boxIncW;  //_rctBoxUp.x;
-    _rctBoxDown.y = _rctBoxUp.y;  //_rctBoxUp.y + boxIncH;
+    _rctBoxDown.x = _rctBoxUp.x + _rctText.w + boxIncW;
+    _rctBoxDown.y = _rctBoxUp.y;
     _rctBoxDown.w = boxIncW;
     _rctBoxDown.h = boxIncH;
 
@@ -198,44 +203,47 @@ void ComboGfx::DrawButton(SDL_Surface* pScreen) {
         // draw current selected text
         int tx, ty;
         TTF_SizeText(_p_fontText, _buttonText.c_str(), &tx, &ty);
-        int iXOffSet = (_rctText.w - tx) / 2;
-        if (iXOffSet < 0) {
-            iXOffSet = 1;
+        int xOffset = (_rctText.w - tx) / 2;
+        if (xOffset < 0) {
+            xOffset = 1;
         }
-        int iYOffset = (_rctText.h - ty) / 2;
+        int yOffset = (_rctText.h - ty) / 2;
         _buttonText = _vctDataStrings[_currDataIndex];
         GFX_UTIL::DrawString(pScreen, _buttonText.c_str(),
-                             _rctText.x + iXOffSet, _rctText.y + iYOffset,
+                             _rctText.x + xOffset, _rctText.y + yOffset,
                              GFX_UTIL_COLOR::White, _p_fontText);
 
         // draw text upper box
         TTF_SizeText(_p_fontText, LP_PLUS, &tx, &ty);
-        iXOffSet = (_rctBoxUp.w - tx) / 2;
-        if (iXOffSet < 0) {
-            iXOffSet = 1;
+        xOffset = (_rctBoxUp.w - tx) / 2;
+        if (xOffset < 0) {
+            xOffset = 1;
         }
-        iYOffset = 0;
+        yOffset = (_rctBoxUp.h - ty) / 2;
+        if (yOffset < 0) {
+            yOffset = 0;
+        }
         if (upBoxSelected) {
             _color = GFX_UTIL_COLOR::Orange;
         } else {
             _color = GFX_UTIL_COLOR::White;
         }
-        GFX_UTIL::DrawString(pScreen, LP_PLUS, _rctBoxUp.x + iXOffSet,
-                             _rctBoxUp.y + iYOffset, _color, _p_fontText);
+        GFX_UTIL::DrawString(pScreen, LP_PLUS, _rctBoxUp.x + xOffset,
+                             _rctBoxUp.y + yOffset, _color, _p_fontText);
 
         // draw text down box
         TTF_SizeText(_p_fontText, LP_MINUS, &tx, &ty);
-        iXOffSet = (_rctBoxDown.w - tx) / 2;
-        if (iXOffSet < 0) {
-            iXOffSet = 1;
+        xOffset = (_rctBoxDown.w - tx) / 2;
+        if (xOffset < 0) {
+            xOffset = 1;
         }
         if (downBoxSelected) {
             _color = GFX_UTIL_COLOR::Orange;
         } else {
             _color = GFX_UTIL_COLOR::White;
         }
-        GFX_UTIL::DrawString(pScreen, LP_MINUS, _rctBoxDown.x + iXOffSet,
-                             _rctBoxDown.y + iYOffset, _color, _p_fontText);
+        GFX_UTIL::DrawString(pScreen, LP_MINUS, _rctBoxDown.x + xOffset,
+                             _rctBoxDown.y + yOffset, _color, _p_fontText);
 
         // draw borders
         GFX_UTIL::DrawRect(pScreen, _rctCtrl.x - 1, _rctCtrl.y - 1,
