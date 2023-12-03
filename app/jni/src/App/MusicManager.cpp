@@ -59,7 +59,7 @@ void MusicManager::Initialize(bool musicEnabled) {
         TRACE_DEBUG("Music is disabled (by settings? %s, hardware audio? %s)\n",
                     !musicEnabled ? "true" : "false",
                     _musicHardwareAvail ? "Ok" : "Failed");
-    }else{
+    } else {
         TRACE("Music OK\n");
     }
 }
@@ -112,6 +112,8 @@ bool MusicManager::IsPlayingMusic() {
 }
 
 bool MusicManager::PlayMusic(int iID, eLoopType eVal) {
+    TRACE_DEBUG("Playing music id: %d, loop: %d, disabled: %s\n", iID, eVal,
+                _musicDisabled ? "yes" : "no");
     if (iID < 0 || iID >= NUM_OF_SOUNDS) {
         return false;
     }
