@@ -494,6 +494,7 @@ void SolitarioGfx::DrawStaticScene() {
 
 LPErrInApp SolitarioGfx::DrawInitialScene() {
     TRACE("DrawInitialScene\n");
+    LPGameSettings pGameSettings = GAMESET::GetSettings();
     SDL_FillRect(_p_Screen, &_p_Screen->clip_rect,
                  SDL_MapRGBA(_p_Screen->format, 0, 0, 0, 0));
     SDL_Rect rctTarget;
@@ -502,7 +503,12 @@ LPErrInApp SolitarioGfx::DrawInitialScene() {
     rctTarget.w = _p_SceneBackground->w;
     rctTarget.h = _p_SceneBackground->h;
     if (!_sceneBackgroundIsBlack) {
-        fade(_p_Screen, _p_SceneBackground, 2, 0, _p_sdlRenderer, &rctTarget);
+        if (pGameSettings->InputType != InputTypeEnum::TouchWithoutMouse) {
+            Fade(_p_Screen, _p_SceneBackground, 2, 0, _p_sdlRenderer,
+                 &rctTarget);
+        } else {
+            InstantFade(_p_Screen);
+        }
     }
 
     SDL_Rect rctBt1;
@@ -511,7 +517,6 @@ LPErrInApp SolitarioGfx::DrawInitialScene() {
     int btoffsetY = 70;
     int btposx = 150;
     int btintraX = 30;
-    LPGameSettings pGameSettings = GAMESET::GetSettings();
     if (pGameSettings->NeedScreenMagnify()) {
         btw = 200;
         bth = 70;
@@ -1084,7 +1089,7 @@ LPErrInApp SolitarioGfx::StartGameLoop() {
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
                 case SDL_QUIT:
-                    fade(_p_Screen, _p_Screen, 1, 1, _p_sdlRenderer, NULL);
+                    Fade(_p_Screen, _p_Screen, 1, 1, _p_sdlRenderer, NULL);
                     return NULL;
 
                 case SDL_KEYDOWN:

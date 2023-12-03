@@ -153,7 +153,7 @@ void credits(SDL_Surface* p_surf_screen, SDL_Surface* pSurfTitle,
         SDL_CreateTextureFromSurface(psdlRenderer, p_surf_screen);
 
     if (pGameSettings->InputType != InputTypeEnum::TouchWithoutMouse) {
-        fade(p_surf_screen, p_surf_screen, 2, 1, psdlRenderer, NULL);
+        Fade(p_surf_screen, p_surf_screen, 2, 1, psdlRenderer, NULL);
     } else {
         InstantFade(p_surf_screen);
     }
@@ -225,7 +225,7 @@ void credits(SDL_Surface* p_surf_screen, SDL_Surface* pSurfTitle,
         }
     } while (!done);
 
-    fade(p_surf_screen, p_surf_screen, 1, 1, psdlRenderer, NULL);
+    Fade(p_surf_screen, p_surf_screen, 1, 1, psdlRenderer, NULL);
 
     if (pMusicManager->IsPlayingMusic()) {
         pMusicManager->StopMusic(300);
