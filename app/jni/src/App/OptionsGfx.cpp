@@ -118,7 +118,7 @@ LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
     int offsetBtY = 30;
     if (_p_GameSettings->NeedScreenMagnify()) {
         rctBt1.w = 180;
-        rctBt1.h = 56;
+        rctBt1.h = 65;
         offsetBtY = 50;
     }
     rctBt1.y = _rctOptBox.y + _rctOptBox.h - offsetBtY - rctBt1.h;
@@ -327,6 +327,9 @@ LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
                         return err;
                     break;
                 }
+            }
+            if (event.type == SDL_FINGERDOWN){
+                _p_buttonOK->FingerDown(event);
             }
             if (event.type == SDL_MOUSEBUTTONUP) {
                 _p_buttonOK->MouseUp(event);

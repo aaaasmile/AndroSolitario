@@ -89,7 +89,7 @@ ClickCb SolitarioGfx::prepClickNewGameCb() {
 
 LPErrInApp SolitarioGfx::Initialize(
     SDL_Surface *s, SDL_Renderer *r, SDL_Window *w, DeckType &dt,
-    LPLanguages planguages, TTF_Font *pfontSmallText, TTF_Font *pfontBigText, 
+    LPLanguages planguages, TTF_Font *pfontSmallText, TTF_Font *pfontBigText,
     SDL_Surface *pSceneBackground, MusicManager *pMusicManager, bool isBlack,
     HighScore *pHighScore) {
     TRACE("Initialize Solitario\n");
@@ -514,7 +514,7 @@ LPErrInApp SolitarioGfx::DrawInitialScene() {
     LPGameSettings pGameSettings = GAMESET::GetSettings();
     if (pGameSettings->NeedScreenMagnify()) {
         btw = 200;
-        bth = 62;
+        bth = 70;
         btoffsetY = 400;
         btposx = 500;
         btintraX = 50;
@@ -838,6 +838,12 @@ LPErrInApp SolitarioGfx::handleGameLoopKeyDownEvent(SDL_Event &event) {
     return NULL;
 }
 
+LPErrInApp SolitarioGfx::handleGameLoopFingerDownEvent(SDL_Event &event) {
+    _p_BtQuit->FingerDown(event);
+    _p_BtNewGame->FingerDown(event);
+    return NULL;
+}
+
 LPErrInApp SolitarioGfx::handleGameLoopMouseDownEvent(SDL_Event &event) {
     if (event.button.button == SDL_BUTTON_LEFT) {
         return handleLeftMouseDown(event);
@@ -1089,6 +1095,11 @@ LPErrInApp SolitarioGfx::StartGameLoop() {
                     if (err != NULL)
                         return err;
                     break;
+                case SDL_FINGERDOWN:
+                    err = handleGameLoopFingerDownEvent(event);
+                    if (err != NULL)
+                        return err;
+                    break;
 
                 case SDL_MOUSEBUTTONDOWN:
                     err = handleGameLoopMouseDownEvent(event);
@@ -1190,6 +1201,8 @@ void SolitarioGfx::BtQuitClick() {
     if (showYesNoMsgBox(_p_Languages->GetCStringId(Languages::ASK_QUIT)) ==
         MesgBoxGfx::RES_YES) {
         _terminated = true;
+    } else {
+        DrawStaticScene();
     }
 }
 
@@ -1198,6 +1211,8 @@ void SolitarioGfx::BtNewGameClick() {
     if (showYesNoMsgBox(_p_Languages->GetCStringId(Languages::ASK_NEWGAME)) ==
         MesgBoxGfx::RES_YES) {
         _newgamerequest = true;
+    } else {
+        DrawStaticScene();
     }
 }
 
@@ -1217,8 +1232,6 @@ LPErrInApp SolitarioGfx::drawScore(SDL_Surface *pScreen) {
     snprintf(buff, sizeof(buff), "%s : %d",
              _p_Languages->GetCStringId(Languages::ID_SCORE), _scoreGame);
 
-    
-    
     SDL_Color colorText = GFX_UTIL_COLOR::White;
     if (_scoreGame < 0) {
         colorText = GFX_UTIL_COLOR::Red;

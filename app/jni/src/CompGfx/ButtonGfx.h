@@ -8,6 +8,7 @@
 #include "WinTypeGlobal.h"
 
 using namespace traits;
+class GameSettings;
 
 class ButtonGfx {
 public:
@@ -27,6 +28,7 @@ public:
     bool MouseMove(SDL_Event& event);
     bool MouseUp(SDL_Event& event);
     bool MouseDown(SDL_Event& event);
+    void FingerDown(SDL_Event& event);
     void DrawButton(SDL_Surface* pScreen);
     void Enable(bool bVal) { _enabled = bVal; }
     void SetVisibleState(VisbleState eVal) { _visibleState = eVal; }
@@ -35,7 +37,7 @@ public:
 private:
     SDL_Surface* _p_buttonSurface;
     TTF_Font* _p_fontText;
-
+    GameSettings* _p_GameSettings;
     int _butID;
     bool _mouseIsDown;
     ButtonType _buttonType;

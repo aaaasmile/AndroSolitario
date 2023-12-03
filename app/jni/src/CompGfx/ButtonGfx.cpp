@@ -1,5 +1,6 @@
 #include "ButtonGfx.h"
 
+#include "GameSettings.h"
 #include "GfxUtil.h"
 
 ButtonGfx::ButtonGfx() {
@@ -11,6 +12,7 @@ ButtonGfx::ButtonGfx() {
     _mouseIsDown = false;
     _buttonType = TEXT_BUTTON;
     _mouseState = MouseState::OUTSIDE;
+    _p_GameSettings = GAMESET::GetSettings();
 }
 
 ButtonGfx::~ButtonGfx() {
@@ -39,6 +41,9 @@ void ButtonGfx::Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
 }
 
 bool ButtonGfx::MouseMove(SDL_Event& event) {
+    if (_p_GameSettings->InputType == InputTypeEnum::TouchWithoutMouse) {
+        return false;
+    }
     MouseState previous = _mouseState;
     if (_visibleState == VISIBLE && _enabled) {
         if (event.motion.x >= _rctButton.x &&
@@ -55,6 +60,9 @@ bool ButtonGfx::MouseMove(SDL_Event& event) {
 }
 
 bool ButtonGfx::MouseDown(SDL_Event& event) {
+    if (_p_GameSettings->InputType == InputTypeEnum::TouchWithoutMouse) {
+        return false;
+    }
     _mouseIsDown = false;
     if (_visibleState == VISIBLE && _enabled) {
         if (event.motion.x >= _rctButton.x &&
@@ -67,12 +75,30 @@ bool ButtonGfx::MouseDown(SDL_Event& event) {
     return _mouseIsDown;
 }
 
+static bool IsPointInsideButton(const SDL_Rect& rct, const SDL_Point& pt) {
+    if (pt.x >= rct.x && pt.x <= rct.x + rct.w && pt.y >= rct.y &&
+        pt.y <= rct.y + rct.h) {
+        return true;
+    }
+    return false;
+}
+
+void ButtonGfx::FingerDown(SDL_Event& event) {
+    SDL_Point pt;
+    _p_GameSettings->GetTouchPoint(event.tfinger, &pt);
+    if (IsPointInsideButton(_rctButton, pt)) {
+        if ((_fncbClickEvent.tc) != NULL)
+            (_fncbClickEvent.tc)->Click(_fncbClickEvent.self, _butID);
+    }
+}
+
 bool ButtonGfx::MouseUp(SDL_Event& event) {
+    if (_p_GameSettings->InputType == InputTypeEnum::TouchWithoutMouse) {
+        return false;
+    }
     if (_visibleState == VISIBLE && _enabled) {
-        if (event.motion.x >= _rctButton.x &&
-            event.motion.x <= _rctButton.x + _rctButton.w &&
-            event.motion.y >= _rctButton.y &&
-            event.motion.y <= _rctButton.y + _rctButton.h) {
+        SDL_Point pt = {event.motion.x, event.motion.y};
+        if (IsPointInsideButton(_rctButton, pt)) {
             if ((_fncbClickEvent.tc) != NULL)
                 (_fncbClickEvent.tc)->Click(_fncbClickEvent.self, _butID);
             _mouseState = MouseState::INSIDE;
@@ -95,8 +121,8 @@ void ButtonGfx::DrawButton(SDL_Surface* pScreen) {
     int mx, my;
     SDL_Color colorText;
     SDL_GetMouseState(&mx, &my);
-    if (mx >= _rctButton.x && mx <= _rctButton.x + _rctButton.w &&
-        my >= _rctButton.y && my <= _rctButton.y + _rctButton.h) {
+    SDL_Point pt = {mx, my};
+    if (IsPointInsideButton(_rctButton, pt)) {
         colorText = GFX_UTIL_COLOR::Orange;
         _mouseState = MouseState::INSIDE;
     } else {

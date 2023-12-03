@@ -54,7 +54,8 @@ class SolitarioGfx {
 
     LPErrInApp Initialize(SDL_Surface *s, SDL_Renderer *r, SDL_Window *w,
                           DeckType &dt, LPLanguages planguages,
-                          TTF_Font *pfontSmallText, TTF_Font *pfontBigText, SDL_Surface *pSceneBackground,
+                          TTF_Font *pfontSmallText, TTF_Font *pfontBigText,
+                          SDL_Surface *pSceneBackground,
                           MusicManager *pMusicManager, bool isBlack,
                           HighScore *pHighScore);
     LPErrInApp StartGameLoop();
@@ -156,6 +157,7 @@ class SolitarioGfx {
     LPErrInApp newGame();
     LPErrInApp handleGameLoopKeyDownEvent(SDL_Event &event);
     LPErrInApp handleGameLoopMouseDownEvent(SDL_Event &event);
+    LPErrInApp handleGameLoopFingerDownEvent(SDL_Event &event);
     void handleGameLoopMouseMoveEvent(SDL_Event &event);
     LPErrInApp handleGameLoopMouseUpEvent(SDL_Event &event);
     LPErrInApp handleLeftMouseDown(SDL_Event &event);
@@ -191,7 +193,7 @@ class SolitarioGfx {
     TTF_Font *_p_FontBigText;
     TTF_Font *_p_FontSmallText;
     HighScore *_p_HighScore;
-    MusicManager* _p_MusicManager;
+    MusicManager *_p_MusicManager;
 
     int _oldx;
     int _oldy;

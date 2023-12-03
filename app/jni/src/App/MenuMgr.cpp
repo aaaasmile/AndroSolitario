@@ -462,17 +462,14 @@ LPErrInApp MenuMgr::HandleRootMenu() {
         }
 
         if (event.type == SDL_FINGERDOWN) {
-            float x = event.tfinger.x;
-            float y = event.tfinger.y;
             pGameSettings->GetTouchPoint(event.tfinger, &touchLocation);
             TRACE_DEBUG("Tap in x=%d, y=%d\n", touchLocation.x,
                         touchLocation.y);
-            // mouseInside = checkTapInsideBox(touchLocation);
-            // if (mouseInside && isFocusedItemConfirmed(touchLocation)) {
             MenuItemBox tapInfoBox;
             if (g_MenuItemBoxes.IsPointInside(touchLocation, tapInfoBox)) {
                 _focusedMenuItem = tapInfoBox.MenuItem;
-                TRACE_DEBUG("Select menu %s from Tap down\n", MenuItemEnumToString(_focusedMenuItem));
+                TRACE_DEBUG("Select menu %s from Tap down\n",
+                            MenuItemEnumToString(_focusedMenuItem));
                 rootMenuNext();
             } else {
                 TRACE_DEBUG("Tap outside the menu list\n");
