@@ -10,14 +10,11 @@
 using namespace traits;
 
 class CheckBoxGfx {
-private:
-    enum { CHECK_W = 16, CHECK_H = 16 };
-
-public:
+   public:
     CheckBoxGfx();
     virtual ~CheckBoxGfx();
 
-public:
+   public:
     enum VisbleState {
         VISIBLE,
         INVISIBLE,
@@ -39,7 +36,7 @@ public:
     int PosY() { return _rctCtrl.y; }
     int Height() { return _rctCtrl.h; }
 
-private:
+   private:
     VisbleState _visibleState;
     SDL_Rect _rctCtrl;
     STRING _buttonText;

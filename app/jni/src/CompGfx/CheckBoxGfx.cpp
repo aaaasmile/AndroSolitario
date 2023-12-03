@@ -1,5 +1,6 @@
 #include "CheckBoxGfx.h"
 
+#include "GameSettings.h"
 #include "GfxUtil.h"
 
 CheckBoxGfx::CheckBoxGfx() {
@@ -56,67 +57,67 @@ void CheckBoxGfx::MouseUp(SDL_Event& event) {
 }
 
 void CheckBoxGfx::DrawButton(SDL_Surface* pScreen) {
-    if (_visibleState != INVISIBLE) {
-        if (_enabled) {
-            int iXOffSet = 0;
-            int iYOffset = 0;
-
-            if (_clicked) {
-                SDL_Rect rctCheck;
-                rctCheck.x = _rctCtrl.x;
-                rctCheck.y = _rctCtrl.y;
-                rctCheck.w = CHECK_W;
-                rctCheck.h = CHECK_H;
-
-                GFX_UTIL::DrawRect(pScreen, rctCheck.x - 1, rctCheck.y - 1,
-                                   rctCheck.x + rctCheck.w + 1,
-                                   rctCheck.y + rctCheck.h + 1,
-                                   GFX_UTIL_COLOR::Gray);
-                GFX_UTIL::DrawRect(pScreen, rctCheck.x - 2, rctCheck.y - 2,
-                                   rctCheck.x + rctCheck.w + 2,
-                                   rctCheck.y + rctCheck.h + 2,
-                                   GFX_UTIL_COLOR::Black);
-                GFX_UTIL::DrawStaticLine(
-                    pScreen, rctCheck.x, rctCheck.y, rctCheck.x + rctCheck.w,
-                    rctCheck.y + rctCheck.h, GFX_UTIL_COLOR::Orange);
-                GFX_UTIL::DrawStaticLine(
-                    pScreen, rctCheck.x + rctCheck.w, rctCheck.y, rctCheck.x,
-                    rctCheck.y + rctCheck.h, GFX_UTIL_COLOR::Orange);
-
-                iXOffSet = rctCheck.w + 10;
-                iYOffset = rctCheck.h;
-
-            } else {
-                SDL_Rect rctCheck;
-                rctCheck.x = _rctCtrl.x;
-                rctCheck.y = _rctCtrl.y;
-                rctCheck.w = CHECK_W;
-                rctCheck.h = CHECK_H;
-
-                GFX_UTIL::DrawRect(pScreen, rctCheck.x - 1, rctCheck.y - 1,
-                                   rctCheck.x + rctCheck.w + 1,
-                                   rctCheck.y + rctCheck.h + 1,
-                                   GFX_UTIL_COLOR::Gray);
-                GFX_UTIL::DrawRect(pScreen, rctCheck.x - 2, rctCheck.y - 2,
-                                   rctCheck.x + rctCheck.w + 2,
-                                   rctCheck.y + rctCheck.h + 2,
-                                   GFX_UTIL_COLOR::Black);
-
-                iXOffSet = rctCheck.w + 10;
-                iYOffset = rctCheck.h;
-            }
-
-            int tx, ty;
-            TTF_SizeText(_p_FontText, _buttonText.c_str(), &tx, &ty);
-
-            if (iXOffSet < 0) {
-                iXOffSet = 1;
-            }
-            GFX_UTIL::DrawString(
-                pScreen, _buttonText.c_str(), _rctCtrl.x + iXOffSet,
-                _rctCtrl.y + iYOffset - ty, _color, _p_FontText);
-        }
+    if (_visibleState == INVISIBLE) {
+        return;
     }
+    if (!_enabled) {
+        return;
+    }
+    int xOffset = 0;
+    int yOffset = 0;
+    int ckbtW = 16;
+    int ckbtH = 16;
+    int intraOffsetX = 10;
+    LPGameSettings pGameSettings = GAMESET::GetSettings();
+    if (pGameSettings->NeedScreenMagnify()) {
+        ckbtW = 40;
+        ckbtH = 40;
+        intraOffsetX = 40;
+    }
+    SDL_Rect rctCheck;
+    if (_clicked) {
+        rctCheck.x = _rctCtrl.x;
+        rctCheck.y = _rctCtrl.y;
+        rctCheck.w = ckbtW;
+        rctCheck.h = ckbtH;
+
+        GFX_UTIL::DrawRect(pScreen, rctCheck.x - 1, rctCheck.y - 1,
+                           rctCheck.x + rctCheck.w + 1,
+                           rctCheck.y + rctCheck.h + 1, GFX_UTIL_COLOR::Gray);
+        GFX_UTIL::DrawRect(pScreen, rctCheck.x - 2, rctCheck.y - 2,
+                           rctCheck.x + rctCheck.w + 2,
+                           rctCheck.y + rctCheck.h + 2, GFX_UTIL_COLOR::Black);
+        GFX_UTIL::DrawStaticLine(
+            pScreen, rctCheck.x, rctCheck.y, rctCheck.x + rctCheck.w,
+            rctCheck.y + rctCheck.h, GFX_UTIL_COLOR::Orange);
+        GFX_UTIL::DrawStaticLine(pScreen, rctCheck.x + rctCheck.w, rctCheck.y,
+                                 rctCheck.x, rctCheck.y + rctCheck.h,
+                                 GFX_UTIL_COLOR::Orange);
+
+    } else {
+        rctCheck.x = _rctCtrl.x;
+        rctCheck.y = _rctCtrl.y;
+        rctCheck.w = ckbtW;
+        rctCheck.h = ckbtH;
+
+        GFX_UTIL::DrawRect(pScreen, rctCheck.x - 1, rctCheck.y - 1,
+                           rctCheck.x + rctCheck.w + 1,
+                           rctCheck.y + rctCheck.h + 1, GFX_UTIL_COLOR::Gray);
+        GFX_UTIL::DrawRect(pScreen, rctCheck.x - 2, rctCheck.y - 2,
+                           rctCheck.x + rctCheck.w + 2,
+                           rctCheck.y + rctCheck.h + 2, GFX_UTIL_COLOR::Black);
+    }
+    xOffset = rctCheck.w + intraOffsetX;
+    yOffset = rctCheck.h;
+
+    int tx, ty;
+    TTF_SizeText(_p_FontText, _buttonText.c_str(), &tx, &ty);
+
+    if (xOffset < 0) {
+        xOffset = 1;
+    }
+    GFX_UTIL::DrawString(pScreen, _buttonText.c_str(), _rctCtrl.x + xOffset,
+                         _rctCtrl.y + yOffset - ty, _color, _p_FontText);
 }
 
 void CheckBoxGfx::RedrawButton(SDL_Surface* pScreen,
