@@ -143,11 +143,16 @@ LPErrInApp HighScore::Show(SDL_Surface* p_surf_screen, SDL_Surface* pSurfTitle,
     SDL_Event event;
     Uint32 last_time, now_time;
     SDL_Keycode key;
+    LPGameSettings pGameSettings = GAMESET::GetSettings();
 
     SDL_Texture* pScreenTexture =
         SDL_CreateTextureFromSurface(psdlRenderer, p_surf_screen);
 
-    fade(p_surf_screen, p_surf_screen, 2, 1, psdlRenderer, NULL);
+    if (pGameSettings->InputType != InputTypeEnum::TouchWithoutMouse) {
+        fade(p_surf_screen, p_surf_screen, 2, 1, psdlRenderer, NULL);
+    } else {
+        InstantFade(p_surf_screen);
+    }
     pMusicManager->PlayMusic(MusicManager::MUSIC_CREDITS_SND,
                              MusicManager::LOOP_ON);
 
@@ -157,7 +162,6 @@ LPErrInApp HighScore::Show(SDL_Surface* p_surf_screen, SDL_Surface* pSurfTitle,
     dest.h = pSurfTitle->h;
 
     SDL_BlitSurface(pSurfTitle, NULL, p_surf_screen, &dest);
-    LPGameSettings pGameSettings = GAMESET::GetSettings();
     bool done = false;
     Uint32 start_time = SDL_GetTicks();
     do {

@@ -113,3 +113,16 @@ void fade(SDL_Surface* p_surf_screen, SDL_Surface* p_surf_img,
     }
     SDL_DestroyTexture(pScreenTexture);
 }
+
+void InstantFade(SDL_Surface* p_surf_screen) {
+    SDL_Rect dest;
+    dest.x = 0;
+    dest.y = 0;
+    dest.w = p_surf_screen->w;
+    dest.h = p_surf_screen->h;
+    SDL_Surface* pBlack = SDL_CreateRGBSurface(
+        SDL_SWSURFACE, p_surf_screen->w, p_surf_screen->h, 32, 0, 0, 0, 0);
+    SDL_FillRect(pBlack, &pBlack->clip_rect,
+                 SDL_MapRGBA(pBlack->format, 0, 0, 0, 0));
+    SDL_BlitSurface(pBlack, NULL, p_surf_screen, &dest);
+}

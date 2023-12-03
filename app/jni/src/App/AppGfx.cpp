@@ -202,8 +202,6 @@ LPErrInApp AppGfx::createWindow() {
         return ERR_UTIL::ErrorCreate("Error SDL_CreateWindow: %s\n",
                                      SDL_GetError());
     }
-    // SDL_SetWindowFullscreen(_p_Window, SDL_WINDOW_FULLSCREEN);
-    // TODO get some landscape mode
     _p_GameSettings->CalcDisplaySize();
     _screenH = _p_GameSettings->GetScreenHeight();
     _screenW = _p_GameSettings->GetScreenWidth();

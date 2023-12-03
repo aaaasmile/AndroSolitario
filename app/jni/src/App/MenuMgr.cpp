@@ -286,7 +286,7 @@ LPErrInApp MenuMgr::drawStaticScene() {
     // header bar
     int hbarOffset = 0;
     int hbar = 46;
-    if (pGameSettings->NeedScreenMagnify()){
+    if (pGameSettings->NeedScreenMagnify()) {
         hbar = 65;
     }
     GFX_UTIL::FillRect(_p_ScreenBackbuffer, _box_X, _box_Y - (2 + hbarOffset),
@@ -310,7 +310,7 @@ LPErrInApp MenuMgr::drawStaticScene() {
     // text title bar
     int bar_x = 30;
     int bar_y = 25;
-    
+
     SDL_Color color = g_color_white;
     err = drawMenuText(
         _p_ScreenBackbuffer,
@@ -329,7 +329,7 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     int minIntraOffsetY = 80;
     intraOffset = min(minIntraOffsetY, intraOffset);
     LPGameSettings pGameSettings = GAMESET::GetSettings();
-    if (pGameSettings->NeedScreenMagnify()){
+    if (pGameSettings->NeedScreenMagnify()) {
         intraOffset += 50;
     }
     // Play
@@ -427,7 +427,8 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     if (err != NULL) {
         return err;
     }
-    g_MenuItemBoxes.SetYInPos(4, lastY - 1); // fill the space until quit with menu 4, not the 5
+    g_MenuItemBoxes.SetYInPos(
+        4, lastY - 1);  // fill the space until quit with menu 4, not the 5
     g_MenuItemBoxes.SetYInPos(5, _box_Y + _rctPanelRedBox.h);
     return NULL;
 }
@@ -470,14 +471,9 @@ LPErrInApp MenuMgr::HandleRootMenu() {
             // if (mouseInside && isFocusedItemConfirmed(touchLocation)) {
             MenuItemBox tapInfoBox;
             if (g_MenuItemBoxes.IsPointInside(touchLocation, tapInfoBox)) {
-                if (tapInfoBox.MenuItem == _focusedMenuItem) {
-                    TRACE_DEBUG("Select menu from Tap down\n");
-                    rootMenuNext();
-                } else {
-                    _focusedMenuItem = tapInfoBox.MenuItem;
-                    TRACE_DEBUG("Tap Focus on Menu item %s\n",
-                                MenuItemEnumToString(_focusedMenuItem));
-                }
+                _focusedMenuItem = tapInfoBox.MenuItem;
+                TRACE_DEBUG("Select menu %s from Tap down\n", MenuItemEnumToString(_focusedMenuItem));
+                rootMenuNext();
             } else {
                 TRACE_DEBUG("Tap outside the menu list\n");
             }
