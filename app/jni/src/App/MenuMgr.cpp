@@ -176,8 +176,8 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
     if (_rctPanelRedBox.w > 1024) {
         _rctPanelRedBox.w = 1024;
     }
-    if (_rctPanelRedBox.h > 1024) {
-        _rctPanelRedBox.h = 1024;
+    if (_rctPanelRedBox.h > 1200) {
+        _rctPanelRedBox.h = 1200;
     }
 
     _rctPanelRedBox.x = (_screenW - _rctPanelRedBox.w) / 2;
@@ -311,7 +311,7 @@ LPErrInApp MenuMgr::drawStaticScene() {
     int bar_x = 30;
     int bar_y = 25;
 
-    SDL_Color color = g_color_white;
+    SDL_Color color = g_color_gray;
     err = drawMenuText(
         _p_ScreenBackbuffer,
         _p_Languages->GetStringId(Languages::ID_WELCOMETITLEBAR).c_str(),
@@ -324,7 +324,7 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     LPErrInApp err;
     int offsetX = 30;
     int offsetY = 60;
-    int morePlaceY = 40;
+    int morePlaceY = 60;
     int intraOffset = (_rctPanelRedBox.h - 80) / 5;
     int minIntraOffsetY = 80;
     intraOffset = min(minIntraOffsetY, intraOffset);
@@ -346,6 +346,9 @@ LPErrInApp MenuMgr::drawMenuTextList() {
         return err;
     }
     currY += morePlaceY;
+#ifdef ANDROID
+    currY += 2 * morePlaceY;
+#endif
     g_MenuItemBoxes.SetPos0Y(_box_Y, currY);
     // Options
     currY = currY + intraOffset;
@@ -380,6 +383,7 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     g_MenuItemBoxes.SetYInPos(2, currY);
 
     // Help
+#ifndef ANDROID
     currY = currY + intraOffset;
     if (_focusedMenuItem != MenuItemEnum::MENU_HELP) {
         color = g_color_off;
@@ -394,6 +398,7 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     }
     currY += morePlaceY;
     g_MenuItemBoxes.SetYInPos(3, currY);
+#endif
 
     // highscore
     currY = currY + intraOffset;

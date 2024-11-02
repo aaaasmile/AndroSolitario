@@ -132,7 +132,7 @@ Languages::Languages() {
     _mtxLangString[LANG_ITA][ID_TRIESTE] = "Triestine";
     _mtxLangString[LANG_ITA][ID_SICILIA] = "Siciliane";
     _mtxLangString[LANG_ITA][ID_CREDITS] = "Credits";
-    _mtxLangString[LANG_ITA][ID_WELCOMETITLEBAR] = "Benvenuti";
+    _mtxLangString[LANG_ITA][ID_WELCOMETITLEBAR] = "Il Solitario";
     _mtxLangString[LANG_ITA][ID_MEN_OPTIONS] = "Opzioni";
     _mtxLangString[LANG_ITA][ID_MN_HELP] = "Guida";
     _mtxLangString[LANG_ITA][ID_OK] = "OK";

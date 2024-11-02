@@ -23,12 +23,15 @@ MusicManager::MusicManager() {
 }
 
 MusicManager::~MusicManager() {
+    StopMusic(0);
     for (int i = 0; i < NUM_OF_SOUNDS; i++) {
         Mix_FreeMusic(_p_Musics[i]);
     }
     for (int j = 0; j < NUM_OF_WAV; j++) {
         Mix_FreeChunk(_p_MusicsWav[j]);
     }
+    SDL_QuitSubSystem(SDL_INIT_AUDIO);
+    TRACE_DEBUG("Quit the audio sub system");
 }
 
 void MusicManager::Initialize(bool musicEnabled) {
@@ -56,9 +59,10 @@ void MusicManager::Initialize(bool musicEnabled) {
         }
     }
     if (_musicDisabled) {
-        TRACE_DEBUG("Music is disabled (by settings? %s, hardware audio? %s)\n",
-                    !musicEnabled ? "true" : "false",
-                    _musicHardwareAvail ? "Ok" : "Failed");
+        TRACE_DEBUG(
+            "[WARN] Music is disabled (by settings? %s, hardware audio? %s)\n",
+            !musicEnabled ? "true" : "false",
+            _musicHardwareAvail ? "Ok" : "Failed");
     } else {
         TRACE("Music OK\n");
     }
@@ -106,14 +110,18 @@ void MusicManager::StopMusic(int fadingMs) {
 
 bool MusicManager::IsPlayingMusic() {
     if (_musicDisabled) {
-        return false;
+        return true;
     }
     return Mix_PlayingMusic();
 }
 
 bool MusicManager::PlayMusic(int iID, eLoopType eVal) {
-    TRACE_DEBUG("Playing music id: %d, loop: %d, disabled: %s\n", iID, eVal,
-                _musicDisabled ? "yes" : "no");
+    if (_musicDisabled) {
+        TRACE_DEBUG("Ignore PlayMusic because is disabled");
+    } else {
+        TRACE_DEBUG("Playing music id: %d, loop: %d\n", iID, eVal);
+    }
+
     if (iID < 0 || iID >= NUM_OF_SOUNDS) {
         return false;
     }
