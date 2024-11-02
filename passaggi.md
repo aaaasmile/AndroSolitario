@@ -237,16 +237,20 @@ questo _files to include_
     app/jni/src/**/
 
 ## Problemi del Solitario su Android
-Questi sono i problemi e todo della conversione in Android.
-SoltarioIta: Fatal: Cannot create dir (null)/.solitario [DONE]
+Questi sono i todo della conversione in Android.
+
+- Problema con il formato dello schermo: il tavolo di gioco è troppo piccolo
+- Nel tavolo da gioco ci vorrebbe un bottone per mettere la musica in pausa.
+
+- SoltarioIta: Fatal: Cannot create dir (null)/.solitario [DONE]
 Fatal: loadProfile: Ini file error /data/data/org.libsdl.app/files/.solitario/options.ini
-Se vuoi una nuova compilazione clean del target Android, allora basta cancellare la directory app/build
-Niente ini.
-- Problema con il formato dello schermo
-- Non mi funzionano poi i pulsanti
+Qui ho rimosso i file ini della libreria ini. Uso un formato binario con SDL. [DONE]
+- Non mi funzionano poi i pulsanti [DONE]
 - Nei credits e hight score non si può tornare indietro, qui serve un "back by tap" in High Score [DONE]
 - shuffle_random è marcato obsoleto in ndk, il risultato è che non mescola un bel nulla [DONE]
-- A livello generale direi che il tap non ce l'ho sotto controllo
+- A livello generale direi che il tap non ce l'ho sotto controllo [DONE]
+- Il menu Esci non mi fa funzionare il suono quando poi riavvio il programma. Questo è dovuto al fatto che le App in Android non hanno il comando Quit. Quando uso lo Swap, il programma termina in modo corretto e anche riparte in modo corretto. Per questo ho rimosso il comando Esci [DONE]
+- Rimosso il menu Guida in quanto non riesco a far partire la visualizzazione del pdf [DONE]
 
 ## Mouse e Touch
 Una discussione interessante sull'argomento si trova su 
@@ -254,7 +258,7 @@ https://discourse.libsdl.org/t/mouse-emulation-of-touch-events/19255/6
 Il fatto è che il touch event viene rimbalzato anche come mouse event. Solo che il rimbalzo
 non è assolutamente preciso. Quindi su Android scelgo di ignorare gli eventi del mouse.
 
-## Compilzzione con target wsl
+## Compilszione con target wsl
 Ho compilato i sorgenti di AndroSolitario anche su WSL, questo per vedere se l'app funziona.
 Uso CMake per compilare il target su WSL, mentre ndk con gradle (Android.mk) per quanto
 riguarda il target Android.
@@ -288,7 +292,7 @@ si possono vedere i traces di SDL prima e dopo la chiamata di main() del mio pro
 
     adb logcat -s "SDL"
 
-## Compile, Deploy, Start
+## Compile, Deploy e Start App
 Per prima cosa collego il device e lancio in windows D:\Xiaomi\platform-tools_r34.0.5-windows\platform-tools\start_adb_server.bat
 Su WSL lancio ./start_adb_service.sh che è un terminal senza output, se tutto procede bene.
 in ~/projects/AndroSolitario lancio 

@@ -417,6 +417,7 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     currY += morePlaceY;
     g_MenuItemBoxes.SetYInPos(4, currY);
 
+#ifndef ANDROID
     // Quit
     currY = currY + intraOffset + 20;
     int lastY = _box_Y + _rctPanelRedBox.h - intraOffset - offsetY + 30;
@@ -435,6 +436,7 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     g_MenuItemBoxes.SetYInPos(
         4, lastY - 1);  // fill the space until quit with menu 4, not the 5
     g_MenuItemBoxes.SetYInPos(5, _box_Y + _rctPanelRedBox.h);
+#endif
     return NULL;
 }
 
