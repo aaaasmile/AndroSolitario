@@ -1,9 +1,10 @@
 # Solitario per Android
 
-Questo progetto è il tentativo di compilare il progetto https://github.com/aaaasmile/Solitario per la piattaforma Android.
+AndroSolitario è il tentativo di compilare il progetto https://github.com/aaaasmile/Solitario per la piattaforma Android.
 Nota che ho già scritto alcune notte per lo sviluppo nel file https://github.com/aaaasmile/Solitario/blob/main/android.md
+In questo progetto ho compilato i sorgenti sia per Android che per WSL2.
 
-## Sviluppo
+## Info per partire con lo sviluppo
 (Vedi sotto per le versioni)
 Lo sviluppo l'ho eseguito su UbuntuMinitoro del mio Mini-k7. Sono partito dal progetto sdl-android-prj-hello
 in scratch ed ho poi aggiunto tutti i sorgenti.
@@ -28,37 +29,7 @@ come il progetto Android di default di Sdl che avevo costruito in scrach hellosd
 Il device che utilizzo ha un Cortex-A73 (Snapdragon 680) un arm 64 bit v8.
 Ha una risoluzione di 1080 x 2400
 Il RedMe, per il deployment, deve essere collegato ed accessibile in WSL2 con il cavo USB.
-In Admin Powershell uso (non più, vedi sotto)
-
-    usbipd wsl list
-    usbipd wsl attach --busid 5-1 --distribution UbuntuMinitoro
-    usbipd wsl detach --busid 5-1  (per scollegare)
-In WSL
-
-    lsusb
-    Bus 001 Device 006: ID 2717:ff48 Xiaomi Inc. Mi/Redmi series (MTP + ADB)
-
-Per compilare (meglio vedi l'ultima sezione)
-Nel terminal di Visual Code:
-
-    export ANDROID_SDK_ROOT=$HOME/android/
-	export PATH=${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin:${ANDROID_SDK_ROOT}/platform-tools:${PATH}
-	sudo $ANDROID_SDK_ROOT/platform-tools/adb start-server
-	adb devices
-Qui l'output deve essere qualcosa di simile a questo (la lista vuota non va):
-
-    List of devices attached
-    f5c24a47        device
-
-Ora si possono lanciare i comandi di compilazione:
-
-    ./gradlew compileDebugSources
-Per installare
-
-    ./gradlew installDebug
-Per lanciare l'app dal terminal di Visual Code:
-
-    adb shell am start -n org.libsdl.app/.SDLActivity
+Per il collegamento vedi la sezione Adb Devices
 
 ## Struttura del progetto
 Riferimento: https://wiki.libsdl.org/SDL2/Android#install_sdl_in_a_gcc_toolchain
@@ -72,15 +43,15 @@ Qui viene instaziata la SDLActivity che al suo interno crea la SDL_Surface dove 
 il game loop del solitario.
 
 ## SDL_Images & Co.
-Ho bisogno anche delle altre librerie. 
+Ho bisogno di SDl e anche di altre librerie. 
 1) SDL_Image: https://github.com/libsdl-org/SDL_image/releases (SDL2_image-2.6.3)
 2) SDL_mixer: https://github.com/libsdl-org/SDL_mixer/releases (SDL2_mixer-2.6.3)
 3) SDL_ttf: https://github.com/libsdl-org/SDL_ttf/releases (SDL2_ttf-2.20.2)
 
 Per quanto riguarda le librerie esterne (esempio ttf usa freetype e harfbuzz) esse vanno messe
-in external. Non si mette la copia della release come  ho fatto per le 4 librerie sdl, ma si segue
-su github il link external che è un fork. All'interno del fork (si vede perché c'è il file Android.mk)
-si scarica il sorgente attraverso lo zip.
+in external (vedi app/jni/SDL_image/Android.mk). Queste librerie esterne, vanno prese dal fork di github. Per esempio png. Dalla repository di SDL_Image si segue il link external di libpng,
+il quale rimanda alla repository  https://github.com/libsdl-org/libpng/tree/c22c2de876e0c2de7a62c6454bd6ee09ddab5571. Qui scarico lo zip del fork e lo installo. 
+
 
 ## SDL Versione Update
 Ho fatto un update della versione SDL2 alla versione 2.28.5. Ho scaricato il tar dal sito
@@ -118,9 +89,8 @@ che ho risolto usando
     arguments "APP_STL=c++_static"
 nel file build.gradle. Nota come in questo file ogni argomento aggiuntivo viene semplicemente inserito
 sotto.
-Per compilare la libini a livello statico non è stato affatto semplice. Più che altro è la
-creazione del file Andorid.mk che non è così intuitiva partendo dal mio file CLanguages.txt del progetto solitario di mysys2.
-Ho dovuto anche cambiare il nome del modulo in inimod per evitare magie sul nome libini (prefisso automatico lib).
+Più che altro è la creazione del file Andorid.mk che non è così intuitiva partendo dal mio file CLanguages.txt del progetto solitario di mysys2.
+Ho tolto libini.
 Ho incluso solo il file cpp per via del suffix. La direttiva include $(BUILD_STATIC_LIBRARY)
 compila la libreria in modo statico. Essa va poi referenziato con LOCAL_STATIC_LIBRARIES := inimod,
 mentre tutte le altre librerie di SDL sono qui: LOCAL_SHARED_LIBRARIES := SDL2 SDL2_ttf SDL2_mixer SDL2_image.
@@ -135,13 +105,15 @@ Su wsl vanno nella home directory nella nuova directory .solitario. Su windows �
 Su Android è l'internal storage che SDL riesce a cambiare. Però accedere a questi nuovi files,
 bisogna utilizzare le funzioni di SDL.
 
-## Adb Device è una lista vuota
-Se il comando
+## Collegare il dispositivo: Adb Devices 
+Nota che sviluppo in Visual Code su WSL2 remoto, ma i comandi adb vanno fatti partire
+da powershell -> cmd in windows.
+Se il comando (powershell in D:\Xiaomi\platform-tools_r34.0.5-windows\platform-tools windows - > cmd ->)
 
     adb devices
 fornisce una lista vuota con _usbipd wsl attach_ che funziona così come il comando lsusb, allora è meglio
 cercare un altra soluzione. 
-Quando collego il teleRedMi, oppure faccio un reboot di windows11 con il RedMi collegato, se
+Quando collego il telefono RedMi, oppure faccio un reboot di windows11 con il RedMi collegato, se
 apro file explorer riesco a vedere RedMiNote 11. In windows Explorer posso poi navigare su tutti i files.
 Seguendo questo link https://stackoverflow.com/questions/60166965/adb-device-list-empty-using-wsl2,
 in fondo al post viene elencato un modo per far funzionare adb devices su ubuntu-minitoro.
@@ -160,6 +132,9 @@ Ora apro un'altra bash su WSL2 e lancio la sequenza:
 
     export ANDROID_SDK_ROOT=$HOME/android/
     export PATH=${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin:${ANDROID_SDK_ROOT}/platform-tools:${PATH}
+
+In powershell -> cmd, ma anche in WSL2
+
     adb devices
 Il risultato è ora:  
 
@@ -280,6 +255,7 @@ Il fatto è che il touch event viene rimbalzato anche come mouse event. Solo che
 non è assolutamente preciso. Quindi su Android scelgo di ignorare gli eventi del mouse.
 
 ## Compilzzione con target wsl
+Ho compilato i sorgenti di AndroSolitario anche su WSL, questo per vedere se l'app funziona.
 Uso CMake per compilare il target su WSL, mentre ndk con gradle (Android.mk) per quanto
 riguarda il target Android.
 
@@ -313,6 +289,12 @@ si possono vedere i traces di SDL prima e dopo la chiamata di main() del mio pro
     adb logcat -s "SDL"
 
 ## Compile, Deploy, Start
+Per prima cosa collego il device e lancio in windows D:\Xiaomi\platform-tools_r34.0.5-windows\platform-tools\start_adb_server.bat
+Su WSL lancio ./start_adb_service.sh che è un terminal senza output, se tutto procede bene.
+in ~/projects/AndroSolitario lancio 
+    
+    code .
+All'interno del terminal di Visual Code posso compilare, installare e lanciare il sfotware:
 
     source ./start_env.sh
     ./gradlew compileDebugSources
