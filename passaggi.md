@@ -241,7 +241,7 @@ Questi sono i todo della conversione in Android.
 
 - Problema con il formato dello schermo: il tavolo di gioco è troppo piccolo
 - Nel tavolo da gioco ci vorrebbe un bottone per mettere la musica in pausa.
-- Il programma sul RedMe si chiama Game invece di Solitario.
+- Il programma sul RedMe si chiama Game invece di Solitario. (si cambia strings.xml) [DONE]
 
 - SoltarioIta: Fatal: Cannot create dir (null)/.solitario [DONE]
 Fatal: loadProfile: Ini file error /data/data/org.libsdl.app/files/.solitario/options.ini
