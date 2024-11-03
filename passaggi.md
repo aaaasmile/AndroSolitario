@@ -239,10 +239,10 @@ questo _files to include_
 ## Problemi del Solitario su Android
 Questi sono i todo della conversione in Android.
 
-- Problema con il formato dello schermo: il tavolo di gioco è troppo piccolo
-- Nel tavolo da gioco ci vorrebbe un bottone per mettere la musica in pausa.
+- Doppio tap dovrebbe avere lo stesso effetto del tasto destro del mouse
+- Problema con il formato dello schermo: il tavolo di gioco è troppo piccolo [DONE]
+- Nel tavolo da gioco ci vorrebbe un bottone per mettere la musica in pausa.[DONE]
 - Il programma sul RedMe si chiama Game invece di Solitario. (si cambia strings.xml) [DONE]
-
 - SoltarioIta: Fatal: Cannot create dir (null)/.solitario [DONE]
 Fatal: loadProfile: Ini file error /data/data/org.libsdl.app/files/.solitario/options.ini
 Qui ho rimosso i file ini della libreria ini. Uso un formato binario con SDL. [DONE]

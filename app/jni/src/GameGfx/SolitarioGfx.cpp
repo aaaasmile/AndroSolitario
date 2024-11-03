@@ -1083,13 +1083,27 @@ LPErrInApp SolitarioGfx::StartGameLoop() {
         _p_BtToggleSound->SetVisibleState(ButtonGfx::VISIBLE);
     }
 
+    LPGameSettings pGameSettings = GAMESET::GetSettings();
+    int xLine0 = 35;
+    int yLine0 = 10;
+    int yoffsetLine0 = 40;
+    int yOverlapCard = 32;
+    int xOffsetIntraStack = 17;
+    if (pGameSettings->NeedScreenMagnify()) {
+        xLine0 = 50;
+        yLine0 = 150;
+        yoffsetLine0 = 150;
+        yOverlapCard = 56;
+        xOffsetIntraStack = 40;
+    }
+
     // index 0 (deck with face down)
-    CreateRegion(RT_DECKSTOCK,          // ID
-                 CRD_VISIBLE | CRD_3D,  // attributes
-                 CRD_DONOTHING,         // Accept mode
-                 CRD_DONOTHING,         // drag mode
-                 CRD_OSYMBOL,           // symbol
-                 35, 10, 2, 2);         // x, y, x offset, yoffset
+    CreateRegion(RT_DECKSTOCK,           // ID
+                 CRD_VISIBLE | CRD_3D,   // attributes
+                 CRD_DONOTHING,          // Accept mode
+                 CRD_DONOTHING,          // drag mode
+                 CRD_OSYMBOL,            // symbol
+                 xLine0, yLine0, 2, 2);  // x, y, x offset, yoffset
     // index 1-7
     int i;
     for (i = 1; i <= 7; i++) {
@@ -1099,8 +1113,9 @@ LPErrInApp SolitarioGfx::StartGameLoop() {
                          CRD_DOKING,  // accept mode
                      CRD_DRAGFACEUP,  // drag mode
                      CRD_HSYMBOL,     // symbol
-                     (g_CardWidth * (i - 1)) + (i * 17), g_CardHeight + 40, 0,
-                     32);  // x, y, x offset, yoffset
+                     (g_CardWidth * (i - 1)) + (i * xOffsetIntraStack),
+                     g_CardHeight + yoffsetLine0 + yLine0, 0,
+                     yOverlapCard);  // x, y, x offset, yoffset
     }
 
     // index 8 (deck face up)
@@ -1109,7 +1124,8 @@ LPErrInApp SolitarioGfx::StartGameLoop() {
                  CRD_DOALL,                                       // accept mode
                  CRD_DRAGTOP,                                     // drag mode
                  CRD_NSYMBOL,                                     // symbol
-                 g_CardWidth + 65, 10, 0, 0);  // x, y, x offset, yoffset
+                 xLine0 + g_CardWidth + xOffsetIntraStack, yLine0, 0,
+                 0);  // x, y, x offset, yoffset
 
     // index 9-12 (4 aces place on the top)
     for (i = 4; i <= 7; i++) {
@@ -1120,7 +1136,7 @@ LPErrInApp SolitarioGfx::StartGameLoop() {
                 CRD_DOSUIT,  // Accept mode
             CRD_DRAGTOP,     // drop mode
             CRD_HSYMBOL,     // symbol
-            (g_CardWidth * (i - 1)) + (i * 17), 10, 0,
+            (g_CardWidth * (i - 1)) + (i * xOffsetIntraStack), yLine0, 0,
             0);  // x, y, x offset, yoffset
     }
 
