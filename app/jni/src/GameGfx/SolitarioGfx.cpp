@@ -24,6 +24,7 @@ extern const char *g_lpszDeckDir;
 
 const int MYIDQUIT = 0;
 const int MYIDNEWGAME = 1;
+const int MYIDTOGGLESOUND = 2;
 
 SolitarioGfx::SolitarioGfx() {
     _p_ScreenBackbufferDrag = 0;
@@ -33,6 +34,7 @@ SolitarioGfx::SolitarioGfx() {
     _p_ScreenTexture = 0;
     _p_BtQuit = NULL;
     _p_BtNewGame = NULL;
+    _p_BtToggleSound = NULL;
     _p_AlphaDisplay = NULL;
     _newgamerequest = false;
     _terminated = true;
@@ -47,6 +49,9 @@ SolitarioGfx::~SolitarioGfx() {
     }
     if (_p_BtQuit != NULL) {
         delete _p_BtQuit;
+    }
+    if (_p_BtToggleSound != NULL) {
+        delete _p_BtToggleSound;
     }
     delete _p_currentTime;
 }
@@ -67,6 +72,7 @@ void SolitarioGfx::clearSurface() {
 }
 
 // command buttons
+// -- quit --
 void fncBind_ButtonQuitClick(void *self, int val) {
     SolitarioGfx *pApp = (SolitarioGfx *)self;
     pApp->BtQuitClick();
@@ -77,6 +83,7 @@ ClickCb SolitarioGfx::prepClickQuitCb() {
     return (ClickCb){.tc = &tc, .self = this};
 }
 
+// -- new game --
 void fncBind_ButtonNewGameClick(void *self, int val) {
     SolitarioGfx *pApp = (SolitarioGfx *)self;
     pApp->BtNewGameClick();
@@ -84,6 +91,17 @@ void fncBind_ButtonNewGameClick(void *self, int val) {
 
 ClickCb SolitarioGfx::prepClickNewGameCb() {
     static VClickCb const tc = {.Click = (&fncBind_ButtonNewGameClick)};
+    return (ClickCb){.tc = &tc, .self = this};
+}
+
+// -- sound on/off --
+void fncBind_ButtonToggleSoundClick(void *self, int val) {
+    SolitarioGfx *pApp = (SolitarioGfx *)self;
+    pApp->BtToggleSoundClick();
+}
+
+ClickCb SolitarioGfx::prepClickToggleSoundCb() {
+    static VClickCb const tc = {.Click = (&fncBind_ButtonToggleSoundClick)};
     return (ClickCb){.tc = &tc, .self = this};
 }
 
@@ -481,6 +499,7 @@ void SolitarioGfx::DrawStaticScene() {
     }
     _p_BtNewGame->DrawButton(_p_Screen);
     _p_BtQuit->DrawButton(_p_Screen);
+    _p_BtToggleSound->DrawButton(_p_Screen);
     _scoreChanged = true;
     drawScore(_p_Screen);
     // it seems here that SDL_BlitSurface copy only the bitmap and not the fill
@@ -542,6 +561,20 @@ LPErrInApp SolitarioGfx::DrawInitialScene() {
     _p_BtNewGame->Initialize(&rctBt1, _p_Screen, _p_FontBigText, MYIDNEWGAME,
                              cbBtNewGame);
     _p_BtNewGame->SetVisibleState(ButtonGfx::INVISIBLE);
+    // button toggle sound
+    int tx = btposx;
+    int offsetY = 30;
+    if (pGameSettings->NeedScreenMagnify()) {
+        tx = btposx;
+        offsetY = 250;
+    }
+    rctBt1.y = _p_Screen->h - offsetY;
+    rctBt1.x = tx;
+    ClickCb cbBtToggleSound = prepClickToggleSoundCb();
+    _p_BtToggleSound = new ButtonGfx();
+    _p_BtToggleSound->Initialize(&rctBt1, _p_Screen, _p_FontBigText,
+                                 MYIDTOGGLESOUND, cbBtToggleSound);
+    _p_BtToggleSound->SetVisibleState(ButtonGfx::INVISIBLE);
     return NULL;
 }
 
@@ -846,6 +879,7 @@ LPErrInApp SolitarioGfx::handleGameLoopKeyDownEvent(SDL_Event &event) {
 LPErrInApp SolitarioGfx::handleGameLoopFingerDownEvent(SDL_Event &event) {
     _p_BtQuit->FingerDown(event);
     _p_BtNewGame->FingerDown(event);
+    _p_BtToggleSound->FingerDown(event);
     return NULL;
 }
 
@@ -962,7 +996,8 @@ void SolitarioGfx::handleGameLoopMouseMoveEvent(SDL_Event &event) {
         DoDrag(event.motion.x, event.motion.y);
     }
     bool statusChanged = _p_BtNewGame->MouseMove(event);
-    statusChanged = statusChanged || _p_BtQuit->MouseMove(event);
+    statusChanged = statusChanged || _p_BtQuit->MouseMove(event) ||
+                    _p_BtToggleSound->MouseMove(event);
     if (statusChanged) {
         DrawStaticScene();
     }
@@ -971,6 +1006,7 @@ void SolitarioGfx::handleGameLoopMouseMoveEvent(SDL_Event &event) {
 LPErrInApp SolitarioGfx::handleGameLoopMouseUpEvent(SDL_Event &event) {
     _p_BtQuit->MouseUp(event);
     _p_BtNewGame->MouseUp(event);
+    _p_BtToggleSound->MouseUp(event);
 
     if (_startdrag) {
         _startdrag = false;
@@ -1036,6 +1072,16 @@ LPErrInApp SolitarioGfx::StartGameLoop() {
     strTextBt = _p_Languages->GetStringId(Languages::ID_NEWGAME);
     _p_BtNewGame->SetButtonText(strTextBt.c_str());
     _p_BtNewGame->SetVisibleState(ButtonGfx::VISIBLE);
+    // button Toggle Sound
+    if (_p_MusicManager->IsMusicEnabled()) {
+        if (_p_MusicManager->IsPlayingMusic()) {
+            strTextBt = _p_Languages->GetStringId(Languages::ON);
+        } else {
+            strTextBt = _p_Languages->GetStringId(Languages::OFF);
+        }
+        _p_BtToggleSound->SetButtonText(strTextBt.c_str());
+        _p_BtToggleSound->SetVisibleState(ButtonGfx::VISIBLE);
+    }
 
     // index 0 (deck with face down)
     CreateRegion(RT_DECKSTOCK,          // ID
@@ -1219,6 +1265,21 @@ void SolitarioGfx::BtNewGameClick() {
     } else {
         DrawStaticScene();
     }
+}
+
+void SolitarioGfx::BtToggleSoundClick() {
+    TRACE("Toggle Sound with user button\n");
+    STRING strTextBt;
+    if (_p_MusicManager->IsPlayingMusic()) {
+        _p_MusicManager->StopMusic(300);
+        strTextBt = _p_Languages->GetStringId(Languages::OFF);
+    } else {
+        strTextBt = _p_Languages->GetStringId(Languages::ON);
+        _p_MusicManager->PlayMusic(MusicManager::MUSIC_PLAY_SND,
+                                   MusicManager::eLoopType::LOOP_ON);
+    }
+    _p_BtToggleSound->SetButtonText(strTextBt.c_str());
+    DrawStaticScene();
 }
 
 LPErrInApp SolitarioGfx::drawScore(SDL_Surface *pScreen) {

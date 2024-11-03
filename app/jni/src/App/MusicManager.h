@@ -27,6 +27,7 @@ class MusicManager {
         }
     }
     void DisableMusic() { _musicDisabled = true; }
+    bool IsMusicEnabled() { return !_musicDisabled; }
 
    private:
     Mix_Chunk* _p_MusicsWav[NUM_OF_WAV];

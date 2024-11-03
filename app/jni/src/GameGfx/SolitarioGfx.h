@@ -148,6 +148,7 @@ class SolitarioGfx {
     }
     void BtQuitClick();
     void BtNewGameClick();
+    void BtToggleSoundClick();
 
    private:
     void updateTextureAsFlipScreen();
@@ -164,6 +165,7 @@ class SolitarioGfx {
     LPErrInApp handleRightMouseDown(SDL_Event &event);
     ClickCb prepClickQuitCb();
     ClickCb prepClickNewGameCb();
+    ClickCb prepClickToggleSoundCb();
     LPErrInApp drawScore(SDL_Surface *pScreen);
     void updateScoreOnAce(int sizeAce, int oldSizeAce);
     void updateScoreOnTurnOverFaceDown();
@@ -210,6 +212,7 @@ class SolitarioGfx {
     bool _newgamerequest;
     ButtonGfx *_p_BtQuit;
     ButtonGfx *_p_BtNewGame;
+    ButtonGfx *_p_BtToggleSound;
     bool _sceneBackgroundIsBlack;
     int _scoreGame;
     bool _scoreChanged;

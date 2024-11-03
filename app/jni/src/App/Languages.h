@@ -76,6 +76,8 @@ public:
         POINTS,
         NAME,
         CARDDECK,
+        ON,
+        OFF,
         TOT_STRINGS  // it must be always on the last place
     };
 

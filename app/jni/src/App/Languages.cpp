@@ -83,6 +83,8 @@ Languages::Languages() {
     _mtxLangString[LANG_DIAL_BREDA][NAME] = "Nom";
     _mtxLangString[LANG_DIAL_BREDA][POINTS] = "Punt";
     _mtxLangString[LANG_DIAL_BREDA][CARDDECK] = "Carti in dal mas";
+    _mtxLangString[LANG_ENG][ON] = "impià";
+    _mtxLangString[LANG_ENG][OFF] = "smors";
 
     // italiano
     _mtxLangString[LANG_ITA][ID_START] = "Inizia";
@@ -153,6 +155,8 @@ Languages::Languages() {
     _mtxLangString[LANG_ITA][NAME] = "Nome";
     _mtxLangString[LANG_ITA][POINTS] = "Punteggio";
     _mtxLangString[LANG_ITA][CARDDECK] = "Carte Mazzo";
+    _mtxLangString[LANG_ITA][ON] = "ON";
+    _mtxLangString[LANG_ITA][OFF] = "OFF";
 
     // English
     _mtxLangString[LANG_ENG][ID_START] = "Start";
@@ -224,6 +228,8 @@ Languages::Languages() {
     _mtxLangString[LANG_ENG][NAME] = "Name";
     _mtxLangString[LANG_ENG][POINTS] = "Points";
     _mtxLangString[LANG_ENG][CARDDECK] = "Deck Cards";
+    _mtxLangString[LANG_ENG][ON] = "ON";
+    _mtxLangString[LANG_ENG][OFF] = "OFF";
 }
 
 std::string Languages::GetStringId(eStringID eId) {
