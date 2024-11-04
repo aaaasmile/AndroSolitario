@@ -1061,6 +1061,8 @@ LPErrInApp SolitarioGfx::handleGameLoopMouseUpEvent(SDL_Event &event) {
 }
 
 LPErrInApp SolitarioGfx::StartGameLoop() {
+    TRACE_DEBUG("StartGameLoop, card width %d, height %d\n", g_CardWidth, g_CardHeight);
+
     _p_MusicManager->PlayMusic(MusicManager::MUSIC_PLAY_SND,
                                MusicManager::eLoopType::LOOP_ON);
     // button Quit
@@ -1089,12 +1091,23 @@ LPErrInApp SolitarioGfx::StartGameLoop() {
     int yoffsetLine0 = 40;
     int yOverlapCard = 32;
     int xOffsetIntraStack = 17;
+    int xOffsetFaceUp = 25;
     if (pGameSettings->NeedScreenMagnify()) {
-        xLine0 = 50;
-        yLine0 = 150;
-        yoffsetLine0 = 150;
-        yOverlapCard = 56;
-        xOffsetIntraStack = 40;
+        if (g_CardWidth <= 127) {
+            xLine0 = 50;
+            yLine0 = 150;
+            yoffsetLine0 = 150;
+            yOverlapCard = 56;
+            xOffsetIntraStack = 40;
+            xOffsetFaceUp = 60;
+        } else {
+            xLine0 = 20;
+            yLine0 = 120;
+            yoffsetLine0 = 130;
+            yOverlapCard = 40;
+            xOffsetIntraStack = 24;
+            xOffsetFaceUp = 48;
+        }
     }
 
     // index 0 (deck with face down)
@@ -1124,7 +1137,7 @@ LPErrInApp SolitarioGfx::StartGameLoop() {
                  CRD_DOALL,                                       // accept mode
                  CRD_DRAGTOP,                                     // drag mode
                  CRD_NSYMBOL,                                     // symbol
-                 xLine0 + g_CardWidth + xOffsetIntraStack, yLine0, 0,
+                 xLine0 + g_CardWidth + xOffsetFaceUp, yLine0, 0,
                  0);  // x, y, x offset, yoffset
 
     // index 9-12 (4 aces place on the top)
