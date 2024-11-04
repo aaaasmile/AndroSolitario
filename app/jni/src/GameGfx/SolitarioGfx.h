@@ -159,6 +159,7 @@ class SolitarioGfx {
     LPErrInApp handleGameLoopKeyDownEvent(SDL_Event &event);
     LPErrInApp handleGameLoopMouseDownEvent(SDL_Event &event);
     LPErrInApp handleGameLoopFingerDownEvent(SDL_Event &event);
+    LPErrInApp handleGameLoopFingerUpEvent(SDL_Event &event);
     void handleGameLoopMouseMoveEvent(SDL_Event &event);
     LPErrInApp handleGameLoopMouseUpEvent(SDL_Event &event);
     LPErrInApp handleLeftMouseDown(SDL_Event &event);
@@ -217,6 +218,7 @@ class SolitarioGfx {
     int _scoreGame;
     bool _scoreChanged;
     CurrentTime *_p_currentTime;
+    Uint32 _lastUpTimestamp;
 };
 
 #endif

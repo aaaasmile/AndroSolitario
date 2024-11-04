@@ -876,10 +876,68 @@ LPErrInApp SolitarioGfx::handleGameLoopKeyDownEvent(SDL_Event &event) {
     return NULL;
 }
 
+// Remeber Finger events are parallel with mouse events
+// here use Finger only for button and mouse right click simulation
 LPErrInApp SolitarioGfx::handleGameLoopFingerDownEvent(SDL_Event &event) {
+    TRACE_DEBUG("handleGameLoopFingerDownEvent \n");
     _p_BtQuit->FingerDown(event);
     _p_BtNewGame->FingerDown(event);
     _p_BtToggleSound->FingerDown(event);
+    return NULL;
+}
+
+LPErrInApp SolitarioGfx::handleGameLoopFingerUpEvent(SDL_Event &event) {
+    TRACE_DEBUG("handleGameLoopFingerUpEvent (tms %d) \n",
+                event.tfinger.timestamp);
+    if (_lastUpTimestamp + 400 > event.tfinger.timestamp) {
+        TRACE_DEBUG("Double Tap recognized\n");
+        LPErrInApp err;
+        CardRegionGfx *pRegion;
+        bool isInitDrag = false;
+        SDL_Point pt;
+        LPGameSettings pGameSettings = GAMESET::GetSettings();
+        pGameSettings->GetTouchPoint(event.tfinger, &pt); // rememeber here event.button.x and event.button.y will not works
+
+        pRegion = SelectRegionOnPoint(pt.x, pt.y);
+        
+        if (pRegion == NULL)
+            return NULL;
+        TRACE_DEBUG("[DT] Region found %d\n", pRegion->Size());
+
+        LPCardGfx pCard = pRegion->GetCard(pRegion->Size() - 1);
+        if (pCard == NULL) {
+            return NULL;
+        }
+        TRACE_DEBUG("[DT] Card found %s\n", pCard->Name());
+
+        if (((pRegion->RegionTypeId() == RegionType::RT_TABLEAU) ||
+             (pRegion->RegionTypeId() == RegionType::RT_DECKSTOCK_FACEUP)) &&
+            pCard->IsFaceUp() &&
+            pRegion->PtOnTop(pt.x, pt.y)) {
+            TRACE_DEBUG("[DT] Select card on region %s \n", pCard->Name());
+            LPCardRegionGfx pDropRegion =
+                FindDropRegion(RegionType::RT_ACE_FOUNDATION, pCard);
+            if (pDropRegion == NULL) {
+                return NULL;
+            }
+            TRACE_DEBUG("[DT] found drop region x=%d,y=%d \n", pDropRegion->X(),
+                        pDropRegion->Y());
+            LPCardStackGfx pCardStack = pRegion->PopStack(1);
+            if (pCardStack == NULL) {
+                return NULL;
+            }
+            TRACE_DEBUG("[DT] found cardStack size=%d \n", pCardStack->Size());
+            err = InitDrag(pCardStack, -1, -1, isInitDrag, pRegion);
+            if (err != NULL) {
+                return err;
+            }
+
+            DoDrop(pDropRegion);
+            updateScoreOnAce(pDropRegion->Size(), pDropRegion->GetSavedSize());
+            delete pCardStack;
+        }
+    }
+    _lastUpTimestamp = event.tfinger.timestamp;
     return NULL;
 }
 
@@ -893,6 +951,7 @@ LPErrInApp SolitarioGfx::handleGameLoopMouseDownEvent(SDL_Event &event) {
 }
 
 LPErrInApp SolitarioGfx::handleLeftMouseDown(SDL_Event &event) {
+    TRACE_DEBUG("handleLeftMouseDown \n");
     LPErrInApp err;
     CardRegionGfx *srcReg;
     bool isInitDrag = false;
@@ -956,6 +1015,7 @@ LPErrInApp SolitarioGfx::handleLeftMouseDown(SDL_Event &event) {
 }
 
 LPErrInApp SolitarioGfx::handleRightMouseDown(SDL_Event &event) {
+    TRACE_DEBUG("handleRightMouseDown \n");
     LPErrInApp err;
     CardRegionGfx *srcReg;
     bool isInitDrag = false;
@@ -992,6 +1052,7 @@ LPErrInApp SolitarioGfx::handleRightMouseDown(SDL_Event &event) {
 }
 
 void SolitarioGfx::handleGameLoopMouseMoveEvent(SDL_Event &event) {
+    //TRACE_DEBUG("handleGameLoopMouseMoveEvent \n");
     if (event.motion.state == SDL_BUTTON(1) && _startdrag) {
         DoDrag(event.motion.x, event.motion.y);
     }
@@ -1004,6 +1065,7 @@ void SolitarioGfx::handleGameLoopMouseMoveEvent(SDL_Event &event) {
 }
 
 LPErrInApp SolitarioGfx::handleGameLoopMouseUpEvent(SDL_Event &event) {
+    TRACE_DEBUG("handleGameLoopMouseUpEvent \n");
     _p_BtQuit->MouseUp(event);
     _p_BtNewGame->MouseUp(event);
     _p_BtToggleSound->MouseUp(event);
@@ -1037,6 +1099,7 @@ LPErrInApp SolitarioGfx::handleGameLoopMouseUpEvent(SDL_Event &event) {
         (RegionSize(Ace_Ix2) == numCardOnSUit) &&
         (RegionSize(Ace_Ix3) == numCardOnSUit) &&
         (RegionSize(Ace_Ix4) == numCardOnSUit)) {
+        TRACE_DEBUG("Victory \n");
         _p_currentTime->StopTimer();
         bonusScore();
         DrawStaticScene();
@@ -1061,7 +1124,8 @@ LPErrInApp SolitarioGfx::handleGameLoopMouseUpEvent(SDL_Event &event) {
 }
 
 LPErrInApp SolitarioGfx::StartGameLoop() {
-    TRACE_DEBUG("StartGameLoop, card width %d, height %d\n", g_CardWidth, g_CardHeight);
+    TRACE_DEBUG("StartGameLoop, card width %d, height %d\n", g_CardWidth,
+                g_CardHeight);
 
     _p_MusicManager->PlayMusic(MusicManager::MUSIC_PLAY_SND,
                                MusicManager::eLoopType::LOOP_ON);
@@ -1177,6 +1241,11 @@ LPErrInApp SolitarioGfx::StartGameLoop() {
                     break;
                 case SDL_FINGERDOWN:
                     err = handleGameLoopFingerDownEvent(event);
+                    if (err != NULL)
+                        return err;
+                    break;
+                case SDL_FINGERUP:
+                    err = handleGameLoopFingerUpEvent(event);
                     if (err != NULL)
                         return err;
                     break;

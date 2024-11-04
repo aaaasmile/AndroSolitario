@@ -129,8 +129,8 @@ LPErrInApp GameSettings::SaveSettings() {
 
 void GameSettings::GetTouchPoint(SDL_TouchFingerEvent& tfinger,
                                  SDL_Point* pPoint) {
-    TRACE_DEBUG("tap on %f, %f - w/h %d/%d\n", tfinger.x, tfinger.y,
-                _screenRect.w, _screenRect.h);
+    // TRACE_DEBUG("tap on %f, %f - w/h %d/%d\n", tfinger.x, tfinger.y,
+    //             _screenRect.w, _screenRect.h);
     pPoint->x = tfinger.x * _screenRect.w;
     pPoint->y = tfinger.y * _screenRect.h;
 }
