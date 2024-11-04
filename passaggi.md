@@ -239,12 +239,15 @@ questo _files to include_
 ## Problemi del Solitario su Android
 Questi sono i todo della conversione in Android.
 
-- Doppio tap dovrebbe avere lo stesso effetto del tasto destro del mouse
+- Gli spin delle opzioni sono troppo piccoli
+- Le carte dei mazzi piacentina son troppo piccole
+- Quando finisce una partita, il nome del record è vuoto
+- Doppio tap dovrebbe avere lo stesso effetto del tasto destro del mouse [DONE]
 - Problema con il formato dello schermo: il tavolo di gioco è troppo piccolo [DONE]
 - Nel tavolo da gioco ci vorrebbe un bottone per mettere la musica in pausa.[DONE]
 - Il programma sul RedMe si chiama Game invece di Solitario. (si cambia strings.xml) [DONE]
 - SoltarioIta: Fatal: Cannot create dir (null)/.solitario [DONE]
-Fatal: loadProfile: Ini file error /data/data/org.libsdl.app/files/.solitario/options.ini
+- Fatal: loadProfile: Ini file error /data/data/org.libsdl.app/files/.solitario/options.ini
 Qui ho rimosso i file ini della libreria ini. Uso un formato binario con SDL. [DONE]
 - Non mi funzionano poi i pulsanti [DONE]
 - Nei credits e hight score non si può tornare indietro, qui serve un "back by tap" in High Score [DONE]
