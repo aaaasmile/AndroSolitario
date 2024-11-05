@@ -330,6 +330,10 @@ LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
             }
             if (event.type == SDL_FINGERDOWN){
                 _p_buttonOK->FingerDown(event);
+                _p_checkMusic->FingerDown(event);
+                _p_comboLang->FingerDown(event);
+                _p_comboBackground->FingerDown(event);
+                _p_comboDeck->FingerDown(event);
             }
             if (event.type == SDL_MOUSEBUTTONUP) {
                 _p_buttonOK->MouseUp(event);

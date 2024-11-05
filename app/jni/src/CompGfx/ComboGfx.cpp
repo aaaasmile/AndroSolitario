@@ -15,6 +15,7 @@ ComboGfx::ComboGfx() {
     _currDataIndex = 0;
     _p_surfBoxSel = 0;
     _p_surfBoxUNSel = 0;
+    _p_GameSettings = GAMESET::GetSettings();
 }
 
 ComboGfx::~ComboGfx() {
@@ -131,7 +132,43 @@ void ComboGfx::MouseMove(SDL_Event& event, SDL_Surface* pScreen,
     }
 }
 
+static bool IsPointInsideBox(const SDL_Rect& rct, const SDL_Point& pt) {
+    if (pt.x >= rct.x && pt.x <= rct.x + rct.w && pt.y >= rct.y &&
+        pt.y <= rct.y + rct.h) {
+        return true;
+    }
+    return false;
+}
+
+void ComboGfx::FingerDown(SDL_Event& event) {
+    SDL_Point pt;
+    _p_GameSettings->GetTouchPoint(event.tfinger, &pt);
+    if (IsPointInsideBox(_rctBoxUp, pt)) {
+        // mouse on up box
+        _currDataIndex++;
+        if (_currDataIndex >= _vctDataStrings.size()) {
+            // circular buffer
+            _currDataIndex = 0;
+        }
+        if ((_fncbClickEvent.tc) != NULL)
+            (_fncbClickEvent.tc)->Click(_fncbClickEvent.self, _currDataIndex);
+    } else if (IsPointInsideBox(_rctBoxDown, pt)) {
+        // mouse on down box
+        if (_currDataIndex == 0) {
+            // circular buffer
+            _currDataIndex = _vctDataStrings.size() - 1;
+        } else {
+            _currDataIndex--;
+        }
+        if ((_fncbClickEvent.tc) != NULL)
+            (_fncbClickEvent.tc)->Click(_fncbClickEvent.self, _currDataIndex);
+    }
+}
+
 void ComboGfx::MouseUp(SDL_Event& event) {
+    if (_p_GameSettings->InputType == InputTypeEnum::TouchWithoutMouse) {
+        return;
+    }
     if (_visibleState == VISIBLE && _enabled) {
         int mx = event.motion.x;
         int my = event.motion.y;
@@ -209,9 +246,9 @@ void ComboGfx::DrawButton(SDL_Surface* pScreen) {
         }
         int yOffset = (_rctText.h - ty) / 2;
         _buttonText = _vctDataStrings[_currDataIndex];
-        GFX_UTIL::DrawString(pScreen, _buttonText.c_str(),
-                             _rctText.x + xOffset, _rctText.y + yOffset,
-                             GFX_UTIL_COLOR::White, _p_fontText);
+        GFX_UTIL::DrawString(pScreen, _buttonText.c_str(), _rctText.x + xOffset,
+                             _rctText.y + yOffset, GFX_UTIL_COLOR::White,
+                             _p_fontText);
 
         // draw text upper box
         TTF_SizeText(_p_fontText, LP_PLUS, &tx, &ty);

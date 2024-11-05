@@ -213,6 +213,12 @@ LPErrInApp AppGfx::createWindow() {
         return ERR_UTIL::ErrorCreate("Cannot create renderer: %s\n",
                                      SDL_GetError());
     }
+    // this is not magnify, but only changing the scale
+    // if (SDL_RenderSetLogicalSize(_p_sdlRenderer, 400, 900) < 0) {
+    //     return ERR_UTIL::ErrorCreate("RenderSetScale error: %s\n",
+    //                                  SDL_GetError());
+    // }
+    //TRACE_DEBUG("Render transformed \n");
 
     _p_Screen = SDL_CreateRGBSurface(0, _screenW, _screenH, 32, 0x00FF0000,
                                      0x0000FF00, 0x000000FF, 0xFF000000);

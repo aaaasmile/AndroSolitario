@@ -5,6 +5,7 @@
 #include "WinTypeGlobal.h"
 
 using namespace traits;
+class GameSettings;
 
 class ComboGfx {
 public:
@@ -19,6 +20,7 @@ public:
     void SetButtonText(LPCSTR strCaption) { _buttonText = strCaption; }
     void MouseMove(SDL_Event& event, SDL_Surface* pScreen,
                    SDL_Texture* pScene_background, SDL_Texture* pScreenTexture);
+    void FingerDown(SDL_Event& event);
     void MouseUp(SDL_Event& event);
     void DrawButton(SDL_Surface* pScreen);
     void EnableWindow(bool bVal) { _enabled = bVal; }
@@ -51,6 +53,7 @@ private:
     int _butID;
     VCT_STRING _vctDataStrings;
     int _currDataIndex;
+    GameSettings* _p_GameSettings;
 };
 
 #endif

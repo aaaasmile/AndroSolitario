@@ -8,6 +8,7 @@ CheckBoxGfx::CheckBoxGfx() {
     _p_FontText = 0;
     _enabled = true;
     _buttonID = -1;
+    _p_GameSettings = GAMESET::GetSettings();
 }
 
 CheckBoxGfx::~CheckBoxGfx() {}
@@ -36,10 +37,35 @@ void CheckBoxGfx::SetVisibleState(VisbleState eVal) {
     }
 }
 
+static bool IsPointInsideCtrl(const SDL_Rect& rct, const SDL_Point& pt) {
+    if (pt.x >= rct.x && pt.x <= rct.x + rct.w && pt.y >= rct.y &&
+        pt.y <= rct.y + rct.h) {
+        return true;
+    }
+    return false;
+}
+
+void CheckBoxGfx::FingerDown(SDL_Event& event) {
+    SDL_Point pt;
+    _p_GameSettings->GetTouchPoint(event.tfinger, &pt);
+    if (IsPointInsideCtrl(_rctCtrl, pt)) {
+        if (_clicked) {
+            _clicked = false;
+        } else {
+            _clicked = true;
+        }
+        if ((_fncbClickEvent.tc) != NULL)
+            (_fncbClickEvent.tc)->Click(_fncbClickEvent.self, _clicked);
+    }
+}
+
 void CheckBoxGfx::MouseMove(SDL_Event& event, SDL_Surface* pScreen,
                             SDL_Surface* pScene_background) {}
 
 void CheckBoxGfx::MouseUp(SDL_Event& event) {
+    if (_p_GameSettings->InputType == InputTypeEnum::TouchWithoutMouse) {
+        return;
+    }
     if (_visibleState == VISIBLE && _enabled) {
         if (event.motion.x >= _rctCtrl.x &&
             event.motion.x <= _rctCtrl.x + _rctCtrl.w &&

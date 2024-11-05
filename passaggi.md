@@ -239,9 +239,11 @@ questo _files to include_
 ## Problemi del Solitario su Android
 Questi sono i todo della conversione in Android.
 
-- Gli spin delle opzioni sono troppo piccoli
+- Gli spin delle opzioni sono troppo piccoli (col finger down va bene) [DONE]
 - Le carte dei mazzi piacentina son troppo piccole
-- Quando finisce una partita, il nome del record è vuoto
+- Quando finisce una partita, il nome del record è vuoto (data e ora vanno bene)
+- GoTo Invido non funziona nella label gfx
+- Sound On/Off meglio un icona
 - Doppio tap dovrebbe avere lo stesso effetto del tasto destro del mouse [DONE]
 - Problema con il formato dello schermo: il tavolo di gioco è troppo piccolo [DONE]
 - Nel tavolo da gioco ci vorrebbe un bottone per mettere la musica in pausa.[DONE]

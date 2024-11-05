@@ -6,6 +6,7 @@
 
 #include "Traits.h"
 #include "WinTypeGlobal.h"
+class GameSettings;
 
 using namespace traits;
 
@@ -25,6 +26,7 @@ class CheckBoxGfx {
     void SetWindowText(LPCSTR strCaption) { _buttonText = strCaption; }
     void MouseMove(SDL_Event& event, SDL_Surface* pScreen,
                    SDL_Surface* pScene_background);
+    void FingerDown(SDL_Event& event);
     void MouseUp(SDL_Event& event);
     void DrawButton(SDL_Surface* pScreen);
     void EnableWindow(bool bVal) { _enabled = bVal; }
@@ -47,6 +49,7 @@ class CheckBoxGfx {
     bool _clicked;
     int _buttonID;
     SDL_Color _colorBorder;
+    GameSettings* _p_GameSettings;
 };
 
 #endif
