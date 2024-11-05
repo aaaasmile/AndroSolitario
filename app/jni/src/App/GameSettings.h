@@ -25,13 +25,14 @@ class GameSettings {
 
    public:
     GameSettings() {
+        // default settings
         PlayerName = "";
         Level = 1;
-        DeckTypeVal.SetType(eDeckType::PIACENTINA);
-        CurrentLanguage = Languages::LANG_ITA;
+        DeckTypeVal.SetType(eDeckType::TAROCK_PIEMONT);
+        CurrentLanguage = Languages::LANG_ENG;
         MusicEnabled = true;
         SettingsDir = "";
-        BackgroundType = BackgroundTypeEnum::Commessaggio;
+        BackgroundType = BackgroundTypeEnum::Mantova;
     }
     LPErrInApp LoadSettings();
     LPErrInApp SaveSettings();

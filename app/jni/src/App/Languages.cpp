@@ -206,12 +206,12 @@ Languages::Languages() {
     _mtxLangString[LANG_ENG][ID_TRIESTE] = "Triestine";
     _mtxLangString[LANG_ENG][ID_SICILIA] = "Siciliane";
     _mtxLangString[LANG_ENG][ID_CREDITS] = "Credits";
-    _mtxLangString[LANG_ENG][ID_WELCOMETITLEBAR] = "Welcome";
+    _mtxLangString[LANG_ENG][ID_WELCOMETITLEBAR] = "The Solitaire";
     _mtxLangString[LANG_ENG][ID_MEN_OPTIONS] = "Options";
     _mtxLangString[LANG_ENG][ID_MN_HELP] = "Help";
     _mtxLangString[LANG_ENG][ID_OK] = "OK";
     _mtxLangString[LANG_ENG][ID_CANCEL] = "Cancel";
-    _mtxLangString[LANG_ENG][ID_NEWGAME] = "New Game";
+    _mtxLangString[LANG_ENG][ID_NEWGAME] = "New";
     _mtxLangString[LANG_ENG][ID_CHOOSEBACKGROUND] = "Background";
     _mtxLangString[LANG_ENG][ID_COMMESSAGGIO] = "Commessaggio";
     _mtxLangString[LANG_ENG][ID_MANTOVA] = "Mantova";
