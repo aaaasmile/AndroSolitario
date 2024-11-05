@@ -49,8 +49,12 @@ Ho bisogno di SDl e anche di altre librerie.
 3) SDL_ttf: https://github.com/libsdl-org/SDL_ttf/releases (SDL2_ttf-2.20.2)
 
 Per quanto riguarda le librerie esterne (esempio ttf usa freetype e harfbuzz) esse vanno messe
-in external (vedi app/jni/SDL_image/Android.mk). Queste librerie esterne, vanno prese dal fork di github. Per esempio png. Dalla repository di SDL_Image si segue il link external di libpng,
-il quale rimanda alla repository  https://github.com/libsdl-org/libpng/tree/c22c2de876e0c2de7a62c6454bd6ee09ddab5571. Qui scarico lo zip del fork e lo installo. 
+in external (vedi app/jni/SDL_image/Android.mk). Per esempio in app/jni/SDL_ttf/external ho copiato freetype e harfbuzz dallo zip scaricato da Github.
+Queste librerie esterne, vanno prese dal fork di github. Per esempio png. Dalla repository di SDL_Image si segue il link external di libpng,
+il quale rimanda alla repository  https://github.com/libsdl-org/libpng/tree/c22c2de876e0c2de7a62c6454bd6ee09ddab5571. Qui scarico lo zip del fork e lo copio nella directory external, nel caso mi servissero. Per la libreria SDL_mixer e SDL_Image non ho copiato nessuna
+libreria esterna, solo per SDL_ttf. Per il formato musicale It, magari ci vorrebbe
+qualche libreria esterna, ma non so quale. Oppure è in formato midi e basta abilitare timidity in 
+Android.mk attraverso SUPPORT_MID_TIMIDITY nel progetto SDL_Mixer.
 
 
 ## SDL Versione Update
