@@ -1,6 +1,4 @@
 #include "Languages.h"
-// CAUTION: this file is intended to be saved in ISO 8859-1
-// If you use UTF-8 then you need to change each TTF call to UTF-8 version
 
 Languages::Languages() {
     for (int i = 0; i < TOT_STRINGS; i++) {
