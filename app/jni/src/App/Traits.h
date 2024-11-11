@@ -1,7 +1,7 @@
 #ifndef TRAITS_FASTDELEGATE__H_
 #define TRAITS_FASTDELEGATE__H_
 
-#include <SDL_ttf.h>
+#include <SDL3_ttf/SDL_ttf.h>
 
 #include "ErrorInfo.h"
 #include "Languages.h"

@@ -1,7 +1,7 @@
 #ifndef CARDREGION_GFX__H
 #define CARDREGION_GFX__H
 
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
 #include "CardStackGfx.h"
 #include "DeckType.h"

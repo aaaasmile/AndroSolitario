@@ -1,6 +1,6 @@
 #include "CurrentTime.h"
 
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
 STRING CurrentTime::ToString() {
     STRING strOut;

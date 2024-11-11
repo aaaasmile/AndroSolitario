@@ -5,8 +5,8 @@
 #pragma warning(disable : 4786)
 #endif
 
-#include <SDL.h>
-#include <SDL_ttf.h>
+#include <SDL3/SDL.h>
+#include <SDL3_ttf/SDL_ttf.h>
 
 #include <stack>
 #include <string>

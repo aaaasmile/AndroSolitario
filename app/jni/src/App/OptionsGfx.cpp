@@ -1,7 +1,7 @@
 #include "OptionsGfx.h"
 
 #include <SDL_endian.h>
-#include <SDL_image.h>
+#include <SDL3_image/SDL_image.h>
 
 #include "CompGfx/ButtonGfx.h"
 #include "CompGfx/CheckBoxGfx.h"

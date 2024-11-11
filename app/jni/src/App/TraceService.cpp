@@ -1,6 +1,6 @@
 #include "TraceService.h"
 
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
 #include <fstream>
 #include <iostream>

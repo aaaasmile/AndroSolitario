@@ -1,8 +1,8 @@
 #ifndef __GFX_UTIL__H
 #define __GFX_UTIL__H
 
-#include <SDL.h>
-#include <SDL_ttf.h>
+#include <SDL3/SDL.h>
+#include <SDL3_ttf/SDL_ttf.h>
 
 #include <string>
 

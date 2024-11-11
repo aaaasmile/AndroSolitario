@@ -1,6 +1,6 @@
 #include "GameSettings.h"
 
-#include <SDL.h>
+#include <SDL3/SDL.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>

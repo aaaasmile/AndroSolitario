@@ -1,8 +1,8 @@
 #ifndef _CBUTTON_GFX_H
 #define _CBUTTON_GFX_H
 
-#include <SDL.h>
-#include <SDL_ttf.h>
+#include <SDL3/SDL.h>
+#include <SDL3_ttf/SDL_ttf.h>
 
 #include "Traits.h"
 #include "WinTypeGlobal.h"

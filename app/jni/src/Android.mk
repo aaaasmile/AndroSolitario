@@ -8,7 +8,6 @@ SDL_PATH := ../SDL
 SDLIMAGE_PATH := ../SDL_image
 SDLMIXER_PATH := ../SDL_mixer
 SDLTTF_PATH := ../SDL_ttf
-LIBINI_PATH := ../libini
 APP_PATH := ./App
 COMPGFX_PATH := ./CompGfx
 GAMEGFX_PATH := ./GameGfx
@@ -21,7 +20,6 @@ LOCAL_C_INCLUDES := $(LOCAL_PATH)/$(SDL_PATH)/include \
                     $(LOCAL_PATH)/$(APP_PATH) \
                     $(LOCAL_PATH)/$(COMPGFX_PATH) \
                     $(LOCAL_PATH)/$(GAMEGFX_PATH) \
-                    $(LOCAL_PATH)/$(LIBINI_PATH)/include \
                     $(LOCAL_PATH)/$(ANDRO_SPEC_PATH) \
 
 # Add your application source files here...

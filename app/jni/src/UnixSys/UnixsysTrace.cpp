@@ -1,4 +1,4 @@
-#include "SDL.h"
+#include <SDL3/SDL.h>
 
 void TraceInServiceINFO(char* myBuff) {
     SDL_Log("[INFO] %s", myBuff);

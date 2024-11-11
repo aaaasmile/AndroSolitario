@@ -1,6 +1,6 @@
 #include "AppGfx.h"
 
-#include <SDL_image.h>
+#include <SDL3_image/SDL_image.h>
 #include <fcntl.h>
 #include <limits.h>
 #include <stdlib.h>

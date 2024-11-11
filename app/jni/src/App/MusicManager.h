@@ -2,7 +2,7 @@
 #define _MUSICMANAGER__H_
 
 #include "ErrorInfo.h"
-#include "SDL_mixer.h"
+#include <SDL3_mixer/SDL_mixer.h>
 #include "WinTypeGlobal.h"
 
 class MusicManager {

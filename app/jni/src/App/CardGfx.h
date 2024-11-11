@@ -1,7 +1,7 @@
 #ifndef CARDGFX__H
 #define CARDGFX__H
 
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
 #include <vector>
 

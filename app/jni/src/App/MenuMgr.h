@@ -5,8 +5,8 @@
 #pragma once
 #endif
 
-#include <SDL.h>
-#include <SDL_ttf.h>
+#include <SDL3/SDL.h>
+#include <SDL3_ttf/SDL_ttf.h>
 
 #include "ErrorInfo.h"
 #include "Traits.h"
