@@ -56,7 +56,6 @@ libreria esterna, solo per SDL_ttf. Per il formato musicale It, magari ci vorreb
 qualche libreria esterna, ma non so quale. Oppure è in formato midi e basta abilitare timidity in 
 Android.mk attraverso SUPPORT_MID_TIMIDITY nel progetto SDL_Mixer.
 
-
 ## SDL Versione Update
 Ho fatto un update della versione SDL2 alla versione 2.28.5. Ho scaricato il tar dal sito
 https://github.com/libsdl-org/SDL/releases, e poi ho copiato quasi tutte le directory nel mio progetto.
@@ -268,7 +267,7 @@ https://discourse.libsdl.org/t/mouse-emulation-of-touch-events/19255/6
 Il fatto è che il touch event viene rimbalzato anche come mouse event. Solo che il rimbalzo
 non è assolutamente preciso. Quindi su Android scelgo di ignorare gli eventi del mouse.
 
-## Compilszione con target wsl
+## Compilazione con target wsl
 Ho compilato i sorgenti di AndroSolitario anche su WSL, questo per vedere se l'app funziona.
 Uso CMake per compilare il target su WSL, mentre ndk con gradle (Android.mk) per quanto
 riguarda il target Android.
@@ -310,7 +309,7 @@ in ~/projects/AndroSolitario lancio
     code .
 All'interno del terminal di Visual Code posso compilare, installare e lanciare il sfotware:
 
-    source ./start_env.sh
+    source start_env.sh
     ./gradlew compileDebugSources
     ./gradlew installDebug
     adb logcat -s "SoltarioIta"
@@ -318,3 +317,28 @@ All'interno del terminal di Visual Code posso compilare, installare e lanciare i
 Nota il comando source. Esso viene usato in quanto le variabili definite rimangono definite all'interno
 dello script.
 
+
+## SDL 3.0
+Ho creato un branch sdl3 e cancellato tutti i sorgenti di SDL*
+Poi ho preso i sorgenti di SDL3.0 da https://github.com/libsdl-org/SDL/releases in formato zip
+dalla prerelease 3.1.6.
+Ho fatto il git clone di AndroSolitario in una nuova directory AndroSolitario3. 
+Qui mi manca l'esecuzione di gradle in quanto il programma l'ho già installato (vedi https://github.com/aaaasmile/Solitario/blob/main/android.md alla voce Gradle).
+Ho ripreso le due directory con gli assets:
+
+    app/src/main/assets
+    asset_data_forwsl
+Ho dovuto cancellare gradlew e gradle.bat perché non hanno funzionato dopo il clone.
+
+    gradle wrapper
+_Could not create service of type ScriptPluginFactory using BuildScopeServices.createScriptPluginFactory()._
+
+Non so perché gradle e gradlew non funzionano. Ho bisogno sicuramente della directory gradle, che
+non è in git. L'ho copiata dalla altra directory e l'ho messa in git. La directory .gradle, invece, può essere tralasciata.
+
+Il comando ./gradlew compileDebugSources mi dice che va tutto bene, invece non va bene niente e non compila. Provo il seguente:
+
+    ./gradlew compileDebugSources --info
+che esegue solo un pre step, ma non chiama ndk. Questo viene eseguito con:
+
+    ./gradlew installDebug --info

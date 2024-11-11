@@ -1,5 +1,4 @@
 build
-gradle
 .gradle
 app/src/main/assets
 *.o
