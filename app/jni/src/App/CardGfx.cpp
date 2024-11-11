@@ -126,7 +126,7 @@ LPErrInApp CardGfx::DrawCardPac(SDL_Surface* s) {
     dest.x = X();
     dest.y = Y();
 
-    if (SDL_BlitSurface(_pPacDeck, &srcCard, s, &dest) == -1) {
+    if (!SDL_BlitSurface(_pPacDeck, &srcCard, s, &dest)) {
         return ERR_UTIL::ErrorCreate(
             "SDL_BlitSurface in DrawCardPac with Iterator error: %s\n",
             SDL_GetError());

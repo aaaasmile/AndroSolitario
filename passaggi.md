@@ -336,9 +336,15 @@ _Could not create service of type ScriptPluginFactory using BuildScopeServices.c
 Non so perché gradle e gradlew non funzionano. Ho bisogno sicuramente della directory gradle, che
 non è in git. L'ho copiata dalla altra directory e l'ho messa in git. La directory .gradle, invece, può essere tralasciata.
 
-Il comando ./gradlew compileDebugSources mi dice che va tutto bene, invece non va bene niente e non compila. Provo il seguente:
+Il comando ./gradlew compileDebugSources mi dice che va tutto bene, ma non crea l'eseguibile. Provo il seguente:
 
-    ./gradlew compileDebugSources --info
+    ./gradlew compileDebugSources
 che esegue solo un pre step, ma non chiama ndk. Questo viene eseguito con:
 
-    ./gradlew installDebug --info
+    ./gradlew installDebug
+e qui si devono correggere tutti gli errori. Per esempio gli header.
+Ho avuto dei problemi con ttf nel generare il file libSDL3_ttf.so. Ho cambiato il file android.mk
+includendo i sorgenti mancanti. 
+Per quanto riguarda sdl_mixer, sdl_image e sdl_ttf ho preso i sorgenti main latest al 11.11.2024.
+
+Quello che attualmente non compila è il mio programma, che è stato crato per SDL2.

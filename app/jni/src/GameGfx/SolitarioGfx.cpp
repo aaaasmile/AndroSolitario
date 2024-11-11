@@ -633,7 +633,7 @@ LPErrInApp SolitarioGfx::DrawCardPac(int x, int y, int nCdIndex,
     dest.x = x;
     dest.y = y;
 
-    if (SDL_BlitSurface(_p_Deck, &srcCard, s, &dest) == -1) {
+    if (!SDL_BlitSurface(_p_Deck, &srcCard, s, &dest)) {
         return ERR_UTIL::ErrorCreate(
             "SDL_BlitSurface in DrawCardPac with Iterator error: %s\n",
             SDL_GetError());
@@ -679,7 +679,7 @@ LPErrInApp SolitarioGfx::DrawCardBackPac(int x, int y, SDL_Surface *s) {
     srcBack.w = g_SymbolWidth;
     srcBack.h = g_SymbolHeight;
 
-    if (SDL_BlitSurface(_p_Symbols, &srcBack, s, &dest) == -1) {
+    if (!SDL_BlitSurface(_p_Symbols, &srcBack, s, &dest)) {
         return ERR_UTIL::ErrorCreate(
             "SDL_BlitSurface in DrawCardBackPac error: %s\n", SDL_GetError());
     }
@@ -713,7 +713,7 @@ LPErrInApp SolitarioGfx::DrawSymbolPac(int x, int y, int nSymbol,
     dest.x = x;
     dest.y = y;
 
-    if (SDL_BlitSurface(_p_Symbols, &srcCard, s, &dest) == -1) {
+    if (!SDL_BlitSurface(_p_Symbols, &srcCard, s, &dest)) {
         return ERR_UTIL::ErrorCreate(
             "SDL_BlitSurface in DrawSymbolPac error: %s\n", SDL_GetError());
     }
