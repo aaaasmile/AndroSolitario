@@ -1,4 +1,96 @@
-# Solitario per Android
+## SDL 3.0
+Ho creato un branch sdl3 e cancellato tutti i sorgenti di SDL*
+Poi ho preso i sorgenti di SDL3.0 da https://github.com/libsdl-org/SDL/releases in formato zip
+dalla prerelease 3.1.6.
+Ho fatto il git clone di AndroSolitario in una nuova directory AndroSolitario3. 
+Qui mi manca l'esecuzione di gradle in quanto il programma l'ho già installato (vedi https://github.com/aaaasmile/Solitario/blob/main/android.md alla voce Gradle).
+Ho ripreso le due directory con gli assets:
+
+    app/src/main/assets
+    asset_data_forwsl
+Ho dovuto cancellare gradlew e gradle.bat perché non hanno funzionato dopo il clone.
+
+    gradle wrapper
+_Could not create service of type ScriptPluginFactory using BuildScopeServices.createScriptPluginFactory()._
+
+Non so perché gradle e gradlew non funzionano. Ho bisogno sicuramente della directory gradle, che
+non è in git. L'ho copiata dalla altra directory e l'ho messa in git. La directory .gradle, invece, può essere tralasciata.
+
+Il comando ./gradlew compileDebugSources mi dice che va tutto bene, ma non crea l'eseguibile. Provo il seguente:
+
+    ./gradlew compileDebugSources
+che esegue solo un pre step, ma non chiama ndk. Questo viene eseguito con:
+
+    ./gradlew installDebug
+e qui si devono correggere tutti gli errori. Per esempio gli header.
+Ho avuto dei problemi con ttf nel generare il file libSDL3_ttf.so. Ho cambiato il file android.mk
+includendo i sorgenti mancanti. 
+Per quanto riguarda sdl_mixer, sdl_image e sdl_ttf ho preso i sorgenti main latest al 11.11.2024.
+
+Quello che attualmente non compila è il mio programma, che è stato crato per SDL2.
+
+## Per Partire
+Nella finestra WSL UbuntuMinitoro vado nella directory ~/projects/AndroSolitario3 e lancio 
+    
+    code .
+
+## Compilazione con target WSL2
+Voglio compilare i sorgenti di AndroSolitario3 anche su WSL, questo per vedere se l'app funziona
+prima di tutto su questo target.
+Uso CMake per compilare il target su WSL, mentre ndk con gradle (Android.mk) per quanto
+riguarda il target Android.
+
+    mkdir build
+    cd build
+    cmake ../app/jni/ -DSDL_WAYLAND=OFF
+    cmake --build .
+o alternativo
+
+    make
+
+Problemi con la funzione random di std. Se uso
+
+    cmake ../app/jni/ -DSDL_WAYLAND=OFF -DCMAKE_CXX_COMPILER=/usr/bin/g++
+    
+per avere g++ in modo esplicito non risolve il problema, quindi è meglio lasciarlo fuori
+ed usare lo standard c++.
+
+In ogni modo sembra una cascata di problemi in quanto il progetto non è compatibile 
+cpn SDL3. Quindi per prima cosa bisogna usare tutte le macro e funzioni di SDL3.
+Poi si può vedere di risolvere l'include di random, che nel progetto scratch funziona benissimo con g++ e c++, mentre con gcc non compila.
+
+Problemi con wayland li ho rimossi con -DSDL_WAYLAND=OFF
+
+    dpkg -L libwayland-dev
+    #include "primary-selection-unstable-v1-client-protocol.h"
+gli header si trovano in /usr/include e nella mia distribuzione non li ho. Ho semplicemente disattivato libwayland
+nella lista CMakeList.txt. 
+
+Le librerie di SDL le ho compilate in modo statico. Per il file
+di musica watermusic.it l'ho convertito in watermusic.ogg in quanto la mia libreria statica sdl_mixer non 
+supporta il formato it. 
+Quando si cambia un file della configuarzione di SDL (il suo CMakeLists.txt) per escludere qualche libreria
+che non uso tipo wayland, devo poi ricostruire la directory build.
+
+    cd ..
+    rm -r -R build
+    mkdir build
+    cd build
+    cmake ../app/jni/ -DSDL_WAYLAND=OFF
+A me sembra che anche 
+
+    make clean
+faccia il suo dovere.
+
+Nota che il programma va a finire nella directory ./build/src ed lì dove ho poi messo le 
+risorse nella directory data. Gli asset li ho anche copiati nella directory asset_data_forwsl 
+(per esempio usando file explorer di windows).
+
+# Versione Per SDL 2.0
+Qui di seguito ho messo tutte le istruzioni che ho usato per compilare la versione Android con 
+SDL2.0.
+
+## Solitario per Android
 
 AndroSolitario è il tentativo di compilare il progetto https://github.com/aaaasmile/Solitario per la piattaforma Android.
 Nota che ho già scritto alcune notte per lo sviluppo nel file https://github.com/aaaasmile/Solitario/blob/main/android.md
@@ -267,33 +359,6 @@ https://discourse.libsdl.org/t/mouse-emulation-of-touch-events/19255/6
 Il fatto è che il touch event viene rimbalzato anche come mouse event. Solo che il rimbalzo
 non è assolutamente preciso. Quindi su Android scelgo di ignorare gli eventi del mouse.
 
-## Compilazione con target wsl
-Ho compilato i sorgenti di AndroSolitario anche su WSL, questo per vedere se l'app funziona.
-Uso CMake per compilare il target su WSL, mentre ndk con gradle (Android.mk) per quanto
-riguarda il target Android.
-
-    mkdir build
-    cd build
-    cmake ../app/jni/
-
-Problemi con wayland
-
-    dpkg -L libwayland-dev
-    #include "primary-selection-unstable-v1-client-protocol.h"
-gli header si trovano in /usr/include e nella mia distribuzione non li ho. Ho semplicemente disattivato libwayland
-nella lista CMakeList.txt. Le librerie di SDL le ho compilate in modo statico. Per il file
-di musica watermusic.it l'ho convertito in watermusic.ogg in quanto la mia libreria statica sdl_mixer non 
-supporta il formato it. 
-Quando si cambia un file della configuarzione di SDL (il suo CMakeLists.txt) per escludere qualche libreria
-che non uso tipo wayland, devo poi ricostruire la directory build.
-
-    cd ..
-    rm -r -R build
-    mkdir build
-    cd build
-    cmake ../app/jni/
-Nota che il programma va a finire nella directory ./build/src ed lì dove ho poi messo le 
-risorse nella directory data. Gli asset li ho anche copiati nella directory asset_data_forwsl.
 
 ## SDL Activity log
 Se ci sono dei problemi nello startup oppure nella chiusura della App (per esempio mancano dei delete)
@@ -316,35 +381,3 @@ All'interno del terminal di Visual Code posso compilare, installare e lanciare i
     adb shell am start -n org.libsdl.app/.SDLActivity
 Nota il comando source. Esso viene usato in quanto le variabili definite rimangono definite all'interno
 dello script.
-
-
-## SDL 3.0
-Ho creato un branch sdl3 e cancellato tutti i sorgenti di SDL*
-Poi ho preso i sorgenti di SDL3.0 da https://github.com/libsdl-org/SDL/releases in formato zip
-dalla prerelease 3.1.6.
-Ho fatto il git clone di AndroSolitario in una nuova directory AndroSolitario3. 
-Qui mi manca l'esecuzione di gradle in quanto il programma l'ho già installato (vedi https://github.com/aaaasmile/Solitario/blob/main/android.md alla voce Gradle).
-Ho ripreso le due directory con gli assets:
-
-    app/src/main/assets
-    asset_data_forwsl
-Ho dovuto cancellare gradlew e gradle.bat perché non hanno funzionato dopo il clone.
-
-    gradle wrapper
-_Could not create service of type ScriptPluginFactory using BuildScopeServices.createScriptPluginFactory()._
-
-Non so perché gradle e gradlew non funzionano. Ho bisogno sicuramente della directory gradle, che
-non è in git. L'ho copiata dalla altra directory e l'ho messa in git. La directory .gradle, invece, può essere tralasciata.
-
-Il comando ./gradlew compileDebugSources mi dice che va tutto bene, ma non crea l'eseguibile. Provo il seguente:
-
-    ./gradlew compileDebugSources
-che esegue solo un pre step, ma non chiama ndk. Questo viene eseguito con:
-
-    ./gradlew installDebug
-e qui si devono correggere tutti gli errori. Per esempio gli header.
-Ho avuto dei problemi con ttf nel generare il file libSDL3_ttf.so. Ho cambiato il file android.mk
-includendo i sorgenti mancanti. 
-Per quanto riguarda sdl_mixer, sdl_image e sdl_ttf ho preso i sorgenti main latest al 11.11.2024.
-
-Quello che attualmente non compila è il mio programma, che è stato crato per SDL2.

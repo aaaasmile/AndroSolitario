@@ -16,7 +16,7 @@ MesgBoxGfx::MesgBoxGfx(void) {
 
 MesgBoxGfx::~MesgBoxGfx(void) {
     if (_p_Surf_Bar) {
-        SDL_FreeSurface(_p_Surf_Bar);
+        SDL_DestroySurface(_p_Surf_Bar);
         _p_Surf_Bar = NULL;
     }
     delete _p_BtButt1;
@@ -245,7 +245,7 @@ int MesgBoxGfx::Show(SDL_Surface* pScene_background, LPCSTR lpsBut1Txt,
             uiLast_time = uiNowTime;
         }
     }
-    SDL_FreeSurface(pShadowSrf);
+    SDL_DestroySurface(pShadowSrf);
     SDL_DestroyTexture(pScreenTexture);
 
     return _result;

@@ -160,7 +160,7 @@ LPErrInApp GFX_UTIL::DrawString(SDL_Surface *screen, const char *strText, int x,
                                      SDL_GetError());
     }
     GFX_UTIL::DrawStaticSpriteEx(screen, 0, 0, width, height, x, y, surFont);
-    SDL_FreeSurface(surFont);
+    SDL_DestroySurface(surFont);
     return NULL;
 }
 

@@ -20,15 +20,15 @@ ComboGfx::ComboGfx() {
 
 ComboGfx::~ComboGfx() {
     if (_p_surfBar) {
-        SDL_FreeSurface(_p_surfBar);
+        SDL_DestroySurface(_p_surfBar);
         _p_surfBar = NULL;
     }
     if (_p_surfBoxSel) {
-        SDL_FreeSurface(_p_surfBoxSel);
+        SDL_DestroySurface(_p_surfBoxSel);
         _p_surfBoxSel = NULL;
     }
     if (_p_surfBoxUNSel) {
-        SDL_FreeSurface(_p_surfBoxUNSel);
+        SDL_DestroySurface(_p_surfBoxUNSel);
         _p_surfBoxUNSel = NULL;
     }
 }

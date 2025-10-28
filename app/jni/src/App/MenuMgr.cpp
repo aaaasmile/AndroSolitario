@@ -132,11 +132,11 @@ MenuMgr::MenuMgr() {
 
 MenuMgr::~MenuMgr() {
     if (_p_MenuBox) {
-        SDL_FreeSurface(_p_MenuBox);
+        SDL_DestroySurface(_p_MenuBox);
         _p_MenuBox = NULL;
     }
     if (_p_ScreenBackbuffer != NULL) {
-        SDL_FreeSurface(_p_ScreenBackbuffer);
+        SDL_DestroySurface(_p_ScreenBackbuffer);
         _p_ScreenBackbuffer = NULL;
     }
     if (_p_ScreenTexture != NULL) {

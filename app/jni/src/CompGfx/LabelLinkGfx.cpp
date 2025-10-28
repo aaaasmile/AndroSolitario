@@ -13,7 +13,7 @@ LabelLinkGfx::LabelLinkGfx() {
 
 LabelLinkGfx::~LabelLinkGfx() {
     if (_p_SurfBar) {
-        SDL_FreeSurface(_p_SurfBar);
+        SDL_DestroySurface(_p_SurfBar);
         _p_SurfBar = NULL;
     }
 }

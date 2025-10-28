@@ -17,7 +17,7 @@ ButtonGfx::ButtonGfx() {
 
 ButtonGfx::~ButtonGfx() {
     if (_p_buttonSurface) {
-        SDL_FreeSurface(_p_buttonSurface);
+        SDL_DestroySurface(_p_buttonSurface);
         _p_buttonSurface = NULL;
     }
 }

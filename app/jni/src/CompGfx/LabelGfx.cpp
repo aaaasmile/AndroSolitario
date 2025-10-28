@@ -11,7 +11,7 @@ LabelGfx::LabelGfx() {
 
 LabelGfx::~LabelGfx() {
     if (_p_Surf_Bar) {
-        SDL_FreeSurface(_p_Surf_Bar);
+        SDL_DestroySurface(_p_Surf_Bar);
         _p_Surf_Bar = NULL;
     }
 }

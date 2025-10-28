@@ -45,7 +45,7 @@ void Fade(SDL_Surface* p_surf_screen, SDL_Surface* p_surf_img,
                 stderr,
                 "fade: could not create a copy of the Screen Surface. (%s)\n",
                 SDL_GetError());
-            SDL_FreeSurface(p_surf_black);
+            SDL_DestroySurface(p_surf_black);
             return;
         }
         /* Ok, copy surfaces and set surfact pointer */
@@ -106,10 +106,10 @@ void Fade(SDL_Surface* p_surf_screen, SDL_Surface* p_surf_img,
         }
     }
     /* Free the black Surface */
-    SDL_FreeSurface(p_surf_black);
+    SDL_DestroySurface(p_surf_black);
     /* Free the Screen copy, if used */
     if (p_surf_screen_copy != NULL) {
-        SDL_FreeSurface(p_surf_screen_copy);
+        SDL_DestroySurface(p_surf_screen_copy);
     }
     SDL_DestroyTexture(pScreenTexture);
 }

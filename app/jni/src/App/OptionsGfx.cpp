@@ -22,7 +22,7 @@ OptionsGfx::OptionsGfx() {
 
 OptionsGfx::~OptionsGfx() {
     if (_p_surfBar) {
-        SDL_FreeSurface(_p_surfBar);
+        SDL_DestroySurface(_p_surfBar);
         _p_surfBar = NULL;
     }
     delete _p_buttonOK;
@@ -32,7 +32,7 @@ OptionsGfx::~OptionsGfx() {
     delete _p_comboBackground;
     for (int i = 0; i < eDeckType::NUM_OF_DECK; i++) {
         if (_p_deckAll[i]) {
-            SDL_FreeSurface(_p_deckAll[i]);
+            SDL_DestroySurface(_p_deckAll[i]);
         }
     }
 }
@@ -424,7 +424,7 @@ LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
             uiLast_time = uiNowTime;
         }
     }
-    SDL_FreeSurface(pShadowSrf);
+    SDL_DestroySurface(pShadowSrf);
     SDL_DestroyTexture(pScreenTexture);
     return NULL;
 }

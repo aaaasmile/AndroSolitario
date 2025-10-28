@@ -141,7 +141,7 @@ LPErrInApp AppGfx::Init() {
 
 LPErrInApp AppGfx::loadSceneBackground() {
     if (_p_SceneBackground != NULL) {
-        SDL_FreeSurface(_p_SceneBackground);
+        SDL_DestroySurface(_p_SceneBackground);
         _p_SceneBackground = NULL;
     }
     if (_p_GameSettings->BackgroundType != BackgroundTypeEnum::Black) {
@@ -183,7 +183,7 @@ LPErrInApp AppGfx::createWindow() {
         SDL_DestroyWindow(_p_Window);
     }
     if (_p_Screen != NULL) {
-        SDL_FreeSurface(_p_Screen);
+        SDL_DestroySurface(_p_Screen);
         _p_Screen = NULL;
     }
     if (_fullScreen) {
@@ -267,15 +267,15 @@ void AppGfx::terminate() {
     SDL_ShowCursor(SDL_ENABLE);
 
     if (_p_Screen != NULL) {
-        SDL_FreeSurface(_p_Screen);
+        SDL_DestroySurface(_p_Screen);
         _p_Screen = NULL;
     }
     if (_p_SceneBackground) {
-        SDL_FreeSurface(_p_SceneBackground);
+        SDL_DestroySurface(_p_SceneBackground);
         _p_SceneBackground = NULL;
     }
     if (_p_CreditTitle) {
-        SDL_FreeSurface(_p_CreditTitle);
+        SDL_DestroySurface(_p_CreditTitle);
         _p_CreditTitle = NULL;
     }
     if (_p_ScreenTexture != NULL) {

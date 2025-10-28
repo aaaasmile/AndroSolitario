@@ -58,7 +58,7 @@ SolitarioGfx::~SolitarioGfx() {
 
 void SolitarioGfx::clearSurface() {
     if (_p_ScreenBackbufferDrag != NULL) {
-        SDL_FreeSurface(_p_ScreenBackbufferDrag);
+        SDL_DestroySurface(_p_ScreenBackbufferDrag);
         _p_ScreenBackbufferDrag = NULL;
     }
     if (_p_ScreenTexture != NULL) {
@@ -66,7 +66,7 @@ void SolitarioGfx::clearSurface() {
         _p_ScreenTexture = NULL;
     }
     if (_p_AlphaDisplay != NULL) {
-        SDL_FreeSurface(_p_AlphaDisplay);
+        SDL_DestroySurface(_p_AlphaDisplay);
         _p_AlphaDisplay = NULL;
     }
 }
@@ -301,7 +301,7 @@ LPErrInApp SolitarioGfx::InitDrag(LPCardStackGfx pCargoStack, int x, int y,
     _dragPileInfo.pSrcRegion = pSrcRegion;
 
     if (_p_Dragface != NULL) {
-        SDL_FreeSurface(_p_Dragface);
+        SDL_DestroySurface(_p_Dragface);
     }
 
     _p_Dragface = SDL_CreateRGBSurface(SDL_SWSURFACE, _dragPileInfo.width,
@@ -413,7 +413,7 @@ LPCardRegionGfx SolitarioGfx::DoDrop(LPCardRegionGfx pDestRegion) {
     zoomDropCard(_dragPileInfo.x, _dragPileInfo.y, pCard, _dragPileInfo.width,
                  _dragPileInfo.height);
 
-    SDL_FreeSurface(_p_Dragface);
+    SDL_DestroySurface(_p_Dragface);
     _p_Dragface = NULL;
     return pBestRegion;
 }
