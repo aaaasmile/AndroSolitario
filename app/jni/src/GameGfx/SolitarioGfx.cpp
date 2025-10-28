@@ -129,15 +129,17 @@ LPErrInApp SolitarioGfx::Initialize(
                                      SDL_GetError());
     }
 
-    _p_AlphaDisplay = SDL_CreateRGBSurface(SDL_SWSURFACE, _p_Screen->w,
-                                           _p_Screen->h, 32, 0, 0, 0, 0);
+    // _p_AlphaDisplay = SDL_CreateRGBSurface(SDL_SWSURFACE, _p_Screen->w,
+    //                                        _p_Screen->h, 32, 0, 0, 0, 0); //SDL2
+    _p_AlphaDisplay = SDL_CreateSurface(_p_Screen->w, _p_Screen->h, SDL_PIXELFORMAT_RGBA32);
     if (_p_AlphaDisplay == NULL) {
         return ERR_UTIL::ErrorCreate("Cannot create alpha display: %s\n",
                                      SDL_GetError());
     }
 
-    _p_ScreenBackbufferDrag = SDL_CreateRGBSurface(
-        SDL_SWSURFACE, _p_Screen->w, _p_Screen->h, 32, 0, 0, 0, 0);
+    // _p_ScreenBackbufferDrag = SDL_CreateRGBSurface(
+    //     SDL_SWSURFACE, _p_Screen->w, _p_Screen->h, 32, 0, 0, 0, 0);//SDL2
+    _p_ScreenBackbufferDrag = SDL_CreateSurface(_p_Screen->w, _p_Screen->h, SDL_PIXELFORMAT_RGBA32);
 
     _p_SceneBackground = pSceneBackground;
     if (_p_SceneBackground == 0) {
@@ -304,11 +306,21 @@ LPErrInApp SolitarioGfx::InitDrag(LPCardStackGfx pCargoStack, int x, int y,
         SDL_DestroySurface(_p_Dragface);
     }
 
-    _p_Dragface = SDL_CreateRGBSurface(SDL_SWSURFACE, _dragPileInfo.width,
-                                       _dragPileInfo.height, 32, 0, 0, 0, 0);
-    SDL_FillRect(_p_Dragface, NULL, SDL_MapRGB(_p_Dragface->format, 0, 255, 0));
-    SDL_SetColorKey(_p_Dragface, true,
-                    SDL_MapRGB(_p_Dragface->format, 0, 255, 0));
+    // _p_Dragface = SDL_CreateRGBSurface(SDL_SWSURFACE, _dragPileInfo.width,
+    //                                    _dragPileInfo.height, 32, 0, 0, 0, 0); // SDL2
+    _p_Dragface = SDL_CreateSurface(_dragPileInfo.width, _dragPileInfo.height, SDL_PIXELFORMAT_RGBA32); 
+    //SDL_FillRect(_p_Dragface, NULL, SDL_MapRGB(_p_Dragface->format, 0, 255, 0)); //SDL2
+    SDL_FillSurfaceRect(_p_Dragface, NULL, 
+        SDL_MapRGB(SDL_GetPixelFormatDetails(_p_Dragface->format), 
+                    SDL_GetSurfacePalette(_p_Dragface), 
+                    0, 255, 0));
+
+    // SDL_SetColorKey(_p_Dragface, true,
+    //                 SDL_MapRGB(_p_Dragface->format, 0, 255, 0)); // SDL2
+    SDL_SetSurfaceColorKey(_p_Dragface, true,
+        SDL_MapRGB(SDL_GetPixelFormatDetails(_p_Dragface->format), 
+                    SDL_GetSurfacePalette(_p_Dragface), 
+                    0, 255, 0));
 
     err = DrawCardStack(_p_Screen, &dragRegion);
     if (err != NULL) {
@@ -331,7 +343,8 @@ LPErrInApp SolitarioGfx::InitDrag(LPCardStackGfx pCargoStack, int x, int y,
 void SolitarioGfx::updateTextureAsFlipScreen() {
     SDL_UpdateTexture(_p_ScreenTexture, NULL, _p_Screen->pixels,
                       _p_Screen->pitch);
-    SDL_RenderCopy(_p_sdlRenderer, _p_ScreenTexture, NULL, NULL);
+    //SDL_RenderCopy(_p_sdlRenderer, _p_ScreenTexture, NULL, NULL); SDL 2
+    SDL_RenderTexture(_p_sdlRenderer, _p_ScreenTexture, NULL, NULL);
     SDL_RenderPresent(_p_sdlRenderer);
 }
 

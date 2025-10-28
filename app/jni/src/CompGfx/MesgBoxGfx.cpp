@@ -235,7 +235,7 @@ int MesgBoxGfx::Show(SDL_Surface* pScene_background, LPCSTR lpsBut1Txt,
         SDL_BlitSurface(pShadowSrf, NULL, _p_Screen, NULL);
         SDL_UpdateTexture(pScreenTexture, NULL, _p_Screen->pixels,
                           _p_Screen->pitch); 
-        SDL_RenderCopy(_p_sdlRenderer, pScreenTexture, NULL, NULL);
+        SDL_RenderTexture(_p_sdlRenderer, pScreenTexture, NULL, NULL);
         SDL_RenderPresent(_p_sdlRenderer);
 
         // synch to frame rate

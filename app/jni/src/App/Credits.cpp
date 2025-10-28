@@ -216,7 +216,7 @@ void credits(SDL_Surface* p_surf_screen, SDL_Surface* pSurfTitle,
         }
         SDL_UpdateTexture(pScreenTexture, NULL, p_surf_screen->pixels,
                           p_surf_screen->pitch);
-        SDL_RenderCopy(psdlRenderer, pScreenTexture, NULL, NULL);
+        SDL_RenderTexture(psdlRenderer, pScreenTexture, NULL, NULL);
         SDL_RenderPresent(psdlRenderer);
 
         now_time = SDL_GetTicks();

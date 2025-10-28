@@ -316,9 +316,9 @@ void ComboGfx::RedrawButton(SDL_Surface* pScreen,
                             SDL_Texture* pScene_background,
                             SDL_Texture* pScreenTexture) {
     if (pScene_background) {
-        SDL_RenderCopy(_p_sdlRenderer, pScene_background, NULL, NULL);
+        SDL_RenderTexture(_p_sdlRenderer, pScene_background, NULL, NULL);
     }
     DrawButton(pScreen);
-    SDL_RenderCopy(_p_sdlRenderer, pScreenTexture, NULL, NULL);
+    SDL_RenderTexture(_p_sdlRenderer, pScreenTexture, NULL, NULL);
     SDL_RenderPresent(_p_sdlRenderer);
 }

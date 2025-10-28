@@ -549,7 +549,7 @@ LPErrInApp MenuMgr::drawMenuText(SDL_Surface* psurf, const char* text, int x,
 void MenuMgr::updateTextureAsFlipScreen() {
     SDL_UpdateTexture(_p_ScreenTexture, NULL, _p_Screen->pixels,
                       _p_Screen->pitch);
-    SDL_RenderCopy(_p_sdlRenderer, _p_ScreenTexture, NULL, NULL);
+    SDL_RenderTexture(_p_sdlRenderer, _p_ScreenTexture, NULL, NULL);
     SDL_RenderPresent(_p_sdlRenderer);
 }
 

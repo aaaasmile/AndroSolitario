@@ -414,7 +414,7 @@ LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
         SDL_BlitSurface(pShadowSrf, NULL, _p_screen, NULL);
         SDL_UpdateTexture(pScreenTexture, NULL, _p_screen->pixels,
                           _p_screen->pitch);
-        SDL_RenderCopy(_p_sdlRenderer, pScreenTexture, NULL, NULL);
+        SDL_RenderTexture(_p_sdlRenderer, pScreenTexture, NULL, NULL);
         SDL_RenderPresent(_p_sdlRenderer);
 
         // synch to frame rate
