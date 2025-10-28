@@ -1,6 +1,6 @@
 #include "CardStackGfx.h"
 
-//#include <random>
+//#include <random> // TODO, make it compile clean
 
 #include "WinTypeGlobal.h"
 
@@ -34,6 +34,7 @@ void CardStackGfx::CleanUp() {
 }
 
 void CardStackGfx::Shuffle() {
+    // TODO, make it compile clean
     //std::random_device rd;
     //std::mt19937 g(rd());
     //std::shuffle(_vct_lpCardGfx.begin(), _vct_lpCardGfx.end(), g);
