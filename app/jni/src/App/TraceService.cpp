@@ -87,7 +87,7 @@ bool TraceService::AddNewEntry(int iChannel, int iId,
     if (m_abChannelMask[iChannel]) {
         int iIndexNew = m_aiChannelCursor[iChannel];
 
-        Uint64 ticks = SDL_GetTicks64();
+        Uint64 ticks = SDL_GetTicks();
 
         m_mtxEntryTraceDetails[iChannel][iIndexNew].m_eTrType = eValType;
         m_mtxEntryTraceDetails[iChannel][iIndexNew].m_iID = iId;
@@ -134,7 +134,7 @@ void TraceService::AddTrace(EntryTraceDetail::eType traceDet, LPCSTR lpszForm,
         if (m_abChannelMask[iChannel]) {
             int iIndexNew = m_aiChannelCursor[iChannel];
 
-            Uint64 ticks = SDL_GetTicks64();
+            Uint64 ticks = SDL_GetTicks();
 
             // update info trace
             m_mtxEntryTraceDetails[iChannel][iIndexNew].m_eTrType = traceDet;
