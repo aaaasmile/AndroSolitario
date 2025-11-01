@@ -13,7 +13,7 @@ char const* credit_text[] = {
     "PART OF THE 'CUPERATIVA' PROJECT",
     "",
     "-LEAD PROGRAMMER",
-    "THE AUTHOR OF INVIDO,IT",
+    "IGORRUN ON INVIDO,IT",
     "",
     "",
     "-CONTRIBUTING ",
