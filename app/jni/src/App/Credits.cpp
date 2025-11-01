@@ -172,13 +172,13 @@ void credits(SDL_Surface* p_surf_screen, SDL_Surface* pSurfTitle,
     do {
         last_time = SDL_GetTicks();
         while (SDL_PollEvent(&event) > 0) {
-            if (event.type == SDL_KEYDOWN) {
-                key = event.key.keysym.sym;
+            if (event.type == SDL_EVENT_KEY_DOWN) {
+                key = event.key.key;
                 if (key == SDLK_ESCAPE) {
                     done = 1;
                 }
             }
-            if (event.type == SDL_FINGERDOWN) {
+            if (event.type == SDL_EVENT_FINGER_DOWN) {
                 done = true;
             }
         }
@@ -200,9 +200,14 @@ void credits(SDL_Surface* p_surf_screen, SDL_Surface* pSurfTitle,
         dest.w = p_surf_screen->w;
         dest.h = 2;
 
-        SDL_FillRect(p_surf_screen, &dest,
-                     SDL_MapRGB(p_surf_screen->format, 0, 0, 0));
-
+        // SDL_FillRect(p_surf_screen, &dest, SDL_MapRGB(p_surf_screen->format,
+        // 0, 0, 0));// SDL 2
+        SDL_Rect clipRect;  // SDL 3
+        SDL_GetSurfaceClipRect(p_surf_screen, &clipRect);
+        SDL_FillSurfaceRect(
+            p_surf_screen, &clipRect,
+            SDL_MapRGB(SDL_GetPixelFormatDetails(p_surf_screen->format),
+                       SDL_GetSurfacePalette(p_surf_screen), 0, 0, 0));
         scroll++;
 
         draw_text(credit_text[g_line], scroll, p_surf_screen);
@@ -279,8 +284,13 @@ static void draw_text(char const* str, int scroll, SDL_Surface* screen) {
                         dest.w = 3;
                         dest.h = 3;
 
-                        SDL_FillRect(screen, &dest,
-                                     SDL_MapRGB(screen->format, r, g, b));
+                        // SDL_FillRect(screen, &dest, SDL_MapRGB(screen->format, r, g, b));// SDL 2
+                        SDL_Rect clipRect;  // SDL 3
+                        SDL_GetSurfaceClipRect(screen, &clipRect);
+                        SDL_FillSurfaceRect(
+                            screen, &clipRect,
+                            SDL_MapRGB(SDL_GetPixelFormatDetails(screen->format),
+                                       SDL_GetSurfacePalette(screen), r, g, b));
                     }
                 }
             }

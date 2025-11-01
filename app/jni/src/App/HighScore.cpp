@@ -170,14 +170,14 @@ LPErrInApp HighScore::Show(SDL_Surface* p_surf_screen, SDL_Surface* pSurfTitle,
         while (SDL_PollEvent(&event) > 0) {
             if (event.type == SDL_QUIT) {
                 done = true;
-            } else if (event.type == SDL_KEYDOWN) {
-                key = event.key.keysym.sym;
+            } else if (event.type == SDL_EVENT_KEY_DOWN) {
+                key = event.key.key;
 
                 if (key == SDLK_ESCAPE) {
                     done = true;
                 }
             }
-            if (event.type == SDL_FINGERDOWN) {
+            if (event.type == SDL_EVENT_FINGER_DOWN) {
                 done = true;
             }
         }

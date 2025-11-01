@@ -468,7 +468,7 @@ LPErrInApp MenuMgr::HandleRootMenu() {
             break;
         }
 
-        if (event.type == SDL_FINGERDOWN) {
+        if (event.type == SDL_EVENT_FINGER_DOWN) {
             pGameSettings->GetTouchPoint(event.tfinger, &touchLocation);
             TRACE_DEBUG("Tap in x=%d, y=%d\n", touchLocation.x,
                         touchLocation.y);
@@ -483,18 +483,18 @@ LPErrInApp MenuMgr::HandleRootMenu() {
             }
         }
 
-        if (event.type == SDL_KEYDOWN) {
-            if (event.key.keysym.sym == SDLK_UP) {
+        if (event.type == SDL_EVENT_KEY_DOWN) {
+            if (event.key.key == SDLK_UP) {
                 _focusedMenuItem = previousMenu(_focusedMenuItem);
             }
-            if (event.key.keysym.sym == SDLK_DOWN) {
+            if (event.key.key == SDLK_DOWN) {
                 _focusedMenuItem = nextMenu(_focusedMenuItem);
             }
-            if (event.key.keysym.sym == SDLK_RETURN) {
+            if (event.key.key == SDLK_RETURN) {
                 TRACE_DEBUG("Select menu from return\n");
                 rootMenuNext();
             }
-            if (event.key.keysym.sym == SDLK_ESCAPE) {
+            if (event.key.key == SDLK_ESCAPE) {
                 (_menuDlgt.tc)->LeaveMenu(_menuDlgt.self);
             }
         }

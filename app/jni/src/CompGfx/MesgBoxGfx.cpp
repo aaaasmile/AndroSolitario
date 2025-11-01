@@ -144,8 +144,8 @@ int MesgBoxGfx::Show(SDL_Surface* pScene_background, LPCSTR lpsBut1Txt,
 
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_KEYDOWN) {
-                if (event.key.keysym.sym == SDLK_RETURN) {
+            if (event.type == SDL_EVENT_KEY_DOWN) {
+                if (event.key.key == SDLK_RETURN) {
                     if (_typeMsg == TY_MB_YES_NO) {
                         ButCmdClicked(ID_BT_YES);
                     } else {
@@ -154,7 +154,7 @@ int MesgBoxGfx::Show(SDL_Surface* pScene_background, LPCSTR lpsBut1Txt,
                     break;
                 }
             }
-            if (event.type == SDL_FINGERDOWN){
+            if (event.type == SDL_EVENT_FINGER_DOWN){
                 if (_p_BtButt1) {
                     _p_BtButt1->FingerDown(event);
                 }

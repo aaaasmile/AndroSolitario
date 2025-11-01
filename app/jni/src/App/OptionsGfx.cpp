@@ -315,20 +315,20 @@ LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
                 _terminated = true;
                 break;
             }
-            if (event.type == SDL_KEYDOWN) {
-                if (event.key.keysym.sym == SDLK_RETURN) {
+            if (event.type == SDL_EVENT_KEY_DOWN) {
+                if (event.key.key == SDLK_RETURN) {
                     err = ButEndOPtClicked(MYIDOK);
                     if (err)
                         return err;
                     break;
-                } else if (event.key.keysym.sym == SDLK_ESCAPE) {
+                } else if (event.key.key == SDLK_ESCAPE) {
                     err = ButEndOPtClicked(MYIDCANCEL);
                     if (err)
                         return err;
                     break;
                 }
             }
-            if (event.type == SDL_FINGERDOWN){
+            if (event.type == SDL_EVENT_FINGER_DOWN){
                 _p_buttonOK->FingerDown(event);
                 _p_checkMusic->FingerDown(event);
                 _p_comboLang->FingerDown(event);

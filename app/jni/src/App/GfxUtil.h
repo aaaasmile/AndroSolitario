@@ -35,7 +35,7 @@ namespace GFX_UTIL {
     void DrawRect(SDL_Surface *screen, int x, int y, int dx, int dy,
                   SDL_Color c);
     void FillRect(SDL_Surface *screen, int x0, int y0, int width, int height,
-                  Uint32 color);
+                  SDL_Color color);
     LPErrInApp LoadCardPac(SDL_Surface **pp_Deck, DeckType &deckType,
                            Uint16 *pac_w, Uint16 *pac_h);
 };
