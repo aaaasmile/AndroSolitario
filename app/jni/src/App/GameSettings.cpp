@@ -29,14 +29,14 @@ LPGameSettings GAMESET::GetSettings() {
 }
 
 LPErrInApp GameSettings::LoadSettings() {
-    if (SettingsDir == "" || GameName == "") {
-        return ERR_UTIL::ErrorCreate(
-            "Setting dir for user settings is not defined");
+    LPErrInApp err = setSettingFileName();
+    if (err != NULL){
+        return err;
     }
-    setSettingFileName();
 
     TRACE("Load setting file %s\n", g_filepath);
-    SDL_RWops* src = SDL_RWFromFile(g_filepath, "rb");
+    //SDL_RWops* src = SDL_RWFromFile(g_filepath, "rb"); SDL 2
+    SDL_IOStream* src = SDL_IOFromFile(g_filepath, "rb"); 
     if (src == 0) {
         TRACE("No setting file found, no problem ignore it and use default\n");
         return NULL;
@@ -47,27 +47,32 @@ LPErrInApp GameSettings::LoadSettings() {
     uint8_t musEnabled;
     uint8_t backgroudType;
 
-    if (SDL_RWread(src, &deckId, 1, 1) == 0) {
+    //if (SDL_RWread(src, &deckId, 1, 1) == 0) { SDL 2
+    if (SDL_ReadIO(src, &deckId, 1) == 0){
         return ERR_UTIL::ErrorCreate(
             "SDL_RWread on setting file error (file %s): %s\n", g_filepath,
             SDL_GetError());
     }
-    if (SDL_RWread(src, &langId, 1, 1) == 0) {
+    //if (SDL_RWread(src, &langId, 1, 1) == 0) { SDL 2
+    if (SDL_ReadIO(src, &langId, 1) == 0) {
         return ERR_UTIL::ErrorCreate(
             "SDL_RWread on setting file error (file %s): %s\n", g_filepath,
             SDL_GetError());
     }
-    if (SDL_RWread(src, &musEnabled, 1, 1) == 0) {
+    //if (SDL_RWread(src, &musEnabled, 1, 1) == 0) { SDL 2
+    if (SDL_ReadIO(src, &musEnabled, 1) == 0) {
         return ERR_UTIL::ErrorCreate(
             "SDL_RWread on setting file error (file %s): %s\n", g_filepath,
             SDL_GetError());
     }
-    if (SDL_RWread(src, &backgroudType, 1, 1) == 0) {
+    //if (SDL_RWread(src, &backgroudType, 1, 1) == 0) { SDL 2
+    if (SDL_ReadIO(src, &backgroudType, 1) == 0) {
         return ERR_UTIL::ErrorCreate(
             "SDL_RWread on setting file error (file %s): %s\n", g_filepath,
             SDL_GetError());
     }
-    SDL_RWclose(src);
+    //SDL_RWclose(src); SDL 2
+    SDL_CloseIO(src);
 
     DeckTypeVal.SetTypeIndex(deckId);
     CurrentLanguage = (Languages::eLangId)langId;
@@ -76,16 +81,20 @@ LPErrInApp GameSettings::LoadSettings() {
     return NULL;
 }
 
-void GameSettings::setSettingFileName(void) {
-    snprintf(g_filepath, sizeof(g_filepath), "%s/%s.bin", SettingsDir.c_str(),
-             GameName.c_str());
-}
-
-LPErrInApp GameSettings::SaveSettings() {
+LPErrInApp GameSettings::setSettingFileName() {
     if (SettingsDir == "" || GameName == "") {
         return ERR_UTIL::ErrorCreate("User dir for setting is not defined");
     }
-    setSettingFileName();
+    snprintf(g_filepath, sizeof(g_filepath), "%s/%s.bin", SettingsDir.c_str(),
+             GameName.c_str());
+    return NULL;
+}
+
+LPErrInApp GameSettings::SaveSettings() {
+    LPErrInApp err = setSettingFileName();
+    if (err != NULL){
+        return err;
+    }
 
     TRACE("Save setting file %s\n", g_filepath);
     uint8_t deckId;
@@ -98,32 +107,38 @@ LPErrInApp GameSettings::SaveSettings() {
     musEnabled = (uint8_t)MusicEnabled;
     backgroudType = (uint8_t)BackgroundType;
 
-    SDL_RWops* dst = SDL_RWFromFile(g_filepath, "wb");
+    //SDL_RWops* dst = SDL_RWFromFile(g_filepath, "wb"); SDL 2
+    SDL_IOStream* dst = SDL_IOFromFile(g_filepath, "wb"); 
     if (dst == 0) {
         return ERR_UTIL::ErrorCreate("Unable to save setting file %s",
                                      g_filepath);
     }
-    int numWritten = SDL_RWwrite(dst, &deckId, 1, 1);
+    //int numWritten = SDL_RWwrite(dst, &deckId, 1, 1); SDL 2
+    int numWritten = SDL_WriteIO(dst, &deckId, 1);
     if (numWritten < 1) {
         return ERR_UTIL::ErrorCreate("SDL_RWwrite single byte %s\n",
                                      SDL_GetError());
     }
-    numWritten = SDL_RWwrite(dst, &langId, 1, 1);
+    //numWritten = SDL_RWwrite(dst, &langId, 1, 1); SDL 2
+    numWritten = SDL_WriteIO(dst, &langId, 1);
     if (numWritten < 1) {
         return ERR_UTIL::ErrorCreate("SDL_RWwrite single byte %s\n",
                                      SDL_GetError());
     }
-    numWritten = SDL_RWwrite(dst, &musEnabled, 1, 1);
+    //numWritten = SDL_RWwrite(dst, &musEnabled, 1, 1); SDL 2
+    numWritten = SDL_WriteIO(dst, &musEnabled, 1);
     if (numWritten < 1) {
         return ERR_UTIL::ErrorCreate("SDL_RWwrite single byte %s\n",
                                      SDL_GetError());
     }
-    numWritten = SDL_RWwrite(dst, &backgroudType, 1, 1);
+    //numWritten = SDL_RWwrite(dst, &backgroudType, 1, 1); SDL 2
+    numWritten = SDL_WriteIO(dst, &backgroudType, 1);
     if (numWritten < 1) {
         return ERR_UTIL::ErrorCreate("SDL_RWwrite single byte %s\n",
                                      SDL_GetError());
     }
-    SDL_RWclose(dst);
+    //SDL_RWclose(dst); SDL 2
+    SDL_CloseIO(dst);
     return NULL;
 }
 
