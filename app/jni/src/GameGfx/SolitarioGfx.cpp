@@ -923,10 +923,10 @@ LPErrInApp SolitarioGfx::newGame() {
 
 LPErrInApp SolitarioGfx::handleGameLoopKeyDownEvent(SDL_Event& event) {
     LPErrInApp err;
-    if (event.key.key == SDLK_n) {
+    if (event.key.key == SDLK_N) {
         _newgamerequest = true;
     }
-    if (event.key.key == SDLK_a) {
+    if (event.key.key == SDLK_A) {
         err = VictoryAnimation();
         if (err != NULL) {
             return err;
@@ -1038,8 +1038,10 @@ LPErrInApp SolitarioGfx::handleLeftMouseDown(SDL_Event& event) {
         }
         if (isInitDrag) {
             _startdrag = true;
-            SDL_ShowCursor(SDL_DISABLE);
-            SDL_SetWindowGrab(_p_Window, SDL_TRUE);
+            //SDL_ShowCursor(SDL_DISABLE); SDL 2
+            //SDL_SetWindowGrab(_p_Window, SDL_TRUE); SDL 2
+            SDL_HideCursor();
+            SDL_SetWindowMouseGrab(_p_Window, true);
         }
     } else if (srcReg->RegionTypeId() == RegionType::RT_DECKSTOCK) {
         if (srcReg->IsEmpty() && !IsRegionEmpty(DeckFaceUp)) {
@@ -1114,7 +1116,7 @@ LPErrInApp SolitarioGfx::handleRightMouseDown(SDL_Event& event) {
 
 void SolitarioGfx::handleGameLoopMouseMoveEvent(SDL_Event& event) {
     // TRACE_DEBUG("handleGameLoopMouseMoveEvent \n");
-    if (event.motion.state == SDL_BUTTON(1) && _startdrag) {
+    if (event.motion.state == SDL_BUTTON_MASK(1) && _startdrag) {
         DoDrag(event.motion.x, event.motion.y);
     }
     bool statusChanged = _p_BtNewGame->MouseMove(event);
@@ -1134,8 +1136,11 @@ LPErrInApp SolitarioGfx::handleGameLoopMouseUpEvent(SDL_Event& event) {
     if (_startdrag) {
         _startdrag = false;
         LPCardRegionGfx pDestReg = DoDrop();
-        SDL_ShowCursor(SDL_ENABLE);
-        SDL_SetWindowGrab(_p_Window, SDL_FALSE);
+        //SDL_ShowCursor(SDL_ENABLE);
+        //SDL_SetWindowGrab(_p_Window, SDL_FALSE); SDL 2
+        SDL_ShowCursor();
+        SDL_SetWindowMouseGrab(_p_Window, false);
+
         if (pDestReg->RegionTypeId() == RegionType::RT_ACE_FOUNDATION) {
             updateScoreOnAce(pDestReg->Size(), pDestReg->GetSavedSize());
         } else if (_dragPileInfo.pSrcRegion->RegionTypeId() ==
@@ -1288,7 +1293,7 @@ LPErrInApp SolitarioGfx::StartGameLoop() {
     while (!_terminated) {
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
-                case SDL_QUIT:
+                case SDL_EVENT_QUIT:
                     Fade(_p_Screen, _p_Screen, 1, 1, _p_sdlRenderer, NULL);
                     return NULL;
 
@@ -1305,23 +1310,23 @@ LPErrInApp SolitarioGfx::StartGameLoop() {
                     if (err != NULL)
                         return err;
                     break;
-                case SDL_FINGERUP:
+                case SDL_EVENT_FINGER_UP:
                     err = handleGameLoopFingerUpEvent(event);
                     if (err != NULL)
                         return err;
                     break;
 
-                case SDL_MOUSEBUTTONDOWN:
+                case SDL_EVENT_MOUSE_BUTTON_DOWN:
                     err = handleGameLoopMouseDownEvent(event);
                     if (err != NULL)
                         return err;
                     break;
 
-                case SDL_MOUSEMOTION:
+                case SDL_EVENT_MOUSE_MOTION:
                     handleGameLoopMouseMoveEvent(event);
                     break;
 
-                case SDL_MOUSEBUTTONUP:
+                case SDL_EVENT_MOUSE_BUTTON_UP:
                     err = handleGameLoopMouseUpEvent(event);
                     if (err != NULL)
                         return err;
@@ -1368,8 +1373,13 @@ int SolitarioGfx::showYesNoMsgBox(LPCSTR strText) {
     MsgBox.Initialize(&rctBox, _p_Screen, _p_FontSmallText,
                       MesgBoxGfx::TY_MB_YES_NO, _p_sdlRenderer);
     DrawStaticScene();
-    SDL_FillRect(_p_AlphaDisplay, &_p_AlphaDisplay->clip_rect,
-                 SDL_MapRGBA(_p_AlphaDisplay->format, 0, 0, 0, 0));
+    // SDL_FillRect(_p_AlphaDisplay, &_p_AlphaDisplay->clip_rect,
+    //              SDL_MapRGBA(_p_AlphaDisplay->format, 0, 0, 0, 0)); SDL 2
+    SDL_FillSurfaceRect(
+        _p_AlphaDisplay, NULL,
+        SDL_MapRGB(SDL_GetPixelFormatDetails(_p_AlphaDisplay->format),
+                   SDL_GetSurfacePalette(_p_AlphaDisplay), 0, 0, 0));
+
     SDL_BlitSurface(_p_Screen, NULL, _p_AlphaDisplay, NULL);
 
     STRING strTextYes = _p_Languages->GetStringId(Languages::ID_YES);
@@ -1398,8 +1408,13 @@ void SolitarioGfx::showOkMsgBox(LPCSTR strText) {
     MsgBox.Initialize(&rctBox, _p_Screen, _p_FontSmallText, MesgBoxGfx::TY_MBOK,
                       _p_sdlRenderer);
     DrawStaticScene();
-    SDL_FillRect(_p_AlphaDisplay, &_p_AlphaDisplay->clip_rect,
-                 SDL_MapRGBA(_p_AlphaDisplay->format, 0, 0, 0, 0));
+    // SDL_FillRect(_p_AlphaDisplay, &_p_AlphaDisplay->clip_rect,
+    //              SDL_MapRGBA(_p_AlphaDisplay->format, 0, 0, 0, 0)); SDL 2
+    SDL_FillSurfaceRect(
+        _p_AlphaDisplay, NULL,
+        SDL_MapRGB(SDL_GetPixelFormatDetails(_p_AlphaDisplay->format),
+                   SDL_GetSurfacePalette(_p_AlphaDisplay), 0, 0, 0));    
+
     SDL_BlitSurface(_p_Screen, NULL, _p_AlphaDisplay, NULL);
 
     STRING strTextOk = _p_Languages->GetStringId(Languages::ID_OK);
@@ -1467,7 +1482,11 @@ LPErrInApp SolitarioGfx::drawScore(SDL_Surface* pScreen) {
     rcs.w = tx + 190;
     rcs.y = ty - 2;
     rcs.h = ty + 46;
-    SDL_FillRect(_p_Screen, &rcs, SDL_MapRGBA(pScreen->format, 0, 0, 0, 0));
+    //SDL_FillRect(_p_Screen, &rcs, SDL_MapRGBA(pScreen->format, 0, 0, 0, 0)); SDL 2
+    SDL_FillSurfaceRect(
+        _p_Screen, &rcs,
+        SDL_MapRGB(SDL_GetPixelFormatDetails(_p_Screen->format),
+                   SDL_GetSurfacePalette(_p_Screen), 0, 0, 0));
 
     LPErrInApp err =
         GFX_UTIL::DrawString(pScreen, buff, tx, ty, colorText, _p_FontBigText);

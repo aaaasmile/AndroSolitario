@@ -168,7 +168,7 @@ LPErrInApp HighScore::Show(SDL_Surface* p_surf_screen, SDL_Surface* pSurfTitle,
         last_time = SDL_GetTicks();
 
         while (SDL_PollEvent(&event) > 0) {
-            if (event.type == SDL_QUIT) {
+            if (event.type == SDL_EVENT_QUIT) {
                 done = true;
             } else if (event.type == SDL_EVENT_KEY_DOWN) {
                 key = event.key.key;

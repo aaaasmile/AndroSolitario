@@ -311,7 +311,7 @@ LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
 
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_QUIT) {
+            if (event.type == SDL_EVENT_QUIT) {
                 _terminated = true;
                 break;
             }
@@ -335,7 +335,7 @@ LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
                 _p_comboBackground->FingerDown(event);
                 _p_comboDeck->FingerDown(event);
             }
-            if (event.type == SDL_MOUSEBUTTONUP) {
+            if (event.type == SDL_EVENT_MOUSE_BUTTON_UP) {
                 _p_buttonOK->MouseUp(event);
                 _p_comboLang->MouseUp(event);
                 _p_checkMusic->MouseUp(event);

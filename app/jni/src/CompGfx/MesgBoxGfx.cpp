@@ -162,10 +162,10 @@ int MesgBoxGfx::Show(SDL_Surface* pScene_background, LPCSTR lpsBut1Txt,
                     _p_BtButt2->FingerDown(event);
                 }
             }
-            if (event.type == SDL_MOUSEMOTION) {
+            if (event.type == SDL_EVENT_MOUSE_MOTION) {
                 // Not needed because mouse recognition is done on draw button
             }
-            if (event.type == SDL_MOUSEBUTTONUP) {
+            if (event.type == SDL_EVENT_MOUSE_BUTTON_UP) {
                 if (_p_BtButt1) {
                     _p_BtButt1->MouseUp(event);
                 }

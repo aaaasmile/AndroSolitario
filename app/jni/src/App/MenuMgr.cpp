@@ -463,7 +463,7 @@ LPErrInApp MenuMgr::HandleRootMenu() {
     bool ignoreMouseEvent =
         pGameSettings->InputType == InputTypeEnum::TouchWithoutMouse;
     while (SDL_PollEvent(&event)) {
-        if (event.type == SDL_QUIT) {
+        if (event.type == SDL_EVENT_QUIT) {
             (_menuDlgt.tc)->LeaveMenu(_menuDlgt.self);
             break;
         }
@@ -498,7 +498,7 @@ LPErrInApp MenuMgr::HandleRootMenu() {
                 (_menuDlgt.tc)->LeaveMenu(_menuDlgt.self);
             }
         }
-        if (event.type == SDL_MOUSEMOTION) {
+        if (event.type == SDL_EVENT_MOUSE_MOTION) {
             if (ignoreMouseEvent) {
                 break;
             }
@@ -512,7 +512,7 @@ LPErrInApp MenuMgr::HandleRootMenu() {
             }
             _p_homeUrl->MouseMove(event);
         }
-        if (event.type == SDL_MOUSEBUTTONDOWN) {
+        if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
             if (ignoreMouseEvent) {
                 break;
             }
@@ -520,7 +520,7 @@ LPErrInApp MenuMgr::HandleRootMenu() {
                 TRACE_DEBUG("Select menu from mouse down\n");
                 rootMenuNext();
             }
-        } else if (event.type == SDL_MOUSEBUTTONUP) {
+        } else if (event.type == SDL_EVENT_MOUSE_BUTTON_UP) {
             if (ignoreMouseEvent) {
                 break;
             }
