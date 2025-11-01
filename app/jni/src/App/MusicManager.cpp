@@ -45,7 +45,15 @@ void MusicManager::Initialize(bool musicEnabled) {
                 SDL_GetError());
 
     } else {
-        if (Mix_OpenAudio(44100, AUDIO_S16, 2, 1024) < 0) {
+        SDL_AudioSpec audio_spec;
+        audio_spec.freq = 44100;  // Sampling frequency in Hz
+        audio_spec.format =
+            SDL_AUDIO_S16LE;        // Sample format (16-bit signed integer)
+        audio_spec.channels = 2;  // Number of channels (Stereo)
+
+        // if (Mix_OpenAudio(44100, AUDIO_S16, 2, 1024) < 0) { SDL2
+        if (Mix_OpenAudio(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &audio_spec) <
+            0) {
             fprintf(stderr,
                     "\nWarning: I could not set up audio for 44100 Hz "
                     "16-bit stereo.\n"

@@ -25,15 +25,15 @@
 #include "OptionsGfx.h"
 #include "WinTypeGlobal.h"
 
-static const char *g_lpszHelpFileName = DATA_PREFIX "solitario.pdf";
+static const char* g_lpszHelpFileName = DATA_PREFIX "solitario.pdf";
 
-static const char *g_lpszIconProgFile = DATA_PREFIX "images/icona_asso.bmp";
-static const char *g_lpszTitleFile = DATA_PREFIX "images/title.png";
-static const char *g_lpszIniFontAriblk = DATA_PREFIX "font/ariblk.ttf";
-static const char *g_lpszIniFontVera = DATA_PREFIX "font/vera.ttf";
-static const char *g_lpszImageSplashComm =
+static const char* g_lpszIconProgFile = DATA_PREFIX "images/icona_asso.bmp";
+static const char* g_lpszTitleFile = DATA_PREFIX "images/title.png";
+static const char* g_lpszIniFontAriblk = DATA_PREFIX "font/ariblk.ttf";
+static const char* g_lpszIniFontVera = DATA_PREFIX "font/vera.ttf";
+static const char* g_lpszImageSplashComm =
     DATA_PREFIX "images/commessaggio.jpg";
-static const char *g_lpszImageSplashMantova = DATA_PREFIX "images/mantova.jpg";
+static const char* g_lpszImageSplashMantova = DATA_PREFIX "images/mantova.jpg";
 
 AppGfx::AppGfx() {
     _p_Window = NULL;
@@ -114,14 +114,20 @@ LPErrInApp AppGfx::Init() {
                                      strFileFontStatus.c_str(), SDL_GetError());
     }
 
-    const char *title = _Languages.GetCStringId(Languages::ID_SOLITARIO);
+    const char* title = _Languages.GetCStringId(Languages::ID_SOLITARIO);
     SDL_SetWindowTitle(_p_Window, title);
 
-    SDL_Surface *psIcon = SDL_LoadBMP(g_lpszIconProgFile);
+    SDL_Surface* psIcon = SDL_LoadBMP(g_lpszIconProgFile);
     if (psIcon == 0) {
         return ERR_UTIL::ErrorCreate("Icon not found");
     }
-    SDL_SetColorKey(psIcon, true, SDL_MapRGB(psIcon->format, 0, 128, 0));
+    // SDL_SetColorKey(psIcon, true, SDL_MapRGB(psIcon->format, 0, 128, 0));
+    // SDL2
+    SDL_SetSurfaceColorKey(
+        psIcon, true,
+        SDL_MapRGB(SDL_GetPixelFormatDetails(psIcon->format),
+                   SDL_GetSurfacePalette(psIcon), 0, 255, 0));
+
     SDL_SetWindowIcon(_p_Window, psIcon);
 
     _p_CreditTitle = IMG_Load(g_lpszTitleFile);
@@ -156,20 +162,34 @@ LPErrInApp AppGfx::loadSceneBackground() {
             return ERR_UTIL::ErrorCreate("Backgound Type %d not supported\n",
                                          _p_GameSettings->BackgroundType);
         }
-        SDL_RWops *srcBack = SDL_RWFromFile(strFileName.c_str(), "rb");
+        // SDL_RWops *srcBack = SDL_RWFromFile(strFileName.c_str(), "rb"); SDL2
+        SDL_IOStream* srcBack = SDL_IOFromFile(strFileName.c_str(), "rb");
+
         if (srcBack == 0) {
             return ERR_UTIL::ErrorCreate("Unable to load %s background image\n",
                                          strFileName.c_str());
         }
-        _p_SceneBackground = IMG_LoadJPG_RW(srcBack);
+        //_p_SceneBackground = IMG_LoadJPG_RW(srcBack); SDL 2
+        _p_SceneBackground = IMG_LoadTyped_IO(srcBack, true, "JPG");
         if (_p_SceneBackground == 0) {
             return ERR_UTIL::ErrorCreate("Unable to create splash");
         }
     } else {
-        _p_SceneBackground = SDL_CreateRGBSurface(SDL_SWSURFACE, _p_Screen->w,
-                                                  _p_Screen->h, 32, 0, 0, 0, 0);
-        SDL_FillRect(_p_SceneBackground, &_p_SceneBackground->clip_rect,
-                     SDL_MapRGBA(_p_SceneBackground->format, 0, 0, 0, 0));
+        // _p_SceneBackground = SDL_CreateRGBSurface(SDL_SWSURFACE,
+        // _p_Screen->w,
+        //                                           _p_Screen->h, 32, 0, 0, 0,
+        //                                           0); SDL 2
+        _p_SceneBackground = SDL_CreateSurface(_p_Screen->w, _p_Screen->h,
+                                               SDL_PIXELFORMAT_RGBA32);
+
+        // SDL_FillRect(_p_SceneBackground, &_p_SceneBackground->clip_rect,
+        //              SDL_MapRGBA(_p_SceneBackground->format, 0, 0, 0, 0)); SDL 2
+        SDL_Rect clipRect;  // SDL 3
+        SDL_GetSurfaceClipRect(_p_SceneBackground, &clipRect);
+        SDL_FillSurfaceRect(
+            _p_SceneBackground, &clipRect,
+            SDL_MapRGB(SDL_GetPixelFormatDetails(_p_SceneBackground->format),
+                       SDL_GetSurfacePalette(_p_SceneBackground), 0, 0, 0));
     }
 
     return NULL;
@@ -177,7 +197,8 @@ LPErrInApp AppGfx::loadSceneBackground() {
 
 LPErrInApp AppGfx::createWindow() {
     TRACE_DEBUG("createWindow\n");
-    int flagwin = 0;
+    //int flagwin = 0; SDL 2
+    SDL_WindowFlags flagwin;
     if (_p_Window != NULL) {
         _p_Window = NULL;
         SDL_DestroyWindow(_p_Window);
@@ -187,17 +208,22 @@ LPErrInApp AppGfx::createWindow() {
         _p_Screen = NULL;
     }
     if (_fullScreen) {
-        flagwin = SDL_WINDOW_FULLSCREEN_DESKTOP;
+        //flagwin = SDL_WINDOW_FULLSCREEN_DESKTOP; SDL 2
+        flagwin = SDL_WINDOW_FULLSCREEN;
     } else {
-        flagwin = SDL_WINDOW_SHOWN;
-    }
+         //flagwin = SDL_WINDOW_SHOWN; SDL 2
+         flagwin = SDL_WINDOW_MODAL;
+    } 
 #ifdef ANDROID
     flagwin = SDL_WINDOW_FULLSCREEN;
 #endif
 
+    // _p_Window = SDL_CreateWindow(
+    //     _p_GameSettings->GameName.c_str(), SDL_WINDOWPOS_UNDEFINED,
+    //     SDL_WINDOWPOS_UNDEFINED, _screenW, _screenH, flagwin); SDL 2
     _p_Window = SDL_CreateWindow(
-        _p_GameSettings->GameName.c_str(), SDL_WINDOWPOS_UNDEFINED,
-        SDL_WINDOWPOS_UNDEFINED, _screenW, _screenH, flagwin);
+        _p_GameSettings->GameName.c_str(), _screenW, _screenH, flagwin);
+
     if (_p_Window == NULL) {
         return ERR_UTIL::ErrorCreate("Error SDL_CreateWindow: %s\n",
                                      SDL_GetError());
@@ -207,21 +233,19 @@ LPErrInApp AppGfx::createWindow() {
     _screenW = _p_GameSettings->GetScreenWidth();
 
     _p_sdlRenderer =
-        SDL_CreateRenderer(_p_Window, -1, SDL_RENDERER_ACCELERATED);
+        //SDL_CreateRenderer(_p_Window, -1, SDL_RENDERER_ACCELERATED); SDL 2
+        SDL_CreateRenderer(_p_Window, NULL);
 
     if (_p_sdlRenderer == NULL) {
         return ERR_UTIL::ErrorCreate("Cannot create renderer: %s\n",
                                      SDL_GetError());
     }
-    // this is not magnify, but only changing the scale
-    // if (SDL_RenderSetLogicalSize(_p_sdlRenderer, 400, 900) < 0) {
-    //     return ERR_UTIL::ErrorCreate("RenderSetScale error: %s\n",
-    //                                  SDL_GetError());
-    // }
-    //TRACE_DEBUG("Render transformed \n");
+    
 
-    _p_Screen = SDL_CreateRGBSurface(0, _screenW, _screenH, 32, 0x00FF0000,
-                                     0x0000FF00, 0x000000FF, 0xFF000000);
+    // _p_Screen = SDL_CreateRGBSurface(0, _screenW, _screenH, 32, 0x00FF0000,
+    //                                  0x0000FF00, 0x000000FF, 0xFF000000); SDL 2
+    _p_Screen = SDL_CreateSurface(_screenW, _screenH, SDL_PIXELFORMAT_RGBA32);
+
     if (_p_Screen == NULL) {
         return ERR_UTIL::ErrorCreate("Error SDL_CreateRGBSurface: %s\n",
                                      SDL_GetError());
@@ -264,7 +288,8 @@ LPErrInApp AppGfx::startGameLoop() {
 
 void AppGfx::terminate() {
     writeProfile();
-    SDL_ShowCursor(SDL_ENABLE);
+    //SDL_ShowCursor(SDL_ENABLE);SDL2
+    SDL_ShowCursor();
 
     if (_p_Screen != NULL) {
         SDL_DestroySurface(_p_Screen);
@@ -315,34 +340,34 @@ LPErrInApp AppGfx::writeProfile() {
     return _p_GameSettings->SaveSettings();
 }
 
-TTF_Font *fncBind_GetFontVera(void *self) {
-    AppGfx *pApp = (AppGfx *)self;
+TTF_Font* fncBind_GetFontVera(void* self) {
+    AppGfx* pApp = (AppGfx*)self;
     return pApp->GetFontVera();
 }
 
-TTF_Font *fncBind_GetFontAriblk(void *self) {
-    AppGfx *pApp = (AppGfx *)self;
+TTF_Font* fncBind_GetFontAriblk(void* self) {
+    AppGfx* pApp = (AppGfx*)self;
     return pApp->GetFontAriblk();
 }
 
-Languages *fncBind_GetLanguageMan(void *self) {
-    AppGfx *pApp = (AppGfx *)self;
+Languages* fncBind_GetLanguageMan(void* self) {
+    AppGfx* pApp = (AppGfx*)self;
     return pApp->GetLanguageMan();
 }
 
-void fncBind_LeaveMenu(void *self) {
-    AppGfx *pApp = (AppGfx *)self;
+void fncBind_LeaveMenu(void* self) {
+    AppGfx* pApp = (AppGfx*)self;
     pApp->LeaveMenu();
 }
 
-void fncBind_SetNextMenu(void *self, MenuItemEnum menuItem) {
-    AppGfx *pApp = (AppGfx *)self;
+void fncBind_SetNextMenu(void* self, MenuItemEnum menuItem) {
+    AppGfx* pApp = (AppGfx*)self;
     pApp->SetNextMenu(menuItem);
 }
 
-LPErrInApp fncBind_SettingsChanged(void *self, bool backGroundChanged,
+LPErrInApp fncBind_SettingsChanged(void* self, bool backGroundChanged,
                                    bool languageChanged) {
-    AppGfx *pApp = (AppGfx *)self;
+    AppGfx* pApp = (AppGfx*)self;
     return pApp->SettingsChanged(backGroundChanged, languageChanged);
 }
 
@@ -375,8 +400,14 @@ LPErrInApp AppGfx::SettingsChanged(bool backGroundChanged,
 
 void AppGfx::clearBackground() {
     TRACE_DEBUG("Clear background\n");
-    SDL_FillRect(_p_Screen, &_p_Screen->clip_rect,
-                 SDL_MapRGBA(_p_Screen->format, 0, 0, 0, 0));
+    // SDL_FillRect(_p_Screen, &_p_Screen->clip_rect,
+    //              SDL_MapRGBA(_p_Screen->format, 0, 0, 0, 0)); SDL 2
+    SDL_Rect clipRect;  // SDL 3
+    SDL_GetSurfaceClipRect(_p_Screen, &clipRect);
+    SDL_FillSurfaceRect(
+        _p_Screen, &clipRect,
+        SDL_MapRGB(SDL_GetPixelFormatDetails(_p_Screen->format),
+                   SDL_GetSurfacePalette(_p_Screen), 0, 0, 0));
     updateScreenTexture();
 }
 
@@ -384,7 +415,7 @@ LPErrInApp AppGfx::MainLoop() {
     LPErrInApp err;
     bool quit = false;
 
-    MenuMgr *pMenuMgr = new MenuMgr();
+    MenuMgr* pMenuMgr = new MenuMgr();
     MenuDelegator delegator = prepMenuDelegator();
     err = pMenuMgr->Initialize(_p_Screen, _p_sdlRenderer, _p_Window, delegator);
     if (err != NULL)
@@ -462,7 +493,7 @@ error:
 }
 
 LPErrInApp AppGfx::showHelp() {
-    const char *cmd = NULL;
+    const char* cmd = NULL;
     char cmdpath[PATH_MAX];
 #ifdef WIN32
     cmd = "start";
@@ -483,7 +514,7 @@ LPErrInApp AppGfx::showHelp() {
 }
 
 LPErrInApp AppGfx::showHighScore() {
-    MusicManager *pMusicManager = NULL;
+    MusicManager* pMusicManager = NULL;
     if (_p_MusicManager->IsPlayingMusic()) {
         _p_MusicManager->StopMusic(600);
     }
@@ -541,7 +572,7 @@ void AppGfx::updateScreenTexture() {
     SDL_RenderPresent(_p_sdlRenderer);
 }
 
-void AppGfx::ParseCmdLine(int argc, char *argv[]) {
+void AppGfx::ParseCmdLine(int argc, char* argv[]) {
     for (int i = 1; i < argc; i++) {
         if (strcmp(argv[i], "--help") == 0 || strcmp(argv[i], "-h") == 0) {
             printf(
@@ -613,7 +644,7 @@ bool AppGfx::parseScreenSize(LPCSTR strInput) {
     char strBuffer[2048];
     memset(strBuffer, 0, 2048);
     char seps[] = " ,\t\n";
-    char *token;
+    char* token;
     VCT_STRING vct_String;
     bool bRet = false;
 
@@ -635,8 +666,8 @@ bool AppGfx::parseScreenSize(LPCSTR strInput) {
     return bRet;
 }
 
-void AppGfx::usage(int errOut, char *cmd) {
-    FILE *f;
+void AppGfx::usage(int errOut, char* cmd) {
+    FILE* f;
 
     if (errOut == 0)
         f = stdout;
