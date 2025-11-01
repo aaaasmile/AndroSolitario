@@ -16,7 +16,7 @@
 #include "WinTypeGlobal.h"
 
 static const char* g_lpszMsgUrl = "Go to invido.it";
-static const char* g_lpszVersion = "Ver 2.3.1 20241103";
+static const char* g_lpszVersion = "Ver 3.0.1 20251101";
 static const char* g_lpszIniFontVera = DATA_PREFIX "font/vera.ttf";
 
 static const SDL_Color g_color_on = {253, 252, 250};
@@ -95,7 +95,7 @@ typedef class MenuItemBoxes {
 
 static MenuItemBoxes g_MenuItemBoxes = MenuItemBoxes();
 
-constexpr const char* MenuItemEnumToString(MenuItemEnum e) {
+const char* MenuItemEnumToString(MenuItemEnum e) {
     switch (e) {
         case MenuItemEnum::MENU_GAME:
             return "MENU_GAME";
@@ -111,6 +111,8 @@ constexpr const char* MenuItemEnumToString(MenuItemEnum e) {
             return "QUIT";
         case MenuItemEnum::NOTHING:
             return "NOTHING";
+        case MenuItemEnum::MENU_ROOT:
+            return "MENU_ROOT";
         default:
             return "undef";
     }
@@ -155,18 +157,14 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
     _p_Screen = pScreen;
     _p_sdlRenderer = pRenderer;
     _p_Window = pWindow;
-    int sizeBigFactorH = 1;
-    int sizeBigFactorW = 1;
-    if (pGameSettings->NeedScreenMagnify()) {
-        sizeBigFactorH = 2;
-    }
-    if (_p_Screen->w > 1200) {
-        sizeBigFactorW = 2;
-    }
-
-    _screenW = _p_Screen->clip_rect.w;
+    
+    SDL_Rect clipRect;  // SDL 3
+    SDL_GetSurfaceClipRect(_p_Screen, &clipRect);
+    //_screenW = _p_Screen->clip_rect.w; SDL 2
+    _screenW = clipRect.w;
     _box_X = _screenW / 6;
-    _screenH = _p_Screen->clip_rect.h;
+    //_screenH = _p_Screen->clip_rect.h; // SDL 2
+    _screenH = clipRect.h;
     _box_Y = _screenH / 5;
 
     _rctPanelRedBox.w = _screenW - _box_X * 2;
@@ -188,8 +186,12 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
           _rctPanelRedBox.w, _rctPanelRedBox.h);
     g_MenuItemBoxes.SetBox(_rctPanelRedBox);
 
-    _p_ScreenBackbuffer = SDL_CreateRGBSurface(SDL_SWSURFACE, _p_Screen->w,
-                                               _p_Screen->h, 32, 0, 0, 0, 0);
+    // _p_ScreenBackbuffer = SDL_CreateRGBSurface(SDL_SWSURFACE, _p_Screen->w,
+    //                                            _p_Screen->h, 32, 0, 0, 0, 0);
+    //                                            SDL 2
+    _p_ScreenBackbuffer =
+        SDL_CreateSurface(_p_Screen->w, _p_Screen->h, SDL_PIXELFORMAT_RGBA32);
+
     _p_ScreenTexture = SDL_CreateTexture(pRenderer, SDL_PIXELFORMAT_ARGB8888,
                                          SDL_TEXTUREACCESS_STREAMING,
                                          _p_Screen->w, _p_Screen->h);
@@ -202,10 +204,17 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
     _p_fontVera = (_menuDlgt.tc)->GetFontVera(_menuDlgt.self);
     _p_Languages = (_menuDlgt.tc)->GetLanguageMan(_menuDlgt.self);
 
-    _p_MenuBox = SDL_CreateRGBSurface(SDL_SWSURFACE, _rctPanelRedBox.w,
-                                      _rctPanelRedBox.h, 32, 0, 0, 0, 0);
-    SDL_FillRect(_p_MenuBox, NULL,
-                 SDL_MapRGBA(_p_Screen->format, 136, 60, 60, 0));
+    // _p_MenuBox = SDL_CreateRGBSurface(SDL_SWSURFACE, _rctPanelRedBox.w,
+    //                                   _rctPanelRedBox.h, 32, 0, 0, 0, 0);
+    _p_MenuBox = SDL_CreateSurface(_rctPanelRedBox.w, _rctPanelRedBox.h,
+                                   SDL_PIXELFORMAT_RGBA32);
+    // SDL_FillRect(_p_MenuBox, NULL,
+    //              SDL_MapRGBA(_p_Screen->format, 136, 60, 60, 0)); SDL 2
+    SDL_FillSurfaceRect(
+        _p_MenuBox, NULL,
+        SDL_MapRGB(SDL_GetPixelFormatDetails(_p_MenuBox->format),
+                   SDL_GetSurfacePalette(_p_MenuBox), 136, 60, 60));
+
     SDL_SetSurfaceBlendMode(_p_MenuBox, SDL_BLENDMODE_BLEND);
     SDL_SetSurfaceAlphaMod(_p_MenuBox, 127);
 
@@ -255,8 +264,13 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
     _p_LabelVersion->SetState(LabelGfx::INVISIBLE);
     _p_LabelVersion->SetWindowText(g_lpszVersion);
 
-    SDL_FillRect(_p_ScreenBackbuffer, &_p_ScreenBackbuffer->clip_rect,
-                 SDL_MapRGBA(_p_ScreenBackbuffer->format, 60, 60, 60, 0));
+    // SDL_FillRect(_p_ScreenBackbuffer, &_p_ScreenBackbuffer->clip_rect,
+    //              SDL_MapRGBA(_p_ScreenBackbuffer->format, 60, 60, 60, 0)); SDL 2
+    SDL_GetSurfaceClipRect(_p_ScreenBackbuffer, &clipRect);
+    SDL_FillSurfaceRect(_p_ScreenBackbuffer, &clipRect,
+                        SDL_MapRGB(SDL_GetPixelFormatDetails(_p_ScreenBackbuffer->format),
+                                   SDL_GetSurfacePalette(_p_ScreenBackbuffer), 60, 60, 60));
+
     SDL_BlitSurface(_p_Screen, NULL, _p_ScreenBackbuffer, NULL);
 
     return NULL;
@@ -276,7 +290,9 @@ LPErrInApp MenuMgr::drawStaticScene() {
     SDL_BlitSurface(_p_SceneBackground, NULL, _p_ScreenBackbuffer, &rctTarget);
 
     Uint32 colorBarTitle =
-        SDL_MapRGB(_p_ScreenBackbuffer->format, 153, 202, 51);
+        //SDL_MapRGB(_p_ScreenBackbuffer->format, 153, 202, 51); SDL 2
+        SDL_MapRGB(SDL_GetPixelFormatDetails(_p_ScreenBackbuffer->format),
+                                   SDL_GetSurfacePalette(_p_ScreenBackbuffer), 153, 202, 51);
 
     // content
     GFX_UTIL::DrawStaticSpriteEx(_p_ScreenBackbuffer, 0, 0, _rctPanelRedBox.w,
@@ -446,7 +462,6 @@ LPErrInApp MenuMgr::HandleRootMenu() {
     _p_homeUrl->SetState(LabelLinkGfx::VISIBLE);
     _p_LabelVersion->SetState(LabelGfx::VISIBLE);
 
-    SDL_Color color = g_color_white;
     err = drawStaticScene();
     if (err != NULL) {
         return err;
@@ -502,7 +517,11 @@ LPErrInApp MenuMgr::HandleRootMenu() {
             if (ignoreMouseEvent) {
                 break;
             }
-            SDL_Point motionLocation = {event.motion.x, event.motion.y};
+            //SDL_Point motionLocation = {event.motion.x, event.motion.y}; SDL 2
+            SDL_Point motionLocation;
+            motionLocation.x = (int)event.motion.x;
+            motionLocation.y = (int)event.motion.y;
+
             MenuItemBox mouseInfoBox;
             if (g_MenuItemBoxes.IsPointInside(motionLocation, mouseInfoBox)) {
                 _focusedMenuItem = mouseInfoBox.MenuItem;

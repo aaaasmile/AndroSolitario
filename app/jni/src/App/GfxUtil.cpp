@@ -220,13 +220,10 @@ void GFX_UTIL::DrawRect(SDL_Surface* screen, int x, int y, int dx, int dy,
 }
 
 void GFX_UTIL::FillRect(SDL_Surface* screen, int x0, int y0, int width,
-                        int height, SDL_Color color) {
+                        int height, Uint32 color) {
     SDL_Rect rect = {x0, y0, width, height};
     // SDL_FillRect(screen, &rect, color);
-    SDL_FillSurfaceRect(
-        screen, NULL,
-        SDL_MapRGB(SDL_GetPixelFormatDetails(screen->format),
-                   SDL_GetSurfacePalette(screen), color.r, color.g, color.b));
+    SDL_FillSurfaceRect(screen, &rect, color);
 }
 
 LPErrInApp GFX_UTIL::LoadCardPac(SDL_Surface** pp_Deck, DeckType& deckType,
