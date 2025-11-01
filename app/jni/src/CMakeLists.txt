@@ -28,7 +28,6 @@ set(SOURCES GameGfx/CardRegionGfx.cpp
             App/OptionsGfx.cpp
             App/TraceService.cpp
             App/HighScore.cpp
-            App/WhereAmI.c
             CompGfx/LabelLinkGfx.cpp
             CompGfx/ButtonGfx.cpp
             CompGfx/CheckBoxGfx.cpp

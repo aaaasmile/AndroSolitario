@@ -42,7 +42,6 @@ LOCAL_SRC_FILES := $(APP_PATH)/Main.cpp \
             $(APP_PATH)/OptionsGfx.cpp \
             $(APP_PATH)/TraceService.cpp \
             $(APP_PATH)/HighScore.cpp \
-            $(APP_PATH)/WhereAmI.c \
             $(COMPGFX_PATH)/LabelLinkGfx.cpp \
             $(COMPGFX_PATH)/ButtonGfx.cpp \
             $(COMPGFX_PATH)/CheckBoxGfx.cpp \

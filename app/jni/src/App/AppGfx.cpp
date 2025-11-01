@@ -55,10 +55,10 @@ AppGfx::~AppGfx() { terminate(); }
 
 LPErrInApp AppGfx::Init() {
     TRACE("Init App\n");
-    LPCSTR exeDirPath = GAMESET::GetExeAppFolder();
-    TRACE("Exe directory is %s\n", exeDirPath);
     _p_GameSettings->GameName = "Solitario";
 #ifdef WIN32
+    LPCSTR exeDirPath = GAMESET::GetExeAppFolder();
+    TRACE("Exe directory is %s\n", exeDirPath);
     if (chdir(exeDirPath) < 0) {
         return ERR_UTIL::ErrorCreate("Unable to change to the exe directory");
     } else {

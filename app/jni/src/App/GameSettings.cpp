@@ -13,7 +13,6 @@
 #include <unistd.h>
 #endif
 
-#include "WhereAmI.h"
 #include "WinTypeGlobal.h"
 
 static LPGameSettings _p_GameSettings = NULL;
@@ -174,22 +173,11 @@ const char* GAMESET::GetExeAppFolder() {
         return _exeRootDir;
     }
 
-    int dirname_length;
-    int length = wai_getExecutablePath(NULL, 0, NULL);
-    char* path = (char*)malloc(length + 1);
-    wai_getExecutablePath(path, length, &dirname_length);
-    path[length] = '\0';
+    const char *path = SDL_GetBasePath();
 
     TRACE("Exe path: %s\n", path);
+    snprintf(_exeRootDir, sizeof(path), "%s", path);
 
-    std::string exeFolder = path;
-    std::replace(exeFolder.begin(), exeFolder.end(), '\\', '/');
-
-    size_t iPos = exeFolder.find_last_of('/');
-    exeFolder = exeFolder.substr(0, iPos);
-    snprintf(_exeRootDir, sizeof(_exeRootDir), "%s", exeFolder.c_str());
-
-    free(path);
     return _exeRootDir;
 }
 

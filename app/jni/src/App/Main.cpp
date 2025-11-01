@@ -3,7 +3,6 @@
 
 #include "AppGfx.h"
 #include "ErrorInfo.h"
-#include "WhereAmI.h"
 
 int main(int argc, char* argv[]) {
     TRACE("*** [Main] - start *** \n");

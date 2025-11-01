@@ -1,6 +1,6 @@
 #include "OptionsGfx.h"
 
-#include <SDL_endian.h>
+#include <SDL3/SDL_endian.h>
 #include <SDL3_image/SDL_image.h>
 
 #include "CompGfx/ButtonGfx.h"
@@ -100,10 +100,18 @@ LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
     _p_sdlRenderer = pRenderer;
     _p_languages = _menuDlgt.tc->GetLanguageMan(_menuDlgt.self);
 
-    _p_surfBar = SDL_CreateRGBSurface(SDL_SWSURFACE, _rctOptBox.w, _rctOptBox.h,
-                                      32, 0, 0, 0, 0);
-    SDL_FillRect(_p_surfBar, NULL,
-                 SDL_MapRGBA(pScreen->format, 10, 100, 10, 0));
+    // _p_surfBar = SDL_CreateRGBSurface(SDL_SWSURFACE, _rctOptBox.w,
+    // _rctOptBox.h,
+    //                                   32, 0, 0, 0, 0);
+    // SDL_FillRect(_p_surfBar, NULL,
+    //              SDL_MapRGBA(pScreen->format, 10, 100, 10, 0)); SDL 2
+    SDL_Surface* _p_surfBar =
+        SDL_CreateSurface(_rctOptBox.w, _rctOptBox.h, SDL_PIXELFORMAT_RGBA32);
+    SDL_FillSurfaceRect(
+        _p_surfBar, NULL,
+        SDL_MapRGB(SDL_GetPixelFormatDetails(pScreen->format),
+                   SDL_GetSurfacePalette(pScreen), 10, 100, 10));
+
     SDL_SetSurfaceBlendMode(_p_surfBar, SDL_BLENDMODE_BLEND);
     SDL_SetSurfaceAlphaMod(_p_surfBar, 200);
 
@@ -293,15 +301,25 @@ LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
         labelOffsetY = 40;
     }
 
-    SDL_Surface* pShadowSrf = SDL_CreateRGBSurface(
-        SDL_SWSURFACE, _p_screen->w, _p_screen->h, 32, 0, 0, 0, 0);
+    // SDL_Surface* pShadowSrf = SDL_CreateRGBSurface(
+    //     SDL_SWSURFACE, _p_screen->w, _p_screen->h, 32, 0, 0, 0, 0); SDL 2
+    SDL_Surface* pShadowSrf =
+        SDL_CreateSurface(_p_screen->w, _p_screen->h, SDL_PIXELFORMAT_RGBA32);
+
     SDL_Texture* pScreenTexture =
         SDL_CreateTextureFromSurface(_p_sdlRenderer, pShadowSrf);
     LPErrInApp err = NULL;
     while (!_terminated) {
         // center the background
-        SDL_FillRect(pShadowSrf, &pShadowSrf->clip_rect,
-                     SDL_MapRGBA(pShadowSrf->format, 0, 0, 0, 0));
+        // SDL_FillRect(pShadowSrf, &pShadowSrf->clip_rect,
+        //              SDL_MapRGBA(pShadowSrf->format, 0, 0, 0, 0)); SDL 2
+        SDL_Rect clipRect;  // SDL 3
+        SDL_GetSurfaceClipRect(pShadowSrf, &clipRect);
+        SDL_FillSurfaceRect(
+            pShadowSrf, &clipRect,
+            SDL_MapRGB(SDL_GetPixelFormatDetails(pShadowSrf->format),
+                       SDL_GetSurfacePalette(pShadowSrf), 0, 0, 0));
+
         SDL_Rect rctTarget;
         rctTarget.x = (pShadowSrf->w - pScene_background->w) / 2;
         rctTarget.y = (pShadowSrf->h - pScene_background->h) / 2;
@@ -328,7 +346,7 @@ LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
                     break;
                 }
             }
-            if (event.type == SDL_EVENT_FINGER_DOWN){
+            if (event.type == SDL_EVENT_FINGER_DOWN) {
                 _p_buttonOK->FingerDown(event);
                 _p_checkMusic->FingerDown(event);
                 _p_comboLang->FingerDown(event);
@@ -363,26 +381,33 @@ LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
 
         // header bar
         SDL_Rect rectHeader;
-        Uint32 colorHeader = SDL_MapRGB(_p_screen->format, 153, 202, 51);
+        Uint32
+            colorHeader =  // SDL_MapRGB(_p_screen->format, 153, 202, 51); SDL 2
+            SDL_MapRGB(SDL_GetPixelFormatDetails(_p_screen->format),
+                       SDL_GetSurfacePalette(_p_screen), 153, 202, 51);
         rectHeader.x = _rctOptBox.x + 1;
         rectHeader.y = _rctOptBox.y + 1;
         rectHeader.h = hbar;
         rectHeader.w = _rctOptBox.w - 1;
-        SDL_FillRect(pShadowSrf, &rectHeader, colorHeader);
+        // SDL_FillRect(pShadowSrf, &rectHeader, colorHeader); SDL 2
+        SDL_FillSurfaceRect(pShadowSrf, &rectHeader, colorHeader);
+
         GFX_UTIL::DrawStaticLine(
             pShadowSrf, rectHeader.x, rectHeader.y + rectHeader.h,
             rectHeader.x + rectHeader.w, rectHeader.y + rectHeader.h,
             GFX_UTIL_COLOR::White);
         // text header
-        GFX_UTIL::DrawString(pShadowSrf, _headerText.c_str(), rectHeader.x + captionOffsetX,
-                             rectHeader.y, GFX_UTIL_COLOR::White, _p_fontCtrl);
+        GFX_UTIL::DrawString(pShadowSrf, _headerText.c_str(),
+                             rectHeader.x + captionOffsetX, rectHeader.y,
+                             GFX_UTIL_COLOR::White, _p_fontCtrl);
 
         // Button OK
         _p_buttonOK->DrawButton(pShadowSrf);
 
         // Combo Language: Label and crontrol
         GFX_UTIL::DrawString(pShadowSrf, strSelectLanguage.c_str(),
-                             _p_comboLang->PosX(), _p_comboLang->PosY() - labelOffsetY,
+                             _p_comboLang->PosX(),
+                             _p_comboLang->PosY() - labelOffsetY,
                              GFX_UTIL_COLOR::Orange, _p_fontText);
 
         _p_comboLang->DrawButton(pShadowSrf);
@@ -399,7 +424,8 @@ LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
 
         // Combo Deck: Label and control
         GFX_UTIL::DrawString(pShadowSrf, strDeckSelectTitle.c_str(),
-                             _p_comboDeck->PosX(), _p_comboDeck->PosY() - labelOffsetY,
+                             _p_comboDeck->PosX(),
+                             _p_comboDeck->PosY() - labelOffsetY,
                              GFX_UTIL_COLOR::Orange, _p_fontText);
 
         _p_comboDeck->DrawButton(pShadowSrf);

@@ -77,14 +77,13 @@ void MusicManager::Initialize(bool musicEnabled) {
 }
 
 LPErrInApp MusicManager::LoadMusicRes() {
-    STRING exeDirPath = GAMESET::GetExeAppFolder();
-
     for (int i = 0; i < NUM_OF_SOUNDS; i++) {
         STRING strFileTmp2 = lpszaSound_filenames[i];
-#ifdef ANDROID
-        STRING strFileFullPath = strFileTmp2;
-#else
+#ifdef WIN32
+        STRING exeDirPath = GAMESET::GetExeAppFolder();
         STRING strFileFullPath = exeDirPath + '/' + strFileTmp2;
+#else
+        STRING strFileFullPath = strFileTmp2;
 #endif
         TRACE_DEBUG("Loading music part %s\n", strFileFullPath.c_str());
         _p_Musics[i] = Mix_LoadMUS(strFileFullPath.c_str());
