@@ -255,7 +255,8 @@ __android_log_print. Poi in un terminal si può usare logcat
     adb logcat -s "SoltarioIta"
 che funziona splendidamente. Per usare un file di log, come utilizzo in msys2, ci dovrebbero essere
 delle difficoltà nel creare il file di log (vedi https://www.gamedev.net/forums/topic/690641-android-ndk-logging-with-sdl/), anche se non l'ho provato.
-SDL_Log mi sembra, per ora, superfluo anche perché non so bene che cosa faccia.
+SDL_Log lo sto utilizzando nella versione WSL con un redirect della macro TRACE impostato sulle
+funzioni definite in  UnixsysTrace.cpp.
 
 ## Android.mk
 Per capire la sintassi di Andoid.mk ho usato il link ufficiale https://developer.android.com/ndk/guides/android_mk.
