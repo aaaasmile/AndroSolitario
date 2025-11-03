@@ -212,7 +212,7 @@ LPErrInApp AppGfx::createWindow() {
         flagwin = SDL_WINDOW_FULLSCREEN;
     } else {
          //flagwin = SDL_WINDOW_SHOWN; SDL 2
-         flagwin = SDL_WINDOW_MODAL;
+         flagwin = SDL_WINDOW_RESIZABLE;
     } 
 #ifdef ANDROID
     flagwin = SDL_WINDOW_FULLSCREEN;

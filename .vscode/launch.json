@@ -30,13 +30,13 @@
             ]
         },
         {
-            "name": "Debug Linux",
+            "name": "Debug WSL",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/src/solitario",
+            "program": "${workspaceFolder}/build/solitario",
             "args": [],
             "stopAtEntry": false,
-            "cwd": "${workspaceFolder}/build/src/",
+            "cwd": "${workspaceFolder}/build/",
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",

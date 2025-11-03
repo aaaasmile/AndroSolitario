@@ -89,6 +89,10 @@ Gli asset in WSL2 vanno piazzati in una directory data di build/bin, che è la d
 viene creato il solitario. Per questo task uso un cutom command in POST_BUILD definito nel 
 file CMakeList.
 
+## Debugger WSL
+In Visual Code seezionare "Debug WSL", settare un break point e far partire il debugger
+di Visual Code. Funziona immediatamente senza problemi.
+
 # Versione Per SDL 2.0
 Qui di seguito ho messo tutte le istruzioni che ho usato per compilare la versione Android con 
 SDL2.0.
