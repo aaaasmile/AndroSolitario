@@ -228,7 +228,10 @@ LPErrInApp AppGfx::createWindow() {
         return ERR_UTIL::ErrorCreate("Error SDL_CreateWindow: %s\n",
                                      SDL_GetError());
     }
-    _p_GameSettings->CalcDisplaySize();
+    LPErrInApp err = _p_GameSettings->CalcDisplaySize(_screenW, _screenH);
+    if (err != NULL){
+        return err;
+    }
     _screenH = _p_GameSettings->GetScreenHeight();
     _screenW = _p_GameSettings->GetScreenWidth();
 
