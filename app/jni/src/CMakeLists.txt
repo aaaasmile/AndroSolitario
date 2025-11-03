@@ -78,6 +78,13 @@ else()
             SDL3_ttf::SDL3_ttf
         )
         # Add any WSL2-specific configurations here
+        # Set a new output name and different postfixes for Debug/Release builds
+        set_target_properties(solitario PROPERTIES
+            OUTPUT_NAME "solitario"
+            DEBUG_POSTFIX ".debug"
+            RELEASE_POSTFIX ""
+            RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+        )
   else()
     message(STATUS "Target system is: " ${CMAKE_SYSTEM})
     target_compile_definitions(${PROJECT_NAME} PRIVATE TRACEINSERVICE _DEBUG)

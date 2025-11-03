@@ -45,12 +45,15 @@ riguarda il target Android.
     cd build
     cmake ../app/jni/ -DSDL_WAYLAND=OFF
     cmake --build .
-o alternativo senza cambiare la directory:
+o alternativo, molto meglio, senza cambiare la directory (-S è la source dir, -B è la build dir):
 
     rm -r -R build
     cmake -S app/jni/ -B build  -DSDL_WAYLAND=OFF
-    cd build
-    make
+    cmake --build build
+Una volta compilato:
+
+    cd build/bin/
+    ./solitario
 
 Problemi con la funzione random di std. Se uso
 
