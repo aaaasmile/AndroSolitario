@@ -79,19 +79,15 @@ supporta il formato it.
 Quando si cambia un file della configuarzione di SDL (il suo CMakeLists.txt) per escludere qualche libreria
 che non uso tipo wayland, devo poi ricostruire la directory build.
 
-    cd ..
-    rm -r -R build
-    mkdir build
-    cd build
-    cmake ../app/jni/ -DSDL_WAYLAND=OFF
-A me sembra che anche 
+Nota che il programma va a finire di dafult nella directory ./build/src. 
+Cambio la destinazione con set_target_properties in CMakeFiles.
+Gli asset li ho copiati con un post build command.
 
-    make clean
-faccia il suo dovere.
-
-Nota che il programma va a finire nella directory ./build/src ed lì dove ho poi messo le 
-risorse nella directory data. Gli asset li ho anche copiati nella directory asset_data_forwsl 
-(per esempio usando file explorer di windows).
+## Assets
+Gli Asset in Android sono piazzati in app/src/main.
+Gli asset in WSL2 vanno piazzati in una directory data di build/bin, che è la directory dove
+viene creato il solitario. Per questo task uso un cutom command in POST_BUILD definito nel 
+file CMakeList.
 
 # Versione Per SDL 2.0
 Qui di seguito ho messo tutte le istruzioni che ho usato per compilare la versione Android con 

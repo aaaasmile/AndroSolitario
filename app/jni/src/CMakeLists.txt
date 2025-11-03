@@ -85,6 +85,14 @@ else()
             RELEASE_POSTFIX ""
             RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
         )
+        # copy asset in build/bin
+        message(STATUS "Current source dir: ${CMAKE_CURRENT_SOURCE_DIR}")
+        add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+          COMMAND ${CMAKE_COMMAND} -E copy_directory
+              ${CMAKE_CURRENT_SOURCE_DIR}/../../src/main/assets/
+              $<TARGET_FILE_DIR:${PROJECT_NAME}>/data/
+          COMMENT "Copying assets directory to build directory"
+        )
   else()
     message(STATUS "Target system is: " ${CMAKE_SYSTEM})
     target_compile_definitions(${PROJECT_NAME} PRIVATE TRACEINSERVICE _DEBUG)
