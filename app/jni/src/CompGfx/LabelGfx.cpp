@@ -21,9 +21,17 @@ void LabelGfx::Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
     _rctCtrl = *pRect;
 
     // black bar surface
-    _p_Surf_Bar = SDL_CreateRGBSurface(SDL_SWSURFACE, _rctCtrl.w, _rctCtrl.h,
-                                       32, 0, 0, 0, 0);
-    SDL_FillRect(_p_Surf_Bar, NULL, SDL_MapRGBA(pScreen->format, 255, 0, 0, 0));
+    // _p_Surf_Bar = SDL_CreateRGBSurface(SDL_SWSURFACE, _rctCtrl.w, _rctCtrl.h,
+    //                                    32, 0, 0, 0, 0);
+    _p_Surf_Bar =
+        SDL_CreateSurface(_rctCtrl.w, _rctCtrl.h, SDL_PIXELFORMAT_RGBA32);                            
+
+    //SDL_FillRect(_p_Surf_Bar, NULL, SDL_MapRGBA(pScreen->format, 255, 0, 0, 0));
+    SDL_FillSurfaceRect(
+        _p_Surf_Bar, NULL,
+        SDL_MapRGB(SDL_GetPixelFormatDetails(_p_Surf_Bar->format),
+                   SDL_GetSurfacePalette(_p_Surf_Bar), 255, 0, 0));
+
     SDL_SetSurfaceBlendMode(_p_Surf_Bar, SDL_BLENDMODE_BLEND);
     SDL_SetSurfaceAlphaMod(_p_Surf_Bar, 127);
     _p_FontText = pFont;

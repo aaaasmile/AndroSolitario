@@ -61,24 +61,48 @@ void ComboGfx::Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
     _rctBoxDown.w = boxIncW;
     _rctBoxDown.h = boxIncH;
 
-    _p_surfBar = SDL_CreateRGBSurface(SDL_SWSURFACE, _rctCtrl.w, _rctCtrl.h, 32,
-                                      0, 0, 0, 0);
-    SDL_FillRect(_p_surfBar, NULL,
-                 SDL_MapRGBA(pScreen->format, 255, 128, 30, 0));
+    //_p_surfBar = SDL_CreateRGBSurface(SDL_SWSURFACE, _rctCtrl.w, _rctCtrl.h, 32,
+    //                                  0, 0, 0, 0); SDL 2
+    _p_surfBar =
+        SDL_CreateSurface(_rctCtrl.w, _rctCtrl.h, SDL_PIXELFORMAT_RGBA32);
+
+    // SDL_FillRect(_p_surfBar, NULL,
+    //              SDL_MapRGBA(pScreen->format, 255, 128, 30, 0));
+    SDL_FillSurfaceRect(
+        _p_surfBar, NULL,
+        SDL_MapRGB(SDL_GetPixelFormatDetails(_p_surfBar->format),
+                   SDL_GetSurfacePalette(_p_surfBar), 255, 128, 30));
+
     SDL_SetSurfaceBlendMode(_p_surfBar, SDL_BLENDMODE_BLEND);
     SDL_SetSurfaceAlphaMod(_p_surfBar, 127);
 
-    _p_surfBoxSel = SDL_CreateRGBSurface(SDL_SWSURFACE, _rctBoxUp.w,
-                                         _rctBoxUp.h, 32, 0, 0, 0, 0);
-    SDL_FillRect(_p_surfBoxSel, NULL,
-                 SDL_MapRGBA(pScreen->format, 200, 200, 130, 0));
+    // _p_surfBoxSel = SDL_CreateRGBSurface(SDL_SWSURFACE, _rctBoxUp.w,
+    //                                      _rctBoxUp.h, 32, 0, 0, 0, 0); SDL 2
+    _p_surfBoxSel =
+        SDL_CreateSurface(_rctBoxUp.w, _rctBoxUp.h, SDL_PIXELFORMAT_RGBA32);
+
+    // SDL_FillRect(_p_surfBoxSel, NULL,
+    //              SDL_MapRGBA(pScreen->format, 200, 200, 130, 0)); SDL 2
+    SDL_FillSurfaceRect(
+        _p_surfBoxSel, NULL,
+        SDL_MapRGB(SDL_GetPixelFormatDetails(_p_surfBoxSel->format),
+                   SDL_GetSurfacePalette(_p_surfBoxSel), 200, 200, 130));
+
     SDL_SetSurfaceBlendMode(_p_surfBoxSel, SDL_BLENDMODE_BLEND);
     SDL_SetSurfaceAlphaMod(_p_surfBoxSel, 127);
 
-    _p_surfBoxUNSel = SDL_CreateRGBSurface(SDL_SWSURFACE, _rctBoxUp.w,
-                                           _rctBoxUp.h, 32, 0, 0, 0, 0);
-    SDL_FillRect(_p_surfBoxUNSel, NULL,
-                 SDL_MapRGBA(pScreen->format, 255, 128, 30, 0));
+    // _p_surfBoxUNSel = SDL_CreateRGBSurface(SDL_SWSURFACE, _rctBoxUp.w,
+    //                                        _rctBoxUp.h, 32, 0, 0, 0, 0);
+    _p_surfBoxUNSel =
+        SDL_CreateSurface(_rctBoxUp.w, _rctBoxUp.h, SDL_PIXELFORMAT_RGBA32);
+
+    // SDL_FillRect(_p_surfBoxUNSel, NULL,
+    //              SDL_MapRGBA(pScreen->format, 255, 128, 30, 0));
+    SDL_FillSurfaceRect(
+        _p_surfBoxUNSel, NULL,
+        SDL_MapRGB(SDL_GetPixelFormatDetails(_p_surfBoxUNSel->format),
+                   SDL_GetSurfacePalette(_p_surfBoxUNSel), 255, 128, 30));
+
     SDL_SetSurfaceBlendMode(_p_surfBoxUNSel, SDL_BLENDMODE_BLEND);
     SDL_SetSurfaceAlphaMod(_p_surfBoxUNSel, 127);
 
@@ -208,7 +232,11 @@ void ComboGfx::DrawButton(SDL_Surface* pScreen) {
     bool downBoxSelected = false;
     if (_enabled) {
         int mx, my;
-        SDL_GetMouseState(&mx, &my);
+        float fmx, fmy;
+        SDL_GetMouseState(&fmx, &fmy);
+        mx = (int)fmx;
+        my = (int)fmy;
+        
         if (mx >= _rctBoxUp.x && mx <= _rctBoxUp.x + _rctBoxUp.w &&
             my >= _rctBoxUp.y && my <= _rctBoxUp.y + _rctBoxUp.h) {
             upBoxSelected = true;

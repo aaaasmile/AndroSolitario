@@ -1,8 +1,8 @@
 #include "MesgBoxGfx.h"
 
 #include "ButtonGfx.h"
-#include "GfxUtil.h"
 #include "GameSettings.h"
+#include "GfxUtil.h"
 
 MesgBoxGfx::MesgBoxGfx(void) {
     _p_Screen = 0;
@@ -35,10 +35,18 @@ LPErrInApp MesgBoxGfx::Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
     _typeMsg = eval;
     _p_sdlRenderer = pRenderer;
 
-    _p_Surf_Bar = SDL_CreateRGBSurface(SDL_SWSURFACE, _rctMsgBox.w,
-                                       _rctMsgBox.h, 32, 0, 0, 0, 0);
-    SDL_FillRect(_p_Surf_Bar, NULL,
-                 SDL_MapRGBA(pScreen->format, 30, 80, 157, 0));
+    // _p_Surf_Bar = SDL_CreateRGBSurface(SDL_SWSURFACE, _rctMsgBox.w,
+    //                                    _rctMsgBox.h, 32, 0, 0, 0, 0);
+    _p_Surf_Bar =
+        SDL_CreateSurface(_rctMsgBox.w, _rctMsgBox.h, SDL_PIXELFORMAT_RGBA32);
+
+    // SDL_FillRect(_p_Surf_Bar, NULL,
+    //              SDL_MapRGBA(pScreen->format, 30, 80, 157, 0));
+    SDL_FillSurfaceRect(
+        _p_Surf_Bar, NULL,
+        SDL_MapRGB(SDL_GetPixelFormatDetails(_p_Surf_Bar->format),
+                   SDL_GetSurfacePalette(_p_Surf_Bar), 30, 80, 157));
+
     SDL_SetSurfaceBlendMode(_p_Surf_Bar, SDL_BLENDMODE_BLEND);
     SDL_SetSurfaceAlphaMod(_p_Surf_Bar, _alpha);
 
@@ -134,8 +142,11 @@ int MesgBoxGfx::Show(SDL_Surface* pScene_background, LPCSTR lpsBut1Txt,
         _p_BtButt2->SetButtonText(lpsBut2Txt);
         _p_BtButt2->SetVisibleState(ButtonGfx::VISIBLE);
     }
-    SDL_Surface* pShadowSrf = SDL_CreateRGBSurface(
-        SDL_SWSURFACE, _p_Screen->w, _p_Screen->h, 32, 0, 0, 0, 0);
+    // SDL_Surface* pShadowSrf = SDL_CreateRGBSurface(
+    //     SDL_SWSURFACE, _p_Screen->w, _p_Screen->h, 32, 0, 0, 0, 0);
+    SDL_Surface* pShadowSrf =
+        SDL_CreateSurface(_rctMsgBox.w, _rctMsgBox.h, SDL_PIXELFORMAT_RGBA32);
+
     SDL_Texture* pScreenTexture =
         SDL_CreateTextureFromSurface(_p_sdlRenderer, pShadowSrf);
 
@@ -154,7 +165,7 @@ int MesgBoxGfx::Show(SDL_Surface* pScene_background, LPCSTR lpsBut1Txt,
                     break;
                 }
             }
-            if (event.type == SDL_EVENT_FINGER_DOWN){
+            if (event.type == SDL_EVENT_FINGER_DOWN) {
                 if (_p_BtButt1) {
                     _p_BtButt1->FingerDown(event);
                 }
@@ -189,7 +200,7 @@ int MesgBoxGfx::Show(SDL_Surface* pScene_background, LPCSTR lpsBut1Txt,
             // draw text lines
             for (int i = 0; i < _dataStrings.size(); i++) {
                 STRING strText = _dataStrings[i];
-                //TTF_SizeText(_p_FontText, strText.c_str(), &tx, &ty); SDL 2
+                // TTF_SizeText(_p_FontText, strText.c_str(), &tx, &ty); SDL 2
                 TTF_GetStringSize(_p_FontText, strText.c_str(), 0, &tx, &ty);
 
                 iXOffSet = (_rctMsgBox.w - tx) / 2;
@@ -201,7 +212,7 @@ int MesgBoxGfx::Show(SDL_Surface* pScene_background, LPCSTR lpsBut1Txt,
             }
         } else {
             // draw only a line in the middle
-            //TTF_SizeText(_p_FontText, _strMsgText.c_str(), &tx, &ty); SDL 2
+            // TTF_SizeText(_p_FontText, _strMsgText.c_str(), &tx, &ty); SDL 2
             TTF_GetStringSize(_p_FontText, _strMsgText.c_str(), 0, &tx, &ty);
 
             iXOffSet = (_rctMsgBox.w - tx) / 2;
@@ -237,7 +248,7 @@ int MesgBoxGfx::Show(SDL_Surface* pScene_background, LPCSTR lpsBut1Txt,
 
         SDL_BlitSurface(pShadowSrf, NULL, _p_Screen, NULL);
         SDL_UpdateTexture(pScreenTexture, NULL, _p_Screen->pixels,
-                          _p_Screen->pitch); 
+                          _p_Screen->pitch);
         SDL_RenderTexture(_p_sdlRenderer, pScreenTexture, NULL, NULL);
         SDL_RenderPresent(_p_sdlRenderer);
 
