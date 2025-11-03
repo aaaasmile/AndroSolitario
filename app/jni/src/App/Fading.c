@@ -116,12 +116,15 @@ void InstantFade(SDL_Surface* p_surf_screen) {
     dest.h = p_surf_screen->h;
     // SDL_Surface* pBlack = SDL_CreateRGBSurface(
     //     SDL_SWSURFACE, p_surf_screen->w, p_surf_screen->h, 32, 0, 0, 0, 0); SDL2
-    // SDL_FillRect(pBlack, &pBlack->clip_rect,
-    //              SDL_MapRGBA(pBlack->format, 0, 0, 0, 0)); SDL2
     SDL_Surface* pBlack = SDL_CreateSurface(p_surf_screen->w, p_surf_screen->h,
                                      SDL_PIXELFORMAT_RGBA32);
+                                     
+    // SDL_FillRect(pBlack, &pBlack->clip_rect,
+    //              SDL_MapRGBA(pBlack->format, 0, 0, 0, 0)); SDL2
+    SDL_Rect clipRect;  // SDL 3
+        SDL_GetSurfaceClipRect(pBlack, &clipRect);
     SDL_FillSurfaceRect(
-            pBlack, NULL,
+            pBlack, &clipRect,
             SDL_MapRGB(SDL_GetPixelFormatDetails(pBlack->format),
                        SDL_GetSurfacePalette(pBlack), 0, 0, 0));
 

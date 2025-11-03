@@ -35,8 +35,8 @@ void LabelLinkGfx::Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
     // 0)); SDL 2
     SDL_FillSurfaceRect(
         _p_SurfBar, NULL,
-        SDL_MapRGB(SDL_GetPixelFormatDetails(_p_SurfBar->format),
-                   SDL_GetSurfacePalette(_p_SurfBar), 255, 0, 0));
+        SDL_MapRGB(SDL_GetPixelFormatDetails(pScreen->format),
+                   SDL_GetSurfacePalette(pScreen), 255, 0, 0));
 
     SDL_SetSurfaceBlendMode(_p_SurfBar, SDL_BLENDMODE_BLEND);
     SDL_SetSurfaceAlphaMod(_p_SurfBar, 127);

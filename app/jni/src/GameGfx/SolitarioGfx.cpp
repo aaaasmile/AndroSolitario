@@ -1375,8 +1375,10 @@ int SolitarioGfx::showYesNoMsgBox(LPCSTR strText) {
     DrawStaticScene();
     // SDL_FillRect(_p_AlphaDisplay, &_p_AlphaDisplay->clip_rect,
     //              SDL_MapRGBA(_p_AlphaDisplay->format, 0, 0, 0, 0)); SDL 2
+    SDL_Rect clipRect;  // SDL 3
+    SDL_GetSurfaceClipRect(_p_AlphaDisplay, &clipRect);
     SDL_FillSurfaceRect(
-        _p_AlphaDisplay, NULL,
+        _p_AlphaDisplay, &clipRect,
         SDL_MapRGB(SDL_GetPixelFormatDetails(_p_AlphaDisplay->format),
                    SDL_GetSurfacePalette(_p_AlphaDisplay), 0, 0, 0));
 
@@ -1410,8 +1412,10 @@ void SolitarioGfx::showOkMsgBox(LPCSTR strText) {
     DrawStaticScene();
     // SDL_FillRect(_p_AlphaDisplay, &_p_AlphaDisplay->clip_rect,
     //              SDL_MapRGBA(_p_AlphaDisplay->format, 0, 0, 0, 0)); SDL 2
+    SDL_Rect clipRect;  // SDL 3
+    SDL_GetSurfaceClipRect(_p_AlphaDisplay, &clipRect);
     SDL_FillSurfaceRect(
-        _p_AlphaDisplay, NULL,
+        _p_AlphaDisplay, &clipRect,
         SDL_MapRGB(SDL_GetPixelFormatDetails(_p_AlphaDisplay->format),
                    SDL_GetSurfacePalette(_p_AlphaDisplay), 0, 0, 0));    
 

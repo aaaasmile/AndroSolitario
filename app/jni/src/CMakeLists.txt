@@ -57,7 +57,6 @@ if(CMAKE_SYSTEM MATCHES Windows)
 else()
   if(CMAKE_SYSTEM MATCHES ".*WSL2.*" OR CMAKE_SYSTEM MATCHES ".*microsoft.*")
         message(STATUS "Target system is WSL2: " ${CMAKE_SYSTEM})
-        # In your CMakeLists.txt
         set(CMAKE_CXX_STANDARD 11)
         set(CMAKE_CXX_STANDARD_REQUIRED ON)
         set(CMAKE_CXX_EXTENSIONS OFF)
@@ -68,7 +67,16 @@ else()
         target_compile_options(${PROJECT_NAME} PRIVATE -std=c++11)
         target_include_directories(${PROJECT_NAME} PRIVATE ../SDL/include ../SDL_image/include ../SDL_mixer/include ../SDL_ttf/include)
         target_compile_definitions(${PROJECT_NAME} PRIVATE TRACEINSERVICE _DEBUG WSL2_BUILD)
-        target_link_libraries(${PROJECT_NAME} SDL3 SDL3_image SDL3_mixer SDL3_ttf)
+        ## use SDL from this compiled project
+        set(SDL3_DIR "../../../build/SDL")
+        # not needed to set: SDL3_image_DIR SDL3_mixer_DIR SDL3_ttf_DIR and find_package for SDL3_image, SDL3_mixer and SDL3_ttf 
+        find_package(SDL3 REQUIRED)
+        target_link_libraries(${PROJECT_NAME}
+            SDL3::SDL3
+            SDL3_image::SDL3_image
+            SDL3_mixer::SDL3_mixer  
+            SDL3_ttf::SDL3_ttf
+        )
         # Add any WSL2-specific configurations here
   else()
     message(STATUS "Target system is: " ${CMAKE_SYSTEM})

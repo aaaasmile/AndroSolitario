@@ -103,10 +103,10 @@ LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
     // _p_surfBar = SDL_CreateRGBSurface(SDL_SWSURFACE, _rctOptBox.w,
     // _rctOptBox.h,
     //                                   32, 0, 0, 0, 0);
-    // SDL_FillRect(_p_surfBar, NULL,
-    //              SDL_MapRGBA(pScreen->format, 10, 100, 10, 0)); SDL 2
     SDL_Surface* _p_surfBar =
         SDL_CreateSurface(_rctOptBox.w, _rctOptBox.h, SDL_PIXELFORMAT_RGBA32);
+    // SDL_FillRect(_p_surfBar, NULL,
+    //              SDL_MapRGBA(pScreen->format, 10, 100, 10, 0)); SDL 2
     SDL_FillSurfaceRect(
         _p_surfBar, NULL,
         SDL_MapRGB(SDL_GetPixelFormatDetails(pScreen->format),

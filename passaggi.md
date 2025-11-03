@@ -40,12 +40,16 @@ prima di tutto su questo target.
 Uso CMake per compilare il target su WSL, mentre ndk con gradle (Android.mk) per quanto
 riguarda il target Android.
 
+    rm -r -R build
     mkdir build
     cd build
     cmake ../app/jni/ -DSDL_WAYLAND=OFF
     cmake --build .
-o alternativo
+o alternativo senza cambiare la directory:
 
+    rm -r -R build
+    cmake -S app/jni/ -B build  -DSDL_WAYLAND=OFF
+    cd build
     make
 
 Problemi con la funzione random di std. Se uso

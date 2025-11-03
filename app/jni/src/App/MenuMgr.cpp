@@ -212,8 +212,8 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
     //              SDL_MapRGBA(_p_Screen->format, 136, 60, 60, 0)); SDL 2
     SDL_FillSurfaceRect(
         _p_MenuBox, NULL,
-        SDL_MapRGB(SDL_GetPixelFormatDetails(_p_MenuBox->format),
-                   SDL_GetSurfacePalette(_p_MenuBox), 136, 60, 60));
+        SDL_MapRGB(SDL_GetPixelFormatDetails(_p_Screen->format),
+                   SDL_GetSurfacePalette(_p_Screen), 136, 60, 60));
 
     SDL_SetSurfaceBlendMode(_p_MenuBox, SDL_BLENDMODE_BLEND);
     SDL_SetSurfaceAlphaMod(_p_MenuBox, 127);

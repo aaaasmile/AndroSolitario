@@ -202,10 +202,8 @@ void credits(SDL_Surface* p_surf_screen, SDL_Surface* pSurfTitle,
 
         // SDL_FillRect(p_surf_screen, &dest, SDL_MapRGB(p_surf_screen->format,
         // 0, 0, 0));// SDL 2
-        SDL_Rect clipRect;  // SDL 3
-        SDL_GetSurfaceClipRect(p_surf_screen, &clipRect);
         SDL_FillSurfaceRect(
-            p_surf_screen, &clipRect,
+            p_surf_screen, &dest,
             SDL_MapRGB(SDL_GetPixelFormatDetails(p_surf_screen->format),
                        SDL_GetSurfacePalette(p_surf_screen), 0, 0, 0));
         scroll++;
@@ -285,10 +283,8 @@ static void draw_text(char const* str, int scroll, SDL_Surface* screen) {
                         dest.h = 3;
 
                         // SDL_FillRect(screen, &dest, SDL_MapRGB(screen->format, r, g, b));// SDL 2
-                        SDL_Rect clipRect;  // SDL 3
-                        SDL_GetSurfaceClipRect(screen, &clipRect);
                         SDL_FillSurfaceRect(
-                            screen, &clipRect,
+                            screen, &dest,
                             SDL_MapRGB(SDL_GetPixelFormatDetails(screen->format),
                                        SDL_GetSurfacePalette(screen), r, g, b));
                     }

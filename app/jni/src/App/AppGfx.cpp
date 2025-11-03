@@ -514,7 +514,6 @@ LPErrInApp AppGfx::showHelp() {
 }
 
 LPErrInApp AppGfx::showHighScore() {
-    MusicManager* pMusicManager = NULL;
     if (_p_MusicManager->IsPlayingMusic()) {
         _p_MusicManager->StopMusic(600);
     }
