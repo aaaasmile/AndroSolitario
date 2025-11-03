@@ -824,7 +824,10 @@ LPErrInApp SolitarioGfx::VictoryAnimation() {
 
 LPErrInApp SolitarioGfx::LoadCardPac() {
     Uint16 w, h;
-    GFX_UTIL::LoadCardPac(&_p_Deck, _deckType, &w, &h);
+    LPErrInApp err = GFX_UTIL::LoadCardPac(&_p_Deck, _deckType, &w, &h);
+    if (err != NULL) {
+        return err;
+    }
     TRACE("Pac size  w = %d, h = %d\n", w, h);
     g_CardWidth = w / 4;
     g_CardHeight = h / _deckType.GetNumCardInSuit();
@@ -1038,8 +1041,8 @@ LPErrInApp SolitarioGfx::handleLeftMouseDown(SDL_Event& event) {
         }
         if (isInitDrag) {
             _startdrag = true;
-            //SDL_ShowCursor(SDL_DISABLE); SDL 2
-            //SDL_SetWindowGrab(_p_Window, SDL_TRUE); SDL 2
+            // SDL_ShowCursor(SDL_DISABLE); SDL 2
+            // SDL_SetWindowGrab(_p_Window, SDL_TRUE); SDL 2
             SDL_HideCursor();
             SDL_SetWindowMouseGrab(_p_Window, true);
         }
@@ -1136,8 +1139,8 @@ LPErrInApp SolitarioGfx::handleGameLoopMouseUpEvent(SDL_Event& event) {
     if (_startdrag) {
         _startdrag = false;
         LPCardRegionGfx pDestReg = DoDrop();
-        //SDL_ShowCursor(SDL_ENABLE);
-        //SDL_SetWindowGrab(_p_Window, SDL_FALSE); SDL 2
+        // SDL_ShowCursor(SDL_ENABLE);
+        // SDL_SetWindowGrab(_p_Window, SDL_FALSE); SDL 2
         SDL_ShowCursor();
         SDL_SetWindowMouseGrab(_p_Window, false);
 
@@ -1417,7 +1420,7 @@ void SolitarioGfx::showOkMsgBox(LPCSTR strText) {
     SDL_FillSurfaceRect(
         _p_AlphaDisplay, &clipRect,
         SDL_MapRGB(SDL_GetPixelFormatDetails(_p_AlphaDisplay->format),
-                   SDL_GetSurfacePalette(_p_AlphaDisplay), 0, 0, 0));    
+                   SDL_GetSurfacePalette(_p_AlphaDisplay), 0, 0, 0));
 
     SDL_BlitSurface(_p_Screen, NULL, _p_AlphaDisplay, NULL);
 
@@ -1486,11 +1489,11 @@ LPErrInApp SolitarioGfx::drawScore(SDL_Surface* pScreen) {
     rcs.w = tx + 190;
     rcs.y = ty - 2;
     rcs.h = ty + 46;
-    //SDL_FillRect(_p_Screen, &rcs, SDL_MapRGBA(pScreen->format, 0, 0, 0, 0)); SDL 2
-    SDL_FillSurfaceRect(
-        _p_Screen, &rcs,
-        SDL_MapRGB(SDL_GetPixelFormatDetails(_p_Screen->format),
-                   SDL_GetSurfacePalette(_p_Screen), 0, 0, 0));
+    // SDL_FillRect(_p_Screen, &rcs, SDL_MapRGBA(pScreen->format, 0, 0, 0, 0));
+    // SDL 2
+    SDL_FillSurfaceRect(_p_Screen, &rcs,
+                        SDL_MapRGB(SDL_GetPixelFormatDetails(_p_Screen->format),
+                                   SDL_GetSurfacePalette(_p_Screen), 0, 0, 0));
 
     LPErrInApp err =
         GFX_UTIL::DrawString(pScreen, buff, tx, ty, colorText, _p_FontBigText);

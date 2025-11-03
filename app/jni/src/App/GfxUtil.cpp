@@ -247,7 +247,7 @@ LPErrInApp GFX_UTIL::LoadCardPac(SDL_Surface** pp_Deck, DeckType& deckType,
             strFileName.c_str(), SDL_GetError());
     }
     // SDL_RWread(src, description, 100, 1); SDL 2
-    SDL_ReadIO(src, description, 1);
+    SDL_ReadIO(src, description, 100);
     // timetag = SDL_ReadLE32(src); SDL 2
     SDL_ReadU32LE(src, &timetag);
     TRACE("Timetag is %d\n", timetag);
