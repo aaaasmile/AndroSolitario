@@ -189,7 +189,8 @@ int MesgBoxGfx::Show(SDL_Surface* pScene_background, LPCSTR lpsBut1Txt,
             // draw text lines
             for (int i = 0; i < _dataStrings.size(); i++) {
                 STRING strText = _dataStrings[i];
-                TTF_SizeText(_p_FontText, strText.c_str(), &tx, &ty);
+                //TTF_SizeText(_p_FontText, strText.c_str(), &tx, &ty); SDL 2
+                TTF_GetStringSize(_p_FontText, strText.c_str(), 0, &tx, &ty);
 
                 iXOffSet = (_rctMsgBox.w - tx) / 2;
                 iYOffset = i * ty + iEmptySpaceOn_Y + iYinitial;
@@ -200,7 +201,9 @@ int MesgBoxGfx::Show(SDL_Surface* pScene_background, LPCSTR lpsBut1Txt,
             }
         } else {
             // draw only a line in the middle
-            TTF_SizeText(_p_FontText, _strMsgText.c_str(), &tx, &ty);
+            //TTF_SizeText(_p_FontText, _strMsgText.c_str(), &tx, &ty); SDL 2
+            TTF_GetStringSize(_p_FontText, _strMsgText.c_str(), 0, &tx, &ty);
+
             iXOffSet = (_rctMsgBox.w - tx) / 2;
             if (iXOffSet < 0) {
                 iXOffSet = 1;

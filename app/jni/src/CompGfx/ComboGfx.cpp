@@ -239,7 +239,8 @@ void ComboGfx::DrawButton(SDL_Surface* pScreen) {
 
         // draw current selected text
         int tx, ty;
-        TTF_SizeText(_p_fontText, _buttonText.c_str(), &tx, &ty);
+        //TTF_SizeText(_p_fontText, _buttonText.c_str(), &tx, &ty); SDL 2
+        TTF_GetStringSize(_p_fontText, _buttonText.c_str(), 0, &tx, &ty);
         int xOffset = (_rctText.w - tx) / 2;
         if (xOffset < 0) {
             xOffset = 1;
@@ -251,7 +252,9 @@ void ComboGfx::DrawButton(SDL_Surface* pScreen) {
                              _p_fontText);
 
         // draw text upper box
-        TTF_SizeText(_p_fontText, LP_PLUS, &tx, &ty);
+        //TTF_SizeText(_p_fontText, LP_PLUS, &tx, &ty);
+        TTF_GetStringSize(_p_fontText, LP_PLUS, 0, &tx, &ty);
+
         xOffset = (_rctBoxUp.w - tx) / 2;
         if (xOffset < 0) {
             xOffset = 1;
@@ -269,7 +272,9 @@ void ComboGfx::DrawButton(SDL_Surface* pScreen) {
                              _rctBoxUp.y + yOffset, _color, _p_fontText);
 
         // draw text down box
-        TTF_SizeText(_p_fontText, LP_MINUS, &tx, &ty);
+        //TTF_SizeText(_p_fontText, LP_MINUS, &tx, &ty);
+        TTF_GetStringSize(_p_fontText, LP_MINUS, 0, &tx, &ty);
+
         xOffset = (_rctBoxDown.w - tx) / 2;
         if (xOffset < 0) {
             xOffset = 1;

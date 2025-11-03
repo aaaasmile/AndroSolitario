@@ -25,9 +25,19 @@ void LabelLinkGfx::Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
     _rctCtrl = *pRect;
 
     // black bar surface
-    _p_SurfBar = SDL_CreateRGBSurface(SDL_SWSURFACE, _rctCtrl.w, _rctCtrl.h, 32,
-                                      0, 0, 0, 0);
-    SDL_FillRect(_p_SurfBar, NULL, SDL_MapRGBA(pScreen->format, 255, 0, 0, 0));
+    // _p_SurfBar = SDL_CreateRGBSurface(SDL_SWSURFACE, _rctCtrl.w, _rctCtrl.h,
+    // 32,
+    //                                   0, 0, 0, 0); SDL 2
+    _p_SurfBar =
+        SDL_CreateSurface(_rctCtrl.w, _rctCtrl.h, SDL_PIXELFORMAT_RGBA32);
+
+    // SDL_FillRect(_p_SurfBar, NULL, SDL_MapRGBA(pScreen->format, 255, 0, 0,
+    // 0)); SDL 2
+    SDL_FillSurfaceRect(
+        _p_SurfBar, NULL,
+        SDL_MapRGB(SDL_GetPixelFormatDetails(_p_SurfBar->format),
+                   SDL_GetSurfacePalette(_p_SurfBar), 255, 0, 0));
+
     SDL_SetSurfaceBlendMode(_p_SurfBar, SDL_BLENDMODE_BLEND);
     SDL_SetSurfaceAlphaMod(_p_SurfBar, 127);
 
@@ -99,7 +109,10 @@ void LabelLinkGfx::Draw(SDL_Surface* pScreen) {
         if (_isEnabled) {
             // begin stuff mouse
             int mx, my;
-            SDL_GetMouseState(&mx, &my);
+            float fmx, fmy;
+            SDL_GetMouseState(&fmx, &fmy);
+            mx = (int)fmx;
+            my = (int)fmy;
             if (mx >= _rctCtrl.x && mx <= _rctCtrl.x + _rctCtrl.w &&
                 my >= _rctCtrl.y && my <= _rctCtrl.y + _rctCtrl.h) {
                 // mouse on button
@@ -110,7 +123,8 @@ void LabelLinkGfx::Draw(SDL_Surface* pScreen) {
             // end stuff mouse
 
             int tx, ty;
-            TTF_SizeText(_p_FontText, _ctrlText.c_str(), &tx, &ty);
+            // TTF_SizeText(_p_FontText, _ctrlText.c_str(), &tx, &ty); SDL2
+            TTF_GetStringSize(_p_FontText, _ctrlText.c_str(), 0, &tx, &ty);
             int iXOffSet = (_rctCtrl.w - tx) / 2;
             if (iXOffSet < 0) {
                 iXOffSet = 1;

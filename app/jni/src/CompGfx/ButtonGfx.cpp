@@ -28,10 +28,18 @@ void ButtonGfx::Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
     _fncbClickEvent = fncbClickEvent;
     _rctButton = *pRect;
 
-    _p_buttonSurface = SDL_CreateRGBSurface(SDL_SWSURFACE, _rctButton.w,
-                                            _rctButton.h, 32, 0, 0, 0, 0);
-    SDL_FillRect(_p_buttonSurface, NULL,
-                 SDL_MapRGBA(pScreen->format, 255, 0, 0, 0));
+    // _p_buttonSurface = SDL_CreateRGBSurface(SDL_SWSURFACE, _rctButton.w,
+    //                                         _rctButton.h, 32, 0, 0, 0, 0);
+    _p_buttonSurface =
+        SDL_CreateSurface(_rctButton.w, _rctButton.h, SDL_PIXELFORMAT_RGBA32);
+
+    // SDL_FillRect(_p_buttonSurface, NULL,
+    //              SDL_MapRGBA(pScreen->format, 255, 0, 0, 0)); SDL 2
+    SDL_FillSurfaceRect(
+        _p_buttonSurface, NULL,
+        SDL_MapRGB(SDL_GetPixelFormatDetails(_p_buttonSurface->format),
+                   SDL_GetSurfacePalette(_p_buttonSurface), 255, 0, 0));
+
     SDL_SetSurfaceBlendMode(_p_buttonSurface, SDL_BLENDMODE_BLEND);
     SDL_SetSurfaceAlphaMod(_p_buttonSurface, 127);
     _p_fontText = pFont;
@@ -97,7 +105,7 @@ bool ButtonGfx::MouseUp(SDL_Event& event) {
         return false;
     }
     if (_visibleState == VISIBLE && _enabled) {
-        SDL_Point pt = {event.motion.x, event.motion.y};
+        SDL_Point pt = {(int)event.motion.x, (int)event.motion.y};
         if (IsPointInsideButton(_rctButton, pt)) {
             if ((_fncbClickEvent.tc) != NULL)
                 (_fncbClickEvent.tc)->Click(_fncbClickEvent.self, _butID);
@@ -120,7 +128,10 @@ void ButtonGfx::DrawButton(SDL_Surface* pScreen) {
 
     int mx, my;
     SDL_Color colorText;
-    SDL_GetMouseState(&mx, &my);
+    float fmx, fmy;
+    SDL_GetMouseState(&fmx, &fmy);
+    mx = (int)fmx;
+    my = (int)fmy;
     SDL_Point pt = {mx, my};
     if (IsPointInsideButton(_rctButton, pt)) {
         colorText = GFX_UTIL_COLOR::Orange;
@@ -133,7 +144,9 @@ void ButtonGfx::DrawButton(SDL_Surface* pScreen) {
     GFX_UTIL::DrawStaticSpriteEx(pScreen, 0, 0, _rctButton.w, _rctButton.h,
                                  _rctButton.x, _rctButton.y, _p_buttonSurface);
     int tx, ty;
-    TTF_SizeText(_p_fontText, _buttonText.c_str(), &tx, &ty);
+    //TTF_SizeText(_p_fontText, _buttonText.c_str(), &tx, &ty); SDL 2
+    TTF_GetStringSize(_p_fontText, _buttonText.c_str(), 0, &tx, &ty);
+
     int iXOffSet = (_rctButton.w - tx) / 2;
     if (iXOffSet < 0) {
         iXOffSet = 1;
