@@ -167,15 +167,20 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
     _screenH = clipRect.h;
     _box_Y = _screenH / 5;
 
-    _rctPanelRedBox.w = _screenW - _box_X * 2;
-    _rctPanelRedBox.h = _screenH - _box_Y * 2;
-    _rctPanelRedBox.w = max(_rctPanelRedBox.w, 800);
-    _rctPanelRedBox.h = max(_rctPanelRedBox.h, 600);
-    if (_rctPanelRedBox.w > 1024) {
-        _rctPanelRedBox.w = 1024;
-    }
-    if (_rctPanelRedBox.h > 1200) {
-        _rctPanelRedBox.h = 1200;
+    if (_screenW == 1024 && _screenH == 768) {
+        _rctPanelRedBox.w = 500;
+        _rctPanelRedBox.h = 560;
+    } else {
+        _rctPanelRedBox.w = _screenW - _box_X * 2;
+        _rctPanelRedBox.h = _screenH - _box_Y * 2;
+        _rctPanelRedBox.w = max(_rctPanelRedBox.w, 800);
+        _rctPanelRedBox.h = max(_rctPanelRedBox.h, 600);
+        if (_rctPanelRedBox.w > 1024) {
+            _rctPanelRedBox.w = 1024;
+        }
+        if (_rctPanelRedBox.h > 1200) {
+            _rctPanelRedBox.h = 1200;
+        }
     }
 
     _rctPanelRedBox.x = (_screenW - _rctPanelRedBox.w) / 2;
@@ -212,10 +217,11 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
     //              SDL_MapRGBA(_p_Screen->format, 136, 60, 60, 0)); SDL 2
     SDL_FillSurfaceRect(_p_MenuBox, NULL,
                         SDL_MapRGB(SDL_GetPixelFormatDetails(_p_Screen->format),
-                                   NULL, 136, 60, 60));
+                                   NULL, 0, 0, 0));
 
     SDL_SetSurfaceBlendMode(_p_MenuBox, SDL_BLENDMODE_BLEND);
-    SDL_SetSurfaceAlphaMod(_p_MenuBox, 127);
+    // SDL_SetSurfaceAlphaMod(_p_MenuBox, 127);
+    SDL_SetSurfaceAlphaMod(_p_MenuBox, 120);
 
     // link to invido.it
     _p_fontVeraUnderscore =
