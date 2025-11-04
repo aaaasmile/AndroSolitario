@@ -103,8 +103,8 @@ LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
     // _p_surfBar = SDL_CreateRGBSurface(SDL_SWSURFACE, _rctOptBox.w,
     // _rctOptBox.h,
     //                                   32, 0, 0, 0, 0);
-    SDL_Surface* _p_surfBar = GFX_UTIL::SDL_CreateRGBSurface(
-        _rctOptBox.w, _rctOptBox.h, 32, 0, 0, 0, 0);
+    _p_surfBar = GFX_UTIL::SDL_CreateRGBSurface(_rctOptBox.w, _rctOptBox.h, 32,
+                                                0, 0, 0, 0);
     if (_p_surfBar == NULL) {
         return ERR_UTIL::ErrorCreate("_p_surfBar error: %s\n", SDL_GetError());
     }
@@ -112,11 +112,11 @@ LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
     //              SDL_MapRGBA(pScreen->format, 10, 100, 10, 0)); SDL 2
 
     SDL_FillSurfaceRect(_p_surfBar, NULL,
-                        SDL_MapRGBA(SDL_GetPixelFormatDetails(pScreen->format),
-                                    NULL, 10, 100, 10, 0));
+                        SDL_MapRGB(SDL_GetPixelFormatDetails(pScreen->format),
+                                   NULL, 10, 100, 10));
 
     SDL_SetSurfaceBlendMode(_p_surfBar, SDL_BLENDMODE_BLEND);
-    SDL_SetSurfaceAlphaMod(_p_surfBar, 200);
+    SDL_SetSurfaceAlphaMod(_p_surfBar, 180);
 
     SDL_Rect rctBt1;
     int iSpace2bt = 20;
@@ -365,7 +365,7 @@ LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
             }
         }
 
-        // the msg box
+        // the background of the option box
         GFX_UTIL::DrawStaticSpriteEx(pShadowSrf, 0, 0, _rctOptBox.w,
                                      _rctOptBox.h, _rctOptBox.x, _rctOptBox.y,
                                      _p_surfBar);
@@ -384,8 +384,7 @@ LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
 
         // header bar
         SDL_Rect rectHeader;
-        Uint32
-            colorHeader =  // SDL_MapRGB(_p_screen->format, 153, 202, 51); SDL 2
+        Uint32 colorHeader =  // SDL_MapRGB(_p_screen->format, 153, 202, 51); //SDL 2
             SDL_MapRGB(SDL_GetPixelFormatDetails(_p_screen->format), NULL, 153,
                        202, 51);
         rectHeader.x = _rctOptBox.x + 1;
