@@ -362,8 +362,14 @@ Qui ho rimosso i file ini della libreria ini. Uso un formato binario con SDL. [D
 - Rimosso il menu Guida in quanto non riesco a far partire la visualizzazione del pdf [DONE]
 
 ## Problemi SDL3 in WSL
-- Schermata del dialogo Opzioni è completamente traspararente anziché verde.
-- Schermata iniziale con i colori a palette fredda
+- Schermata del dialogo Opzioni è completamente traspararente anziché verde. [DONE]
+- Schermata iniziale con i colori a palette fredda. (problema con create surface mask) [DONE]
+- Shuffle mazzo non va (spostato la dichiarazione di include sotto quella di vector) [DONE]
+- Nel gioco il tasto escape non interrompe la musica
+- Nel gioco il bottone della musica non va bene nella posizione
+- Il font della message box è troppo piccolo
+- Il nome del giocatore deve essere cambiato con le opzioni. Come default può andare bene usare env, 
+ma non va settato nella funzione save high score.
 
 ## Mouse e Touch
 Una discussione interessante sull'argomento si trova su 
