@@ -370,6 +370,7 @@ Qui ho rimosso i file ini della libreria ini. Uso un formato binario con SDL. [D
 - Il font della message box è troppo piccolo
 - Il nome del giocatore deve essere cambiato con le opzioni. Come default può andare bene usare env, 
 ma non va settato nella funzione save high score.
+- Il bottone dello stop della musica va messo come icona.
 
 ## Mouse e Touch
 Una discussione interessante sull'argomento si trova su 
