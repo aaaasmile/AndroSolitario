@@ -39,7 +39,7 @@ LPErrInApp HighScore::Save() {
     TRACE("Save high score file %s\n", g_filepath);
 
     // SDL_RWops* dst = SDL_RWFromFile(g_filepath, "wb"); SDL 2
-    SDL_IOStream* dst = SDL_IOFromFile(g_filepath, "rb");
+    SDL_IOStream* dst = SDL_IOFromFile(g_filepath, "wb");
     if (dst == 0) {
         return ERR_UTIL::ErrorCreate("Unable to save high score file %s",
                                      g_filepath);
