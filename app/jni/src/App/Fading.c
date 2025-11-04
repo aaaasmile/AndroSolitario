@@ -51,8 +51,8 @@ void Fade(SDL_Surface* p_surf_screen, SDL_Surface* p_surf_img,
     //              SDL_MapRGB(p_surf_screen->format, 0, 0, 0)); //SDL 2
     SDL_FillSurfaceRect(
         p_surf_black, NULL,
-        SDL_MapRGB(SDL_GetPixelFormatDetails(p_surf_black->format),
-                   SDL_GetSurfacePalette(p_surf_black), 0, 0, 0));
+        SDL_MapRGB(SDL_GetPixelFormatDetails(p_surf_black->format), NULL, 0, 0,
+                   0));
 
     if (p_surf_screen == p_surf_img) {
         // if ((p_surf_screen_copy = SDL_CreateRGBSurface(
@@ -64,12 +64,11 @@ void Fade(SDL_Surface* p_surf_screen, SDL_Surface* p_surf_img,
         //     NULL) { //SDL 2
         p_surf_screen_copy = SDL_CreateRGBSurface(
             p_surf_screen->w, p_surf_screen->h,
-                SDL_GetPixelFormatDetails(p_surf_screen->format)
-                    ->bits_per_pixel,
-                SDL_GetPixelFormatDetails(p_surf_screen->format)->Rmask,
-                SDL_GetPixelFormatDetails(p_surf_screen->format)->Gmask,
-                SDL_GetPixelFormatDetails(p_surf_screen->format)->Bmask,
-                SDL_GetPixelFormatDetails(p_surf_screen->format)->Amask);
+            SDL_GetPixelFormatDetails(p_surf_screen->format)->bits_per_pixel,
+            SDL_GetPixelFormatDetails(p_surf_screen->format)->Rmask,
+            SDL_GetPixelFormatDetails(p_surf_screen->format)->Gmask,
+            SDL_GetPixelFormatDetails(p_surf_screen->format)->Bmask,
+            SDL_GetPixelFormatDetails(p_surf_screen->format)->Amask);
 
         if (p_surf_screen_copy == NULL) {
             fprintf(
@@ -147,9 +146,9 @@ void InstantFade(SDL_Surface* p_surf_screen) {
     //              SDL_MapRGBA(pBlack->format, 0, 0, 0, 0)); SDL2
     SDL_Rect clipRect;  // SDL 3
     SDL_GetSurfaceClipRect(pBlack, &clipRect);
-    SDL_FillSurfaceRect(pBlack, &clipRect,
-                        SDL_MapRGB(SDL_GetPixelFormatDetails(pBlack->format),
-                                   SDL_GetSurfacePalette(pBlack), 0, 0, 0));
+    SDL_FillSurfaceRect(
+        pBlack, &clipRect,
+        SDL_MapRGB(SDL_GetPixelFormatDetails(pBlack->format), NULL, 0, 0, 0));
 
     SDL_BlitSurface(pBlack, NULL, p_surf_screen, &dest);
 

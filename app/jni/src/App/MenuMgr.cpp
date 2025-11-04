@@ -210,10 +210,9 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
         _rctPanelRedBox.w, _rctPanelRedBox.h, 32, 0, 0, 0, 0);
     // SDL_FillRect(_p_MenuBox, NULL,
     //              SDL_MapRGBA(_p_Screen->format, 136, 60, 60, 0)); SDL 2
-    SDL_FillSurfaceRect(
-        _p_MenuBox, NULL,
-        SDL_MapRGB(SDL_GetPixelFormatDetails(_p_Screen->format),
-                   SDL_GetSurfacePalette(_p_Screen), 136, 60, 60));
+    SDL_FillSurfaceRect(_p_MenuBox, NULL,
+                        SDL_MapRGB(SDL_GetPixelFormatDetails(_p_Screen->format),
+                                   NULL, 136, 60, 60));
 
     SDL_SetSurfaceBlendMode(_p_MenuBox, SDL_BLENDMODE_BLEND);
     SDL_SetSurfaceAlphaMod(_p_MenuBox, 127);
@@ -271,7 +270,7 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
     SDL_FillSurfaceRect(
         _p_ScreenBackbuffer, &clipRect,
         SDL_MapRGBA(SDL_GetPixelFormatDetails(_p_ScreenBackbuffer->format),
-                    SDL_GetSurfacePalette(_p_ScreenBackbuffer), 60, 60, 60, 0));
+                    NULL, 60, 60, 60, 0));
 
     SDL_BlitSurface(_p_Screen, NULL, _p_ScreenBackbuffer, NULL);
 
@@ -293,8 +292,8 @@ LPErrInApp MenuMgr::drawStaticScene() {
 
     Uint32 colorBarTitle =
         // SDL_MapRGB(_p_ScreenBackbuffer->format, 153, 202, 51); SDL 2
-        SDL_MapRGB(SDL_GetPixelFormatDetails(_p_ScreenBackbuffer->format),
-                   SDL_GetSurfacePalette(_p_ScreenBackbuffer), 153, 202, 51);
+        SDL_MapRGB(SDL_GetPixelFormatDetails(_p_ScreenBackbuffer->format), NULL,
+                   153, 202, 51);
 
     // content
     GFX_UTIL::DrawStaticSpriteEx(_p_ScreenBackbuffer, 0, 0, _rctPanelRedBox.w,

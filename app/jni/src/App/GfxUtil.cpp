@@ -32,14 +32,13 @@ void GFX_UTIL::ScreenShade(SDL_Surface* surface, SDL_Rect* rect, float opacity,
         for (int x = rect->x; x < rect->x + rect->w; x++) {
             pixel = GetPixel(surface, x, y);
             // SDL_GetRGB(pixel, surface->format, &r, &g, &b); SDL2
-            SDL_GetRGB(pixel, SDL_GetPixelFormatDetails(surface->format),
-                       SDL_GetSurfacePalette(surface), &r, &g, &b);
+            SDL_GetRGB(pixel, SDL_GetPixelFormatDetails(surface->format), NULL,
+                       &r, &g, &b);
             r = (Uint8)((float)r * opacity);
             g = (Uint8)((float)g * opacity);
             b = (Uint8)((float)b * opacity);
-            Uint32 color =
-                SDL_MapRGBA(SDL_GetPixelFormatDetails(surface->format),
-                            SDL_GetSurfacePalette(surface), r, g, b, 255);
+            Uint32 color = SDL_MapRGBA(
+                SDL_GetPixelFormatDetails(surface->format), NULL, r, g, b, 255);
             // SetPixel(surface, x, y, SDL_MapRGBA(surface->format, r, g, b,
             // 255)); SDL 2
             SetPixel(surface, x, y, color);
@@ -64,8 +63,8 @@ void GFX_UTIL::rectangleRGBA(SDL_Surface* screen, int x1, int y1, int x2,
         bneedunlock = true;
 
     // color = SDL_MapRGBA(screen->format, r, g, b, a); SDL2
-    color = SDL_MapRGBA(SDL_GetPixelFormatDetails(screen->format),
-                        SDL_GetSurfacePalette(screen), r, g, b, a);
+    color = SDL_MapRGBA(SDL_GetPixelFormatDetails(screen->format), NULL, r, g,
+                        b, a);
 
     for (x = x1; x < x2; x++) {
         SetPixel(screen, x, y1, color);
@@ -92,8 +91,8 @@ void GFX_UTIL::boxRGBA(SDL_Surface* screen, int x1, int y1, int x2, int y2,
     if (SDL_LockSurface(screen) == 0)
         bneedunlock = true;
 
-    color = SDL_MapRGBA(SDL_GetPixelFormatDetails(screen->format),
-                        SDL_GetSurfacePalette(screen), r, g, b, a);
+    color = SDL_MapRGBA(SDL_GetPixelFormatDetails(screen->format), NULL, r, g,
+                        b, a);
 
     for (y = y1; y < y2; y++) {
         for (x = x1; x < x2; x++) {
@@ -204,9 +203,8 @@ void GFX_UTIL::DrawStaticLine(SDL_Surface* screen, int x0, int y0, int x1,
                 screen, x, y,
                 // SDL_MapRGBA(screen->format, color.r, color.g, color.b, 255));
                 // SDL2
-                SDL_MapRGB(SDL_GetPixelFormatDetails(screen->format),
-                           SDL_GetSurfacePalette(screen), color.r, color.g,
-                           color.b));
+                SDL_MapRGB(SDL_GetPixelFormatDetails(screen->format), NULL,
+                           color.r, color.g, color.b));
         }
     }
 }
@@ -287,9 +285,8 @@ LPErrInApp GFX_UTIL::LoadCardPac(SDL_Surface** pp_Deck, DeckType& deckType,
     //     // SDL 2
     SDL_SetSurfaceColorKey(
         *pp_Deck, true,
-        SDL_MapRGB(SDL_GetPixelFormatDetails((*pp_Deck)->format),
-                   SDL_GetSurfacePalette(*pp_Deck), red_trasp, green_trasp,
-                   blue_trasp));
+        SDL_MapRGB(SDL_GetPixelFormatDetails((*pp_Deck)->format), NULL,
+                   red_trasp, green_trasp, blue_trasp));
     *pac_h = h;
     *pac_w = w;
 

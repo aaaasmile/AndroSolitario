@@ -30,7 +30,7 @@ void LabelGfx::Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
     // 0));
     SDL_FillSurfaceRect(_p_Surf_Bar, NULL,
                         SDL_MapRGB(SDL_GetPixelFormatDetails(pScreen->format),
-                                   SDL_GetSurfacePalette(pScreen), 255, 0, 0));
+                                   NULL, 255, 0, 0));
 
     SDL_SetSurfaceBlendMode(_p_Surf_Bar, SDL_BLENDMODE_BLEND);
     SDL_SetSurfaceAlphaMod(_p_Surf_Bar, 127);

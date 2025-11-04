@@ -37,7 +37,7 @@ void ButtonGfx::Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
     //              SDL_MapRGBA(pScreen->format, 255, 0, 0, 0)); SDL 2
     SDL_FillSurfaceRect(_p_buttonSurface, NULL,
                         SDL_MapRGB(SDL_GetPixelFormatDetails(pScreen->format),
-                                   SDL_GetSurfacePalette(pScreen), 255, 0, 0));
+                                   NULL, 255, 0, 0));
 
     SDL_SetSurfaceBlendMode(_p_buttonSurface, SDL_BLENDMODE_BLEND);
     SDL_SetSurfaceAlphaMod(_p_buttonSurface, 127);

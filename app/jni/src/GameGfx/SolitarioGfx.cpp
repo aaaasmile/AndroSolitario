@@ -318,15 +318,15 @@ LPErrInApp SolitarioGfx::InitDrag(LPCardStackGfx pCargoStack, int x, int y,
     // 0)); //SDL2
     SDL_FillSurfaceRect(
         _p_Dragface, NULL,
-        SDL_MapRGB(SDL_GetPixelFormatDetails(_p_Dragface->format),
-                   SDL_GetSurfacePalette(_p_Dragface), 0, 255, 0));
+        SDL_MapRGB(SDL_GetPixelFormatDetails(_p_Dragface->format), NULL, 0, 255,
+                   0));
 
     // SDL_SetColorKey(_p_Dragface, true,
     //                 SDL_MapRGB(_p_Dragface->format, 0, 255, 0)); // SDL2
     SDL_SetSurfaceColorKey(
         _p_Dragface, true,
-        SDL_MapRGB(SDL_GetPixelFormatDetails(_p_Dragface->format),
-                   SDL_GetSurfacePalette(_p_Dragface), 0, 255, 0));
+        SDL_MapRGB(SDL_GetPixelFormatDetails(_p_Dragface->format), NULL, 0, 255,
+                   0));
 
     err = DrawCardStack(_p_Screen, &dragRegion);
     if (err != NULL) {
@@ -507,7 +507,7 @@ void SolitarioGfx::DrawStaticScene() {
     SDL_GetSurfaceClipRect(_p_Screen, &clipRect);
     SDL_FillSurfaceRect(_p_Screen, &clipRect,
                         SDL_MapRGB(SDL_GetPixelFormatDetails(_p_Screen->format),
-                                   SDL_GetSurfacePalette(_p_Screen), 0, 0, 0));
+                                   NULL, 0, 0, 0));
 
     SDL_Rect rctTarget;
     rctTarget.x = (_p_Screen->w - _p_SceneBackground->w) / 2;
@@ -537,7 +537,7 @@ void SolitarioGfx::DrawStaticScene() {
     SDL_FillSurfaceRect(
         _p_ScreenBackbufferDrag, &clipRect,
         SDL_MapRGB(SDL_GetPixelFormatDetails(_p_ScreenBackbufferDrag->format),
-                   SDL_GetSurfacePalette(_p_ScreenBackbufferDrag), 0, 0, 0));
+                   NULL, 0, 0, 0));
 
     SDL_BlitSurface(_p_Screen, NULL, _p_ScreenBackbufferDrag, NULL);
 
@@ -553,7 +553,7 @@ LPErrInApp SolitarioGfx::DrawInitialScene() {
     SDL_GetSurfaceClipRect(_p_Screen, &clipRect);
     SDL_FillSurfaceRect(_p_Screen, &clipRect,
                         SDL_MapRGB(SDL_GetPixelFormatDetails(_p_Screen->format),
-                                   SDL_GetSurfacePalette(_p_Screen), 0, 0, 0));
+                                   NULL, 0, 0, 0));
 
     SDL_Rect rctTarget;
     rctTarget.x = (_p_Screen->w - _p_SceneBackground->w) / 2;
@@ -885,8 +885,8 @@ LPErrInApp SolitarioGfx::LoadSymbolsForPac() {
     }
     SDL_SetSurfaceColorKey(
         _p_Symbols, true,
-        SDL_MapRGB(SDL_GetPixelFormatDetails(_p_Symbols->format),
-                   SDL_GetSurfacePalette(_p_Symbols), r, g, b));
+        SDL_MapRGB(SDL_GetPixelFormatDetails(_p_Symbols->format), NULL, r, g,
+                   b));
 
     g_SymbolWidth = _p_Symbols->w / 4;
     g_SymbolHeight = _p_Symbols->h;
@@ -1382,8 +1382,8 @@ int SolitarioGfx::showYesNoMsgBox(LPCSTR strText) {
     SDL_GetSurfaceClipRect(_p_AlphaDisplay, &clipRect);
     SDL_FillSurfaceRect(
         _p_AlphaDisplay, &clipRect,
-        SDL_MapRGB(SDL_GetPixelFormatDetails(_p_AlphaDisplay->format),
-                   SDL_GetSurfacePalette(_p_AlphaDisplay), 0, 0, 0));
+        SDL_MapRGB(SDL_GetPixelFormatDetails(_p_AlphaDisplay->format), NULL, 0,
+                   0, 0));
 
     SDL_BlitSurface(_p_Screen, NULL, _p_AlphaDisplay, NULL);
 
@@ -1419,8 +1419,8 @@ void SolitarioGfx::showOkMsgBox(LPCSTR strText) {
     SDL_GetSurfaceClipRect(_p_AlphaDisplay, &clipRect);
     SDL_FillSurfaceRect(
         _p_AlphaDisplay, &clipRect,
-        SDL_MapRGB(SDL_GetPixelFormatDetails(_p_AlphaDisplay->format),
-                   SDL_GetSurfacePalette(_p_AlphaDisplay), 0, 0, 0));
+        SDL_MapRGB(SDL_GetPixelFormatDetails(_p_AlphaDisplay->format), NULL, 0,
+                   0, 0));
 
     SDL_BlitSurface(_p_Screen, NULL, _p_AlphaDisplay, NULL);
 
@@ -1493,7 +1493,7 @@ LPErrInApp SolitarioGfx::drawScore(SDL_Surface* pScreen) {
     // SDL 2
     SDL_FillSurfaceRect(_p_Screen, &rcs,
                         SDL_MapRGB(SDL_GetPixelFormatDetails(_p_Screen->format),
-                                   SDL_GetSurfacePalette(_p_Screen), 0, 0, 0));
+                                   NULL, 0, 0, 0));
 
     LPErrInApp err =
         GFX_UTIL::DrawString(pScreen, buff, tx, ty, colorText, _p_FontBigText);

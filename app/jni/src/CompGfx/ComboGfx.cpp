@@ -69,10 +69,9 @@ void ComboGfx::Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
 
     // SDL_FillRect(_p_surfBar, NULL,
     //              SDL_MapRGBA(pScreen->format, 255, 128, 30, 0));
-    SDL_FillSurfaceRect(
-        _p_surfBar, NULL,
-        SDL_MapRGB(SDL_GetPixelFormatDetails(pScreen->format),
-                   SDL_GetSurfacePalette(pScreen), 255, 128, 30));
+    SDL_FillSurfaceRect(_p_surfBar, NULL,
+                        SDL_MapRGB(SDL_GetPixelFormatDetails(pScreen->format),
+                                   NULL, 255, 128, 30));
 
     SDL_SetSurfaceBlendMode(_p_surfBar, SDL_BLENDMODE_BLEND);
     SDL_SetSurfaceAlphaMod(_p_surfBar, 127);
@@ -84,10 +83,9 @@ void ComboGfx::Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
 
     // SDL_FillRect(_p_surfBoxSel, NULL,
     //              SDL_MapRGBA(pScreen->format, 200, 200, 130, 0)); SDL 2
-    SDL_FillSurfaceRect(
-        _p_surfBoxSel, NULL,
-        SDL_MapRGB(SDL_GetPixelFormatDetails(pScreen->format),
-                   SDL_GetSurfacePalette(pScreen), 200, 200, 130));
+    SDL_FillSurfaceRect(_p_surfBoxSel, NULL,
+                        SDL_MapRGB(SDL_GetPixelFormatDetails(pScreen->format),
+                                   NULL, 200, 200, 130));
 
     SDL_SetSurfaceBlendMode(_p_surfBoxSel, SDL_BLENDMODE_BLEND);
     SDL_SetSurfaceAlphaMod(_p_surfBoxSel, 127);
@@ -99,10 +97,9 @@ void ComboGfx::Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
 
     // SDL_FillRect(_p_surfBoxUNSel, NULL,
     //              SDL_MapRGBA(pScreen->format, 255, 128, 30, 0));
-    SDL_FillSurfaceRect(
-        _p_surfBoxUNSel, NULL,
-        SDL_MapRGB(SDL_GetPixelFormatDetails(pScreen->format),
-                   SDL_GetSurfacePalette(pScreen), 255, 128, 30));
+    SDL_FillSurfaceRect(_p_surfBoxUNSel, NULL,
+                        SDL_MapRGB(SDL_GetPixelFormatDetails(pScreen->format),
+                                   NULL, 255, 128, 30));
 
     SDL_SetSurfaceBlendMode(_p_surfBoxUNSel, SDL_BLENDMODE_BLEND);
     SDL_SetSurfaceAlphaMod(_p_surfBoxUNSel, 127);

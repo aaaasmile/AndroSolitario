@@ -42,10 +42,9 @@ LPErrInApp MesgBoxGfx::Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
 
     // SDL_FillRect(_p_Surf_Bar, NULL,
     //              SDL_MapRGBA(pScreen->format, 30, 80, 157, 0));
-    SDL_FillSurfaceRect(
-        _p_Surf_Bar, NULL,
-        SDL_MapRGB(SDL_GetPixelFormatDetails(pScreen->format),
-                   SDL_GetSurfacePalette(pScreen), 30, 80, 157));
+    SDL_FillSurfaceRect(_p_Surf_Bar, NULL,
+                        SDL_MapRGB(SDL_GetPixelFormatDetails(pScreen->format),
+                                   NULL, 30, 80, 157));
 
     SDL_SetSurfaceBlendMode(_p_Surf_Bar, SDL_BLENDMODE_BLEND);
     SDL_SetSurfaceAlphaMod(_p_Surf_Bar, _alpha);

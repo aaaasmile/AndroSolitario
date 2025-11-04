@@ -204,8 +204,8 @@ void credits(SDL_Surface* p_surf_screen, SDL_Surface* pSurfTitle,
         // 0, 0, 0));// SDL 2
         SDL_FillSurfaceRect(
             p_surf_screen, &dest,
-            SDL_MapRGB(SDL_GetPixelFormatDetails(p_surf_screen->format),
-                       SDL_GetSurfacePalette(p_surf_screen), 0, 0, 0));
+            SDL_MapRGB(SDL_GetPixelFormatDetails(p_surf_screen->format), NULL,
+                       0, 0, 0));
         scroll++;
 
         draw_text(credit_text[g_line], scroll, p_surf_screen);
@@ -282,11 +282,13 @@ static void draw_text(char const* str, int scroll, SDL_Surface* screen) {
                         dest.w = 3;
                         dest.h = 3;
 
-                        // SDL_FillRect(screen, &dest, SDL_MapRGB(screen->format, r, g, b));// SDL 2
+                        // SDL_FillRect(screen, &dest,
+                        // SDL_MapRGB(screen->format, r, g, b));// SDL 2
                         SDL_FillSurfaceRect(
                             screen, &dest,
-                            SDL_MapRGB(SDL_GetPixelFormatDetails(screen->format),
-                                       SDL_GetSurfacePalette(screen), r, g, b));
+                            SDL_MapRGB(
+                                SDL_GetPixelFormatDetails(screen->format), NULL,
+                                r, g, b));
                     }
                 }
             }

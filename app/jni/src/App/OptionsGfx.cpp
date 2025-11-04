@@ -111,10 +111,9 @@ LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
     // SDL_FillRect(_p_surfBar, NULL,
     //              SDL_MapRGBA(pScreen->format, 10, 100, 10, 0)); SDL 2
 
-    SDL_FillSurfaceRect(
-        _p_surfBar, NULL,
-        SDL_MapRGBA(SDL_GetPixelFormatDetails(pScreen->format),
-                    SDL_GetSurfacePalette(pScreen), 10, 100, 10, 0));
+    SDL_FillSurfaceRect(_p_surfBar, NULL,
+                        SDL_MapRGBA(SDL_GetPixelFormatDetails(pScreen->format),
+                                    NULL, 10, 100, 10, 0));
 
     SDL_SetSurfaceBlendMode(_p_surfBar, SDL_BLENDMODE_BLEND);
     SDL_SetSurfaceAlphaMod(_p_surfBar, 200);
@@ -321,8 +320,8 @@ LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
         SDL_GetSurfaceClipRect(pShadowSrf, &clipRect);
         SDL_FillSurfaceRect(
             pShadowSrf, &clipRect,
-            SDL_MapRGBA(SDL_GetPixelFormatDetails(pShadowSrf->format),
-                        SDL_GetSurfacePalette(pShadowSrf), 0, 0, 0, 0));
+            SDL_MapRGBA(SDL_GetPixelFormatDetails(pShadowSrf->format), NULL, 0,
+                        0, 0, 0));
 
         SDL_Rect rctTarget;
         rctTarget.x = (pShadowSrf->w - pScene_background->w) / 2;
@@ -387,8 +386,8 @@ LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
         SDL_Rect rectHeader;
         Uint32
             colorHeader =  // SDL_MapRGB(_p_screen->format, 153, 202, 51); SDL 2
-            SDL_MapRGB(SDL_GetPixelFormatDetails(_p_screen->format),
-                       SDL_GetSurfacePalette(_p_screen), 153, 202, 51);
+            SDL_MapRGB(SDL_GetPixelFormatDetails(_p_screen->format), NULL, 153,
+                       202, 51);
         rectHeader.x = _rctOptBox.x + 1;
         rectHeader.y = _rctOptBox.y + 1;
         rectHeader.h = hbar;

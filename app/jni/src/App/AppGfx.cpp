@@ -125,8 +125,7 @@ LPErrInApp AppGfx::Init() {
     // SDL2
     SDL_SetSurfaceColorKey(
         psIcon, true,
-        SDL_MapRGB(SDL_GetPixelFormatDetails(psIcon->format),
-                   SDL_GetSurfacePalette(psIcon), 0, 128, 0));
+        SDL_MapRGB(SDL_GetPixelFormatDetails(psIcon->format), NULL, 0, 128, 0));
 
     SDL_SetWindowIcon(_p_Window, psIcon);
 
@@ -191,7 +190,7 @@ LPErrInApp AppGfx::loadSceneBackground() {
         SDL_FillSurfaceRect(
             _p_SceneBackground, &clipRect,
             SDL_MapRGB(SDL_GetPixelFormatDetails(_p_SceneBackground->format),
-                       SDL_GetSurfacePalette(_p_SceneBackground), 0, 0, 0));
+                       NULL, 0, 0, 0));
     }
 
     return NULL;
@@ -412,7 +411,7 @@ void AppGfx::clearBackground() {
     SDL_GetSurfaceClipRect(_p_Screen, &clipRect);
     SDL_FillSurfaceRect(_p_Screen, &clipRect,
                         SDL_MapRGB(SDL_GetPixelFormatDetails(_p_Screen->format),
-                                   SDL_GetSurfacePalette(_p_Screen), 0, 0, 0));
+                                   NULL, 0, 0, 0));
     updateScreenTexture();
 }
 
