@@ -126,7 +126,7 @@ LPErrInApp AppGfx::Init() {
     SDL_SetSurfaceColorKey(
         psIcon, true,
         SDL_MapRGB(SDL_GetPixelFormatDetails(psIcon->format),
-                   SDL_GetSurfacePalette(psIcon), 0, 255, 0));
+                   SDL_GetSurfacePalette(psIcon), 0, 128, 0));
 
     SDL_SetWindowIcon(_p_Window, psIcon);
 
@@ -170,20 +170,22 @@ LPErrInApp AppGfx::loadSceneBackground() {
                                          strFileName.c_str());
         }
         //_p_SceneBackground = IMG_LoadJPG_RW(srcBack); SDL 2
-        _p_SceneBackground = IMG_LoadTyped_IO(srcBack, true, "JPG");
+        _p_SceneBackground = IMG_LoadTyped_IO(srcBack, false, "JPG");
         if (_p_SceneBackground == 0) {
             return ERR_UTIL::ErrorCreate("Unable to create splash");
         }
+        SDL_CloseIO(srcBack);
     } else {
         // _p_SceneBackground = SDL_CreateRGBSurface(SDL_SWSURFACE,
         // _p_Screen->w,
         //                                           _p_Screen->h, 32, 0, 0, 0,
         //                                           0); SDL 2
-        _p_SceneBackground = SDL_CreateSurface(_p_Screen->w, _p_Screen->h,
-                                               SDL_PIXELFORMAT_RGBA32);
+        _p_SceneBackground = GFX_UTIL::SDL_CreateRGBSurface(
+            _p_Screen->w, _p_Screen->h, 32, 0, 0, 0, 0);
 
         // SDL_FillRect(_p_SceneBackground, &_p_SceneBackground->clip_rect,
-        //              SDL_MapRGBA(_p_SceneBackground->format, 0, 0, 0, 0)); SDL 2
+        //              SDL_MapRGBA(_p_SceneBackground->format, 0, 0, 0, 0));
+        //              SDL 2
         SDL_Rect clipRect;  // SDL 3
         SDL_GetSurfaceClipRect(_p_SceneBackground, &clipRect);
         SDL_FillSurfaceRect(
@@ -197,7 +199,7 @@ LPErrInApp AppGfx::loadSceneBackground() {
 
 LPErrInApp AppGfx::createWindow() {
     TRACE_DEBUG("createWindow\n");
-    //int flagwin = 0; SDL 2
+    // int flagwin = 0; SDL 2
     SDL_WindowFlags flagwin;
     if (_p_Window != NULL) {
         _p_Window = NULL;
@@ -208,12 +210,12 @@ LPErrInApp AppGfx::createWindow() {
         _p_Screen = NULL;
     }
     if (_fullScreen) {
-        //flagwin = SDL_WINDOW_FULLSCREEN_DESKTOP; SDL 2
+        // flagwin = SDL_WINDOW_FULLSCREEN_DESKTOP; SDL 2
         flagwin = SDL_WINDOW_FULLSCREEN;
     } else {
-         //flagwin = SDL_WINDOW_SHOWN; SDL 2
-         flagwin = SDL_WINDOW_RESIZABLE;
-    } 
+        // flagwin = SDL_WINDOW_SHOWN; SDL 2
+        flagwin = SDL_WINDOW_RESIZABLE;
+    }
 #ifdef ANDROID
     flagwin = SDL_WINDOW_FULLSCREEN;
 #endif
@@ -221,33 +223,34 @@ LPErrInApp AppGfx::createWindow() {
     // _p_Window = SDL_CreateWindow(
     //     _p_GameSettings->GameName.c_str(), SDL_WINDOWPOS_UNDEFINED,
     //     SDL_WINDOWPOS_UNDEFINED, _screenW, _screenH, flagwin); SDL 2
-    _p_Window = SDL_CreateWindow(
-        _p_GameSettings->GameName.c_str(), _screenW, _screenH, flagwin);
+    _p_Window = SDL_CreateWindow(_p_GameSettings->GameName.c_str(), _screenW,
+                                 _screenH, flagwin);
 
     if (_p_Window == NULL) {
         return ERR_UTIL::ErrorCreate("Error SDL_CreateWindow: %s\n",
                                      SDL_GetError());
     }
     LPErrInApp err = _p_GameSettings->CalcDisplaySize(_screenW, _screenH);
-    if (err != NULL){
+    if (err != NULL) {
         return err;
     }
     _screenH = _p_GameSettings->GetScreenHeight();
     _screenW = _p_GameSettings->GetScreenWidth();
 
     _p_sdlRenderer =
-        //SDL_CreateRenderer(_p_Window, -1, SDL_RENDERER_ACCELERATED); SDL 2
+        // SDL_CreateRenderer(_p_Window, -1, SDL_RENDERER_ACCELERATED); SDL 2
         SDL_CreateRenderer(_p_Window, NULL);
 
     if (_p_sdlRenderer == NULL) {
         return ERR_UTIL::ErrorCreate("Cannot create renderer: %s\n",
                                      SDL_GetError());
     }
-    
 
     // _p_Screen = SDL_CreateRGBSurface(0, _screenW, _screenH, 32, 0x00FF0000,
-    //                                  0x0000FF00, 0x000000FF, 0xFF000000); SDL 2
-    _p_Screen = SDL_CreateSurface(_screenW, _screenH, SDL_PIXELFORMAT_RGBA32);
+    //                                  0x0000FF00, 0x000000FF, 0xFF000000); SDL
+    //                                  2
+    _p_Screen = GFX_UTIL::SDL_CreateRGBSurface(
+        _screenW, _screenH, 32, 0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
 
     if (_p_Screen == NULL) {
         return ERR_UTIL::ErrorCreate("Error SDL_CreateRGBSurface: %s\n",
@@ -291,7 +294,7 @@ LPErrInApp AppGfx::startGameLoop() {
 
 void AppGfx::terminate() {
     writeProfile();
-    //SDL_ShowCursor(SDL_ENABLE);SDL2
+    // SDL_ShowCursor(SDL_ENABLE);SDL2
     SDL_ShowCursor();
 
     if (_p_Screen != NULL) {
@@ -407,10 +410,9 @@ void AppGfx::clearBackground() {
     //              SDL_MapRGBA(_p_Screen->format, 0, 0, 0, 0)); SDL 2
     SDL_Rect clipRect;  // SDL 3
     SDL_GetSurfaceClipRect(_p_Screen, &clipRect);
-    SDL_FillSurfaceRect(
-        _p_Screen, &clipRect,
-        SDL_MapRGB(SDL_GetPixelFormatDetails(_p_Screen->format),
-                   SDL_GetSurfacePalette(_p_Screen), 0, 0, 0));
+    SDL_FillSurfaceRect(_p_Screen, &clipRect,
+                        SDL_MapRGB(SDL_GetPixelFormatDetails(_p_Screen->format),
+                                   SDL_GetSurfacePalette(_p_Screen), 0, 0, 0));
     updateScreenTexture();
 }
 

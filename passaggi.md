@@ -361,6 +361,10 @@ Qui ho rimosso i file ini della libreria ini. Uso un formato binario con SDL. [D
 - Il menu Esci non mi fa funzionare il suono quando poi riavvio il programma. Questo è dovuto al fatto che le App in Android non hanno il comando Quit. Quando uso lo Swap, il programma termina in modo corretto e anche riparte in modo corretto. Per questo ho rimosso il comando Esci [DONE]
 - Rimosso il menu Guida in quanto non riesco a far partire la visualizzazione del pdf [DONE]
 
+## Problemi SDL3 in WSL
+- Schermata del dialogo Opzioni è completamente traspararente anziché verde.
+- Schermata iniziale con i colori a palette fredda
+
 ## Mouse e Touch
 Una discussione interessante sull'argomento si trova su 
 https://discourse.libsdl.org/t/mouse-emulation-of-touch-events/19255/6

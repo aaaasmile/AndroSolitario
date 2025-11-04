@@ -103,14 +103,18 @@ LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
     // _p_surfBar = SDL_CreateRGBSurface(SDL_SWSURFACE, _rctOptBox.w,
     // _rctOptBox.h,
     //                                   32, 0, 0, 0, 0);
-    SDL_Surface* _p_surfBar =
-        SDL_CreateSurface(_rctOptBox.w, _rctOptBox.h, SDL_PIXELFORMAT_RGBA32);
+    SDL_Surface* _p_surfBar = GFX_UTIL::SDL_CreateRGBSurface(
+        _rctOptBox.w, _rctOptBox.h, 32, 0, 0, 0, 0);
+    if (_p_surfBar == NULL) {
+        return ERR_UTIL::ErrorCreate("_p_surfBar error: %s\n", SDL_GetError());
+    }
     // SDL_FillRect(_p_surfBar, NULL,
     //              SDL_MapRGBA(pScreen->format, 10, 100, 10, 0)); SDL 2
+
     SDL_FillSurfaceRect(
         _p_surfBar, NULL,
-        SDL_MapRGB(SDL_GetPixelFormatDetails(pScreen->format),
-                   SDL_GetSurfacePalette(pScreen), 10, 100, 10));
+        SDL_MapRGBA(SDL_GetPixelFormatDetails(pScreen->format),
+                    SDL_GetSurfacePalette(pScreen), 10, 100, 10, 0));
 
     SDL_SetSurfaceBlendMode(_p_surfBar, SDL_BLENDMODE_BLEND);
     SDL_SetSurfaceAlphaMod(_p_surfBar, 200);
@@ -303,8 +307,8 @@ LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
 
     // SDL_Surface* pShadowSrf = SDL_CreateRGBSurface(
     //     SDL_SWSURFACE, _p_screen->w, _p_screen->h, 32, 0, 0, 0, 0); SDL 2
-    SDL_Surface* pShadowSrf =
-        SDL_CreateSurface(_p_screen->w, _p_screen->h, SDL_PIXELFORMAT_RGBA32);
+    SDL_Surface* pShadowSrf = GFX_UTIL::SDL_CreateRGBSurface(
+        _p_screen->w, _p_screen->h, 32, 0, 0, 0, 0);
 
     SDL_Texture* pScreenTexture =
         SDL_CreateTextureFromSurface(_p_sdlRenderer, pShadowSrf);
@@ -317,8 +321,8 @@ LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
         SDL_GetSurfaceClipRect(pShadowSrf, &clipRect);
         SDL_FillSurfaceRect(
             pShadowSrf, &clipRect,
-            SDL_MapRGB(SDL_GetPixelFormatDetails(pShadowSrf->format),
-                       SDL_GetSurfacePalette(pShadowSrf), 0, 0, 0));
+            SDL_MapRGBA(SDL_GetPixelFormatDetails(pShadowSrf->format),
+                        SDL_GetSurfacePalette(pShadowSrf), 0, 0, 0, 0));
 
         SDL_Rect rctTarget;
         rctTarget.x = (pShadowSrf->w - pScene_background->w) / 2;

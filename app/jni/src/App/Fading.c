@@ -25,7 +25,14 @@ void Fade(SDL_Surface* p_surf_screen, SDL_Surface* p_surf_img,
     //          p_surf_screen->format->Bmask, p_surf_screen->format->Amask)) ==
     //          NULL) {
     p_surf_black = SDL_CreateSurface(p_surf_screen->w, p_surf_screen->h,
-                                     SDL_PIXELFORMAT_RGBA32);
+            SDL_GetPixelFormatForMasks(
+                 SDL_GetPixelFormatDetails(p_surf_black->format)->bits_per_pixel, 
+                 SDL_GetPixelFormatDetails(p_surf_black->format)->Rmask, 
+                 SDL_GetPixelFormatDetails(p_surf_black->format)->Gmask,  
+                 SDL_GetPixelFormatDetails(p_surf_black->format)->Bmask,  
+                 SDL_GetPixelFormatDetails(p_surf_black->format)->Amask));                         
+        
+        //SDL_PIXELFORMAT_RGBA32);
     if (p_surf_black == NULL) {
         fprintf(stderr, "fade: could not create the black Surface. (%s)\n",
                 SDL_GetError());
@@ -40,14 +47,20 @@ void Fade(SDL_Surface* p_surf_screen, SDL_Surface* p_surf_img,
                        SDL_GetSurfacePalette(p_surf_black), 0, 0, 0));
 
     if (p_surf_screen == p_surf_img) {
-        p_surf_screen_copy = SDL_CreateSurface(p_surf_screen->w, p_surf_screen->h,
-                                     SDL_PIXELFORMAT_RGBA32);
         // if ((p_surf_screen_copy = SDL_CreateRGBSurface(
         //          ui_flags, p_surf_screen->w, p_surf_screen->h,
         //          p_surf_screen->format->BitsPerPixel,
         //          p_surf_screen->format->Rmask, p_surf_screen->format->Gmask,
         //          p_surf_screen->format->Bmask, p_surf_screen->format->Amask)) ==
         //     NULL) { //SDL 2
+        p_surf_screen_copy = SDL_CreateSurface(p_surf_screen->w, p_surf_screen->h,
+                                     SDL_GetPixelFormatForMasks(
+                 SDL_GetPixelFormatDetails(p_surf_screen->format)->bits_per_pixel, 
+                 SDL_GetPixelFormatDetails(p_surf_screen->format)->Rmask, 
+                 SDL_GetPixelFormatDetails(p_surf_screen->format)->Gmask,  
+                 SDL_GetPixelFormatDetails(p_surf_screen->format)->Bmask,  
+                 SDL_GetPixelFormatDetails(p_surf_screen->format)->Amask));
+        
         if (p_surf_screen_copy == NULL){
             fprintf(
                 stderr,

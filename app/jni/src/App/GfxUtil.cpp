@@ -308,3 +308,11 @@ std::string STR_UTIL::intToString(int iNumber) {
     temp = buffer;
     return temp;
 }
+
+SDL_Surface* GFX_UTIL::SDL_CreateRGBSurface(int width, int height, int depth,
+                                            Uint32 Rmask, Uint32 Gmask,
+                                            Uint32 Bmask, Uint32 Amask) {
+    return SDL_CreateSurface(
+        width, height,
+        SDL_GetPixelFormatForMasks(depth, Rmask, Gmask, Bmask, Amask));
+}
