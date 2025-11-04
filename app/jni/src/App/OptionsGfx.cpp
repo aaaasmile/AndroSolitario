@@ -112,11 +112,11 @@ LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
     //              SDL_MapRGBA(pScreen->format, 10, 100, 10, 0)); SDL 2
 
     SDL_FillSurfaceRect(_p_surfBar, NULL,
-                        SDL_MapRGB(SDL_GetPixelFormatDetails(pScreen->format),
-                                   NULL, 10, 100, 10));
+                        SDL_MapRGB(SDL_GetPixelFormatDetails(_p_surfBar->format),
+                                   NULL, 10, 10, 10));
 
     SDL_SetSurfaceBlendMode(_p_surfBar, SDL_BLENDMODE_BLEND);
-    SDL_SetSurfaceAlphaMod(_p_surfBar, 180);
+    SDL_SetSurfaceAlphaMod(_p_surfBar, 70);
 
     SDL_Rect rctBt1;
     int iSpace2bt = 20;
@@ -365,7 +365,7 @@ LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
             }
         }
 
-        // the background of the option box
+        //the background of the option box
         GFX_UTIL::DrawStaticSpriteEx(pShadowSrf, 0, 0, _rctOptBox.w,
                                      _rctOptBox.h, _rctOptBox.x, _rctOptBox.y,
                                      _p_surfBar);
