@@ -348,6 +348,9 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     if (pGameSettings->NeedScreenMagnify()) {
         intraOffset += 50;
     }
+    if (_rctPanelRedBox.h <= 600){
+        morePlaceY = 0;
+    }
     // Play
     if (_focusedMenuItem != MenuItemEnum::MENU_GAME) {
         color = g_color_off;
