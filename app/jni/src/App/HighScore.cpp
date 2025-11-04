@@ -50,7 +50,7 @@ LPErrInApp HighScore::Save() {
         memset(name, 0, 16);
         memcpy(name, _scoreInfo[k].Name.c_str(), 15);
         //int numWritten = SDL_RWwrite(dst, name, 16, 1);
-        int numWritten = SDL_WriteIO(dst, name, 1);
+        int numWritten = SDL_WriteIO(dst, name, 16);
         if (numWritten < 1) {
             return ERR_UTIL::ErrorCreate("SDL_RWwrite name highscore %s\n",
                                          SDL_GetError());
@@ -121,7 +121,7 @@ LPErrInApp HighScore::Load() {
         uint16_t score = 0;
         uint8_t numCard;
         //if (SDL_RWread(src, name, 16, 1) == 0) { SDL 2
-        if (SDL_ReadIO(src, &name, 1) == 0){
+        if (SDL_ReadIO(src, &name, 16) == 0){
             return ERR_UTIL::ErrorCreate(
                 "SDL_RWread on highscore file error (file %s): %s\n",
                 g_filepath, SDL_GetError());
