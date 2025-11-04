@@ -61,10 +61,11 @@ void ComboGfx::Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
     _rctBoxDown.w = boxIncW;
     _rctBoxDown.h = boxIncH;
 
-    //_p_surfBar = SDL_CreateRGBSurface(SDL_SWSURFACE, _rctCtrl.w, _rctCtrl.h, 32,
+    //_p_surfBar = SDL_CreateRGBSurface(SDL_SWSURFACE, _rctCtrl.w, _rctCtrl.h,
+    // 32,
     //                                  0, 0, 0, 0); SDL 2
     _p_surfBar =
-        SDL_CreateSurface(_rctCtrl.w, _rctCtrl.h, SDL_PIXELFORMAT_RGBA32);
+        GFX_UTIL::SDL_CreateRGBSurface(_rctCtrl.w, _rctCtrl.h, 32, 0, 0, 0, 0);
 
     // SDL_FillRect(_p_surfBar, NULL,
     //              SDL_MapRGBA(pScreen->format, 255, 128, 30, 0));
@@ -78,8 +79,8 @@ void ComboGfx::Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
 
     // _p_surfBoxSel = SDL_CreateRGBSurface(SDL_SWSURFACE, _rctBoxUp.w,
     //                                      _rctBoxUp.h, 32, 0, 0, 0, 0); SDL 2
-    _p_surfBoxSel =
-        SDL_CreateSurface(_rctBoxUp.w, _rctBoxUp.h, SDL_PIXELFORMAT_RGBA32);
+    _p_surfBoxSel = GFX_UTIL::SDL_CreateRGBSurface(_rctBoxUp.w, _rctBoxUp.h, 32,
+                                                   0, 0, 0, 0);
 
     // SDL_FillRect(_p_surfBoxSel, NULL,
     //              SDL_MapRGBA(pScreen->format, 200, 200, 130, 0)); SDL 2
@@ -93,8 +94,8 @@ void ComboGfx::Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
 
     // _p_surfBoxUNSel = SDL_CreateRGBSurface(SDL_SWSURFACE, _rctBoxUp.w,
     //                                        _rctBoxUp.h, 32, 0, 0, 0, 0);
-    _p_surfBoxUNSel =
-        SDL_CreateSurface(_rctBoxUp.w, _rctBoxUp.h, SDL_PIXELFORMAT_RGBA32);
+    _p_surfBoxUNSel = GFX_UTIL::SDL_CreateRGBSurface(_rctBoxUp.w, _rctBoxUp.h,
+                                                     32, 0, 0, 0, 0);
 
     // SDL_FillRect(_p_surfBoxUNSel, NULL,
     //              SDL_MapRGBA(pScreen->format, 255, 128, 30, 0));
@@ -267,7 +268,7 @@ void ComboGfx::DrawButton(SDL_Surface* pScreen) {
 
         // draw current selected text
         int tx, ty;
-        //TTF_SizeText(_p_fontText, _buttonText.c_str(), &tx, &ty); SDL 2
+        // TTF_SizeText(_p_fontText, _buttonText.c_str(), &tx, &ty); SDL 2
         TTF_GetStringSize(_p_fontText, _buttonText.c_str(), 0, &tx, &ty);
         int xOffset = (_rctText.w - tx) / 2;
         if (xOffset < 0) {
@@ -280,7 +281,7 @@ void ComboGfx::DrawButton(SDL_Surface* pScreen) {
                              _p_fontText);
 
         // draw text upper box
-        //TTF_SizeText(_p_fontText, LP_PLUS, &tx, &ty);
+        // TTF_SizeText(_p_fontText, LP_PLUS, &tx, &ty);
         TTF_GetStringSize(_p_fontText, LP_PLUS, 0, &tx, &ty);
 
         xOffset = (_rctBoxUp.w - tx) / 2;
@@ -300,7 +301,7 @@ void ComboGfx::DrawButton(SDL_Surface* pScreen) {
                              _rctBoxUp.y + yOffset, _color, _p_fontText);
 
         // draw text down box
-        //TTF_SizeText(_p_fontText, LP_MINUS, &tx, &ty);
+        // TTF_SizeText(_p_fontText, LP_MINUS, &tx, &ty);
         TTF_GetStringSize(_p_fontText, LP_MINUS, 0, &tx, &ty);
 
         xOffset = (_rctBoxDown.w - tx) / 2;

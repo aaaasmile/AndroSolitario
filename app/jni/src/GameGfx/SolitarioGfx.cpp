@@ -132,8 +132,8 @@ LPErrInApp SolitarioGfx::Initialize(
     // _p_AlphaDisplay = SDL_CreateRGBSurface(SDL_SWSURFACE, _p_Screen->w,
     //                                        _p_Screen->h, 32, 0, 0, 0, 0);
     //                                        //SDL2
-    _p_AlphaDisplay =
-        SDL_CreateSurface(_p_Screen->w, _p_Screen->h, SDL_PIXELFORMAT_RGBA32);
+    _p_AlphaDisplay = GFX_UTIL::SDL_CreateRGBSurface(_p_Screen->w, _p_Screen->h,
+                                                     32, 0, 0, 0, 0);
     if (_p_AlphaDisplay == NULL) {
         return ERR_UTIL::ErrorCreate("Cannot create alpha display: %s\n",
                                      SDL_GetError());
@@ -141,8 +141,8 @@ LPErrInApp SolitarioGfx::Initialize(
 
     // _p_ScreenBackbufferDrag = SDL_CreateRGBSurface(
     //     SDL_SWSURFACE, _p_Screen->w, _p_Screen->h, 32, 0, 0, 0, 0);//SDL2
-    _p_ScreenBackbufferDrag =
-        SDL_CreateSurface(_p_Screen->w, _p_Screen->h, SDL_PIXELFORMAT_RGBA32);
+    _p_ScreenBackbufferDrag = GFX_UTIL::SDL_CreateRGBSurface(
+        _p_Screen->w, _p_Screen->h, 32, 0, 0, 0, 0);
 
     _p_SceneBackground = pSceneBackground;
     if (_p_SceneBackground == 0) {
@@ -312,8 +312,8 @@ LPErrInApp SolitarioGfx::InitDrag(LPCardStackGfx pCargoStack, int x, int y,
     // _p_Dragface = SDL_CreateRGBSurface(SDL_SWSURFACE, _dragPileInfo.width,
     //                                    _dragPileInfo.height, 32, 0, 0, 0, 0);
     //                                    // SDL2
-    _p_Dragface = SDL_CreateSurface(_dragPileInfo.width, _dragPileInfo.height,
-                                    SDL_PIXELFORMAT_RGBA32);
+    _p_Dragface = GFX_UTIL::SDL_CreateRGBSurface(
+        _dragPileInfo.width, _dragPileInfo.height, 32, 0, 0, 0, 0);
     // SDL_FillRect(_p_Dragface, NULL, SDL_MapRGB(_p_Dragface->format, 0, 255,
     // 0)); //SDL2
     SDL_FillSurfaceRect(

@@ -37,8 +37,8 @@ LPErrInApp MesgBoxGfx::Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
 
     // _p_Surf_Bar = SDL_CreateRGBSurface(SDL_SWSURFACE, _rctMsgBox.w,
     //                                    _rctMsgBox.h, 32, 0, 0, 0, 0);
-    _p_Surf_Bar =
-        SDL_CreateSurface(_rctMsgBox.w, _rctMsgBox.h, SDL_PIXELFORMAT_RGBA32);
+    _p_Surf_Bar = GFX_UTIL::SDL_CreateRGBSurface(_rctMsgBox.w, _rctMsgBox.h, 32,
+                                                 0, 0, 0, 0);
 
     // SDL_FillRect(_p_Surf_Bar, NULL,
     //              SDL_MapRGBA(pScreen->format, 30, 80, 157, 0));
@@ -144,8 +144,8 @@ int MesgBoxGfx::Show(SDL_Surface* pScene_background, LPCSTR lpsBut1Txt,
     }
     // SDL_Surface* pShadowSrf = SDL_CreateRGBSurface(
     //     SDL_SWSURFACE, _p_Screen->w, _p_Screen->h, 32, 0, 0, 0, 0);
-    SDL_Surface* pShadowSrf =
-        SDL_CreateSurface(_rctMsgBox.w, _rctMsgBox.h, SDL_PIXELFORMAT_RGBA32);
+    SDL_Surface* pShadowSrf = GFX_UTIL::SDL_CreateRGBSurface(
+        _p_Screen->w, _p_Screen->h, 32, 0, 0, 0, 0);
 
     SDL_Texture* pScreenTexture =
         SDL_CreateTextureFromSurface(_p_sdlRenderer, pShadowSrf);
