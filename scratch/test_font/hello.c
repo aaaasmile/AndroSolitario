@@ -29,7 +29,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
     SDL_Surface *text;
 
     /* Create the window */
-    if (!SDL_CreateWindowAndRenderer("Hello World", 800, 600, SDL_WINDOW_FULLSCREEN, &window, &renderer)) {
+    if (!SDL_CreateWindowAndRenderer("Hello World", 800, 600, SDL_WINDOW_RESIZABLE, &window, &renderer)) {
         SDL_Log("Couldn't create window and renderer: %s\n", SDL_GetError());
         return SDL_APP_FAILURE;
     }
@@ -47,7 +47,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
     }
 
     /* Create the text */
-    text = TTF_RenderText_Blended(font, "Hello World!", 0, color);
+    text = TTF_RenderText_Blended(font, "🔊🔊🔊🔊🔊🔊🔊🔇🔇🔇🔇", 0, color);
     if (text) {
         texture = SDL_CreateTextureFromSurface(renderer, text);
         SDL_DestroySurface(text);
