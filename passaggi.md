@@ -52,7 +52,7 @@ o alternativo, molto meglio, senza cambiare la directory (-S è la source dir, -
     cmake --build build
 Una volta compilato:
 
-    cd build/bin/
+    cd build
     ./solitario
 
 Problemi con la funzione random di std. Se uso
@@ -82,6 +82,17 @@ che non uso tipo wayland, devo poi ricostruire la directory build.
 Nota che il programma va a finire di dafult nella directory ./build/src. 
 Cambio la destinazione con set_target_properties in CMakeFiles.
 Gli asset li ho copiati con un post build command.
+
+## Directory Scratch
+Voglio creare dei piccoli progetti per testare delle funzionalità singole.
+Per esempio cd scratch/test_font vorrei compilare il programma hello.c.
+A questo scopo ho creato un nuovo file CMakeList.txt che mi compila sdl e il file.
+
+    rm -r -R build
+    cmake -S . -B build -DSDL_WAYLAND=OFF
+    cmake --build build
+    cd build
+    ./hello
 
 ## Assets
 Gli Asset in Android sono piazzati in app/src/main.
