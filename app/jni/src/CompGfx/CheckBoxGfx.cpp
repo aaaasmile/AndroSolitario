@@ -8,7 +8,7 @@ CheckBoxGfx::CheckBoxGfx() {
     _p_FontText = 0;
     _enabled = true;
     _buttonID = -1;
-    _p_GameSettings = GAMESET::GetSettings();
+    _p_GameSettings = GameSettings::GetSettings();
 }
 
 CheckBoxGfx::~CheckBoxGfx() {}
@@ -94,7 +94,7 @@ void CheckBoxGfx::DrawButton(SDL_Surface* pScreen) {
     int ckbtW = 16;
     int ckbtH = 16;
     int intraOffsetX = 10;
-    LPGameSettings pGameSettings = GAMESET::GetSettings();
+    LPGameSettings pGameSettings = GameSettings::GetSettings();
     if (pGameSettings->NeedScreenMagnify()) {
         ckbtW = 40;
         ckbtH = 40;

@@ -28,7 +28,7 @@ HighScore::HighScore() {
 }
 
 LPErrInApp HighScore::Save() {
-    LPGameSettings pGameSettings = GAMESET::GetSettings();
+    LPGameSettings pGameSettings = GameSettings::GetSettings();
     if (pGameSettings->SettingsDir == "" || pGameSettings->GameName == "") {
         return ERR_UTIL::ErrorCreate("User dir for high score is not defined");
     }
@@ -49,25 +49,25 @@ LPErrInApp HighScore::Save() {
         char name[16];
         memset(name, 0, 16);
         memcpy(name, _scoreInfo[k].Name.c_str(), 15);
-        //int numWritten = SDL_RWwrite(dst, name, 16, 1);
+        // int numWritten = SDL_RWwrite(dst, name, 16, 1);
         int numWritten = SDL_WriteIO(dst, name, 16);
         if (numWritten < 1) {
             return ERR_UTIL::ErrorCreate("SDL_RWwrite name highscore %s\n",
                                          SDL_GetError());
         }
-        //if (SDL_WriteLE16(dst, _scoreInfo[k].Score) == 0) { SDL 2
+        // if (SDL_WriteLE16(dst, _scoreInfo[k].Score) == 0) { SDL 2
         if (SDL_WriteU16LE(dst, _scoreInfo[k].Score) == 0) {
             return ERR_UTIL::ErrorCreate("SDL_RWwrite score highscore %s\n",
                                          SDL_GetError());
         }
-        //numWritten = SDL_RWwrite(dst, &_scoreInfo[k].NumCard, 1, 1); SDL 2
+        // numWritten = SDL_RWwrite(dst, &_scoreInfo[k].NumCard, 1, 1); SDL 2
         numWritten = SDL_WriteIO(dst, &_scoreInfo[k].NumCard, 1);
         if (numWritten < 1) {
             return ERR_UTIL::ErrorCreate("SDL_RWwrite numCard highscore %s\n",
                                          SDL_GetError());
         }
     }
-    //SDL_RWclose(dst); SDL 2
+    // SDL_RWclose(dst); SDL 2
     SDL_CloseIO(dst);
     return NULL;
 }
@@ -103,13 +103,13 @@ LPErrInApp HighScore::SaveScore(int score, int numCard) {
 }
 
 LPErrInApp HighScore::Load() {
-    LPGameSettings pGameSettings = GAMESET::GetSettings();
+    LPGameSettings pGameSettings = GameSettings::GetSettings();
 
     snprintf(g_filepath, sizeof(g_filepath), "%s/%s-score.bin",
              pGameSettings->SettingsDir.c_str(),
              pGameSettings->GameName.c_str());
     TRACE("Load high score file %s\n", g_filepath);
-    //SDL_RWops* src = SDL_RWFromFile(g_filepath, "rb"); SDL2
+    // SDL_RWops* src = SDL_RWFromFile(g_filepath, "rb"); SDL2
     SDL_IOStream* src = SDL_IOFromFile(g_filepath, "rb");
     if (src == 0) {
         TRACE("No score file found, ignore it and use default\n");
@@ -120,15 +120,15 @@ LPErrInApp HighScore::Load() {
         char name[16];
         uint16_t score = 0;
         uint8_t numCard;
-        //if (SDL_RWread(src, name, 16, 1) == 0) { SDL 2
-        if (SDL_ReadIO(src, &name, 16) == 0){
+        // if (SDL_RWread(src, name, 16, 1) == 0) { SDL 2
+        if (SDL_ReadIO(src, &name, 16) == 0) {
             return ERR_UTIL::ErrorCreate(
                 "SDL_RWread on highscore file error (file %s): %s\n",
                 g_filepath, SDL_GetError());
         }
-        //score = SDL_ReadLE16(src); SDL 2
+        // score = SDL_ReadLE16(src); SDL 2
         SDL_ReadU16LE(src, &score);
-        //if (SDL_RWread(src, &numCard, 1, 1) == 0) { SDL 2
+        // if (SDL_RWread(src, &numCard, 1, 1) == 0) { SDL 2
         if (SDL_ReadIO(src, &numCard, 1) == 0) {
             return ERR_UTIL::ErrorCreate(
                 "SDL_RWread on highscore file error (file %s): %s\n",
@@ -139,7 +139,7 @@ LPErrInApp HighScore::Load() {
         _scoreInfo[k].Score = score;
         _scoreInfo[k].NumCard = numCard;
     }
-    //SDL_RWclose(src); SDL 2
+    // SDL_RWclose(src); SDL 2
     SDL_CloseIO(src);
 
     return NULL;
@@ -147,12 +147,13 @@ LPErrInApp HighScore::Load() {
 
 LPErrInApp HighScore::Show(SDL_Surface* p_surf_screen, SDL_Surface* pSurfTitle,
                            SDL_Renderer* psdlRenderer,
-                           MusicManager* pMusicManager, Languages* pLanguages) {
+                           MusicManager* pMusicManager) {
     SDL_Rect dest;
     SDL_Event event;
     Uint32 last_time, now_time;
     SDL_Keycode key;
-    LPGameSettings pGameSettings = GAMESET::GetSettings();
+    LPGameSettings pGameSettings = GameSettings::GetSettings();
+    LPLanguages pLanguages = pGameSettings->GetLanguageMan();
 
     SDL_Texture* pScreenTexture =
         SDL_CreateTextureFromSurface(psdlRenderer, p_surf_screen);
@@ -210,7 +211,7 @@ LPErrInApp HighScore::Show(SDL_Surface* p_surf_screen, SDL_Surface* pSurfTitle,
         yOff = 0;
         TTF_Font* pFont = pGameSettings->GetFontAriblk();
         TTF_Font* pFont2 = pGameSettings->GetFontVera();
-        
+
         xOff += ax;
         SDL_Color txtColor = GFX_UTIL_COLOR::Gray;
         GFX_UTIL::DrawString(p_surf_screen,

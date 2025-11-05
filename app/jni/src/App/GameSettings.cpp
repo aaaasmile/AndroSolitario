@@ -24,11 +24,42 @@ static const char* g_lpszIniFontAriblkFname = DATA_PREFIX "font/ariblk.ttf";
 static const char* g_lpszIniFontVeraFname = DATA_PREFIX "font/vera.ttf";
 static const char* g_lpszFontSymbFname = DATA_PREFIX "font/notosans-sym.ttf";
 
-LPGameSettings GAMESET::GetSettings() {
+LPGameSettings GameSettings::GetSettings() {
     if (_p_GameSettings == NULL) {
         _p_GameSettings = new GameSettings();
     }
     return _p_GameSettings;
+}
+
+GameSettings::GameSettings() {
+    // default settings
+    PlayerName = "";
+    Level = 1;
+    DeckTypeVal.SetType(eDeckType::TAROCK_PIEMONT);
+    CurrentLanguage = Languages::LANG_ENG;
+    MusicEnabled = true;
+    SettingsDir = "";
+    BackgroundType = BackgroundTypeEnum::Mantova;
+    _p_Languages = NULL;
+}
+
+GameSettings::~GameSettings() {
+    if (_p_Languages) {
+        delete _p_Languages;
+        _p_Languages = NULL;
+    }
+}
+
+void GameSettings::SetCurrentLang() {
+    GetLanguageMan();
+    _p_Languages->SetLang(CurrentLanguage);
+}
+
+Languages* GameSettings::GetLanguageMan() {
+    if (_p_Languages == NULL) {
+        _p_Languages = new Languages();
+    }
+    return _p_Languages;
 }
 
 LPErrInApp GameSettings::LoadSettings() {

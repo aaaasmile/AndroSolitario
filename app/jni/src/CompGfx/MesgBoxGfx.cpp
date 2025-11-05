@@ -52,7 +52,7 @@ LPErrInApp MesgBoxGfx::Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
     _colCurrent = GFX_UTIL_COLOR::White;
     SDL_Rect rctBt1;
     ClickCb cbBt = prepClickBtCb();
-    LPGameSettings pGameSettings = GAMESET::GetSettings();
+    LPGameSettings pGameSettings = GameSettings::GetSettings();
     int btw = 120;
     int bth = 28;
     int btoffsetY = 10;

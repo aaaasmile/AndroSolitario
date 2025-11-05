@@ -32,7 +32,6 @@ public:
     void SetPlayerName(std::string strVal) {
         _p_GameSettings->PlayerName = strVal;
     }
-    Languages* GetLanguageMan() { return &_Languages; }
     void ParseCmdLine(int argc, char* argv[]);
     void LeaveMenu();
     void SetNextMenu(MenuItemEnum menuItem) { _histMenu.push(menuItem); }
@@ -67,7 +66,7 @@ private:
     SolitarioGfx* _p_SolitarioGfx;
     MusicManager* _p_MusicManager;
     HighScore* _p_HighScore;
-    Languages _Languages;
+    
 
     int _screenW;
     int _screenH;

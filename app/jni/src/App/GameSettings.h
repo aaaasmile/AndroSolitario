@@ -26,16 +26,9 @@ class GameSettings {
     InputTypeEnum InputType;
 
    public:
-    GameSettings() {
-        // default settings
-        PlayerName = "";
-        Level = 1;
-        DeckTypeVal.SetType(eDeckType::TAROCK_PIEMONT);
-        CurrentLanguage = Languages::LANG_ENG;
-        MusicEnabled = true;
-        SettingsDir = "";
-        BackgroundType = BackgroundTypeEnum::Mantova;
-    }
+    static GameSettings* GetSettings(); 
+    ~GameSettings();
+
     LPErrInApp LoadSettings();
     LPErrInApp SaveSettings();
     LPErrInApp LoadFonts();
@@ -58,11 +51,15 @@ class GameSettings {
         _fontBigSize = 46;
         _fontSymSize = 36;
     }
-    TTF_Font* GetFontAriblk(){return _p_fontAriblk;}
-    TTF_Font* GetFontVera(){return _p_fontVera;}
-    TTF_Font* GetFontSymb(){return _p_fontSymb;}
+    TTF_Font* GetFontAriblk() { return _p_fontAriblk; }
+    TTF_Font* GetFontVera() { return _p_fontVera; }
+    TTF_Font* GetFontSymb() { return _p_fontSymb; }
+
+    Languages* GetLanguageMan();
+    void SetCurrentLang();
 
    private:
+    GameSettings();
     LPErrInApp setSettingFileName();
 
    private:
@@ -73,13 +70,12 @@ class GameSettings {
     TTF_Font* _p_fontVera;
     TTF_Font* _p_fontAriblk;
     TTF_Font* _p_fontSymb;
-    
+    Languages* _p_Languages;
 };
 
 typedef GameSettings* LPGameSettings;
 
 namespace GAMESET {
-LPGameSettings GetSettings();
 const char* GetHomeFolder();
 LPErrInApp CreateHomeFolderIfNotExists(bool& dirCreated);
 const char* GetExeAppFolder();

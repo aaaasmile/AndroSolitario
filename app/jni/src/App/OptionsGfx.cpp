@@ -15,9 +15,8 @@ OptionsGfx::OptionsGfx() {
     _p_surfBar = 0;
     _p_buttonOK = 0;
     _terminated = false;
-    _p_languages = 0;
     _p_MusicManager = 0;
-    _p_GameSettings = GAMESET::GetSettings();
+    _p_GameSettings = GameSettings::GetSettings();
 }
 
 OptionsGfx::~OptionsGfx() {
@@ -98,7 +97,6 @@ LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
     _p_fontCtrl = _p_GameSettings->GetFontAriblk();
     _p_fontText = _p_GameSettings->GetFontVera();
     _p_sdlRenderer = pRenderer;
-    _p_languages = _menuDlgt.tc->GetLanguageMan(_menuDlgt.self);
 
     // _p_surfBar = SDL_CreateRGBSurface(SDL_SWSURFACE, _rctOptBox.w,
     // _rctOptBox.h,
@@ -240,6 +238,8 @@ LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
 LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
                             STRING& strCaption) {
     TRACE_DEBUG("Options - Show\n");
+    LPGameSettings pGameSettings = GameSettings::GetSettings();                                    
+    LPLanguages pLanguages = pGameSettings->GetLanguageMan();
     _headerText = strCaption;
     _terminated = false;
     Uint32 uiInitialTick = SDL_GetTicks();
@@ -248,44 +248,44 @@ LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
 
     // button ok
     STRING strTextBt;
-    strTextBt = _p_languages->GetStringId(Languages::ID_OK);
+    strTextBt = pLanguages->GetStringId(Languages::ID_OK);
     _p_buttonOK->SetButtonText(strTextBt.c_str());
     _p_buttonOK->SetVisibleState(ButtonGfx::VISIBLE);
 
     // combobox language selection
     STRING strSelectLanguage =
-        _p_languages->GetStringId(Languages::ID_CHOOSELANGUA);
-    strTextBt = _p_languages->GetStringId(Languages::ID_ITALIANO);
+        pLanguages->GetStringId(Languages::ID_CHOOSELANGUA);
+    strTextBt = pLanguages->GetStringId(Languages::ID_ITALIANO);
     _p_comboLang->AddLineText(strTextBt.c_str());
-    strTextBt = _p_languages->GetStringId(Languages::ID_DIALETMN);
+    strTextBt = pLanguages->GetStringId(Languages::ID_DIALETMN);
     _p_comboLang->AddLineText(strTextBt.c_str());
-    strTextBt = _p_languages->GetStringId(Languages::ID_ENGLISH);
+    strTextBt = pLanguages->GetStringId(Languages::ID_ENGLISH);
     _p_comboLang->AddLineText(strTextBt.c_str());
 
     _p_comboLang->SetVisibleState(ComboGfx::VISIBLE);
     _p_comboLang->SelectIndex(_p_GameSettings->CurrentLanguage);
 
     // checkbox music
-    strTextBt = _p_languages->GetStringId(Languages::ID_SOUNDOPT);
+    strTextBt = pLanguages->GetStringId(Languages::ID_SOUNDOPT);
     _p_checkMusic->SetWindowText(strTextBt.c_str());
     _p_checkMusic->SetVisibleState(CheckBoxGfx::VISIBLE);
     _p_checkMusic->SetCheckState(_p_GameSettings->MusicEnabled);
 
     // combobox background selection
     STRING strSelectBackGround =
-        _p_languages->GetStringId(Languages::ID_CHOOSEBACKGROUND);
-    strTextBt = _p_languages->GetStringId(Languages::ID_COMMESSAGGIO);
+        pLanguages->GetStringId(Languages::ID_CHOOSEBACKGROUND);
+    strTextBt = pLanguages->GetStringId(Languages::ID_COMMESSAGGIO);
     _p_comboBackground->AddLineText(strTextBt.c_str());
-    strTextBt = _p_languages->GetStringId(Languages::ID_MANTOVA);
+    strTextBt = pLanguages->GetStringId(Languages::ID_MANTOVA);
     _p_comboBackground->AddLineText(strTextBt.c_str());
-    strTextBt = _p_languages->GetStringId(Languages::ID_BLACK);
+    strTextBt = pLanguages->GetStringId(Languages::ID_BLACK);
     _p_comboBackground->AddLineText(strTextBt.c_str());
     _p_comboBackground->SetVisibleState(ComboGfx::VISIBLE);
     _p_comboBackground->SelectIndex(_p_GameSettings->BackgroundType);
 
     // combobox deck selection
     STRING strDeckSelectTitle =
-        _p_languages->GetStringId(Languages::ID_CHOOSEMAZZO);
+        pLanguages->GetStringId(Languages::ID_CHOOSEMAZZO);
     DeckType dt;
     for (int i = 0; i < eDeckType::NUM_OF_DECK; i++) {
         dt.SetTypeIndex(i);

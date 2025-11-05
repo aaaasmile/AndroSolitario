@@ -12,7 +12,7 @@ ButtonGfx::ButtonGfx() {
     _mouseIsDown = false;
     _buttonType = TEXT_BUTTON;
     _mouseState = MouseState::OUTSIDE;
-    _p_GameSettings = GAMESET::GetSettings();
+    _p_GameSettings = GameSettings::GetSettings();
 }
 
 ButtonGfx::~ButtonGfx() {

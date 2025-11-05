@@ -53,7 +53,6 @@ class SolitarioGfx {
     ~SolitarioGfx();
 
     LPErrInApp Initialize(SDL_Surface *s, SDL_Renderer *r, SDL_Window *w,
-                          LPLanguages planguages,
                           SDL_Surface *pSceneBackground,
                           MusicManager *pMusicManager,
                           HighScore *pHighScore);
@@ -191,7 +190,6 @@ class SolitarioGfx {
     SDL_Surface *_p_SceneBackground;
     SDL_Renderer *_p_sdlRenderer;
     SDL_Window *_p_Window;
-    LPLanguages _p_Languages;
     TTF_Font *_p_FontBigText;
     TTF_Font *_p_FontSmallText;
     HighScore *_p_HighScore;

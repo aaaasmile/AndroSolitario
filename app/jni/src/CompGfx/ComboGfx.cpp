@@ -15,7 +15,7 @@ ComboGfx::ComboGfx() {
     _currDataIndex = 0;
     _p_surfBoxSel = 0;
     _p_surfBoxUNSel = 0;
-    _p_GameSettings = GAMESET::GetSettings();
+    _p_GameSettings = GameSettings::GetSettings();
 }
 
 ComboGfx::~ComboGfx() {
@@ -39,7 +39,7 @@ void ComboGfx::Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
     _fncbClickEvent = fncbClickEvent;
     _rctCtrl = *pRect;
     _p_sdlRenderer = psdlRenderer;
-    LPGameSettings pGameSettings = GAMESET::GetSettings();
+    LPGameSettings pGameSettings = GameSettings::GetSettings();
 
     int boxIncW = 20;
     int boxIncH = _rctCtrl.h;

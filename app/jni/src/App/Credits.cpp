@@ -147,7 +147,7 @@ void credits(SDL_Surface* p_surf_screen, SDL_Surface* pSurfTitle,
     SDL_Event event;
     Uint32 last_time, now_time;
     SDL_Keycode key;
-    LPGameSettings pGameSettings = GAMESET::GetSettings();
+    LPGameSettings pGameSettings = GameSettings::GetSettings();
 
     SDL_Texture* pScreenTexture =
         SDL_CreateTextureFromSurface(psdlRenderer, p_surf_screen);

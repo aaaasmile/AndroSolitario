@@ -125,7 +125,6 @@ MenuMgr::MenuMgr() {
     _p_fontVeraUnderscore = 0;
     _p_ScreenBackbuffer = 0;
     _focusedMenuItem = MenuItemEnum::MENU_GAME;
-    _p_Languages = 0;
     _p_MenuBox = 0;
     _p_SceneBackground = 0;
     _p_homeUrl = NULL;
@@ -153,8 +152,8 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
                                SDL_Window* pWindow,
                                MenuDelegator& menuDelegator) {
     _menuDlgt = menuDelegator;
-    LPGameSettings pGameSettings = GAMESET::GetSettings();
-    _p_Screen = pScreen;
+    LPGameSettings pGameSettings = GameSettings::GetSettings();
+    _p_Screen = pScreen; 
     _p_sdlRenderer = pRenderer;
     _p_Window = pWindow;
 
@@ -207,8 +206,7 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
 
     _p_fontAriblk = pGameSettings->GetFontAriblk();
     _p_fontVera = pGameSettings->GetFontVera();
-    _p_Languages = (_menuDlgt.tc)->GetLanguageMan(_menuDlgt.self);
-
+    
     // _p_MenuBox = SDL_CreateRGBSurface(SDL_SWSURFACE, _rctPanelRedBox.w,
     //                                   _rctPanelRedBox.h, 32, 0, 0, 0, 0);
     _p_MenuBox = GFX_UTIL::SDL_CreateRGBSurface(
@@ -284,7 +282,8 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
 }
 
 LPErrInApp MenuMgr::drawStaticScene() {
-    LPGameSettings pGameSettings = GAMESET::GetSettings();
+    LPGameSettings pGameSettings = GameSettings::GetSettings();
+    LPLanguages pLanguages = pGameSettings->GetLanguageMan();
     // function called in loop
     SDL_Rect rctTarget;
     LPErrInApp err = NULL;
@@ -337,7 +336,7 @@ LPErrInApp MenuMgr::drawStaticScene() {
     SDL_Color color = g_color_gray;
     err = drawMenuText(
         _p_ScreenBackbuffer,
-        _p_Languages->GetStringId(Languages::ID_WELCOMETITLEBAR).c_str(),
+        pLanguages->GetStringId(Languages::ID_WELCOMETITLEBAR).c_str(),
         _box_X + bar_x, _box_Y + bar_y - hbar / 2, color, _p_fontAriblk);
     return err;
 }
@@ -351,7 +350,8 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     int intraOffset = (_rctPanelRedBox.h - 80) / 5;
     int minIntraOffsetY = 80;
     intraOffset = min(minIntraOffsetY, intraOffset);
-    LPGameSettings pGameSettings = GAMESET::GetSettings();
+    LPGameSettings pGameSettings = GameSettings::GetSettings();
+    LPLanguages pLanguages = pGameSettings->GetLanguageMan();
     if (pGameSettings->NeedScreenMagnify()) {
         intraOffset += 50;
     }
@@ -366,7 +366,7 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     }
     int currY = _box_Y + offsetY + 30;
     err = drawMenuText(_p_ScreenBackbuffer,
-                       _p_Languages->GetStringId(Languages::ID_START).c_str(),
+                       pLanguages->GetStringId(Languages::ID_START).c_str(),
                        _box_X + offsetX, currY, color, _p_fontAriblk);
     if (err != NULL) {
         return err;
@@ -385,7 +385,7 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     }
     err = drawMenuText(
         _p_ScreenBackbuffer,
-        _p_Languages->GetStringId(Languages::ID_MEN_OPTIONS).c_str(),
+        pLanguages->GetStringId(Languages::ID_MEN_OPTIONS).c_str(),
         _box_X + offsetX, currY, color, _p_fontAriblk);
     if (err != NULL) {
         return err;
@@ -400,7 +400,7 @@ LPErrInApp MenuMgr::drawMenuTextList() {
         color = g_color_on;
     }
     err = drawMenuText(_p_ScreenBackbuffer,
-                       _p_Languages->GetStringId(Languages::ID_CREDITS).c_str(),
+                       pLanguages->GetStringId(Languages::ID_CREDITS).c_str(),
                        _box_X + offsetX, currY, color, _p_fontAriblk);
     if (err != NULL) {
         return err;
@@ -417,7 +417,7 @@ LPErrInApp MenuMgr::drawMenuTextList() {
         color = g_color_on;
     }
     err = drawMenuText(_p_ScreenBackbuffer,
-                       _p_Languages->GetStringId(Languages::ID_MN_HELP).c_str(),
+                       pLanguages->GetStringId(Languages::ID_MN_HELP).c_str(),
                        _box_X + offsetX, currY, color, _p_fontAriblk);
     if (err != NULL) {
         return err;
@@ -435,7 +435,7 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     }
     err =
         drawMenuText(_p_ScreenBackbuffer,
-                     _p_Languages->GetStringId(Languages::ID_HIGHSCORE).c_str(),
+                     pLanguages->GetStringId(Languages::ID_HIGHSCORE).c_str(),
                      _box_X + offsetX, currY, color, _p_fontAriblk);
     if (err != NULL) {
         return err;
@@ -454,7 +454,7 @@ LPErrInApp MenuMgr::drawMenuTextList() {
         color = g_color_on;
     }
     err = drawMenuText(_p_ScreenBackbuffer,
-                       _p_Languages->GetStringId(Languages::ID_EXIT).c_str(),
+                       pLanguages->GetStringId(Languages::ID_EXIT).c_str(),
                        _box_X + offsetX, lastY, color, _p_fontAriblk);
     if (err != NULL) {
         return err;
@@ -484,7 +484,7 @@ LPErrInApp MenuMgr::HandleRootMenu() {
     SDL_Point touchLocation;
     bool mouseInside;
     SDL_Event event;
-    LPGameSettings pGameSettings = GAMESET::GetSettings();
+    LPGameSettings pGameSettings = GameSettings::GetSettings();
     bool ignoreMouseEvent =
         pGameSettings->InputType == InputTypeEnum::TouchWithoutMouse;
     while (SDL_PollEvent(&event)) {

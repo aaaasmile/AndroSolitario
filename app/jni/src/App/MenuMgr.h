@@ -38,7 +38,6 @@ class MenuMgr {
 
    private:
     MenuDelegator _menuDlgt;
-    Languages* _p_Languages;
     TTF_Font* _p_fontAriblk;
     TTF_Font* _p_fontVera;
     TTF_Font* _p_fontVeraUnderscore;

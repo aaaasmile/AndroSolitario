@@ -105,18 +105,18 @@ ClickCb SolitarioGfx::prepClickToggleSoundCb() {
     return (ClickCb){.tc = &tc, .self = this};
 }
 
-LPErrInApp SolitarioGfx::Initialize(
-    SDL_Surface* s, SDL_Renderer* r, SDL_Window* w, 
-    LPLanguages planguages, 
-    SDL_Surface* pSceneBackground, MusicManager* pMusicManager,
-    HighScore* pHighScore) {
+LPErrInApp SolitarioGfx::Initialize(SDL_Surface* s, SDL_Renderer* r,
+                                    SDL_Window* w,
+                                    SDL_Surface* pSceneBackground,
+                                    MusicManager* pMusicManager,
+                                    HighScore* pHighScore) {
     TRACE("Initialize Solitario\n");
-    LPGameSettings pGameSettings = GAMESET::GetSettings();
-    setDeckType( pGameSettings->DeckTypeVal);
+    LPGameSettings pGameSettings = GameSettings::GetSettings();
+    setDeckType(pGameSettings->DeckTypeVal);
     _p_MusicManager = pMusicManager;
     _p_HighScore = pHighScore;
-    _sceneBackgroundIsBlack = pGameSettings->BackgroundType == BackgroundTypeEnum::Black;
-    _p_Languages = planguages;
+    _sceneBackgroundIsBlack =
+        pGameSettings->BackgroundType == BackgroundTypeEnum::Black;
     _p_FontBigText = pGameSettings->GetFontAriblk();
     _p_FontSmallText = pGameSettings->GetFontVera();
     LPErrInApp err;
@@ -547,7 +547,7 @@ void SolitarioGfx::DrawStaticScene() {
 
 LPErrInApp SolitarioGfx::DrawInitialScene() {
     TRACE("DrawInitialScene\n");
-    LPGameSettings pGameSettings = GAMESET::GetSettings();
+    LPGameSettings pGameSettings = GameSettings::GetSettings();
     // SDL_FillRect(_p_Screen, &_p_Screen->clip_rect,
     // SDL_MapRGBA(_p_Screen->format, 0, 0, 0, 0)); //SDL 2
     SDL_Rect clipRect;  // SDL 3
@@ -584,7 +584,7 @@ LPErrInApp SolitarioGfx::DrawInitialScene() {
         btposx = 500;
         btintraX = 50;
     }
-    if (_p_Screen->w == 1024){
+    if (_p_Screen->w == 1024) {
         btposx = 500;
     }
     // button Quit
@@ -617,8 +617,9 @@ LPErrInApp SolitarioGfx::DrawInitialScene() {
     rctBt1.w = btwSymb;
     ClickCb cbBtToggleSound = prepClickToggleSoundCb();
     _p_BtToggleSound = new ButtonGfx();
-    _p_BtToggleSound->InitializeAsSymbol(&rctBt1, _p_Screen, pGameSettings->GetFontSymb(),
-                                 MYIDTOGGLESOUND, cbBtToggleSound);
+    _p_BtToggleSound->InitializeAsSymbol(&rctBt1, _p_Screen,
+                                         pGameSettings->GetFontSymb(),
+                                         MYIDTOGGLESOUND, cbBtToggleSound);
     _p_BtToggleSound->SetVisibleState(ButtonGfx::INVISIBLE);
     return NULL;
 }
@@ -964,7 +965,7 @@ LPErrInApp SolitarioGfx::handleGameLoopFingerUpEvent(SDL_Event& event) {
         CardRegionGfx* pRegion;
         bool isInitDrag = false;
         SDL_Point pt;
-        LPGameSettings pGameSettings = GAMESET::GetSettings();
+        LPGameSettings pGameSettings = GameSettings::GetSettings();
         pGameSettings->GetTouchPoint(event.tfinger,
                                      &pt);  // rememeber here event.button.x and
                                             // event.button.y will not works
@@ -1179,7 +1180,9 @@ LPErrInApp SolitarioGfx::handleGameLoopMouseUpEvent(SDL_Event& event) {
         bonusScore();
         DrawStaticScene();
         char buff[1024];
-        snprintf(buff, 1024, _p_Languages->GetCStringId(Languages::FINAL_SCORE),
+        LPGameSettings pGameSettings = GameSettings::GetSettings();
+        LPLanguages pLanguages = pGameSettings->GetLanguageMan();
+        snprintf(buff, 1024, pLanguages->GetCStringId(Languages::FINAL_SCORE),
                  _scoreGame);
         showOkMsgBox(buff);
         err = _p_HighScore->SaveScore(_scoreGame, _deckType.GetNumCards());
@@ -1201,16 +1204,18 @@ LPErrInApp SolitarioGfx::handleGameLoopMouseUpEvent(SDL_Event& event) {
 LPErrInApp SolitarioGfx::StartGameLoop() {
     TRACE_DEBUG("StartGameLoop, card width %d, height %d\n", g_CardWidth,
                 g_CardHeight);
+    LPGameSettings pGameSettings = GameSettings::GetSettings();
+    LPLanguages pLanguages = pGameSettings->GetLanguageMan();
 
     _p_MusicManager->PlayMusic(MusicManager::MUSIC_PLAY_SND,
                                MusicManager::eLoopType::LOOP_ON);
     // button Quit
     STRING strTextBt;
-    strTextBt = _p_Languages->GetStringId(Languages::ID_EXIT);
+    strTextBt = pLanguages->GetStringId(Languages::ID_EXIT);
     _p_BtQuit->SetButtonText(strTextBt.c_str());
     _p_BtQuit->SetVisibleState(ButtonGfx::VISIBLE);
     // button New Game
-    strTextBt = _p_Languages->GetStringId(Languages::ID_NEWGAME);
+    strTextBt = pLanguages->GetStringId(Languages::ID_NEWGAME);
     _p_BtNewGame->SetButtonText(strTextBt.c_str());
     _p_BtNewGame->SetVisibleState(ButtonGfx::VISIBLE);
     // button Toggle Sound
@@ -1224,7 +1229,6 @@ LPErrInApp SolitarioGfx::StartGameLoop() {
         _p_BtToggleSound->SetVisibleState(ButtonGfx::VISIBLE);
     }
 
-    LPGameSettings pGameSettings = GAMESET::GetSettings();
     int xLine0 = 35;
     int yLine0 = 10;
     int yoffsetLine0 = 40;
@@ -1364,7 +1368,8 @@ LPErrInApp SolitarioGfx::StartGameLoop() {
 }
 
 int SolitarioGfx::showYesNoMsgBox(LPCSTR strText) {
-    LPGameSettings pGameSettings = GAMESET::GetSettings();
+    LPGameSettings pGameSettings = GameSettings::GetSettings();
+    LPLanguages pLanguages = pGameSettings->GetLanguageMan();
     MesgBoxGfx MsgBox;
     int offsetW = 100;
     int offsetH = 130;
@@ -1393,15 +1398,16 @@ int SolitarioGfx::showYesNoMsgBox(LPCSTR strText) {
 
     SDL_BlitSurface(_p_Screen, NULL, _p_AlphaDisplay, NULL);
 
-    STRING strTextYes = _p_Languages->GetStringId(Languages::ID_YES);
-    STRING strTextNo = _p_Languages->GetStringId(Languages::ID_NO);
+    STRING strTextYes = pLanguages->GetStringId(Languages::ID_YES);
+    STRING strTextNo = pLanguages->GetStringId(Languages::ID_NO);
 
     return MsgBox.Show(_p_AlphaDisplay, strTextYes.c_str(), strTextNo.c_str(),
                        strText);
 }
 
 void SolitarioGfx::showOkMsgBox(LPCSTR strText) {
-    LPGameSettings pGameSettings = GAMESET::GetSettings();
+    LPGameSettings pGameSettings = GameSettings::GetSettings();
+    LPLanguages pLanguages = pGameSettings->GetLanguageMan();
     int offsetW = 100;
     int offsetH = 130;
     if (pGameSettings->NeedScreenMagnify()) {
@@ -1430,13 +1436,15 @@ void SolitarioGfx::showOkMsgBox(LPCSTR strText) {
 
     SDL_BlitSurface(_p_Screen, NULL, _p_AlphaDisplay, NULL);
 
-    STRING strTextOk = _p_Languages->GetStringId(Languages::ID_OK);
+    STRING strTextOk = pLanguages->GetStringId(Languages::ID_OK);
     MsgBox.Show(_p_AlphaDisplay, strTextOk.c_str(), "", strText);
 }
 
 void SolitarioGfx::BtQuitClick() {
     TRACE("Quit with user button\n");
-    if (showYesNoMsgBox(_p_Languages->GetCStringId(Languages::ASK_QUIT)) ==
+    LPGameSettings pGameSettings = GameSettings::GetSettings();
+    LPLanguages pLanguages = pGameSettings->GetLanguageMan();
+    if (showYesNoMsgBox(pLanguages->GetCStringId(Languages::ASK_QUIT)) ==
         MesgBoxGfx::RES_YES) {
         _terminated = true;
     } else {
@@ -1446,7 +1454,9 @@ void SolitarioGfx::BtQuitClick() {
 
 void SolitarioGfx::BtNewGameClick() {
     TRACE("New Game with user button\n");
-    if (showYesNoMsgBox(_p_Languages->GetCStringId(Languages::ASK_NEWGAME)) ==
+    LPGameSettings pGameSettings = GameSettings::GetSettings();
+    LPLanguages pLanguages = pGameSettings->GetLanguageMan();
+    if (showYesNoMsgBox(pLanguages->GetCStringId(Languages::ASK_NEWGAME)) ==
         MesgBoxGfx::RES_YES) {
         _newgamerequest = true;
     } else {
@@ -1473,7 +1483,8 @@ LPErrInApp SolitarioGfx::drawScore(SDL_Surface* pScreen) {
     if (!_scoreChanged) {
         return NULL;
     }
-    LPGameSettings pGameSettings = GAMESET::GetSettings();
+    LPGameSettings pGameSettings = GameSettings::GetSettings();
+    LPLanguages pLanguages = pGameSettings->GetLanguageMan();
     int tx = 10;
     int offsetY = 30;
     if (pGameSettings->NeedScreenMagnify()) {
@@ -1483,7 +1494,7 @@ LPErrInApp SolitarioGfx::drawScore(SDL_Surface* pScreen) {
     int ty = pScreen->h - offsetY;
     char buff[256];
     snprintf(buff, sizeof(buff), "%s : %d",
-             _p_Languages->GetCStringId(Languages::ID_SCORE), _scoreGame);
+             pLanguages->GetCStringId(Languages::ID_SCORE), _scoreGame);
 
     SDL_Color colorText = GFX_UTIL_COLOR::White;
     if (_scoreGame < 0) {

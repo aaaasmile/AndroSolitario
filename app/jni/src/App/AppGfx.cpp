@@ -47,7 +47,7 @@ AppGfx::AppGfx() {
     _p_HighScore = 0;
     _p_CreditTitle = 0;
     _fullScreen = false;
-    _p_GameSettings = GAMESET::GetSettings();
+    _p_GameSettings = GameSettings::GetSettings();
 }
 
 AppGfx::~AppGfx() { terminate(); }
@@ -90,7 +90,8 @@ LPErrInApp AppGfx::Init() {
     _p_HighScore = new HighScore();
     _p_HighScore->Load();
 
-    _Languages.SetLang(_p_GameSettings->CurrentLanguage);
+    _p_GameSettings->SetCurrentLang();
+    Languages *pLanguages = _p_GameSettings->GetLanguageMan();
 
     if (TTF_Init() == -1) {
         return ERR_UTIL::ErrorCreate("Font init error");
@@ -99,7 +100,7 @@ LPErrInApp AppGfx::Init() {
         _p_GameSettings->UseBigFontSize();
     }
 
-    const char* title = _Languages.GetCStringId(Languages::ID_SOLITARIO);
+    const char* title = pLanguages->GetCStringId(Languages::ID_SOLITARIO);
     SDL_SetWindowTitle(_p_Window, title);
 
     SDL_Surface* psIcon = SDL_LoadBMP(g_lpszIconProgFile);
@@ -269,7 +270,7 @@ LPErrInApp AppGfx::startGameLoop() {
     _p_SolitarioGfx = new SolitarioGfx();
 
     err = _p_SolitarioGfx->Initialize(_p_Screen, _p_sdlRenderer, _p_Window,
-                                      &_Languages, _p_SceneBackground,
+                                      _p_SceneBackground,
                                       _p_MusicManager, _p_HighScore);
     if (err != NULL)
         return err;
@@ -331,11 +332,6 @@ LPErrInApp AppGfx::writeProfile() {
     return _p_GameSettings->SaveSettings();
 }
 
-Languages* fncBind_GetLanguageMan(void* self) {
-    AppGfx* pApp = (AppGfx*)self;
-    return pApp->GetLanguageMan();
-}
-
 void fncBind_LeaveMenu(void* self) {
     AppGfx* pApp = (AppGfx*)self;
     pApp->LeaveMenu();
@@ -355,7 +351,6 @@ LPErrInApp fncBind_SettingsChanged(void* self, bool backGroundChanged,
 MenuDelegator AppGfx::prepMenuDelegator() {
     // Use only static otherwise you loose it
     static VMenuDelegator const tc = {
-        .GetLanguageMan = (&fncBind_GetLanguageMan),
         .LeaveMenu = (&fncBind_LeaveMenu),
         .SetNextMenu = (&fncBind_SetNextMenu),
         .SettingsChanged = (&fncBind_SettingsChanged)};
@@ -374,6 +369,7 @@ LPErrInApp AppGfx::SettingsChanged(bool backGroundChanged,
     if (backGroundChanged) {
         _backGroundChanged = true;
     }
+    _p_GameSettings->SetCurrentLang();
     return writeProfile();
 }
 
@@ -496,7 +492,7 @@ LPErrInApp AppGfx::showHighScore() {
         _p_MusicManager->StopMusic(600);
     }
     _p_HighScore->Show(_p_Screen, _p_CreditTitle, _p_sdlRenderer,
-                       _p_MusicManager, &_Languages);
+                       _p_MusicManager);
 
     LeaveMenu();
 
@@ -525,7 +521,10 @@ LPErrInApp AppGfx::showOptionGeneral() {
     OptionsGfx optGfx;
 
     MenuDelegator delegator = prepMenuDelegator();
-    STRING caption = _Languages.GetStringId(Languages::ID_MEN_OPTIONS);
+    LPGameSettings pGameSettings = GameSettings::GetSettings();
+    LPLanguages pLanguages = pGameSettings->GetLanguageMan();
+
+    STRING caption = pLanguages->GetStringId(Languages::ID_MEN_OPTIONS);
     LPErrInApp err = optGfx.Initialize(_p_Screen, _p_sdlRenderer,
                                        _p_MusicManager, delegator);
     if (err) {

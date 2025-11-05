@@ -20,16 +20,15 @@ typedef struct {
 class HighScore {
     enum { NUMOFSCORE = 10 };
 
-public:
+   public:
     HighScore();
     LPErrInApp Load();
     LPErrInApp Save();
     LPErrInApp SaveScore(int score, int numCard);
     LPErrInApp Show(SDL_Surface* screen, SDL_Surface* pSurfTitle,
-                    SDL_Renderer* psdlRenderer, MusicManager* pMusicManager,
-                    Languages* pLanguages);
+                    SDL_Renderer* psdlRenderer, MusicManager* pMusicManager);
 
-private:
+   private:
     ScoreInfo _scoreInfo[NUMOFSCORE];
 };
 
