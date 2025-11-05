@@ -572,6 +572,7 @@ LPErrInApp SolitarioGfx::DrawInitialScene() {
 
     SDL_Rect rctBt1;
     int btw = 120;
+    int btwSymb = 60;
     int bth = 28;
     int btoffsetY = 70;
     int btposx = 150;
@@ -613,9 +614,10 @@ LPErrInApp SolitarioGfx::DrawInitialScene() {
     }
     rctBt1.y = _p_Screen->h - offsetY;
     rctBt1.x = tx;
+    rctBt1.w = btwSymb;
     ClickCb cbBtToggleSound = prepClickToggleSoundCb();
     _p_BtToggleSound = new ButtonGfx();
-    _p_BtToggleSound->Initialize(&rctBt1, _p_Screen, _p_FontBigText,
+    _p_BtToggleSound->InitializeAsSymbol(&rctBt1, _p_Screen, pGameSettings->GetFontSymb(),
                                  MYIDTOGGLESOUND, cbBtToggleSound);
     _p_BtToggleSound->SetVisibleState(ButtonGfx::INVISIBLE);
     return NULL;

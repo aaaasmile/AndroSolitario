@@ -47,6 +47,27 @@ void ButtonGfx::Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
     _buttonType = TEXT_BUTTON;
 }
 
+void ButtonGfx::InitializeAsSymbol(SDL_Rect* pRect, SDL_Surface* pScreen,
+                                   TTF_Font* pFont, int iButID,
+                                   ClickCb& fncbClickEvent) {
+    _fncbClickEvent = fncbClickEvent;
+    _rctButton = *pRect;
+
+    _p_buttonSurface = GFX_UTIL::SDL_CreateRGBSurface(
+        _rctButton.w, _rctButton.h, 32, 0, 0, 0, 0);
+
+    SDL_FillSurfaceRect(_p_buttonSurface, NULL,
+                        SDL_MapRGB(SDL_GetPixelFormatDetails(pScreen->format),
+                                   NULL, 255, 0, 0));
+
+    SDL_SetSurfaceBlendMode(_p_buttonSurface, SDL_BLENDMODE_BLEND);
+    SDL_SetSurfaceAlphaMod(_p_buttonSurface, 127);
+    _p_fontText = pFont;
+    _butID = iButID;
+    _mouseIsDown = false;
+    _buttonType = SYMBOL_BT;
+}
+
 bool ButtonGfx::MouseMove(SDL_Event& event) {
     if (_p_GameSettings->InputType == InputTypeEnum::TouchWithoutMouse) {
         return false;
@@ -144,7 +165,13 @@ void ButtonGfx::DrawButton(SDL_Surface* pScreen) {
                                  _rctButton.x, _rctButton.y, _p_buttonSurface);
     int tx, ty;
     // TTF_SizeText(_p_fontText, _buttonText.c_str(), &tx, &ty); SDL 2
-    TTF_GetStringSize(_p_fontText, _buttonText.c_str(), 0, &tx, &ty);
+    if (_buttonType == TEXT_BUTTON){
+        TTF_GetStringSize(_p_fontText, _buttonText.c_str(), 0, &tx, &ty);
+    }else {
+        TTF_MeasureString(_p_fontText, _buttonText.c_str(), 1, _rctButton.w, &tx, NULL);
+        tx += 5;
+    }
+    
 
     int iXOffSet = (_rctButton.w - tx) / 2;
     if (iXOffSet < 0) {
