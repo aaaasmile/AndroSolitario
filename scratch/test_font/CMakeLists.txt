@@ -28,7 +28,6 @@ else()
         message(STATUS "C++ compiler ID: ${CMAKE_CXX_COMPILER_ID}")
         message(STATUS "C++ compiler version: ${CMAKE_CXX_COMPILER_VERSION}")
         target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_11)
-        target_compile_options(${PROJECT_NAME} PRIVATE -std=c++11)
         target_include_directories(${PROJECT_NAME} PRIVATE ../../app/jni/SDL/include ../../app/jni/SDL_image/include ../../app/jni/SDL_mixer/include ../../app/jni/SDL_ttf/include)
         target_compile_definitions(${PROJECT_NAME} PRIVATE TRACEINSERVICE _DEBUG WSL2_BUILD)
         ## use SDL from this compiled in this workspace
@@ -45,7 +44,12 @@ else()
             SDL3_ttf::SDL3_ttf
         )
         message(STATUS "Current source dir: ${CMAKE_CURRENT_SOURCE_DIR}")
-
+        add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+          COMMAND ${CMAKE_COMMAND} -E copy_directory
+              ${CMAKE_CURRENT_SOURCE_DIR}/fonts
+              $<TARGET_FILE_DIR:${PROJECT_NAME}>/fonts
+          COMMENT "Copying font to build directory"
+        )
   else()
     message(STATUS "Target system is: " ${CMAKE_SYSTEM})
   endif()
