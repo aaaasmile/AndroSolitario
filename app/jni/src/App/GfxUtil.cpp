@@ -283,10 +283,12 @@ LPErrInApp GFX_UTIL::LoadCardPac(SDL_Surface** pp_Deck, DeckType& deckType,
     //     *pp_Deck, true,
     //     SDL_MapRGB((*pp_Deck)->format, red_trasp, green_trasp, blue_trasp));
     //     // SDL 2
+    // SDL_GetSurfacePalette is important because the alpha color on the top left is indexed with a palette
     SDL_SetSurfaceColorKey(
         *pp_Deck, true,
-        SDL_MapRGB(SDL_GetPixelFormatDetails((*pp_Deck)->format), NULL,
-                   red_trasp, green_trasp, blue_trasp));
+        SDL_MapRGB(SDL_GetPixelFormatDetails((*pp_Deck)->format),
+                   SDL_GetSurfacePalette(*pp_Deck), red_trasp, green_trasp,
+                   blue_trasp));
     *pac_h = h;
     *pac_w = w;
 
