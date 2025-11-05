@@ -106,18 +106,19 @@ ClickCb SolitarioGfx::prepClickToggleSoundCb() {
 }
 
 LPErrInApp SolitarioGfx::Initialize(
-    SDL_Surface* s, SDL_Renderer* r, SDL_Window* w, DeckType& dt,
-    LPLanguages planguages, TTF_Font* pfontSmallText, TTF_Font* pfontBigText,
-    SDL_Surface* pSceneBackground, MusicManager* pMusicManager, bool isBlack,
+    SDL_Surface* s, SDL_Renderer* r, SDL_Window* w, 
+    LPLanguages planguages, 
+    SDL_Surface* pSceneBackground, MusicManager* pMusicManager,
     HighScore* pHighScore) {
     TRACE("Initialize Solitario\n");
-    setDeckType(dt);
+    LPGameSettings pGameSettings = GAMESET::GetSettings();
+    setDeckType( pGameSettings->DeckTypeVal);
     _p_MusicManager = pMusicManager;
     _p_HighScore = pHighScore;
-    _sceneBackgroundIsBlack = isBlack;
+    _sceneBackgroundIsBlack = pGameSettings->BackgroundType == BackgroundTypeEnum::Black;
     _p_Languages = planguages;
-    _p_FontBigText = pfontBigText;
-    _p_FontSmallText = pfontSmallText;
+    _p_FontBigText = pGameSettings->GetFontAriblk();
+    _p_FontSmallText = pGameSettings->GetFontVera();
     LPErrInApp err;
     _p_Screen = s;
     _p_sdlRenderer = r;

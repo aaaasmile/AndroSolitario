@@ -6,7 +6,6 @@
 #endif
 
 #include <SDL3/SDL.h>
-#include <SDL3_ttf/SDL_ttf.h>
 
 #include <stack>
 #include <string>
@@ -35,10 +34,6 @@ public:
     }
     Languages* GetLanguageMan() { return &_Languages; }
     void ParseCmdLine(int argc, char* argv[]);
-    TTF_Font* GetFontVera() { return _p_fontVera; }  // text small
-    TTF_Font* GetFontAriblk() {
-        return _p_fontAriblk;
-    }  // text for big command on menu
     void LeaveMenu();
     void SetNextMenu(MenuItemEnum menuItem) { _histMenu.push(menuItem); }
     LPErrInApp SettingsChanged(bool backGroundChanged, bool languageChanged);
@@ -68,8 +63,6 @@ private:
     SDL_Texture* _p_ScreenTexture;
     SDL_Window* _p_Window;
     SDL_Renderer* _p_sdlRenderer;
-    TTF_Font* _p_fontVera;
-    TTF_Font* _p_fontAriblk;
     GameSettings* _p_GameSettings;
     SolitarioGfx* _p_SolitarioGfx;
     MusicManager* _p_MusicManager;

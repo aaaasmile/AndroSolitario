@@ -53,10 +53,9 @@ class SolitarioGfx {
     ~SolitarioGfx();
 
     LPErrInApp Initialize(SDL_Surface *s, SDL_Renderer *r, SDL_Window *w,
-                          DeckType &dt, LPLanguages planguages,
-                          TTF_Font *pfontSmallText, TTF_Font *pfontBigText,
+                          LPLanguages planguages,
                           SDL_Surface *pSceneBackground,
-                          MusicManager *pMusicManager, bool isBlack,
+                          MusicManager *pMusicManager,
                           HighScore *pHighScore);
     LPErrInApp StartGameLoop();
 

@@ -20,8 +20,6 @@ enum MenuItemEnum {
 namespace traits {
     // trait for menu
     typedef struct {
-        TTF_Font* (*const GetFontVera)(void* self);
-        TTF_Font* (*const GetFontAriblk)(void* self);
         Languages* (*const GetLanguageMan)(void* self);
         void (*const LeaveMenu)(void* self);
         void (*const SetNextMenu)(void* self, MenuItemEnum menuItem);

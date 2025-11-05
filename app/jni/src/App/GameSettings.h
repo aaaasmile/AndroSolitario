@@ -1,12 +1,14 @@
 #ifndef __GAMESETTINGS__H_
 #define __GAMESETTINGS__H_
 
+#include <SDL3/SDL.h>
+#include <SDL3_ttf/SDL_ttf.h>
+
 #include <string>
 
 #include "DeckType.h"
 #include "ErrorInfo.h"
 #include "Languages.h"
-#include <SDL3/SDL.h>
 
 enum BackgroundTypeEnum { Commessaggio = 0, Mantova = 1, Black = 2 };
 enum InputTypeEnum { Mouse = 0, TouchWithoutMouse = 1 };
@@ -36,6 +38,7 @@ class GameSettings {
     }
     LPErrInApp LoadSettings();
     LPErrInApp SaveSettings();
+    LPErrInApp LoadFonts();
     LPErrInApp CalcDisplaySize(int w, int h);
     void GetTouchPoint(SDL_TouchFingerEvent& tfinger, SDL_Point* pPoint);
     int GetScreenHeight() { return _screenRect.h; }
@@ -45,6 +48,7 @@ class GameSettings {
     }
     int GetSizeFontSmall() { return _fontSmallSize; }
     int GetSizeFontBig() { return _fontBigSize; }
+    int GetSizeFontSym() { return _fontSymSize; }
     void SetFontSize(int s, int b) {
         _fontBigSize = b;
         _fontSmallSize = s;
@@ -52,15 +56,24 @@ class GameSettings {
     void UseBigFontSize() {
         _fontSmallSize = 22;
         _fontBigSize = 46;
+        _fontSymSize = 36;
     }
+    TTF_Font* GetFontAriblk(){return _p_fontAriblk;}
+    TTF_Font* GetFontVera(){return _p_fontVera;}
+    TTF_Font* GetFontSymb(){return _p_fontSymb;}
 
    private:
     LPErrInApp setSettingFileName();
-    
+
    private:
     SDL_Rect _screenRect = {0};
     int _fontSmallSize = 11;
     int _fontBigSize = 22;
+    int _fontSymSize = 24;
+    TTF_Font* _p_fontVera;
+    TTF_Font* _p_fontAriblk;
+    TTF_Font* _p_fontSymb;
+    
 };
 
 typedef GameSettings* LPGameSettings;

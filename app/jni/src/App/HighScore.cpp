@@ -147,8 +147,7 @@ LPErrInApp HighScore::Load() {
 
 LPErrInApp HighScore::Show(SDL_Surface* p_surf_screen, SDL_Surface* pSurfTitle,
                            SDL_Renderer* psdlRenderer,
-                           MusicManager* pMusicManager, TTF_Font* pFont,
-                           TTF_Font* pFont2, Languages* pLanguages) {
+                           MusicManager* pMusicManager, Languages* pLanguages) {
     SDL_Rect dest;
     SDL_Event event;
     Uint32 last_time, now_time;
@@ -209,7 +208,9 @@ LPErrInApp HighScore::Show(SDL_Surface* p_surf_screen, SDL_Surface* pSurfTitle,
         char buff[256];
         xOff = 0;
         yOff = 0;
-
+        TTF_Font* pFont = pGameSettings->GetFontAriblk();
+        TTF_Font* pFont2 = pGameSettings->GetFontVera();
+        
         xOff += ax;
         SDL_Color txtColor = GFX_UTIL_COLOR::Gray;
         GFX_UTIL::DrawString(p_surf_screen,

@@ -205,8 +205,8 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
                                      SDL_GetError());
     }
 
-    _p_fontAriblk = (_menuDlgt.tc)->GetFontAriblk(_menuDlgt.self);
-    _p_fontVera = (_menuDlgt.tc)->GetFontVera(_menuDlgt.self);
+    _p_fontAriblk = pGameSettings->GetFontAriblk();
+    _p_fontVera = pGameSettings->GetFontVera();
     _p_Languages = (_menuDlgt.tc)->GetLanguageMan(_menuDlgt.self);
 
     // _p_MenuBox = SDL_CreateRGBSurface(SDL_SWSURFACE, _rctPanelRedBox.w,

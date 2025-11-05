@@ -95,8 +95,8 @@ LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
     _p_screen = pScreen;
     _menuDlgt = menuDlg;
     _p_MusicManager = pMusicMgr;
-    _p_fontText = _menuDlgt.tc->GetFontVera(_menuDlgt.self);
-    _p_fontCtrl = _menuDlgt.tc->GetFontAriblk(_menuDlgt.self);
+    _p_fontCtrl = _p_GameSettings->GetFontAriblk();
+    _p_fontText = _p_GameSettings->GetFontVera();
     _p_sdlRenderer = pRenderer;
     _p_languages = _menuDlgt.tc->GetLanguageMan(_menuDlgt.self);
 

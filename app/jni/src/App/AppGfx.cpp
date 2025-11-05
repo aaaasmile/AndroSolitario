@@ -29,8 +29,7 @@ static const char* g_lpszHelpFileName = DATA_PREFIX "solitario.pdf";
 
 static const char* g_lpszIconProgFile = DATA_PREFIX "images/icona_asso.bmp";
 static const char* g_lpszTitleFile = DATA_PREFIX "images/title.png";
-static const char* g_lpszIniFontAriblk = DATA_PREFIX "font/ariblk.ttf";
-static const char* g_lpszIniFontVera = DATA_PREFIX "font/vera.ttf";
+
 static const char* g_lpszImageSplashComm =
     DATA_PREFIX "images/commessaggio.jpg";
 static const char* g_lpszImageSplashMantova = DATA_PREFIX "images/mantova.jpg";
@@ -99,20 +98,6 @@ LPErrInApp AppGfx::Init() {
     if (_p_GameSettings->NeedScreenMagnify()) {
         _p_GameSettings->UseBigFontSize();
     }
-    int sizeFontBig = _p_GameSettings->GetSizeFontBig();
-    int sizeFontSmall = _p_GameSettings->GetSizeFontSmall();
-    std::string strFileFontStatus = g_lpszIniFontAriblk;
-    _p_fontAriblk = TTF_OpenFont(strFileFontStatus.c_str(), sizeFontBig);
-    if (_p_fontAriblk == 0) {
-        return ERR_UTIL::ErrorCreate("Unable to load font %s, error: %s\n",
-                                     strFileFontStatus.c_str(), SDL_GetError());
-    }
-    strFileFontStatus = g_lpszIniFontVera;
-    _p_fontVera = TTF_OpenFont(strFileFontStatus.c_str(), sizeFontSmall);
-    if (_p_fontVera == 0) {
-        return ERR_UTIL::ErrorCreate("Unable to load font %s, error: %s\n",
-                                     strFileFontStatus.c_str(), SDL_GetError());
-    }
 
     const char* title = _Languages.GetCStringId(Languages::ID_SOLITARIO);
     SDL_SetWindowTitle(_p_Window, title);
@@ -134,6 +119,10 @@ LPErrInApp AppGfx::Init() {
         return ERR_UTIL::ErrorCreate("Title image not found");
     }
     err = loadSceneBackground();
+    if (err != NULL) {
+        return err;
+    }
+    err = _p_GameSettings->LoadFonts();
     if (err != NULL) {
         return err;
     }
@@ -279,12 +268,9 @@ LPErrInApp AppGfx::startGameLoop() {
     }
     _p_SolitarioGfx = new SolitarioGfx();
 
-    err = _p_SolitarioGfx->Initialize(
-        _p_Screen, _p_sdlRenderer, _p_Window, _p_GameSettings->DeckTypeVal,
-        &_Languages, _p_fontVera, _p_fontAriblk, _p_SceneBackground,
-        _p_MusicManager,
-        _p_GameSettings->BackgroundType == BackgroundTypeEnum::Black,
-        _p_HighScore);
+    err = _p_SolitarioGfx->Initialize(_p_Screen, _p_sdlRenderer, _p_Window,
+                                      &_Languages, _p_SceneBackground,
+                                      _p_MusicManager, _p_HighScore);
     if (err != NULL)
         return err;
 
@@ -345,16 +331,6 @@ LPErrInApp AppGfx::writeProfile() {
     return _p_GameSettings->SaveSettings();
 }
 
-TTF_Font* fncBind_GetFontVera(void* self) {
-    AppGfx* pApp = (AppGfx*)self;
-    return pApp->GetFontVera();
-}
-
-TTF_Font* fncBind_GetFontAriblk(void* self) {
-    AppGfx* pApp = (AppGfx*)self;
-    return pApp->GetFontAriblk();
-}
-
 Languages* fncBind_GetLanguageMan(void* self) {
     AppGfx* pApp = (AppGfx*)self;
     return pApp->GetLanguageMan();
@@ -379,8 +355,6 @@ LPErrInApp fncBind_SettingsChanged(void* self, bool backGroundChanged,
 MenuDelegator AppGfx::prepMenuDelegator() {
     // Use only static otherwise you loose it
     static VMenuDelegator const tc = {
-        .GetFontVera = (&fncBind_GetFontVera),
-        .GetFontAriblk = (&fncBind_GetFontAriblk),
         .GetLanguageMan = (&fncBind_GetLanguageMan),
         .LeaveMenu = (&fncBind_LeaveMenu),
         .SetNextMenu = (&fncBind_SetNextMenu),
@@ -522,8 +496,7 @@ LPErrInApp AppGfx::showHighScore() {
         _p_MusicManager->StopMusic(600);
     }
     _p_HighScore->Show(_p_Screen, _p_CreditTitle, _p_sdlRenderer,
-                       _p_MusicManager, _p_fontAriblk, _p_fontVera,
-                       &_Languages);
+                       _p_MusicManager, &_Languages);
 
     LeaveMenu();
 

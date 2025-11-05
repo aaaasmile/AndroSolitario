@@ -9,11 +9,7 @@ else()
 endif()
 
 # Solitario program
-set(SOURCES GameGfx/CardRegionGfx.cpp
-            GameGfx/CardStackGfx.cpp
-            GameGfx/SolitarioGfx.cpp
-            GameGfx/CurrentTime.cpp
-            App/MusicManager.cpp
+set(SOURCES App/MusicManager.cpp
             App/AppGfx.cpp
             App/CardGfx.cpp
             App/DeckType.cpp
@@ -33,7 +29,11 @@ set(SOURCES GameGfx/CardRegionGfx.cpp
             CompGfx/CheckBoxGfx.cpp
             CompGfx/ComboGfx.cpp
             CompGfx/MesgBoxGfx.cpp
-            CompGfx/LabelGfx.cpp)
+            CompGfx/LabelGfx.cpp
+            CompGfx/CurrentTime.cpp
+            GameGfx/CardRegionGfx.cpp
+            GameGfx/CardStackGfx.cpp
+            GameGfx/SolitarioGfx.cpp)
 if (${UNIX_SYS})
     set(SOURCES2 UnixSys/UnixsysTrace.cpp)
 endif()
