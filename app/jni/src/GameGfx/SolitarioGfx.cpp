@@ -582,6 +582,9 @@ LPErrInApp SolitarioGfx::DrawInitialScene() {
         btposx = 500;
         btintraX = 50;
     }
+    if (_p_Screen->w == 1024){
+        btposx = 500;
+    }
     // button Quit
     ClickCb cbBtQuit = prepClickQuitCb();
     _p_BtQuit = new ButtonGfx();
@@ -939,7 +942,7 @@ LPErrInApp SolitarioGfx::handleGameLoopKeyDownEvent(SDL_Event& event) {
     return NULL;
 }
 
-// Remeber Finger events are parallel with mouse events
+// Remember Finger events are parallel with mouse events
 // here use Finger only for button and mouse right click simulation
 LPErrInApp SolitarioGfx::handleGameLoopFingerDownEvent(SDL_Event& event) {
     TRACE_DEBUG("handleGameLoopFingerDownEvent \n");
@@ -1210,9 +1213,9 @@ LPErrInApp SolitarioGfx::StartGameLoop() {
     // button Toggle Sound
     if (_p_MusicManager->IsMusicEnabled()) {
         if (_p_MusicManager->IsPlayingMusic()) {
-            strTextBt = _p_Languages->GetStringId(Languages::ON);
+            strTextBt = "🔊";  //_p_Languages->GetStringId(Languages::ON);
         } else {
-            strTextBt = _p_Languages->GetStringId(Languages::OFF);
+            strTextBt = "🔇";  //_p_Languages->GetStringId(Languages::OFF);
         }
         _p_BtToggleSound->SetButtonText(strTextBt.c_str());
         _p_BtToggleSound->SetVisibleState(ButtonGfx::VISIBLE);
@@ -1453,9 +1456,9 @@ void SolitarioGfx::BtToggleSoundClick() {
     STRING strTextBt;
     if (_p_MusicManager->IsPlayingMusic()) {
         _p_MusicManager->StopMusic(300);
-        strTextBt = _p_Languages->GetStringId(Languages::OFF);
+        strTextBt = "🔇";  //_p_Languages->GetStringId(Languages::OFF);
     } else {
-        strTextBt = _p_Languages->GetStringId(Languages::ON);
+        strTextBt = "🔊";  //_p_Languages->GetStringId(Languages::ON);
         _p_MusicManager->PlayMusic(MusicManager::MUSIC_PLAY_SND,
                                    MusicManager::eLoopType::LOOP_ON);
     }
