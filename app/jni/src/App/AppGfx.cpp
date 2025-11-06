@@ -560,30 +560,3 @@ void AppGfx::ParseCmdLine(int argc, char* argv[]) {
     }
 }
 
-bool AppGfx::parseScreenSize(LPCSTR strInput) {
-    char strBuffer[2048];
-    memset(strBuffer, 0, 2048);
-    char seps[] = " ,\t\n";
-    char* token;
-    VCT_STRING vct_String;
-    bool bRet = false;
-
-    int iNumChar = strlen(strInput);
-    strncpy(strBuffer, strInput, iNumChar);
-    token = strtok(strBuffer, seps);
-    while (token != NULL) {
-        vct_String.push_back(token);
-        token = strtok(NULL, seps);
-    }
-
-    int iNumElemntArr = vct_String.size();
-
-    if (iNumElemntArr == 2) {
-        sscanf((LPCSTR)vct_String[0].c_str(), "%d", &_screenW);
-        sscanf((LPCSTR)vct_String[1].c_str(), "%d", &_screenH);
-        bRet = true;
-    }
-    return bRet;
-}
-
-
