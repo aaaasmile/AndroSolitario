@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2024 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2025 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -36,17 +36,18 @@ static int numjoysticks = 0;
 
 static EM_BOOL Emscripten_JoyStickConnected(int eventType, const EmscriptenGamepadEvent *gamepadEvent, void *userData)
 {
+    SDL_joylist_item *item;
     int i;
 
-    SDL_joylist_item *item;
+    SDL_LockJoysticks();
 
     if (JoystickByIndex(gamepadEvent->index) != NULL) {
-        return 1;
+        goto done;
     }
 
     item = (SDL_joylist_item *)SDL_malloc(sizeof(SDL_joylist_item));
     if (!item) {
-        return 1;
+        goto done;
     }
 
     SDL_zerop(item);
@@ -55,14 +56,14 @@ static EM_BOOL Emscripten_JoyStickConnected(int eventType, const EmscriptenGamep
     item->name = SDL_CreateJoystickName(0, 0, NULL, gamepadEvent->id);
     if (!item->name) {
         SDL_free(item);
-        return 1;
+        goto done;
     }
 
     item->mapping = SDL_strdup(gamepadEvent->mapping);
     if (!item->mapping) {
         SDL_free(item->name);
         SDL_free(item);
-        return 1;
+        goto done;
     }
 
     item->naxes = gamepadEvent->numAxes;
@@ -98,6 +99,9 @@ static EM_BOOL Emscripten_JoyStickConnected(int eventType, const EmscriptenGamep
     SDL_Log("Added joystick with index %d", item->index);
 #endif
 
+done:
+    SDL_UnlockJoysticks();
+
     return 1;
 }
 
@@ -105,6 +109,8 @@ static EM_BOOL Emscripten_JoyStickDisconnected(int eventType, const EmscriptenGa
 {
     SDL_joylist_item *item = SDL_joylist;
     SDL_joylist_item *prev = NULL;
+
+    SDL_LockJoysticks();
 
     while (item) {
         if (item->index == gamepadEvent->index) {
@@ -115,7 +121,7 @@ static EM_BOOL Emscripten_JoyStickDisconnected(int eventType, const EmscriptenGa
     }
 
     if (!item) {
-        return 1;
+        goto done;
     }
 
     if (item->joystick) {
@@ -143,6 +149,10 @@ static EM_BOOL Emscripten_JoyStickDisconnected(int eventType, const EmscriptenGa
     SDL_free(item->name);
     SDL_free(item->mapping);
     SDL_free(item);
+
+done:
+    SDL_UnlockJoysticks();
+
     return 1;
 }
 
@@ -295,6 +305,7 @@ static SDL_JoystickID EMSCRIPTEN_JoystickGetDeviceInstanceID(int device_index)
 static bool EMSCRIPTEN_JoystickOpen(SDL_Joystick *joystick, int device_index)
 {
     SDL_joylist_item *item = JoystickByDeviceIndex(device_index);
+    bool rumble_available = false;
 
     if (!item) {
         return SDL_SetError("No such device");
@@ -312,6 +323,22 @@ static bool EMSCRIPTEN_JoystickOpen(SDL_Joystick *joystick, int device_index)
 
     joystick->nbuttons = item->nbuttons;
     joystick->naxes = item->naxes;
+
+    rumble_available = EM_ASM_INT({
+        let gamepads = navigator['getGamepads']();
+        if (!gamepads) {
+            return 0;
+        }
+        let gamepad = gamepads[$0];
+        if (!gamepad || !gamepad['vibrationActuator']) {
+            return 0;
+        }
+        return 1;
+        }, item->index);
+
+    if (rumble_available) {
+        SDL_SetBooleanProperty(SDL_GetJoystickProperties(joystick), SDL_PROP_JOYSTICK_CAP_RUMBLE_BOOLEAN, true);
+    }
 
     return true;
 }
@@ -380,7 +407,29 @@ static SDL_GUID EMSCRIPTEN_JoystickGetDeviceGUID(int device_index)
 
 static bool EMSCRIPTEN_JoystickRumble(SDL_Joystick *joystick, Uint16 low_frequency_rumble, Uint16 high_frequency_rumble)
 {
-    return SDL_Unsupported();
+    SDL_joylist_item *item = (SDL_joylist_item *)joystick->hwdata;
+
+    // clang-format off
+    bool result = EM_ASM_INT({
+        let gamepads = navigator['getGamepads']();
+        if (!gamepads) {
+            return 0;
+        }
+        let gamepad = gamepads[$0];
+        if (!gamepad || !gamepad['vibrationActuator']) {
+            return 0;
+        }
+
+        gamepad['vibrationActuator']['playEffect']('dual-rumble', {
+            'startDelay': 0,
+            'duration': 3000,
+            'weakMagnitude': $1 / 0xFFFF,
+            'strongMagnitude': $2 / 0xFFFF,
+        });
+        return 1;
+        }, item->index, low_frequency_rumble, high_frequency_rumble);
+
+    return result;
 }
 
 static bool EMSCRIPTEN_JoystickRumbleTriggers(SDL_Joystick *joystick, Uint16 left_rumble, Uint16 right_rumble)

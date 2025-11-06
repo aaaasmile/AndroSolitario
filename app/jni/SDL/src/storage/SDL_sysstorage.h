@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2024 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2025 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -44,6 +44,7 @@ extern TitleStorageBootStrap GENERIC_titlebootstrap;
 // Steam does not have title storage APIs
 
 extern UserStorageBootStrap GENERIC_userbootstrap;
+extern UserStorageBootStrap PRIVATE_userbootstrap;
 extern UserStorageBootStrap STEAM_userbootstrap;
 
 extern SDL_Storage *GENERIC_OpenFileStorage(const char *path);

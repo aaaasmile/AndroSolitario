@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2024 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2025 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -49,17 +49,18 @@ typedef struct SDL_WaylandTabletInput
 
 typedef struct
 {
-    int32_t repeat_rate;     // Repeat rate in range of [1, 1000] character(s) per second
-    int32_t repeat_delay_ms; // Time to first repeat event in milliseconds
-    Uint32 keyboard_id;      // ID of the source keyboard.
+    Sint32 repeat_rate;     // Repeat rate in range of [1, 1000] character(s) per second
+    Sint32 repeat_delay_ms; // Time to first repeat event in milliseconds
+    Uint32 keyboard_id;     // ID of the source keyboard.
     bool is_initialized;
 
     bool is_key_down;
-    uint32_t key;
-    Uint64 wl_press_time_ns;  // Key press time as reported by the Wayland API
+    Uint32 key;
+    Uint32 wl_press_time_ms;  // Key press time as reported by the Wayland API in milliseconds
+    Uint64 base_time_ns;      // Key press time as reported by the Wayland API in nanoseconds
     Uint64 sdl_press_time_ns; // Key press time expressed in SDL ticks
     Uint64 next_repeat_ns;    // Next repeat event in nanoseconds
-    uint32_t scancode;
+    Uint32 scancode;
     char text[8];
 } SDL_WaylandKeyboardRepeat;
 
@@ -81,8 +82,8 @@ struct SDL_WaylandInput
     SDL_WindowData *pointer_focus;
     SDL_WindowData *keyboard_focus;
     SDL_CursorData *current_cursor;
-    Uint32 keyboard_id;
-    Uint32 pointer_id;
+    SDL_KeyboardID keyboard_id;
+    SDL_MouseID pointer_id;
     uint32_t pointer_enter_serial;
 
     // High-resolution event timestamps
@@ -94,7 +95,7 @@ struct SDL_WaylandInput
     wl_fixed_t sx_w;
     wl_fixed_t sy_w;
 
-    uint32_t buttons_pressed;
+    SDL_MouseButtonFlags buttons_pressed;
 
     // The serial of the last implicit grab event for window activation and selection data.
     Uint32 last_implicit_grab_serial;
@@ -114,7 +115,8 @@ struct SDL_WaylandInput
         uint32_t idx_ctrl;
         uint32_t idx_alt;
         uint32_t idx_gui;
-        uint32_t idx_mode;
+        uint32_t idx_mod3;
+        uint32_t idx_mod5;
         uint32_t idx_num;
         uint32_t idx_caps;
 
@@ -157,11 +159,13 @@ extern int Wayland_WaitEventTimeout(SDL_VideoDevice *_this, Sint64 timeoutNS);
 
 extern void Wayland_create_data_device(SDL_VideoData *d);
 extern void Wayland_create_primary_selection_device(SDL_VideoData *d);
-extern void Wayland_create_text_input(SDL_VideoData *d);
+
+extern void Wayland_create_text_input_manager(SDL_VideoData *d, uint32_t id);
 
 extern void Wayland_input_initialize_seat(SDL_VideoData *d);
 extern void Wayland_display_destroy_input(SDL_VideoData *d);
 
+extern void Wayland_input_init_relative_pointer(SDL_VideoData *d);
 extern bool Wayland_input_enable_relative_pointer(struct SDL_WaylandInput *input);
 extern bool Wayland_input_disable_relative_pointer(struct SDL_WaylandInput *input);
 

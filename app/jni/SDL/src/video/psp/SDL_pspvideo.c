@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2024 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2025 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -117,6 +117,8 @@ static SDL_VideoDevice *PSP_Create(void)
     device->IsScreenKeyboardShown = PSP_IsScreenKeyboardShown;
 
     device->PumpEvents = PSP_PumpEvents;
+
+    device->device_caps = VIDEO_DEVICE_CAPS_FULLSCREEN_ONLY;
 
     return device;
 }
@@ -265,7 +267,8 @@ VideoBootStrap PSP_bootstrap = {
     "psp",
     "PSP Video Driver",
     PSP_Create,
-    PSP_ShowMessageBox
+    PSP_ShowMessageBox,
+    false
 };
 
 /*****************************************************************************/

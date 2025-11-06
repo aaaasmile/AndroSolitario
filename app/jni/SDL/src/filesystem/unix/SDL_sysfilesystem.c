@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2024 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2025 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -78,7 +78,7 @@ static char *search_path_for_binary(const char *bin)
     char *envr;
     size_t alloc_size;
     char *exe = NULL;
-    char *start = envr;
+    char *start;
     char *ptr;
 
     if (!envr_real) {
@@ -86,7 +86,7 @@ static char *search_path_for_binary(const char *bin)
         return NULL;
     }
 
-    envr = SDL_strdup(envr_real);
+    start = envr = SDL_strdup(envr_real);
     if (!envr) {
         return NULL;
     }

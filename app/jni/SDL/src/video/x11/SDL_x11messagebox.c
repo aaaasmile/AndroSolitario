@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2024 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2025 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -30,7 +30,10 @@
 #include <X11/keysym.h>
 #include <locale.h>
 
+#ifndef SDL_FORK_MESSAGEBOX
 #define SDL_FORK_MESSAGEBOX 1
+#endif
+
 #define SDL_SET_LOCALE      1
 
 #if SDL_FORK_MESSAGEBOX
@@ -45,8 +48,20 @@
 #define MIN_DIALOG_WIDTH  200 // Minimum dialog width
 #define MIN_DIALOG_HEIGHT 100 // Minimum dialog height
 
-static const char g_MessageBoxFontLatin1[] = "-*-*-medium-r-normal--0-120-*-*-p-0-iso8859-1";
-static const char g_MessageBoxFont[] = "-*-*-medium-r-normal--*-120-*-*-*-*-*-*";
+static const char g_MessageBoxFontLatin1[] =
+    "-*-*-medium-r-normal--0-120-*-*-p-0-iso8859-1";
+
+static const char* g_MessageBoxFont[] = {
+    "-*-*-medium-r-normal--*-120-*-*-*-*-iso10646-1",  // explicitly unicode (iso10646-1)
+    "-*-*-medium-r-*--*-120-*-*-*-*-iso10646-1",  // explicitly unicode (iso10646-1)
+    "-misc-*-*-*-*--*-*-*-*-*-*-iso10646-1",  // misc unicode (fix for some systems)
+    "-*-*-*-*-*--*-*-*-*-*-*-iso10646-1",  // just give me anything Unicode.
+    "-*-*-medium-r-normal--*-120-*-*-*-*-iso8859-1",  // explicitly latin1, in case low-ASCII works out.
+    "-*-*-medium-r-*--*-120-*-*-*-*-iso8859-1",  // explicitly latin1, in case low-ASCII works out.
+    "-misc-*-*-*-*--*-*-*-*-*-*-iso8859-1",  // misc latin1 (fix for some systems)
+    "-*-*-*-*-*--*-*-*-*-*-*-iso8859-1",  // just give me anything latin1.
+    NULL
+};
 
 static const SDL_MessageBoxColor g_default_colors[SDL_MESSAGEBOX_COLOR_COUNT] = {
     { 56, 54, 53 },    // SDL_MESSAGEBOX_COLOR_BACKGROUND,
@@ -192,13 +207,19 @@ static bool X11_MessageBoxInit(SDL_MessageBoxDataX11 *data, const SDL_MessageBox
     if (SDL_X11_HAVE_UTF8) {
         char **missing = NULL;
         int num_missing = 0;
-        data->font_set = X11_XCreateFontSet(data->display, g_MessageBoxFont,
-                                            &missing, &num_missing, NULL);
-        if (missing) {
-            X11_XFreeStringList(missing);
+        int i_font;
+        for (i_font = 0; g_MessageBoxFont[i_font]; ++i_font) {
+            data->font_set = X11_XCreateFontSet(data->display, g_MessageBoxFont[i_font],
+                                                &missing, &num_missing, NULL);
+            if (missing) {
+                X11_XFreeStringList(missing);
+            }
+            if (data->font_set) {
+                break;
+            }
         }
         if (!data->font_set) {
-            return SDL_SetError("Couldn't load font %s", g_MessageBoxFont);
+            return SDL_SetError("Couldn't load x11 message box font");
         }
     } else
 #endif
@@ -407,6 +428,13 @@ static bool X11_MessageBoxCreateWindow(SDL_MessageBoxDataX11 *data)
     Display *display = data->display;
     SDL_WindowData *windowdata = NULL;
     const SDL_MessageBoxData *messageboxdata = data->messageboxdata;
+#ifdef SDL_VIDEO_DRIVER_X11_XRANDR
+#ifdef XRANDR_DISABLED_BY_DEFAULT
+    const bool use_xrandr_by_default = false;
+#else
+    const bool use_xrandr_by_default = true;
+#endif
+#endif
 
     if (messageboxdata->window) {
         SDL_DisplayData *displaydata = SDL_GetDisplayDriverDataForWindow(messageboxdata->window);
@@ -459,9 +487,10 @@ static bool X11_MessageBoxCreateWindow(SDL_MessageBoxDataX11 *data)
                         (unsigned char *)&_NET_WM_WINDOW_TYPE_DIALOG, 1);
 
     // Allow the window to be deleted by the window manager
-    data->wm_protocols = X11_XInternAtom(display, "WM_PROTOCOLS", False);
     data->wm_delete_message = X11_XInternAtom(display, "WM_DELETE_WINDOW", False);
     X11_XSetWMProtocols(display, data->window, &data->wm_delete_message, 1);
+
+    data->wm_protocols = X11_XInternAtom(display, "WM_PROTOCOLS", False);
 
     if (windowdata) {
         XWindowAttributes attrib;
@@ -478,7 +507,17 @@ static bool X11_MessageBoxCreateWindow(SDL_MessageBoxDataX11 *data)
             const SDL_DisplayData *dpydata = dpy->internal;
             x = dpydata->x + ((dpy->current_mode->w - data->dialog_width) / 2);
             y = dpydata->y + ((dpy->current_mode->h - data->dialog_height) / 3);
-        } else { // oh well. This will misposition on a multi-head setup. Init first next time.
+        }
+#ifdef SDL_VIDEO_DRIVER_X11_XRANDR
+        else if (SDL_GetHintBoolean(SDL_HINT_VIDEO_X11_XRANDR, use_xrandr_by_default)) {
+            XRRScreenResources *screen = X11_XRRGetScreenResourcesCurrent(display, DefaultRootWindow(display));
+            XRRCrtcInfo *crtc_info = X11_XRRGetCrtcInfo(display, screen, screen->crtcs[0]);
+            x = (crtc_info->width - data->dialog_width) / 2;
+            y = (crtc_info->height - data->dialog_height) / 3;
+        }
+#endif
+        else {
+            // oh well. This will misposition on a multi-head setup. Init first next time.
             x = (DisplayWidth(display, data->screen) - data->dialog_width) / 2;
             y = (DisplayHeight(display, data->screen) - data->dialog_height) / 3;
         }

@@ -4,15 +4,15 @@ function(SDL_DetectTargetCPUArchitectures DETECTED_ARCHS)
 
   if(APPLE AND CMAKE_OSX_ARCHITECTURES)
     foreach(known_arch IN LISTS known_archs)
-      set(SDL_CPU_${known_arch} "0")
+      set(SDL_CPU_${known_arch} "0" PARENT_SCOPE)
     endforeach()
     set(detected_archs)
     foreach(osx_arch IN LISTS CMAKE_OSX_ARCHITECTURES)
       if(osx_arch STREQUAL "x86_64")
-        set(SDL_CPU_X64 "1")
+        set(SDL_CPU_X64 "1" PARENT_SCOPE)
         list(APPEND detected_archs "X64")
       elseif(osx_arch STREQUAL "arm64")
-        set(SDL_CPU_ARM64 "1")
+        set(SDL_CPU_ARM64 "1" PARENT_SCOPE)
         list(APPEND detected_archs "ARM64")
       endif()
     endforeach()
@@ -61,8 +61,8 @@ const char *arch_${known_arch} = \"INFO<${known_arch}=\" ARCH_${known_arch} \">\
 
   set(src_arch_detect "${src_vars}
 int main(int argc, char *argv[]) {
-  (void)argv;
   int result = 0;
+  (void)argv;
 ${src_main}
   return result;
 }")

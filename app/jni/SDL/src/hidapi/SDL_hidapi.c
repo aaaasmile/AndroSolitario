@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2024 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2025 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -807,6 +807,8 @@ typedef struct LIBUSB_hid_device_ LIBUSB_hid_device;
 #define hid_send_feature_report      LIBUSB_hid_send_feature_report
 #define hid_set_nonblocking          LIBUSB_hid_set_nonblocking
 #define hid_write                    LIBUSB_hid_write
+#define hid_version                  LIBUSB_hid_version
+#define hid_version_str              LIBUSB_hid_version_str
 #define input_report                 LIBUSB_input_report
 #define make_path                    LIBUSB_make_path
 #define new_hid_device               LIBUSB_new_hid_device
@@ -1242,7 +1244,7 @@ int SDL_hid_init(void)
         return -1;
     }
 
-#ifdef SDL_PLATFORM_MACOS
+#if defined(SDL_PLATFORM_MACOS) && !defined(SDL_HIDAPI_DISABLED)
     hid_darwin_set_open_exclusive(0);
 #endif
 

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2024 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2025 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -27,7 +27,9 @@
 
 #include "../../events/SDL_mouse_c.h"
 
-// #define DEBUG_COCOAMOUSE
+#if 0
+#define DEBUG_COCOAMOUSE
+#endif
 
 #ifdef DEBUG_COCOAMOUSE
 #define DLog(fmt, ...) printf("%s: " fmt "\n", __func__, ##__VA_ARGS__)
@@ -42,19 +44,20 @@
 {
     static NSCursor *invisibleCursor = NULL;
     if (!invisibleCursor) {
-        // RAW 16x16 transparent GIF
-        static unsigned char cursorBytes[] = {
-            0x47, 0x49, 0x46, 0x38, 0x37, 0x61, 0x10, 0x00, 0x10, 0x00, 0x80,
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x21, 0xF9, 0x04,
-            0x01, 0x00, 0x00, 0x01, 0x00, 0x2C, 0x00, 0x00, 0x00, 0x00, 0x10,
-            0x00, 0x10, 0x00, 0x00, 0x02, 0x0E, 0x8C, 0x8F, 0xA9, 0xCB, 0xED,
-            0x0F, 0xA3, 0x9C, 0xB4, 0xDA, 0x8B, 0xB3, 0x3E, 0x05, 0x00, 0x3B
-        };
+        const int size = 32;
+        NSImage *cursorImage = [[NSImage alloc] initWithSize:NSMakeSize(size, size)];
+        NSBitmapImageRep *imgrep = [[NSBitmapImageRep alloc] initWithBitmapDataPlanes:NULL
+                                                                           pixelsWide:size
+                                                                           pixelsHigh:size
+                                                                        bitsPerSample:8
+                                                                      samplesPerPixel:4
+                                                                             hasAlpha:YES
+                                                                             isPlanar:NO
+                                                                       colorSpaceName:NSDeviceRGBColorSpace
+                                                                          bytesPerRow:(size * 4)
+                                                                         bitsPerPixel:32];
+        [cursorImage addRepresentation:imgrep];
 
-        NSData *cursorData = [NSData dataWithBytesNoCopy:&cursorBytes[0]
-                                                  length:sizeof(cursorBytes)
-                                            freeWhenDone:NO];
-        NSImage *cursorImage = [[NSImage alloc] initWithData:cursorData];
         invisibleCursor = [[NSCursor alloc] initWithImage:cursorImage
                                                   hotSpot:NSZeroPoint];
     }
@@ -62,25 +65,6 @@
     return invisibleCursor;
 }
 @end
-
-static SDL_Cursor *Cocoa_CreateDefaultCursor(void)
-{
-    @autoreleasepool {
-        NSCursor *nscursor;
-        SDL_Cursor *cursor = NULL;
-
-        nscursor = [NSCursor arrowCursor];
-
-        if (nscursor) {
-            cursor = SDL_calloc(1, sizeof(*cursor));
-            if (cursor) {
-                cursor->internal = (void *)CFBridgingRetain(nscursor);
-            }
-        }
-
-        return cursor;
-    }
-}
 
 static SDL_Cursor *Cocoa_CreateCursor(SDL_Surface *surface, int hot_x, int hot_y)
 {
@@ -229,6 +213,12 @@ static SDL_Cursor *Cocoa_CreateSystemCursor(SDL_SystemCursor id)
     }
 }
 
+static SDL_Cursor *Cocoa_CreateDefaultCursor(void)
+{
+    SDL_SystemCursor id = SDL_GetDefaultSystemCursor();
+    return Cocoa_CreateSystemCursor(id);
+}
+
 static void Cocoa_FreeCursor(SDL_Cursor *cursor)
 {
     @autoreleasepool {
@@ -243,11 +233,11 @@ static bool Cocoa_ShowCursor(SDL_Cursor *cursor)
         SDL_VideoDevice *device = SDL_GetVideoDevice();
         SDL_Window *window = (device ? device->windows : NULL);
         for (; window != NULL; window = window->next) {
-            SDL_CocoaWindowData *internal = (__bridge SDL_CocoaWindowData *)window->internal;
-            if (internal) {
-                [internal.nswindow performSelectorOnMainThread:@selector(invalidateCursorRectsForView:)
-                                                      withObject:[internal.nswindow contentView]
-                                                   waitUntilDone:NO];
+            SDL_CocoaWindowData *data = (__bridge SDL_CocoaWindowData *)window->internal;
+            if (data) {
+                [data.nswindow performSelectorOnMainThread:@selector(invalidateCursorRectsForView:)
+                                                withObject:[data.nswindow contentView]
+                                             waitUntilDone:NO];
             }
         }
         return true;
@@ -441,6 +431,13 @@ static void Cocoa_HandleTitleButtonEvent(SDL_VideoDevice *_this, NSEvent *event)
     }
 }
 
+static NSWindow *Cocoa_MouseFocus;
+
+NSWindow *Cocoa_GetMouseFocus()
+{
+    return Cocoa_MouseFocus;
+}
+
 void Cocoa_HandleMouseEvent(SDL_VideoDevice *_this, NSEvent *event)
 {
     SDL_MouseID mouseID = SDL_DEFAULT_MOUSE_ID;
@@ -450,7 +447,30 @@ void Cocoa_HandleMouseEvent(SDL_VideoDevice *_this, NSEvent *event)
     CGFloat lastMoveX, lastMoveY;
     float deltaX, deltaY;
     bool seenWarp;
-    switch ([event type]) {
+
+    // All events except NSEventTypeMouseExited can only happen if the window
+    // has mouse focus, so we'll always set the focus even if we happen to miss
+    // NSEventTypeMouseEntered, which apparently happens if the window is
+    // created under the mouse on macOS 12.7.  But, only set the focus if
+    // the event acutally has a non-NULL window, otherwise what would happen
+    // is that after an NSEventTypeMouseEntered there would sometimes be
+    // NSEventTypeMouseMoved without a window causing us to suppress subsequent
+    // mouse move events.
+    NSEventType event_type = [event type];
+    if (event_type == NSEventTypeMouseExited) {
+        Cocoa_MouseFocus = NULL;
+    } else {
+        if ([event window] != NULL) {
+            Cocoa_MouseFocus = [event window];
+        }
+    }
+
+    switch (event_type) {
+    case NSEventTypeMouseEntered:
+    case NSEventTypeMouseExited:
+        // Focus is handled above
+        return;
+
     case NSEventTypeMouseMoved:
     case NSEventTypeLeftMouseDragged:
     case NSEventTypeRightMouseDragged:

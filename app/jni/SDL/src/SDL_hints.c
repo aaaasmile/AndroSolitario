@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2024 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2025 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -21,6 +21,10 @@
 #include "SDL_internal.h"
 
 #include "SDL_hints_c.h"
+
+#ifdef SDL_PLATFORM_ANDROID
+#include "core/android/SDL_android.h"
+#endif
 
 typedef struct SDL_HintWatch
 {
@@ -147,6 +151,13 @@ bool SDL_SetHintWithPriority(const char *name, const char *value, SDL_HintPriori
         }
     }
 
+#ifdef SDL_PLATFORM_ANDROID
+    if (SDL_strcmp(name, SDL_HINT_ANDROID_ALLOW_RECREATE_ACTIVITY) == 0) {
+        // Special handling for this hint, which needs to persist outside the normal application flow
+        Android_SetAllowRecreateActivity(SDL_GetStringBoolean(value, false));
+    }
+#endif // SDL_PLATFORM_ANDROID
+
     SDL_UnlockProperties(hints);
 
     return result;
@@ -185,6 +196,17 @@ bool SDL_ResetHint(const char *name)
         result = true;
     }
 
+#ifdef SDL_PLATFORM_ANDROID
+    if (SDL_strcmp(name, SDL_HINT_ANDROID_ALLOW_RECREATE_ACTIVITY) == 0) {
+        // Special handling for this hint, which needs to persist outside the normal application flow
+        if (env) {
+            Android_SetAllowRecreateActivity(SDL_GetStringBoolean(env, false));
+        } else {
+            Android_SetAllowRecreateActivity(false);
+        }
+    }
+#endif // SDL_PLATFORM_ANDROID
+
     SDL_UnlockProperties(hints);
 
     return result;
@@ -210,6 +232,17 @@ static void SDLCALL ResetHintsCallback(void *userdata, SDL_PropertiesID hints, c
     SDL_free(hint->value);
     hint->value = NULL;
     hint->priority = SDL_HINT_DEFAULT;
+
+#ifdef SDL_PLATFORM_ANDROID
+    if (SDL_strcmp(name, SDL_HINT_ANDROID_ALLOW_RECREATE_ACTIVITY) == 0) {
+        // Special handling for this hint, which needs to persist outside the normal application flow
+        if (env) {
+            Android_SetAllowRecreateActivity(SDL_GetStringBoolean(env, false));
+        } else {
+            Android_SetAllowRecreateActivity(false);
+        }
+    }
+#endif // SDL_PLATFORM_ANDROID
 }
 
 void SDL_ResetHints(void)

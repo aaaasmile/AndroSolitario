@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2024 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2025 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -54,6 +54,8 @@ bool Android_WaitLifecycleEvent(SDL_AndroidLifecycleEvent *event, Sint64 timeout
 
 void Android_LockActivityMutex(void);
 void Android_UnlockActivityMutex(void);
+
+void Android_SetAllowRecreateActivity(bool enabled);
 
 // Interface from the SDL library into the Android Java activity
 extern void Android_JNI_SetActivityTitle(const char *title);

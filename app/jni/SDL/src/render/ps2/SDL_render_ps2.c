@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2024 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2025 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -60,7 +60,7 @@ typedef struct
 static int vsync_sema_id = 0;
 
 // PRIVATE METHODS
-static int vsync_handler(void)
+static int vsync_handler(int reason)
 {
     iSignalSema(vsync_sema_id);
 
@@ -109,6 +109,16 @@ static gs_rgbaq float_color_to_RGBAQ(const SDL_FColor *color, float color_scale)
     uint8_t colorG = (uint8_t)SDL_roundf(SDL_clamp(color->g * color_scale, 0.0f, 1.0f) * 255.0f);
     uint8_t colorB = (uint8_t)SDL_roundf(SDL_clamp(color->b * color_scale, 0.0f, 1.0f) * 255.0f);
     uint8_t colorA = (uint8_t)SDL_roundf(SDL_clamp(color->a, 0.0f, 1.0f) * 255.0f);
+
+    return color_to_RGBAQ(colorR, colorG, colorB, colorA, 0x00);
+}
+
+static gs_rgbaq float_color_to_RGBAQ_tex(const SDL_FColor *color, float color_scale)
+{
+    uint8_t colorR = (uint8_t)SDL_roundf(SDL_clamp(color->r * color_scale, 0.0f, 1.0f) * 127.0f);
+    uint8_t colorG = (uint8_t)SDL_roundf(SDL_clamp(color->g * color_scale, 0.0f, 1.0f) * 127.0f);
+    uint8_t colorB = (uint8_t)SDL_roundf(SDL_clamp(color->b * color_scale, 0.0f, 1.0f) * 127.0f);
+    uint8_t colorA = (uint8_t)SDL_roundf(SDL_clamp(color->a, 0.0f, 1.0f) * 63.0f);
 
     return color_to_RGBAQ(colorR, colorG, colorB, colorA, 0x00);
 }
@@ -193,21 +203,6 @@ static bool PS2_UpdateTexture(SDL_Renderer *renderer, SDL_Texture *texture,
     PS2_UnlockTexture(renderer, texture);
 
     return true;
-}
-
-static void PS2_SetTextureScaleMode(SDL_Renderer *renderer, SDL_Texture *texture, SDL_ScaleMode scaleMode)
-{
-    GSTEXTURE *ps2_texture = (GSTEXTURE *)texture->internal;
-    /*
-     set texture filtering according to scaleMode
-     supported hint values are nearest (0, default) or linear (1)
-     gskit scale mode is either GS_FILTER_NEAREST (good for tile-map)
-     or GS_FILTER_LINEAR (good for scaling)
-     */
-    uint32_t gsKitScaleMode = (scaleMode == SDL_SCALEMODE_NEAREST
-                                   ? GS_FILTER_NEAREST
-                                   : GS_FILTER_LINEAR);
-    ps2_texture->Filter = gsKitScaleMode;
 }
 
 static bool PS2_SetRenderTarget(SDL_Renderer *renderer, SDL_Texture *texture)
@@ -296,7 +291,7 @@ static bool PS2_QueueGeometry(SDL_Renderer *renderer, SDL_RenderCommand *cmd, SD
             uv_ = (float *)((char *)uv + j * uv_stride);
 
             vertices->xyz2 = vertex_to_XYZ2(data->gsGlobal, xy_[0] * scale_x, xy_[1] * scale_y, 0);
-            vertices->rgbaq = float_color_to_RGBAQ(col_, color_scale);
+            vertices->rgbaq = float_color_to_RGBAQ_tex(col_, color_scale);
             vertices->uv = vertex_to_UV(ps2_tex, uv_[0] * ps2_tex->Width, uv_[1] * ps2_tex->Height);
 
             vertices++;
@@ -458,6 +453,16 @@ static bool PS2_RenderGeometry(SDL_Renderer *renderer, void *vertices, SDL_Rende
         const GSPRIMUVPOINT *verts = (GSPRIMUVPOINT *) (vertices + cmd->data.draw.first);
         GSTEXTURE *ps2_tex = (GSTEXTURE *)cmd->data.draw.texture->internal;
 
+        switch (cmd->data.draw.texture_scale_mode) {
+        case SDL_SCALEMODE_NEAREST:
+            ps2_tex->Filter = GS_FILTER_NEAREST;
+            break;
+        case SDL_SCALEMODE_LINEAR:
+            ps2_tex->Filter = GS_FILTER_LINEAR;
+            break;
+        default:
+            break;
+        }
         gsKit_TexManager_bind(data->gsGlobal, ps2_tex);
         gsKit_prim_list_triangle_goraud_texture_uv_3d(data->gsGlobal, ps2_tex, count, verts);
     } else {
@@ -695,7 +700,6 @@ static bool PS2_CreateRenderer(SDL_Renderer *renderer, SDL_Window *window, SDL_P
     renderer->UpdateTexture = PS2_UpdateTexture;
     renderer->LockTexture = PS2_LockTexture;
     renderer->UnlockTexture = PS2_UnlockTexture;
-    renderer->SetTextureScaleMode = PS2_SetTextureScaleMode;
     renderer->SetRenderTarget = PS2_SetRenderTarget;
     renderer->QueueSetViewport = PS2_QueueSetViewport;
     renderer->QueueSetDrawColor = PS2_QueueNoOp;

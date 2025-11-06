@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2024 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2025 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -471,7 +471,7 @@ bool SDL_SendJoystickVirtualSensorDataInner(SDL_Joystick *joystick, SDL_SensorTy
             return false;
         }
         hwdata->sensor_events = sensor_events;
-        hwdata->max_sensor_events = hwdata->max_sensor_events;
+        hwdata->max_sensor_events = new_max_sensor_events;
     }
 
     VirtualSensorEvent *event = &hwdata->sensor_events[hwdata->num_sensor_events++];

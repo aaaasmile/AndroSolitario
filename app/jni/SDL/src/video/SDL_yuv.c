@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2024 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2025 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -26,7 +26,7 @@
 #include "yuv2rgb/yuv_rgb.h"
 
 
-#if SDL_HAVE_YUV
+#ifdef SDL_HAVE_YUV
 static bool IsPlanar2x2Format(SDL_PixelFormat format);
 #endif
 
@@ -36,7 +36,7 @@ static bool IsPlanar2x2Format(SDL_PixelFormat format);
  */
 bool SDL_CalculateYUVSize(SDL_PixelFormat format, int w, int h, size_t *size, size_t *pitch)
 {
-#if SDL_HAVE_YUV
+#ifdef SDL_HAVE_YUV
     int sz_plane = 0, sz_plane_chroma = 0, sz_plane_packed = 0;
 
     if (IsPlanar2x2Format(format) == true) {
@@ -155,7 +155,7 @@ bool SDL_CalculateYUVSize(SDL_PixelFormat format, int w, int h, size_t *size, si
 #endif
 }
 
-#if SDL_HAVE_YUV
+#ifdef SDL_HAVE_YUV
 
 static bool GetYUVConversionType(SDL_Colorspace colorspace, YCbCrType *yuv_type)
 {
@@ -921,7 +921,7 @@ static bool SDL_ConvertPixels_XRGB8888_to_YUV(int width, int height, const void 
         int plane_skip;
 
         if (dst_pitch < row_size) {
-            return SDL_SetError("Destination pitch is too small, expected at least %d\n", row_size);
+            return SDL_SetError("Destination pitch is too small, expected at least %d", row_size);
         }
         plane_skip = (dst_pitch - row_size);
 
@@ -1628,26 +1628,44 @@ static bool SDL_ConvertPixels_SwapNV_std(int width, int height, const void *src,
     const int UVwidth = (width + 1) / 2;
     const int UVheight = (height + 1) / 2;
     const int srcUVPitch = ((src_pitch + 1) / 2) * 2;
-    const int srcUVPitchLeft = (srcUVPitch - UVwidth * 2) / sizeof(Uint16);
     const int dstUVPitch = ((dst_pitch + 1) / 2) * 2;
-    const int dstUVPitchLeft = (dstUVPitch - UVwidth * 2) / sizeof(Uint16);
-    const Uint16 *srcUV;
-    Uint16 *dstUV;
 
     // Skip the Y plane
     src = (const Uint8 *)src + height * src_pitch;
     dst = (Uint8 *)dst + height * dst_pitch;
 
-    srcUV = (const Uint16 *)src;
-    dstUV = (Uint16 *)dst;
-    y = UVheight;
-    while (y--) {
-        x = UVwidth;
-        while (x--) {
-            *dstUV++ = SDL_Swap16(*srcUV++);
+    bool aligned = (((uintptr_t)src | (uintptr_t)dst) & 1) == 0;
+    if (aligned) {
+        const int srcUVPitchLeft = (srcUVPitch - UVwidth * 2) / sizeof(Uint16);
+        const int dstUVPitchLeft = (dstUVPitch - UVwidth * 2) / sizeof(Uint16);
+        const Uint16 *srcUV = (const Uint16 *)src;
+        Uint16 *dstUV = (Uint16 *)dst;
+        y = UVheight;
+        while (y--) {
+            x = UVwidth;
+            while (x--) {
+                *dstUV++ = SDL_Swap16(*srcUV++);
+            }
+            srcUV += srcUVPitchLeft;
+            dstUV += dstUVPitchLeft;
         }
-        srcUV += srcUVPitchLeft;
-        dstUV += dstUVPitchLeft;
+    } else {
+        const int srcUVPitchLeft = (srcUVPitch - UVwidth * 2);
+        const int dstUVPitchLeft = (dstUVPitch - UVwidth * 2);
+        const Uint8 *srcUV = (const Uint8 *)src;
+        Uint8 *dstUV = (Uint8 *)dst;
+        y = UVheight;
+        while (y--) {
+            x = UVwidth;
+            while (x--) {
+                Uint8 u = *srcUV++;
+                Uint8 v = *srcUV++;
+                *dstUV++ = v;
+                *dstUV++ = u;
+            }
+            srcUV += srcUVPitchLeft;
+            dstUV += dstUVPitchLeft;
+        }
     }
     return true;
 }
@@ -2561,7 +2579,7 @@ bool SDL_ConvertPixels_YUV_to_YUV(int width, int height,
                                   SDL_PixelFormat src_format, SDL_Colorspace src_colorspace, SDL_PropertiesID src_properties, const void *src, int src_pitch,
                                   SDL_PixelFormat dst_format, SDL_Colorspace dst_colorspace, SDL_PropertiesID dst_properties, void *dst, int dst_pitch)
 {
-#if SDL_HAVE_YUV
+#ifdef SDL_HAVE_YUV
     if (src_colorspace != dst_colorspace) {
         return SDL_SetError("SDL_ConvertPixels_YUV_to_YUV: colorspace conversion not supported");
     }

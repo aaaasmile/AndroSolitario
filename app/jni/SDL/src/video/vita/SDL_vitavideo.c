@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2024 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2025 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -153,6 +153,8 @@ static SDL_VideoDevice *VITA_Create(void)
 
     device->PumpEvents = VITA_PumpEvents;
 
+    device->device_caps = VIDEO_DEVICE_CAPS_FULLSCREEN_ONLY;
+
     return device;
 }
 
@@ -160,7 +162,8 @@ VideoBootStrap VITA_bootstrap = {
     "vita",
     "VITA Video Driver",
     VITA_Create,
-    VITA_ShowMessageBox
+    VITA_ShowMessageBox,
+    false
 };
 
 /*****************************************************************************/

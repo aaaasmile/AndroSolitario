@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2024 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2025 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -48,7 +48,6 @@ struct SDL_WindowData
         struct
         {
             struct libdecor_frame *frame;
-            bool initial_configure_seen;
         } libdecor;
 #endif
         struct
@@ -66,7 +65,6 @@ struct SDL_WindowData
                     struct xdg_positioner *xdg_positioner;
                 } popup;
             };
-            bool initial_configure_seen;
         } xdg;
     } shell_surface;
     enum
@@ -116,18 +114,20 @@ struct SDL_WindowData
     struct wp_alpha_modifier_surface_v1 *wp_alpha_modifier_surface_v1;
     struct xdg_toplevel_icon_v1 *xdg_toplevel_icon_v1;
     struct frog_color_managed_surface *frog_color_managed_surface;
+    struct wp_color_management_surface_feedback_v1 *wp_color_management_surface_feedback;
+
+    struct Wayland_ColorInfoState *color_info_state;
 
     SDL_AtomicInt swap_interval_ready;
 
     SDL_DisplayData **outputs;
     int num_outputs;
 
-    SDL_Window *keyboard_focus;
-
     char *app_id;
     double scale_factor;
 
-    struct Wayland_SHMBuffer icon;
+    struct Wayland_SHMBuffer *icon_buffers;
+    int icon_buffer_count;
 
     struct
     {
@@ -174,10 +174,18 @@ struct SDL_WindowData
         int min_height;
     } system_limits;
 
+    struct
+    {
+        int width;
+        int height;
+    } toplevel_bounds;
+
     SDL_DisplayID last_displayID;
     int fullscreen_deadline_count;
-    int maximized_deadline_count;
+    int maximized_restored_deadline_count;
     Uint64 last_focus_event_time_ns;
+    int icc_fd;
+    Uint32 icc_size;
     bool floating;
     bool suspended;
     bool resizing;
@@ -186,11 +194,11 @@ struct SDL_WindowData
     bool is_fullscreen;
     bool fullscreen_exclusive;
     bool drop_fullscreen_requests;
+    bool showing_window;
     bool fullscreen_was_positioned;
     bool show_hide_sync_required;
     bool scale_to_display;
     bool reparenting_required;
-    bool pending_restored_size;
     bool double_buffer;
 
     SDL_HitTestResult hit_test_result;
@@ -225,7 +233,9 @@ extern void Wayland_ShowWindowSystemMenu(SDL_Window *window, int x, int y);
 extern void Wayland_DestroyWindow(SDL_VideoDevice *_this, SDL_Window *window);
 extern bool Wayland_SuspendScreenSaver(SDL_VideoDevice *_this);
 extern bool Wayland_SetWindowIcon(SDL_VideoDevice *_this, SDL_Window *window, SDL_Surface *icon);
+extern bool Wayland_SetWindowFocusable(SDL_VideoDevice *_this, SDL_Window *window, bool focusable);
 extern float Wayland_GetWindowContentScale(SDL_VideoDevice *_this, SDL_Window *window);
+extern void *Wayland_GetWindowICCProfile(SDL_VideoDevice *_this, SDL_Window *window, size_t *size);
 
 extern bool Wayland_SetWindowHitTest(SDL_Window *window, bool enabled);
 extern bool Wayland_FlashWindow(SDL_VideoDevice *_this, SDL_Window *window, SDL_FlashOperation operation);
