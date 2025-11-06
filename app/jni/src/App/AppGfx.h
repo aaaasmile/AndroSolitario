@@ -43,7 +43,6 @@ private:
     void terminate();
     LPErrInApp loadProfile();
     LPErrInApp writeProfile();
-    void usage(int errOut, char* cmd);
     bool parseScreenSize(LPCSTR strOpz);
     void updateScreenTexture();
     LPErrInApp showHelp();

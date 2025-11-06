@@ -16,7 +16,7 @@
 #include "WinTypeGlobal.h"
 
 static const char* g_lpszMsgUrl = "Go to invido.it";
-static const char* g_lpszVersion = "Ver 3.0.1 20251101";
+static const char* g_lpszVersion = VERSION;
 static const char* g_lpszIniFontVera = DATA_PREFIX "font/vera.ttf";
 
 static const SDL_Color g_color_on = {253, 252, 250};
@@ -41,7 +41,11 @@ typedef struct MenuItemBox {
     }
 }* PMenuItemBox;
 
+#ifndef ANDROID
 static const int NumOfMenuItems = 6;
+#else
+static const int NumOfMenuItems = 5;
+#endif
 typedef class MenuItemBoxes {
     MenuItemBox _menuInfoBoxes[NumOfMenuItems];
     int _minX;
@@ -56,7 +60,9 @@ typedef class MenuItemBoxes {
         _menuInfoBoxes[2] = {0, 0, MenuItemEnum::MENU_CREDITS};
         _menuInfoBoxes[3] = {0, 0, MenuItemEnum::MENU_HELP};
         _menuInfoBoxes[4] = {0, 0, MenuItemEnum::MENU_HIGHSCORE};
+#ifndef ANDROID
         _menuInfoBoxes[5] = {0, 0, MenuItemEnum::QUIT};
+#endif
     }
     bool IsPointInside(const SDL_Point& tap, MenuItemBox& tapped) {
         tapped = {0, 0, MenuItemEnum::NOTHING};
@@ -153,7 +159,7 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
                                MenuDelegator& menuDelegator) {
     _menuDlgt = menuDelegator;
     LPGameSettings pGameSettings = GameSettings::GetSettings();
-    _p_Screen = pScreen; 
+    _p_Screen = pScreen;
     _p_sdlRenderer = pRenderer;
     _p_Window = pWindow;
 
@@ -206,7 +212,7 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
 
     _p_fontAriblk = pGameSettings->GetFontAriblk();
     _p_fontVera = pGameSettings->GetFontVera();
-    
+
     // _p_MenuBox = SDL_CreateRGBSurface(SDL_SWSURFACE, _rctPanelRedBox.w,
     //                                   _rctPanelRedBox.h, 32, 0, 0, 0, 0);
     _p_MenuBox = GFX_UTIL::SDL_CreateRGBSurface(
@@ -347,7 +353,7 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     int offsetX = 30;
     int offsetY = 60;
     int morePlaceY = 60;
-    int intraOffset = (_rctPanelRedBox.h - 80) / 5;
+    int intraOffset = (_rctPanelRedBox.h - 80) / NumOfMenuItems;
     int minIntraOffsetY = 80;
     intraOffset = min(minIntraOffsetY, intraOffset);
     LPGameSettings pGameSettings = GameSettings::GetSettings();
@@ -383,10 +389,10 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     } else {
         color = g_color_on;
     }
-    err = drawMenuText(
-        _p_ScreenBackbuffer,
-        pLanguages->GetStringId(Languages::ID_MEN_OPTIONS).c_str(),
-        _box_X + offsetX, currY, color, _p_fontAriblk);
+    err =
+        drawMenuText(_p_ScreenBackbuffer,
+                     pLanguages->GetStringId(Languages::ID_MEN_OPTIONS).c_str(),
+                     _box_X + offsetX, currY, color, _p_fontAriblk);
     if (err != NULL) {
         return err;
     }
@@ -433,10 +439,9 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     } else {
         color = g_color_on;
     }
-    err =
-        drawMenuText(_p_ScreenBackbuffer,
-                     pLanguages->GetStringId(Languages::ID_HIGHSCORE).c_str(),
-                     _box_X + offsetX, currY, color, _p_fontAriblk);
+    err = drawMenuText(_p_ScreenBackbuffer,
+                       pLanguages->GetStringId(Languages::ID_HIGHSCORE).c_str(),
+                       _box_X + offsetX, currY, color, _p_fontAriblk);
     if (err != NULL) {
         return err;
     }

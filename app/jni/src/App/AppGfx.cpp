@@ -91,7 +91,7 @@ LPErrInApp AppGfx::Init() {
     _p_HighScore->Load();
 
     _p_GameSettings->SetCurrentLang();
-    Languages *pLanguages = _p_GameSettings->GetLanguageMan();
+    Languages* pLanguages = _p_GameSettings->GetLanguageMan();
 
     if (TTF_Init() == -1) {
         return ERR_UTIL::ErrorCreate("Font init error");
@@ -270,8 +270,8 @@ LPErrInApp AppGfx::startGameLoop() {
     _p_SolitarioGfx = new SolitarioGfx();
 
     err = _p_SolitarioGfx->Initialize(_p_Screen, _p_sdlRenderer, _p_Window,
-                                      _p_SceneBackground,
-                                      _p_MusicManager, _p_HighScore);
+                                      _p_SceneBackground, _p_MusicManager,
+                                      _p_HighScore);
     if (err != NULL)
         return err;
 
@@ -549,68 +549,13 @@ void AppGfx::updateScreenTexture() {
 
 void AppGfx::ParseCmdLine(int argc, char* argv[]) {
     for (int i = 1; i < argc; i++) {
-        if (strcmp(argv[i], "--help") == 0 || strcmp(argv[i], "-h") == 0) {
-            printf(
-                "Solitario version %s (c) 2004-2023 Invido.it\nOptions "
-                "available: \n"
-                "--fullscreen   - to run in fullscreen, if possible "
-                "(vs. "
-                "windowed)\n"
-                "--size x,y starts the Solitario at given resolution "
-                "x,y \n",
-                VERSION);
-
+        if (strcmp(argv[i], "--version") == 0 || strcmp(argv[i], "-v") == 0) {
+            printf("Solitario version %s (c) 2004-2025 Invido.it\n", VERSION);
             exit(0);
-        } else if (strcmp(argv[i], "--copyright") == 0 ||
-                   strcmp(argv[i], "-c") == 0) {
-            printf(
-                "\n\"Solitario\" version %s, Copyright (C) 2004-2024 "
-                "Invido.it\n"
-                "This program is free software; you can redistribute "
-                "it "
-                "and/or\n"
-                "modify it under the terms of the GNU General Public "
-                "License\n"
-                "as published by the Free Software Foundation.  See "
-                "COPYING.txt\n"
-                "\n"
-                "This program is distributed in the hope that it will "
-                "be "
-                "useful,\n"
-                "but WITHOUT ANY WARRANTY; without even the implied "
-                "warranty "
-                "of\n"
-                "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n"
-                "\n",
-                VERSION);
-
-            exit(0);
-        } else if (strcmp(argv[i], "--usage") == 0 ||
-                   strcmp(argv[i], "-u") == 0) {
-            usage(0, argv[0]);
-        } else if (strcmp(argv[i], "--fullscreen") == 0 ||
-                   strcmp(argv[i], "-f") == 0) {
-            _fullScreen = true;
-        } else if (strcmp(argv[i], "--version") == 0 ||
-                   strcmp(argv[i], "-v") == 0) {
-            printf("Solitario versione %s\n", VERSION);
-            exit(0);
-        } else if (strcmp(argv[i], "--size") == 0 ||
-                   strcmp(argv[i], "-s") == 0) {
-            if (i >= argc - 1) {
-                fprintf(stderr, "%s two arguments needed\n", argv[i]);
-                usage(1, argv[0]);
-            } else {
-                if (parseScreenSize(argv[i + 1])) {
-                } else {
-                    fprintf(stderr, "parameter incorrect: %s\n", argv[i + 1]);
-                    usage(1, argv[0]);
-                }
-                i++;
-            }
         } else {
-            fprintf(stderr, "unknown option: %s\n", argv[i]);
-            usage(1, argv[0]);
+            printf("unknown option: %s\n", argv[i]);
+            printf("\nUsage: %s --version \n", argv[0]);
+            exit(1);
         }
     }
 }
@@ -641,19 +586,4 @@ bool AppGfx::parseScreenSize(LPCSTR strInput) {
     return bRet;
 }
 
-void AppGfx::usage(int errOut, char* cmd) {
-    FILE* f;
 
-    if (errOut == 0)
-        f = stdout;
-    else
-        f = stderr;
-
-    fprintf(f,
-            "\nUsage: %s {--help | --usage | --copyright}\n"
-            "       %s [--fullscreen] [--size x,y] "
-            "\n",
-            cmd, cmd);
-
-    exit(errOut);
-}
