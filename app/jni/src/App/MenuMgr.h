@@ -51,6 +51,7 @@ class MenuMgr {
     MenuItemEnum _focusedMenuItem;
     int _box_Y;
     int _box_X;
+    int _hBar;
     int _screenW;
     int _screenH;
     SDL_Rect _rctPanelRedBox;

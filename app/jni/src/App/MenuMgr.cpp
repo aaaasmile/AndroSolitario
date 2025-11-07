@@ -26,6 +26,7 @@ static const SDL_Color g_color_ombre = {87, 87, 87, 50};
 static const SDL_Color g_color_black = {0, 0, 0};
 static const SDL_Color g_color_gray = {128, 128, 128};
 static const SDL_Color g_color_red = {255, 0, 0};
+static const SDL_Color g_color_green = {15, 255, 15};
 
 MenuItemEnum nextMenu(MenuItemEnum currMenu);
 MenuItemEnum previousMenu(MenuItemEnum currMenu);
@@ -41,7 +42,7 @@ typedef struct MenuItemBox {
     }
 }* PMenuItemBox;
 
-#ifndef ANDROID
+#if HASQUITMENU
 static const int NumOfMenuItems = 6;
 #else
 static const int NumOfMenuItems = 5;
@@ -60,7 +61,7 @@ typedef class MenuItemBoxes {
         _menuInfoBoxes[2] = {0, 0, MenuItemEnum::MENU_CREDITS};
         _menuInfoBoxes[3] = {0, 0, MenuItemEnum::MENU_HELP};
         _menuInfoBoxes[4] = {0, 0, MenuItemEnum::MENU_HIGHSCORE};
-#ifndef ANDROID
+#if HASQUITMENU
         _menuInfoBoxes[5] = {0, 0, MenuItemEnum::QUIT};
 #endif
     }
@@ -79,8 +80,7 @@ typedef class MenuItemBoxes {
                 return true;
             }
         }
-        tapped.MenuItem = _menuInfoBoxes[4].MenuItem;
-        return true;
+        return false;
     }
     void SetBox(const SDL_Rect& rct) {
         _minX = rct.x;
@@ -97,6 +97,19 @@ typedef class MenuItemBoxes {
         }
     }
     void SetPos0Y(int sY, int eY) { _menuInfoBoxes[0].SetY(sY, eY); }
+    void drawMaxBox(SDL_Surface* pScreen) {
+#if DEBUG_MENU_BORDER_BOX
+        GFX_UTIL::DrawRect(pScreen, _minX, _minY, _maxX, _maxY, g_color_red);
+#endif
+    }
+    void drawBorder(int i, SDL_Surface* pScreen) {
+#if DEBUG_MENU_BORDER
+        if ((i >= 0) && i < NumOfMenuItems) {
+            GFX_UTIL::DrawRect(pScreen, _minX, _menuInfoBoxes[i].StartY, _maxX,
+                               _menuInfoBoxes[i].EndY, g_color_red);
+        }
+#endif
+    }
 }* PMenuItemBoxes;
 
 static MenuItemBoxes g_MenuItemBoxes = MenuItemBoxes();
@@ -344,6 +357,7 @@ LPErrInApp MenuMgr::drawStaticScene() {
         _p_ScreenBackbuffer,
         pLanguages->GetStringId(Languages::ID_WELCOMETITLEBAR).c_str(),
         _box_X + bar_x, _box_Y + bar_y - hbar / 2, color, _p_fontAriblk);
+    _hBar = hbar;
     return err;
 }
 
@@ -377,13 +391,15 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     if (err != NULL) {
         return err;
     }
-    currY += morePlaceY;
-#ifdef ANDROID
-    currY += 2 * morePlaceY;
-#endif
-    g_MenuItemBoxes.SetPos0Y(_box_Y, currY);
+    int startY = _box_Y + _hBar;
+    int endY = currY + morePlaceY + offsetY;
+
+    g_MenuItemBoxes.drawMaxBox(_p_ScreenBackbuffer);
+    g_MenuItemBoxes.SetPos0Y(startY, endY);
+    g_MenuItemBoxes.drawBorder(0, _p_ScreenBackbuffer);
+
     // Options
-    currY = currY + intraOffset;
+    currY = currY + intraOffset + morePlaceY;
     if (_focusedMenuItem != MenuItemEnum::MENU_OPTIONS) {
         color = g_color_off;
     } else {
@@ -396,9 +412,12 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     if (err != NULL) {
         return err;
     }
-    currY += morePlaceY;
-    g_MenuItemBoxes.SetYInPos(1, currY);
+    endY = currY + morePlaceY + offsetY;
+    g_MenuItemBoxes.SetYInPos(1, endY);
+    g_MenuItemBoxes.drawBorder(1, _p_ScreenBackbuffer); 
+
     // Credits
+    currY += morePlaceY;
     currY = currY + intraOffset;
     if (_focusedMenuItem != MenuItemEnum::MENU_CREDITS) {
         color = g_color_off;
@@ -411,11 +430,15 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     if (err != NULL) {
         return err;
     }
-    currY += morePlaceY;
-    g_MenuItemBoxes.SetYInPos(2, currY);
+    g_MenuItemBoxes.drawBorder(1, _p_ScreenBackbuffer); 
+
+    endY = currY + morePlaceY + offsetY;
+    g_MenuItemBoxes.SetYInPos(2, endY);
+    g_MenuItemBoxes.drawBorder(2, _p_ScreenBackbuffer); 
 
     // Help
-#ifndef ANDROID
+#if HASHELPMENU
+    currY += morePlaceY;
     currY = currY + intraOffset;
     if (_focusedMenuItem != MenuItemEnum::MENU_HELP) {
         color = g_color_off;
@@ -428,11 +451,13 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     if (err != NULL) {
         return err;
     }
-    currY += morePlaceY;
-    g_MenuItemBoxes.SetYInPos(3, currY);
+    endY = currY + morePlaceY + offsetY;
+    g_MenuItemBoxes.SetYInPos(3, endY);
+    g_MenuItemBoxes.drawBorder(3, _p_ScreenBackbuffer);
 #endif
 
     // highscore
+    currY += morePlaceY;
     currY = currY + intraOffset;
     if (_focusedMenuItem != MenuItemEnum::MENU_HIGHSCORE) {
         color = g_color_off;
@@ -445,11 +470,13 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     if (err != NULL) {
         return err;
     }
-    currY += morePlaceY;
-    g_MenuItemBoxes.SetYInPos(4, currY);
+    endY = currY + morePlaceY + offsetY;
+    g_MenuItemBoxes.SetYInPos(4, endY);
+    g_MenuItemBoxes.drawBorder(4, _p_ScreenBackbuffer); 
 
-#ifndef ANDROID
+#if HASQUITMENU
     // Quit
+    currY += morePlaceY;
     currY = currY + intraOffset + 20;
     int lastY = _box_Y + _rctPanelRedBox.h - intraOffset - offsetY + 30;
     lastY = max(lastY, currY);
@@ -464,9 +491,8 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     if (err != NULL) {
         return err;
     }
-    g_MenuItemBoxes.SetYInPos(
-        4, lastY - 1);  // fill the space until quit with menu 4, not the 5
     g_MenuItemBoxes.SetYInPos(5, _box_Y + _rctPanelRedBox.h);
+    g_MenuItemBoxes.drawBorder(5, _p_ScreenBackbuffer);
 #endif
     return NULL;
 }
@@ -487,11 +513,11 @@ LPErrInApp MenuMgr::HandleRootMenu() {
     }
 
     SDL_Point touchLocation;
-    bool mouseInside;
     SDL_Event event;
     LPGameSettings pGameSettings = GameSettings::GetSettings();
     bool ignoreMouseEvent =
         pGameSettings->InputType == InputTypeEnum::TouchWithoutMouse;
+    // TRACE_DEBUG("Ignore mouse events: %b", ignoreMouseEvent);
     while (SDL_PollEvent(&event)) {
         if (event.type == SDL_EVENT_QUIT) {
             (_menuDlgt.tc)->LeaveMenu(_menuDlgt.self);
@@ -510,6 +536,7 @@ LPErrInApp MenuMgr::HandleRootMenu() {
                 rootMenuNext();
             } else {
                 TRACE_DEBUG("Tap outside the menu list\n");
+                _focusedMenuItem = MenuItemEnum::NOTHING;
             }
         }
 
@@ -541,9 +568,8 @@ LPErrInApp MenuMgr::HandleRootMenu() {
             MenuItemBox mouseInfoBox;
             if (g_MenuItemBoxes.IsPointInside(motionLocation, mouseInfoBox)) {
                 _focusedMenuItem = mouseInfoBox.MenuItem;
-                mouseInside = true;
-            } else {
-                mouseInside = false;
+            }else{
+                _focusedMenuItem = MenuItemEnum::NOTHING;
             }
             _p_homeUrl->MouseMove(event);
         }
@@ -551,9 +577,19 @@ LPErrInApp MenuMgr::HandleRootMenu() {
             if (ignoreMouseEvent) {
                 break;
             }
-            if (mouseInside) {
-                TRACE_DEBUG("Select menu from mouse down\n");
+            MenuItemBox mouseInfoBox;
+            SDL_Point clickLocation;
+            clickLocation.x = (int)event.button.x;
+            clickLocation.y = (int)event.button.y;
+
+            if (g_MenuItemBoxes.IsPointInside(clickLocation, mouseInfoBox)) {
+                _focusedMenuItem = mouseInfoBox.MenuItem;
+                TRACE_DEBUG("Select menu %s from mouse down\n",
+                            MenuItemEnumToString(_focusedMenuItem));
                 rootMenuNext();
+            } else {
+                TRACE_DEBUG("Mouse outside the menu list\n");
+                _focusedMenuItem = MenuItemEnum::NOTHING;
             }
         } else if (event.type == SDL_EVENT_MOUSE_BUTTON_UP) {
             if (ignoreMouseEvent) {

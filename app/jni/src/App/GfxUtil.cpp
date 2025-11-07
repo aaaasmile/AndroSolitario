@@ -209,12 +209,12 @@ void GFX_UTIL::DrawStaticLine(SDL_Surface* screen, int x0, int y0, int x1,
     }
 }
 
-void GFX_UTIL::DrawRect(SDL_Surface* screen, int x, int y, int dx, int dy,
+void GFX_UTIL::DrawRect(SDL_Surface* screen, int xi, int yi, int xf, int yf,
                         SDL_Color color) {
-    DrawStaticLine(screen, x, y, dx, y, color);
-    DrawStaticLine(screen, x, y, x, dy, color);
-    DrawStaticLine(screen, dx, y, dx, dy, color);
-    DrawStaticLine(screen, x, dy, dx, dy, color);
+    DrawStaticLine(screen, xi, yi, xf, yi, color);
+    DrawStaticLine(screen, xi, yi, xi, yf, color);
+    DrawStaticLine(screen, xf, yi, xf, yf, color);
+    DrawStaticLine(screen, xi, yf, xf, yf, color);
 }
 
 void GFX_UTIL::FillRect(SDL_Surface* screen, int x0, int y0, int width,
