@@ -9,8 +9,6 @@
 #include "ErrorInfo.h"
 #include "Languages.h"
 
-class MusicManager;
-
 typedef struct {
     std::string Name;
     uint16_t Score;
@@ -26,7 +24,7 @@ class HighScore {
     LPErrInApp Save();
     LPErrInApp SaveScore(int score, int numCard);
     LPErrInApp Show(SDL_Surface* screen, SDL_Surface* pSurfTitle,
-                    SDL_Renderer* psdlRenderer, MusicManager* pMusicManager);
+                    SDL_Renderer* psdlRenderer);
 
    private:
     ScoreInfo _scoreInfo[NUMOFSCORE];

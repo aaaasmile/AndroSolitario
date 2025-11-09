@@ -30,25 +30,24 @@ class OptionsGfx {
         MYIDCOMBOBACK = 5
     };
 
-public:
+   public:
     OptionsGfx();
     ~OptionsGfx();
 
-    LPErrInApp Initialize(SDL_Surface* pScreen,
-                          SDL_Renderer* pRenderer, MusicManager* pMusicMgr,
+    LPErrInApp Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
                           MenuDelegator& menuDlg);
     LPErrInApp Show(SDL_Surface* pScene_background, STRING& strCaption);
     void SetCaption(STRING& strCaption) { _headerText = strCaption; }
     LPErrInApp ButEndOPtClicked(int iButID);
     void CheckboxMusicClicked(bool state);
 
-private:
+   private:
     ClickCb prepClickCb();
     ClickCb prepClickComboCb();
     CheckboxClickCb prepCheckBoxClickMusic();
     ClickCb prepSelectionDeckCb();
 
-private:
+   private:
     SDL_Renderer* _p_sdlRenderer;
     SDL_Rect _rctOptBox;
     SDL_Surface* _p_surfBar;

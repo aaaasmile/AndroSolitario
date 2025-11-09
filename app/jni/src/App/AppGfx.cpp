@@ -72,7 +72,7 @@ LPErrInApp AppGfx::Init() {
     if (err != NULL) {
         return err;
     }
-    
+
     if (!SDL_WasInit(SDL_INIT_VIDEO)) {
         if (SDL_Init(0) < 0) {
             return ERR_UTIL::ErrorCreate("Couldn't initialize SDL: %s\n",
@@ -268,8 +268,7 @@ LPErrInApp AppGfx::startGameLoop() {
     _p_SolitarioGfx = new SolitarioGfx();
 
     err = _p_SolitarioGfx->Initialize(_p_Screen, _p_sdlRenderer, _p_Window,
-                                      _p_SceneBackground, _p_MusicManager,
-                                      _p_HighScore);
+                                      _p_SceneBackground, _p_HighScore);
     if (err != NULL)
         return err;
 
@@ -488,8 +487,7 @@ LPErrInApp AppGfx::showHighScore() {
     if (_p_MusicManager->IsPlayingMusic()) {
         _p_MusicManager->StopMusic(600);
     }
-    _p_HighScore->Show(_p_Screen, _p_CreditTitle, _p_sdlRenderer,
-                       _p_MusicManager);
+    _p_HighScore->Show(_p_Screen, _p_CreditTitle, _p_sdlRenderer);
 
     LeaveMenu();
 
@@ -506,7 +504,7 @@ LPErrInApp AppGfx::showCredits() {
     if (_p_MusicManager->IsPlayingMusic()) {
         _p_MusicManager->StopMusic(600);
     }
-    credits(_p_Screen, _p_CreditTitle, _p_sdlRenderer, _p_MusicManager);
+    credits(_p_Screen, _p_CreditTitle, _p_sdlRenderer);
     LeaveMenu();
     _p_MusicManager->PlayMusic(MusicManager::MUSIC_INIT_SND,
                                MusicManager::LOOP_ON);
@@ -522,8 +520,7 @@ LPErrInApp AppGfx::showOptionGeneral() {
     LPLanguages pLanguages = pGameSettings->GetLanguageMan();
 
     STRING caption = pLanguages->GetStringId(Languages::ID_MEN_OPTIONS);
-    LPErrInApp err = optGfx.Initialize(_p_Screen, _p_sdlRenderer,
-                                       _p_MusicManager, delegator);
+    LPErrInApp err = optGfx.Initialize(_p_Screen, _p_sdlRenderer, delegator);
     if (err) {
         return err;
     }
@@ -556,4 +553,3 @@ void AppGfx::ParseCmdLine(int argc, char* argv[]) {
         }
     }
 }
-

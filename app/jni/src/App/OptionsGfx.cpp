@@ -75,7 +75,6 @@ CheckboxClickCb OptionsGfx::prepCheckBoxClickMusic() {
 }
 
 LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
-                                  MusicManager* pMusicMgr,
                                   MenuDelegator& menuDlg) {
     if (pScreen == NULL) {
         return ERR_UTIL::ErrorCreate("pScreen is null");
@@ -93,7 +92,7 @@ LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
 
     _p_screen = pScreen;
     _menuDlgt = menuDlg;
-    _p_MusicManager = pMusicMgr;
+    _p_MusicManager = _p_GameSettings->GetMusicManager();
     _p_fontCtrl = _p_GameSettings->GetFontAriblk();
     _p_fontText = _p_GameSettings->GetFontVera();
     _p_sdlRenderer = pRenderer;

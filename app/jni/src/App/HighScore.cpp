@@ -146,8 +146,7 @@ LPErrInApp HighScore::Load() {
 }
 
 LPErrInApp HighScore::Show(SDL_Surface* p_surf_screen, SDL_Surface* pSurfTitle,
-                           SDL_Renderer* psdlRenderer,
-                           MusicManager* pMusicManager) {
+                           SDL_Renderer* psdlRenderer) {
     SDL_Rect dest;
     SDL_Event event;
     Uint32 last_time, now_time;
@@ -163,6 +162,7 @@ LPErrInApp HighScore::Show(SDL_Surface* p_surf_screen, SDL_Surface* pSurfTitle,
     } else {
         InstantFade(p_surf_screen);
     }
+    MusicManager* pMusicManager = pGameSettings->GetMusicManager();
     pMusicManager->PlayMusic(MusicManager::MUSIC_CREDITS_SND,
                              MusicManager::LOOP_ON);
 
@@ -174,6 +174,8 @@ LPErrInApp HighScore::Show(SDL_Surface* p_surf_screen, SDL_Surface* pSurfTitle,
     SDL_BlitSurface(pSurfTitle, NULL, p_surf_screen, &dest);
     bool done = false;
     Uint32 start_time = SDL_GetTicks();
+    bool ignoreMouseEvent =
+        pGameSettings->InputType == InputTypeEnum::TouchWithoutMouse;
     do {
         last_time = SDL_GetTicks();
 
@@ -188,6 +190,12 @@ LPErrInApp HighScore::Show(SDL_Surface* p_surf_screen, SDL_Surface* pSurfTitle,
                 }
             }
             if (event.type == SDL_EVENT_FINGER_DOWN) {
+                done = true;
+            }
+            if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
+                if (ignoreMouseEvent) {
+                    break;
+                }
                 done = true;
             }
         }

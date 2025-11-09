@@ -140,7 +140,7 @@ static void draw_text(const char* str, int scroll, SDL_Surface* screen);
 static int g_line = 0;
 
 void credits(SDL_Surface* p_surf_screen, SDL_Surface* pSurfTitle,
-             SDL_Renderer* psdlRenderer, MusicManager* pMusicManager) {
+             SDL_Renderer* psdlRenderer) {
     bool done;
     uint32_t scroll;
     SDL_Rect src, dest;
@@ -148,6 +148,7 @@ void credits(SDL_Surface* p_surf_screen, SDL_Surface* pSurfTitle,
     Uint32 last_time, now_time;
     SDL_Keycode key;
     LPGameSettings pGameSettings = GameSettings::GetSettings();
+    MusicManager* pMusicManager = pGameSettings->GetMusicManager();
 
     SDL_Texture* pScreenTexture =
         SDL_CreateTextureFromSurface(psdlRenderer, p_surf_screen);
@@ -169,6 +170,8 @@ void credits(SDL_Surface* p_surf_screen, SDL_Surface* pSurfTitle,
     done = 0;
     scroll = 0;
     g_line = 0;
+    bool ignoreMouseEvent =
+        pGameSettings->InputType == InputTypeEnum::TouchWithoutMouse;
     do {
         last_time = SDL_GetTicks();
         while (SDL_PollEvent(&event) > 0) {
@@ -179,6 +182,12 @@ void credits(SDL_Surface* p_surf_screen, SDL_Surface* pSurfTitle,
                 }
             }
             if (event.type == SDL_EVENT_FINGER_DOWN) {
+                done = true;
+            }
+            if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
+                if (ignoreMouseEvent) {
+                    break;
+                }
                 done = true;
             }
         }

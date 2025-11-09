@@ -54,7 +54,6 @@ class SolitarioGfx {
 
     LPErrInApp Initialize(SDL_Surface *s, SDL_Renderer *r, SDL_Window *w,
                           SDL_Surface *pSceneBackground,
-                          MusicManager *pMusicManager,
                           HighScore *pHighScore);
     LPErrInApp StartGameLoop();
 

@@ -108,12 +108,11 @@ ClickCb SolitarioGfx::prepClickToggleSoundCb() {
 LPErrInApp SolitarioGfx::Initialize(SDL_Surface* s, SDL_Renderer* r,
                                     SDL_Window* w,
                                     SDL_Surface* pSceneBackground,
-                                    MusicManager* pMusicManager,
                                     HighScore* pHighScore) {
     TRACE("Initialize Solitario\n");
     LPGameSettings pGameSettings = GameSettings::GetSettings();
     setDeckType(pGameSettings->DeckTypeVal);
-    _p_MusicManager = pMusicManager;
+    _p_MusicManager = pGameSettings->GetMusicManager();
     _p_HighScore = pHighScore;
     _sceneBackgroundIsBlack =
         pGameSettings->BackgroundType == BackgroundTypeEnum::Black;
