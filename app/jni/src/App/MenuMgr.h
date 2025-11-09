@@ -49,6 +49,7 @@ class MenuMgr {
     SDL_Texture* _p_ScreenTexture;
     SDL_Renderer* _p_sdlRenderer;
     MenuItemEnum _focusedMenuItem;
+    MenuItemEnum _prevFocusedMenuItem;
     int _box_Y;
     int _box_X;
     int _hBar;

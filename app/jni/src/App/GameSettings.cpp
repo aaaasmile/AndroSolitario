@@ -13,6 +13,7 @@
 #include <unistd.h>
 #endif
 
+#include "MusicManager.h"
 #include "WinTypeGlobal.h"
 
 static LPGameSettings _p_GameSettings = NULL;
@@ -41,12 +42,17 @@ GameSettings::GameSettings() {
     SettingsDir = "";
     BackgroundType = BackgroundTypeEnum::Mantova;
     _p_Languages = NULL;
+    _p_MusicManager = new MusicManager();
 }
 
 GameSettings::~GameSettings() {
     if (_p_Languages) {
         delete _p_Languages;
         _p_Languages = NULL;
+    }
+    if (_p_MusicManager) {
+        delete _p_MusicManager;
+        _p_MusicManager = NULL;
     }
 }
 
@@ -60,6 +66,11 @@ Languages* GameSettings::GetLanguageMan() {
         _p_Languages = new Languages();
     }
     return _p_Languages;
+}
+
+MusicManager* GameSettings::InitMusicManager() {
+    _p_MusicManager->Initialize(MusicEnabled);
+    return _p_MusicManager;
 }
 
 LPErrInApp GameSettings::LoadSettings() {

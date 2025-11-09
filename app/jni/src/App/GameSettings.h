@@ -13,6 +13,8 @@
 enum BackgroundTypeEnum { Commessaggio = 0, Mantova = 1, Black = 2 };
 enum InputTypeEnum { Mouse = 0, TouchWithoutMouse = 1 };
 
+class MusicManager;
+
 class GameSettings {
    public:
     std::string PlayerName;
@@ -26,7 +28,7 @@ class GameSettings {
     InputTypeEnum InputType;
 
    public:
-    static GameSettings* GetSettings(); 
+    static GameSettings* GetSettings();
     ~GameSettings();
 
     LPErrInApp LoadSettings();
@@ -57,6 +59,8 @@ class GameSettings {
 
     Languages* GetLanguageMan();
     void SetCurrentLang();
+    MusicManager* GetMusicManager() { return _p_MusicManager; }
+    MusicManager* InitMusicManager();
 
    private:
     GameSettings();
@@ -71,6 +75,7 @@ class GameSettings {
     TTF_Font* _p_fontAriblk;
     TTF_Font* _p_fontSymb;
     Languages* _p_Languages;
+    MusicManager* _p_MusicManager;
 };
 
 typedef GameSettings* LPGameSettings;

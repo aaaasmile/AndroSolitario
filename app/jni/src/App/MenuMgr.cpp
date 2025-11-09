@@ -13,6 +13,7 @@
 #include "ErrorInfo.h"
 #include "GameSettings.h"
 #include "GfxUtil.h"
+#include "MusicManager.h"
 #include "WinTypeGlobal.h"
 
 static const char* g_lpszMsgUrl = "Go to invido.it";
@@ -414,7 +415,7 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     }
     endY = currY + morePlaceY + offsetY;
     g_MenuItemBoxes.SetYInPos(1, endY);
-    g_MenuItemBoxes.drawBorder(1, _p_ScreenBackbuffer); 
+    g_MenuItemBoxes.drawBorder(1, _p_ScreenBackbuffer);
 
     // Credits
     currY += morePlaceY;
@@ -430,11 +431,11 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     if (err != NULL) {
         return err;
     }
-    g_MenuItemBoxes.drawBorder(1, _p_ScreenBackbuffer); 
+    g_MenuItemBoxes.drawBorder(1, _p_ScreenBackbuffer);
 
     endY = currY + morePlaceY + offsetY;
     g_MenuItemBoxes.SetYInPos(2, endY);
-    g_MenuItemBoxes.drawBorder(2, _p_ScreenBackbuffer); 
+    g_MenuItemBoxes.drawBorder(2, _p_ScreenBackbuffer);
 
     // Help
 #if HASHELPMENU
@@ -472,7 +473,7 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     }
     endY = currY + morePlaceY + offsetY;
     g_MenuItemBoxes.SetYInPos(4, endY);
-    g_MenuItemBoxes.drawBorder(4, _p_ScreenBackbuffer); 
+    g_MenuItemBoxes.drawBorder(4, _p_ScreenBackbuffer);
 
 #if HASQUITMENU
     // Quit
@@ -515,6 +516,7 @@ LPErrInApp MenuMgr::HandleRootMenu() {
     SDL_Point touchLocation;
     SDL_Event event;
     LPGameSettings pGameSettings = GameSettings::GetSettings();
+    MusicManager* pMusicManager = pGameSettings->GetMusicManager();
     bool ignoreMouseEvent =
         pGameSettings->InputType == InputTypeEnum::TouchWithoutMouse;
     // TRACE_DEBUG("Ignore mouse events: %b", ignoreMouseEvent);
@@ -543,9 +545,15 @@ LPErrInApp MenuMgr::HandleRootMenu() {
         if (event.type == SDL_EVENT_KEY_DOWN) {
             if (event.key.key == SDLK_UP) {
                 _focusedMenuItem = previousMenu(_focusedMenuItem);
+                if (_focusedMenuItem != MenuItemEnum::NOTHING) {
+                    pMusicManager->PlayEffect(MusicManager::EFFECT_OVER);
+                }
             }
             if (event.key.key == SDLK_DOWN) {
                 _focusedMenuItem = nextMenu(_focusedMenuItem);
+                if (_focusedMenuItem != MenuItemEnum::NOTHING) {
+                    pMusicManager->PlayEffect(MusicManager::EFFECT_OVER);
+                }
             }
             if (event.key.key == SDLK_RETURN) {
                 TRACE_DEBUG("Select menu from return\n");
@@ -568,7 +576,12 @@ LPErrInApp MenuMgr::HandleRootMenu() {
             MenuItemBox mouseInfoBox;
             if (g_MenuItemBoxes.IsPointInside(motionLocation, mouseInfoBox)) {
                 _focusedMenuItem = mouseInfoBox.MenuItem;
-            }else{
+                if (_focusedMenuItem != MenuItemEnum::NOTHING && 
+                    _focusedMenuItem != _prevFocusedMenuItem) {
+                    pMusicManager->PlayEffect(MusicManager::EFFECT_OVER);
+                    _prevFocusedMenuItem = _focusedMenuItem;
+                }    
+            } else {
                 _focusedMenuItem = MenuItemEnum::NOTHING;
             }
             _p_homeUrl->MouseMove(event);

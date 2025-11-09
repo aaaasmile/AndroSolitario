@@ -72,7 +72,7 @@ LPErrInApp AppGfx::Init() {
     if (err != NULL) {
         return err;
     }
-
+    
     if (!SDL_WasInit(SDL_INIT_VIDEO)) {
         if (SDL_Init(0) < 0) {
             return ERR_UTIL::ErrorCreate("Couldn't initialize SDL: %s\n",
@@ -83,9 +83,6 @@ LPErrInApp AppGfx::Init() {
     if (err != NULL) {
         return err;
     }
-
-    _p_MusicManager = new MusicManager();
-    _p_MusicManager->Initialize(_p_GameSettings->MusicEnabled);
 
     _p_HighScore = new HighScore();
     _p_HighScore->Load();
@@ -130,6 +127,7 @@ LPErrInApp AppGfx::Init() {
 
     clearBackground();
 
+    _p_MusicManager = _p_GameSettings->InitMusicManager();
     err = _p_MusicManager->LoadMusicRes();
     return err;
 }
@@ -299,7 +297,6 @@ void AppGfx::terminate() {
         SDL_DestroyTexture(_p_ScreenTexture);
     }
 
-    delete _p_MusicManager;
     delete _p_SolitarioGfx;
     delete _p_HighScore;
     _p_SolitarioGfx = NULL;
