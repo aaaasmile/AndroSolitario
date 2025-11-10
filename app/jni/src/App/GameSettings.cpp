@@ -73,6 +73,13 @@ MusicManager* GameSettings::InitMusicManager() {
     return _p_MusicManager;
 }
 
+void GameSettings::TerminateMusicManager() {
+    if (_p_MusicManager) {
+        delete _p_MusicManager;
+        _p_MusicManager = NULL;
+    }   
+}
+
 LPErrInApp GameSettings::LoadSettings() {
     LPErrInApp err = setSettingFileName();
     if (err != NULL) {

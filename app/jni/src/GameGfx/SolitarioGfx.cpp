@@ -46,17 +46,21 @@ SolitarioGfx::~SolitarioGfx() {
     clearSurface();
     if (_p_BtNewGame != NULL) {
         delete _p_BtNewGame;
+        _p_BtNewGame = NULL;
     }
     if (_p_BtQuit != NULL) {
         delete _p_BtQuit;
+        _p_BtQuit = NULL;
     }
     if (_p_BtToggleSound != NULL) {
         delete _p_BtToggleSound;
+         _p_BtToggleSound = NULL;
     }
     delete _p_currentTime;
 }
 
 void SolitarioGfx::clearSurface() {
+    TRACE_DEBUG("clearSurface\n");
     if (_p_ScreenBackbufferDrag != NULL) {
         SDL_DestroySurface(_p_ScreenBackbufferDrag);
         _p_ScreenBackbufferDrag = NULL;

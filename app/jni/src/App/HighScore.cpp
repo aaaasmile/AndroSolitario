@@ -27,6 +27,10 @@ HighScore::HighScore() {
     }
 }
 
+HighScore::~HighScore() {
+    TRACE_DEBUG("HighScore destructor\n");
+}
+
 LPErrInApp HighScore::Save() {
     LPGameSettings pGameSettings = GameSettings::GetSettings();
     if (pGameSettings->SettingsDir == "" || pGameSettings->GameName == "") {

@@ -20,6 +20,7 @@ class HighScore {
 
    public:
     HighScore();
+    ~HighScore();
     LPErrInApp Load();
     LPErrInApp Save();
     LPErrInApp SaveScore(int score, int numCard);

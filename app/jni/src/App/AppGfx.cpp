@@ -299,7 +299,7 @@ void AppGfx::terminate() {
     delete _p_SolitarioGfx;
     delete _p_HighScore;
     _p_SolitarioGfx = NULL;
-    _p_MusicManager = NULL;
+    _p_GameSettings->TerminateMusicManager();
     _p_HighScore = NULL;
 
     SDL_DestroyWindow(_p_Window);

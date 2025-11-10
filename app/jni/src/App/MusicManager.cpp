@@ -23,6 +23,7 @@ MusicManager::MusicManager() {
 }
 
 MusicManager::~MusicManager() {
+    TRACE_DEBUG("Quit the audio sub system");
     StopMusic(0);
     for (int i = 0; i < NUM_OF_SOUNDS; i++) {
         Mix_FreeMusic(_p_Musics[i]);
@@ -31,7 +32,7 @@ MusicManager::~MusicManager() {
         Mix_FreeChunk(_p_MusicsWav[j]);
     }
     SDL_QuitSubSystem(SDL_INIT_AUDIO);
-    TRACE_DEBUG("Quit the audio sub system");
+    TRACE_DEBUG("Audio sub system shutdown");
 }
 
 void MusicManager::Initialize(bool musicEnabled) {
