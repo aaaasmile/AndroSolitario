@@ -16,6 +16,7 @@ class ButtonGfx;
 class Languages;
 class CheckBoxGfx;
 class ComboGfx;
+class TextInputGfx;
 class MusicManager;
 
 using namespace traits;
@@ -36,7 +37,8 @@ class OptionsGfx {
 
     LPErrInApp Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
                           MenuDelegator& menuDlg);
-    LPErrInApp Show(SDL_Surface* pScene_background, STRING& strCaption);
+    LPErrInApp Show(SDL_Surface* pScene_background, STRING& strCaption,
+                    SDL_Window* pWindow);
     void SetCaption(STRING& strCaption) { _headerText = strCaption; }
     LPErrInApp ButEndOPtClicked(int iButID);
     void CheckboxMusicClicked(bool state);
@@ -63,6 +65,7 @@ class OptionsGfx {
     ComboGfx* _p_comboLang;
     ComboGfx* _p_comboDeck;
     ComboGfx* _p_comboBackground;
+    TextInputGfx* _p_textInput;
     SDL_Surface* _p_deckAll[eDeckType::NUM_OF_DECK];
     CardGfx _cardOnEachDeck[3][eDeckType::NUM_OF_DECK];
     MenuDelegator _menuDlgt;

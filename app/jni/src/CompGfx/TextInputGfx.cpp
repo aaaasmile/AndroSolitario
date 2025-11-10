@@ -95,6 +95,15 @@ void TextInputGfx::DrawCtrl(SDL_Surface* pScreen) {
         GFX_UTIL::DrawString(pScreen, _text.c_str(), _rctCtrl.x + offsetX,
                              _rctCtrl.y + offsetY, GFX_UTIL_COLOR::White,
                              _p_fontText);
+    }else{
+        int tx, ty;
+        const char* namePlaceHolder = "Please enter the name";
+        TTF_GetStringSize(_p_fontText, namePlaceHolder, 0, &tx, &ty);
+        int offsetY = (_rctCtrl.h - ty) / 2;
+
+        GFX_UTIL::DrawString(pScreen, namePlaceHolder, _rctCtrl.x + offsetX,
+                             _rctCtrl.y + offsetY, GFX_UTIL_COLOR::Gray,
+                             _p_fontText);
     }
 
     // Draw cursor

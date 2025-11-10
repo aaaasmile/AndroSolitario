@@ -440,7 +440,7 @@ LPErrInApp AppGfx::MainLoop() {
 
             case MenuItemEnum::MENU_OPTIONS:
                 _backGroundChanged = false;
-                err = showOptionGeneral();
+                err = showGeneralOptions();
                 if (err != NULL)
                     goto error;
                 if (_backGroundChanged) {
@@ -515,8 +515,8 @@ LPErrInApp AppGfx::showCredits() {
     return NULL;
 }
 
-LPErrInApp AppGfx::showOptionGeneral() {
-    TRACE("Show option general\n");
+LPErrInApp AppGfx::showGeneralOptions() {
+    TRACE("Show general Options\n");
     OptionsGfx optGfx;
 
     MenuDelegator delegator = prepMenuDelegator();
@@ -528,7 +528,7 @@ LPErrInApp AppGfx::showOptionGeneral() {
     if (err) {
         return err;
     }
-    err = optGfx.Show(_p_SceneBackground, caption);
+    err = optGfx.Show(_p_SceneBackground, caption, _p_Window);
     if (err) {
         return err;
     }

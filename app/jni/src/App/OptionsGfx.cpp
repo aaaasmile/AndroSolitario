@@ -6,6 +6,8 @@
 #include "CompGfx/ButtonGfx.h"
 #include "CompGfx/CheckBoxGfx.h"
 #include "CompGfx/ComboGfx.h"
+#include "CompGfx/TextInputGfx.h"
+
 #include "GfxUtil.h"
 #include "MusicManager.h"
 
@@ -29,6 +31,8 @@ OptionsGfx::~OptionsGfx() {
     delete _p_checkMusic;
     delete _p_comboDeck;
     delete _p_comboBackground;
+    delete _p_textInput;
+
     for (int i = 0; i < eDeckType::NUM_OF_DECK; i++) {
         if (_p_deckAll[i]) {
             SDL_DestroySurface(_p_deckAll[i]);
@@ -172,7 +176,7 @@ LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
     _p_checkMusic->Initialize(&rctBt1, pScreen, _p_fontText, MYIDMUSICCHK,
                               cbCheckboxMusic);
     _p_checkMusic->SetVisibleState(CheckBoxGfx::INVISIBLE);
-    // background
+    // game image background
     _p_comboBackground = new ComboGfx();
     rctBt1.w = comboW;
     rctBt1.h = comboH;
@@ -181,14 +185,22 @@ LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
     _p_comboBackground->Initialize(&rctBt1, pScreen, _p_fontText, MYIDCOMBOBACK,
                                    pRenderer, nullCb);
     _p_comboBackground->SetVisibleState(ComboGfx::INVISIBLE);
+    // Player name
+    _p_textInput = new TextInputGfx();
+    rctBt1.w = comboW;
+    rctBt1.h = comboH;
+    rctBt1.y = _p_comboBackground->PosY() + _p_comboBackground->Height() + combo2OffsetY;
+    rctBt1.x = _p_comboBackground->PosX();
+    _p_textInput->Initialize(&rctBt1, pScreen, _p_fontText);
+        
     // Deck
     // combo deck selection
     _p_comboDeck = new ComboGfx();
     rctBt1.w = comboW;
     rctBt1.h = comboH;
-    rctBt1.y = _p_comboBackground->PosY() + _p_comboBackground->Height() +
+    rctBt1.y = _p_textInput->PosY() + _p_textInput->Height() +
                combo3OffsetY;
-    rctBt1.x = _p_comboBackground->PosX();
+    rctBt1.x = _p_textInput->PosX();
 
     _p_comboDeck->Initialize(&rctBt1, pScreen, _p_fontText, MYIDCOMBODECK,
                              pRenderer, nullCb);
@@ -236,7 +248,7 @@ LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
 }
 
 LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
-                            STRING& strCaption) {
+                            STRING& strCaption, SDL_Window* pWindow) {
     TRACE_DEBUG("Options - Show\n");
     LPGameSettings pGameSettings = GameSettings::GetSettings();
     LPLanguages pLanguages = pGameSettings->GetLanguageMan();
@@ -282,6 +294,10 @@ LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
     _p_comboBackground->AddLineText(strTextBt.c_str());
     _p_comboBackground->SetVisibleState(ComboGfx::VISIBLE);
     _p_comboBackground->SelectIndex(_p_GameSettings->BackgroundType);
+
+    // player name
+    _p_textInput->SetText(pGameSettings->PlayerName);
+    _p_textInput->SetVisibleState(TextInputGfx::VISIBLE);
 
     // combobox deck selection
     STRING strDeckSelectTitle =
@@ -370,6 +386,7 @@ LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
                     mouseDownRec = false;
                 }
             }
+            _p_textInput->HandleEvent(event, pWindow);
         }
 
         // the background of the option box
@@ -432,6 +449,9 @@ LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
                              GFX_UTIL_COLOR::Orange, _p_fontText);
         _p_comboBackground->DrawButton(pShadowSrf);
 
+        // player name
+        _p_textInput->DrawCtrl(pShadowSrf);
+
         // Combo Deck: Label and control
         GFX_UTIL::DrawString(pShadowSrf, strDeckSelectTitle.c_str(),
                              _p_comboDeck->PosX(),
@@ -452,6 +472,9 @@ LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
                           _p_screen->pitch);
         SDL_RenderTexture(_p_sdlRenderer, pScreenTexture, NULL, NULL);
         SDL_RenderPresent(_p_sdlRenderer);
+        
+        // update controls
+        _p_textInput->Update();
 
         // synch to frame rate
         Uint32 uiNowTime = SDL_GetTicks();

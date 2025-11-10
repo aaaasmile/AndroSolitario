@@ -47,7 +47,7 @@ private:
     LPErrInApp showHelp();
     LPErrInApp showCredits();
     LPErrInApp showHighScore();
-    LPErrInApp showOptionGeneral();
+    LPErrInApp showGeneralOptions();
 
     MenuDelegator prepMenuDelegator();
     void clearBackground();

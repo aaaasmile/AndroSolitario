@@ -20,10 +20,13 @@ class TextInputGfx {
     const std::string& GetText() const { return _text; }
     void SetText(const std::string& newText) { _text = newText; }
     bool GetHasFocus() const { return _hasFocus; }
-    void HandleEvent(const SDL_Event& event, SDL_Window *pWindow);
+    void HandleEvent(const SDL_Event& event, SDL_Window* pWindow);
     void SetVisibleState(VisbleState eVal) { _visibleState = eVal; }
     void DrawCtrl(SDL_Surface* pScreen);
     void Update();
+    int PosX() { return _rctCtrl.x; }
+    int PosY() { return _rctCtrl.y; }
+    int Height() { return _rctCtrl.h; }
 
    private:
     bool _hasFocus;
