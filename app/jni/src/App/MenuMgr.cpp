@@ -660,6 +660,8 @@ MenuItemEnum previousMenu(MenuItemEnum currMenu) {
             return MenuItemEnum::MENU_HELP;
         case MenuItemEnum::QUIT:
             return MenuItemEnum::MENU_HIGHSCORE;
+        case MenuItemEnum::NOTHING:
+            return MenuItemEnum::QUIT;
         default:
             return currMenu;
     }
@@ -680,6 +682,8 @@ MenuItemEnum nextMenu(MenuItemEnum currMenu) {
             return MenuItemEnum::QUIT;
         case MenuItemEnum::QUIT:
             return MenuItemEnum::QUIT;
+        case MenuItemEnum::NOTHING:
+            return MenuItemEnum::MENU_GAME;
         default:
             return currMenu;
     }
