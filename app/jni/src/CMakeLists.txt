@@ -24,13 +24,13 @@ set(SOURCES App/MusicManager.cpp
             App/OptionsGfx.cpp
             App/TraceService.cpp
             App/HighScore.cpp
+            App/CurrentTime.cpp
             CompGfx/LabelLinkGfx.cpp
             CompGfx/ButtonGfx.cpp
             CompGfx/CheckBoxGfx.cpp
             CompGfx/ComboGfx.cpp
             CompGfx/MesgBoxGfx.cpp
             CompGfx/LabelGfx.cpp
-            CompGfx/CurrentTime.cpp
             GameGfx/CardRegionGfx.cpp
             GameGfx/CardStackGfx.cpp
             GameGfx/SolitarioGfx.cpp)
