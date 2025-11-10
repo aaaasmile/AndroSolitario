@@ -78,6 +78,7 @@ public:
         CARDDECK,
         ON,
         OFF,
+        PLEASE_ENTER_NAME,
         TOT_STRINGS  // it must be always on the last place
     };
 

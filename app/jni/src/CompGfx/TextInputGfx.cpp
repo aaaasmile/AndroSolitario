@@ -96,8 +96,10 @@ void TextInputGfx::DrawCtrl(SDL_Surface* pScreen) {
                              _rctCtrl.y + offsetY, GFX_UTIL_COLOR::White,
                              _p_fontText);
     }else{
+        LPGameSettings pGameSettings = GameSettings::GetSettings();
+        Languages* pLang = pGameSettings->GetLanguageMan();
         int tx, ty;
-        const char* namePlaceHolder = "Please enter the name";
+        const char* namePlaceHolder = pLang->GetCStringId(Languages::PLEASE_ENTER_NAME);
         TTF_GetStringSize(_p_fontText, namePlaceHolder, 0, &tx, &ty);
         int offsetY = (_rctCtrl.h - ty) / 2;
 
