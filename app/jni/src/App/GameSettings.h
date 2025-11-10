@@ -18,7 +18,6 @@ class MusicManager;
 class GameSettings {
    public:
     std::string PlayerName;
-    int Level;
     DeckType DeckTypeVal;
     Languages::eLangId CurrentLanguage;
     bool MusicEnabled;

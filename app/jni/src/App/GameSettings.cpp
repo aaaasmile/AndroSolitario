@@ -34,8 +34,7 @@ LPGameSettings GameSettings::GetSettings() {
 
 GameSettings::GameSettings() {
     // default settings
-    PlayerName = "";
-    Level = 1;
+    PlayerName = "Virginio";
     DeckTypeVal.SetType(eDeckType::PIACENTINA);
     CurrentLanguage = Languages::LANG_ENG;
     MusicEnabled = true;

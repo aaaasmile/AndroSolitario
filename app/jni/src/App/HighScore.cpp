@@ -85,14 +85,13 @@ LPErrInApp HighScore::SaveScore(int score, int numCard) {
         }
     }
     if (j > -1) {
-        char bufName[256];
-        sprintf(bufName, "%s", getenv("USERNAME"));
-        TRACE("Saving score for user %s\n", bufName);
+        LPGameSettings pGameSettings = GameSettings::GetSettings();
+        TRACE("Saving score for user %s\n", pGameSettings->PlayerName);
         ScoreInfo prev;
         for (int i = j; i < NUMOFSCORE; i++) {
             if (i == j) {
                 prev = _scoreInfo[i];
-                _scoreInfo[i].Name = bufName;
+                _scoreInfo[i].Name = pGameSettings->PlayerName;
                 _scoreInfo[i].Score = score;
                 _scoreInfo[i].NumCard = numCard;
             } else {
