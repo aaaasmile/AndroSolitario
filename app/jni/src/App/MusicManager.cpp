@@ -21,6 +21,7 @@ MusicManager::MusicManager() {
     _currentMusicID = 0;
     _currentLoop = LOOP_ON;
     _musicDisabled = true;
+    _musicPaused = false;
 }
 
 MusicManager::~MusicManager() { TRACE_DEBUG("Destroy music manager"); }
@@ -69,7 +70,7 @@ LPErrInApp MusicManager::Initialize(bool musicEnabled) {
             !musicEnabled ? "true" : "false",
             _musicHardwareAvail ? "Ok" : "Failed");
     } else {
-        TRACE("Music OK\n");
+        TRACE("Music system initialized OK\n");
     }
     return NULL;
 }
@@ -111,6 +112,24 @@ void MusicManager::StopMusic(int fadingMs) {
     }
     Mix_FadeOutMusic(fadingMs);
     Mix_HaltMusic();
+}
+
+void MusicManager::PauseMusic() {
+    TRACE_DEBUG("Pause music \n");
+    if (_musicDisabled) {
+        return;
+    }
+    Mix_PauseMusic();
+    _musicPaused = true;
+}
+
+void MusicManager::ResumeMusic() {
+    TRACE_DEBUG("Resume music \n");
+    if (_musicDisabled) {
+        return;
+    }
+    Mix_ResumeMusic();
+    _musicPaused = false;
 }
 
 bool MusicManager::IsPlayingMusic() {

@@ -54,7 +54,7 @@ SolitarioGfx::~SolitarioGfx() {
     }
     if (_p_BtToggleSound != NULL) {
         delete _p_BtToggleSound;
-         _p_BtToggleSound = NULL;
+        _p_BtToggleSound = NULL;
     }
     delete _p_currentTime;
 }
@@ -1471,12 +1471,17 @@ void SolitarioGfx::BtToggleSoundClick() {
     TRACE("Toggle Sound with user button\n");
     STRING strTextBt;
     if (_p_MusicManager->IsPlayingMusic()) {
-        _p_MusicManager->StopMusic(300);
-        strTextBt = "🔇";  //_p_Languages->GetStringId(Languages::OFF);
+        // playing music or paused
+        if (_p_MusicManager->IsMusicPaused()) {
+            _p_MusicManager->ResumeMusic();
+            strTextBt = "🔊";  //_p_Languages->GetStringId(Languages::ON);
+        } else {
+            _p_MusicManager->PauseMusic();
+            strTextBt = "🔇";  //_p_Languages->GetStringId(Languages::OFF);
+        }
     } else {
-        strTextBt = "🔊";  //_p_Languages->GetStringId(Languages::ON);
-        _p_MusicManager->PlayMusic(MusicManager::MUSIC_PLAY_SND,
-                                   MusicManager::eLoopType::LOOP_ON);
+        // no music
+        strTextBt = "🔇";
     }
     _p_BtToggleSound->SetButtonText(strTextBt.c_str());
     DrawStaticScene();
