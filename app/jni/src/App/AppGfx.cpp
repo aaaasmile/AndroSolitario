@@ -127,7 +127,11 @@ LPErrInApp AppGfx::Init() {
 
     clearBackground();
 
-    _p_MusicManager = _p_GameSettings->InitMusicManager();
+    err = _p_GameSettings->InitMusicManager();
+    if (err != NULL) {
+        return err;
+    }
+    _p_MusicManager = _p_GameSettings->GetMusicManager();
     err = _p_MusicManager->LoadMusicRes();
     return err;
 }

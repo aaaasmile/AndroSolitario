@@ -36,23 +36,19 @@ GameSettings::GameSettings() {
     // default settings
     PlayerName = "";
     Level = 1;
-    DeckTypeVal.SetType(eDeckType::TAROCK_PIEMONT);
+    DeckTypeVal.SetType(eDeckType::PIACENTINA);
     CurrentLanguage = Languages::LANG_ENG;
     MusicEnabled = true;
     SettingsDir = "";
     BackgroundType = BackgroundTypeEnum::Mantova;
     _p_Languages = NULL;
-    _p_MusicManager = new MusicManager();
+    _p_MusicManager = NULL;
 }
 
 GameSettings::~GameSettings() {
     if (_p_Languages) {
         delete _p_Languages;
         _p_Languages = NULL;
-    }
-    if (_p_MusicManager) {
-        delete _p_MusicManager;
-        _p_MusicManager = NULL;
     }
 }
 
@@ -68,16 +64,21 @@ Languages* GameSettings::GetLanguageMan() {
     return _p_Languages;
 }
 
-MusicManager* GameSettings::InitMusicManager() {
-    _p_MusicManager->Initialize(MusicEnabled);
-    return _p_MusicManager;
+LPErrInApp GameSettings::InitMusicManager() {
+    if (_p_MusicManager == NULL) {
+        _p_MusicManager = new MusicManager();
+    }else{
+        return ERR_UTIL::ErrorCreate("Sound manager already initialized");
+    }
+    return _p_MusicManager->Initialize(MusicEnabled);
 }
 
 void GameSettings::TerminateMusicManager() {
     if (_p_MusicManager) {
+        _p_MusicManager->Terminate();
         delete _p_MusicManager;
         _p_MusicManager = NULL;
-    }   
+    }
 }
 
 LPErrInApp GameSettings::LoadSettings() {
@@ -261,6 +262,7 @@ void GAMESET::GetNameWithAssets(const char* src_path, std::string& res) {
 #else
     res = src_path;
 #endif
+    TRACE_DEBUG("[GetNameWithAssets] : %s\n", res);
 }
 
 const char* GAMESET::GetExeAppFolder() {

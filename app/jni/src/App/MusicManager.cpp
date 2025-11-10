@@ -8,7 +8,8 @@ static const char* lpszaSound_filenames[MusicManager::NUM_OF_SOUNDS] = {
     DATA_PREFIX "music/wolmer-invido.ogg", DATA_PREFIX "music/watermusic.ogg",
     DATA_PREFIX "music/wings-of-the-wind.ogg"};
 
-static const char* lpszaEffects_filenames[MusicManager::NUM_OF_WAV] = {DATA_PREFIX "music/click_over.wav"};
+static const char* lpszaEffects_filenames[MusicManager::NUM_OF_WAV] = {
+    DATA_PREFIX "music/click_over.wav"};
 
 MusicManager::MusicManager() {
     for (int i = 0; i < NUM_OF_SOUNDS; i++) {
@@ -22,8 +23,9 @@ MusicManager::MusicManager() {
     _musicDisabled = true;
 }
 
-MusicManager::~MusicManager() {
-    TRACE_DEBUG("Quit the audio sub system");
+MusicManager::~MusicManager() { TRACE_DEBUG("Destroy music manager"); }
+
+void MusicManager::Terminate() {
     StopMusic(0);
     for (int i = 0; i < NUM_OF_SOUNDS; i++) {
         Mix_FreeMusic(_p_Musics[i]);
@@ -31,42 +33,36 @@ MusicManager::~MusicManager() {
     for (int j = 0; j < NUM_OF_WAV; j++) {
         Mix_FreeChunk(_p_MusicsWav[j]);
     }
+    Mix_CloseAudio();
+    Mix_Quit();
+
     SDL_QuitSubSystem(SDL_INIT_AUDIO);
     TRACE_DEBUG("Audio sub system shutdown");
 }
 
-void MusicManager::Initialize(bool musicEnabled) {
+LPErrInApp MusicManager::Initialize(bool musicEnabled) {
     _musicDisabled = true;
     _musicHardwareAvail = false;
     if (SDL_Init(SDL_INIT_AUDIO) < 0) {
-        fprintf(stderr,
-                "\nWarning: I could not initialize audio!\n"
-                "The Simple DirectMedia error that occured was:\n"
-                "%s\n\n",
-                SDL_GetError());
+        return ERR_UTIL::ErrorCreate("Error on audio initialize: %s",
+                                     SDL_GetError());
+    }
+    SDL_AudioSpec audio_spec;
+    audio_spec.freq = 44100;  // Sampling frequency in Hz
+    audio_spec.format =
+        SDL_AUDIO_S16LE;      // Sample format (16-bit signed integer)
+    audio_spec.channels = 2;  // Number of channels (Stereo)
+
+    // if (Mix_OpenAudio(44100, AUDIO_S16, 2, 1024) < 0) { SDL2
+    if (Mix_OpenAudio(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &audio_spec) < 0) {
+        return ERR_UTIL::ErrorCreate("Error on Mix_OpenAudio: %s",
+                                     SDL_GetError());
 
     } else {
-        SDL_AudioSpec audio_spec;
-        audio_spec.freq = 44100;  // Sampling frequency in Hz
-        audio_spec.format =
-            SDL_AUDIO_S16LE;        // Sample format (16-bit signed integer)
-        audio_spec.channels = 2;  // Number of channels (Stereo)
-
-        // if (Mix_OpenAudio(44100, AUDIO_S16, 2, 1024) < 0) { SDL2
-        if (Mix_OpenAudio(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &audio_spec) <
-            0) {
-            fprintf(stderr,
-                    "\nWarning: I could not set up audio for 44100 Hz "
-                    "16-bit stereo.\n"
-                    "The Simple DirectMedia error that occured was:\n"
-                    "%s\n\n",
-                    SDL_GetError());
-
-        } else {
-            _musicHardwareAvail = true;
-            _musicDisabled = !musicEnabled;
-        }
+        _musicHardwareAvail = true;
+        _musicDisabled = !musicEnabled;
     }
+
     if (_musicDisabled) {
         TRACE_DEBUG(
             "[WARN] Music is disabled (by settings? %s, hardware audio? %s)\n",
@@ -75,6 +71,7 @@ void MusicManager::Initialize(bool musicEnabled) {
     } else {
         TRACE("Music OK\n");
     }
+    return NULL;
 }
 
 LPErrInApp MusicManager::LoadMusicRes() {

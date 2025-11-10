@@ -13,7 +13,8 @@ class MusicManager {
     MusicManager();
     virtual ~MusicManager();
 
-    void Initialize(bool musicEnabled);
+    LPErrInApp Initialize(bool musicEnabled);
+    void Terminate();
     void StopMusic(int fadingMs);
     bool PlayMusic(int iID, eLoopType eVal);
     void PlayCurrentMusic();
