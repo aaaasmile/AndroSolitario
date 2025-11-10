@@ -108,9 +108,10 @@ LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
     // SDL_FillRect(_p_surfBar, NULL,
     //              SDL_MapRGBA(pScreen->format, 10, 100, 10, 0)); SDL 2
 
-    SDL_FillSurfaceRect(_p_surfBar, NULL,
-                        SDL_MapRGB(SDL_GetPixelFormatDetails(_p_surfBar->format),
-                                   NULL, 10, 10, 10));
+    SDL_FillSurfaceRect(
+        _p_surfBar, NULL,
+        SDL_MapRGB(SDL_GetPixelFormatDetails(_p_surfBar->format), NULL, 10, 10,
+                   10));
 
     SDL_SetSurfaceBlendMode(_p_surfBar, SDL_BLENDMODE_BLEND);
     SDL_SetSurfaceAlphaMod(_p_surfBar, 70);
@@ -237,7 +238,7 @@ LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
 LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
                             STRING& strCaption) {
     TRACE_DEBUG("Options - Show\n");
-    LPGameSettings pGameSettings = GameSettings::GetSettings();                                    
+    LPGameSettings pGameSettings = GameSettings::GetSettings();
     LPLanguages pLanguages = pGameSettings->GetLanguageMan();
     _headerText = strCaption;
     _terminated = false;
@@ -311,6 +312,7 @@ LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
     SDL_Texture* pScreenTexture =
         SDL_CreateTextureFromSurface(_p_sdlRenderer, pShadowSrf);
     LPErrInApp err = NULL;
+    bool mouseDownRec = false;
     while (!_terminated) {
         // center the background
         // SDL_FillRect(pShadowSrf, &pShadowSrf->clip_rect,
@@ -355,16 +357,22 @@ LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
                 _p_comboBackground->FingerDown(event);
                 _p_comboDeck->FingerDown(event);
             }
+            if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
+                mouseDownRec = true;
+            }
             if (event.type == SDL_EVENT_MOUSE_BUTTON_UP) {
-                _p_buttonOK->MouseUp(event);
-                _p_comboLang->MouseUp(event);
-                _p_checkMusic->MouseUp(event);
-                _p_comboBackground->MouseUp(event);
-                _p_comboDeck->MouseUp(event);
+                if (mouseDownRec) {
+                    _p_buttonOK->MouseUp(event);
+                    _p_comboLang->MouseUp(event);
+                    _p_checkMusic->MouseUp(event);
+                    _p_comboBackground->MouseUp(event);
+                    _p_comboDeck->MouseUp(event);
+                    mouseDownRec = false;
+                }
             }
         }
 
-        //the background of the option box
+        // the background of the option box
         GFX_UTIL::DrawStaticSpriteEx(pShadowSrf, 0, 0, _rctOptBox.w,
                                      _rctOptBox.h, _rctOptBox.x, _rctOptBox.y,
                                      _p_surfBar);
@@ -383,7 +391,8 @@ LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
 
         // header bar
         SDL_Rect rectHeader;
-        Uint32 colorHeader =  // SDL_MapRGB(_p_screen->format, 153, 202, 51); //SDL 2
+        Uint32 colorHeader =  // SDL_MapRGB(_p_screen->format, 153, 202, 51);
+                              // //SDL 2
             SDL_MapRGB(SDL_GetPixelFormatDetails(_p_screen->format), NULL, 153,
                        202, 51);
         rectHeader.x = _rctOptBox.x + 1;
