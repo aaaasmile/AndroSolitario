@@ -8,6 +8,8 @@
 TextInputGfx::TextInputGfx() {
     _visibleState = INVISIBLE;
     _lastBlinkTime = 0;
+    _hasFocus = false;
+    _cursorVisible = false;
 }
 
 TextInputGfx::~TextInputGfx() {
