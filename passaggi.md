@@ -53,6 +53,11 @@ e si risolve mettendo nel file main.cpp il seguente header:
 Nota che la versione WSL funziona senza problemi.
 
 Il problema successivo è quello dell'orientamento.
+Il problema si risolve impostando per la versione Android lo schermo in questo modo:
+
+    _screenW = 1080;
+    _screenH = 1920;
+Nota che in WSL lo schermo è troppo grande.
 
 ## Per Partire
 Nella finestra WSL UbuntuMinitoro vado nella directory ~/projects/AndroSolitario3 e lancio 

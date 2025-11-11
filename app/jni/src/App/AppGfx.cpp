@@ -40,8 +40,14 @@ AppGfx::AppGfx() {
     _p_SolitarioGfx = NULL;
     _p_SceneBackground = NULL;
     _p_Screen = NULL;
-    _screenW = 1024;
+#ifdef ANDROID
+    // this is portrait
+    _screenW = 1080;
+    _screenH = 1920;
+#else
     _screenH = 768;
+    _screenW = 1024;
+#endif
     _Bpp = 0;
     _p_MusicManager = 0;
     _p_HighScore = 0;
