@@ -45,6 +45,14 @@ L'errore l'ho notato con il log genrico:
 
     adb logcat
 
+Il problema successivo è che non viene trovato libMain. Questa è una novità di SDL3
+e si risolve mettendo nel file main.cpp il seguente header:
+
+    #include <SDL3/SDL.h>
+    #include <SDL3/SDL_main.h>
+Nota che la versione WSL funziona senza problemi.
+
+Il problema successivo è quello dell'orientamento.
 
 ## Per Partire
 Nella finestra WSL UbuntuMinitoro vado nella directory ~/projects/AndroSolitario3 e lancio 
