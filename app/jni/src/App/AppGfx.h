@@ -42,7 +42,6 @@ private:
     LPErrInApp createWindow();
     void terminate();
     LPErrInApp loadProfile();
-    LPErrInApp writeProfile();
     void updateScreenTexture();
     LPErrInApp showHelp();
     LPErrInApp showCredits();

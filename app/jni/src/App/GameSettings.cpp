@@ -123,6 +123,16 @@ LPErrInApp GameSettings::LoadSettings() {
             "SDL_RWread on setting file error (file %s): %s\n", g_filepath,
             SDL_GetError());
     }
+    // player name
+    std::string playername;
+    playername.resize(20);
+
+    if (SDL_ReadIO(src, (void*)playername.data(), 20) == 0) {
+        return ERR_UTIL::ErrorCreate(
+            "SDL_RWread on setting file error (file %s): %s\n", g_filepath,
+            SDL_GetError());
+    }
+
     // SDL_RWclose(src); SDL 2
     SDL_CloseIO(src);
 
@@ -130,6 +140,7 @@ LPErrInApp GameSettings::LoadSettings() {
     CurrentLanguage = (Languages::eLangId)langId;
     MusicEnabled = musEnabled;
     BackgroundType = (BackgroundTypeEnum)backgroudType;
+    PlayerName = playername;
     return NULL;
 }
 
@@ -187,25 +198,31 @@ LPErrInApp GameSettings::SaveSettings() {
     // int numWritten = SDL_RWwrite(dst, &deckId, 1, 1); SDL 2
     int numWritten = SDL_WriteIO(dst, &deckId, 1);
     if (numWritten < 1) {
-        return ERR_UTIL::ErrorCreate("SDL_RWwrite single byte %s\n",
+        return ERR_UTIL::ErrorCreate("SDL_WriteIO error %s\n",
                                      SDL_GetError());
     }
     // numWritten = SDL_RWwrite(dst, &langId, 1, 1); SDL 2
     numWritten = SDL_WriteIO(dst, &langId, 1);
     if (numWritten < 1) {
-        return ERR_UTIL::ErrorCreate("SDL_RWwrite single byte %s\n",
+        return ERR_UTIL::ErrorCreate("SDL_WriteIO error %s\n",
                                      SDL_GetError());
     }
     // numWritten = SDL_RWwrite(dst, &musEnabled, 1, 1); SDL 2
     numWritten = SDL_WriteIO(dst, &musEnabled, 1);
     if (numWritten < 1) {
-        return ERR_UTIL::ErrorCreate("SDL_RWwrite single byte %s\n",
+        return ERR_UTIL::ErrorCreate("SDL_WriteIO error %s\n",
                                      SDL_GetError());
     }
     // numWritten = SDL_RWwrite(dst, &backgroudType, 1, 1); SDL 2
     numWritten = SDL_WriteIO(dst, &backgroudType, 1);
     if (numWritten < 1) {
-        return ERR_UTIL::ErrorCreate("SDL_RWwrite single byte %s\n",
+        return ERR_UTIL::ErrorCreate("SDL_WriteIO error %s\n",
+                                     SDL_GetError());
+    }
+
+     numWritten = SDL_WriteIO(dst, PlayerName.c_str(), PlayerName.size());
+    if (numWritten < 1) {
+        return ERR_UTIL::ErrorCreate("SDL_WriteIO error %s\n",
                                      SDL_GetError());
     }
     // SDL_RWclose(dst); SDL 2

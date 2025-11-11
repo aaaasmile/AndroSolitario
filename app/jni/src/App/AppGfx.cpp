@@ -280,7 +280,6 @@ LPErrInApp AppGfx::startGameLoop() {
 }
 
 void AppGfx::terminate() {
-    writeProfile();
     // SDL_ShowCursor(SDL_ENABLE);SDL2
     SDL_ShowCursor();
 
@@ -327,11 +326,6 @@ LPErrInApp AppGfx::loadProfile() {
     return _p_GameSettings->LoadSettings();
 }
 
-LPErrInApp AppGfx::writeProfile() {
-    TRACE("Save profile \n");
-    return _p_GameSettings->SaveSettings();
-}
-
 void fncBind_LeaveMenu(void* self) {
     AppGfx* pApp = (AppGfx*)self;
     pApp->LeaveMenu();
@@ -365,12 +359,10 @@ void AppGfx::LeaveMenu() {
 
 LPErrInApp AppGfx::SettingsChanged(bool backGroundChanged,
                                    bool languageChanged) {
-    TRACE("Persist settings\n");
     if (backGroundChanged) {
         _backGroundChanged = true;
     }
-    _p_GameSettings->SetCurrentLang();
-    return writeProfile();
+    return NULL;
 }
 
 void AppGfx::clearBackground() {
@@ -448,6 +440,7 @@ LPErrInApp AppGfx::MainLoop() {
                     if (err)
                         goto error;
                     pMenuMgr->SetBackground(_p_SceneBackground);
+                    _backGroundChanged = false;
                 }
                 break;
 

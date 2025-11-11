@@ -488,18 +488,14 @@ LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
     return NULL;
 }
 
-LPErrInApp OptionsGfx::ButEndOPtClicked(int iButID) {
+LPErrInApp OptionsGfx::ButEndOPtClicked(int butID) {
     _terminated = true;
-    _result = iButID;
-    TRACE("OK options\n");
+    TRACE("OK options clicked %d\n", butID);
     Languages::eLangId prevLangId = _p_GameSettings->CurrentLanguage;
     eDeckType prevDeckType = _p_GameSettings->DeckTypeVal.GetType();
     bool prevMusicEnabled = _p_GameSettings->MusicEnabled;
     BackgroundTypeEnum prevBackgroundType = _p_GameSettings->BackgroundType;
-    if (_result == MYIDCANCEL) {
-        CheckboxMusicClicked(prevMusicEnabled);
-        return NULL;
-    }
+    std::string prevName = _p_GameSettings->PlayerName;
 
     switch (_p_comboLang->GetSelectedIndex()) {
         case 0:
@@ -534,11 +530,17 @@ LPErrInApp OptionsGfx::ButEndOPtClicked(int iButID) {
     dt.SetTypeIndex(_p_comboDeck->GetSelectedIndex());
     _p_GameSettings->DeckTypeVal.CopyFrom(dt);
     _p_GameSettings->MusicEnabled = _p_checkMusic->GetCheckState();
+    _p_GameSettings->PlayerName = _p_textInput->GetText();
+
     if ((_p_GameSettings->MusicEnabled != prevMusicEnabled) ||
         (_p_GameSettings->DeckTypeVal.GetType() != prevDeckType) ||
         (_p_GameSettings->BackgroundType != prevBackgroundType) ||
+        (_p_GameSettings->PlayerName != prevName) ||
         (_p_GameSettings->CurrentLanguage != prevLangId)) {
-        TRACE("Settings are changed, save it\n");
+         
+        TRACE("Settings are changed\n");
+        _p_GameSettings->SetCurrentLang();
+
         LPErrInApp err = _menuDlgt.tc->SettingsChanged(
             _menuDlgt.self,
             (_p_GameSettings->BackgroundType != prevBackgroundType),
@@ -546,6 +548,7 @@ LPErrInApp OptionsGfx::ButEndOPtClicked(int iButID) {
         if (err) {
             return err;
         }
+        return _p_GameSettings->SaveSettings();
     }
     return NULL;
 }

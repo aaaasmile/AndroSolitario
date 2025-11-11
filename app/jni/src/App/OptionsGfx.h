@@ -59,7 +59,6 @@ class OptionsGfx {
     SDL_Color _color;
     ButtonGfx* _p_buttonOK;
     bool _terminated;
-    int _result;
     STRING _headerText;
     CheckBoxGfx* _p_checkMusic;
     ComboGfx* _p_comboLang;
