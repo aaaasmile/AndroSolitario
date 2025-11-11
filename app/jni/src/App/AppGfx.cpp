@@ -329,7 +329,11 @@ LPErrInApp AppGfx::loadProfile() {
     _p_GameSettings->SettingsDir = dirpath;
 
     TRACE("Load profile\n");
-    return _p_GameSettings->LoadSettings();
+    err = _p_GameSettings->LoadSettings();
+    if (err != NULL){
+        TRACE("Ignore settings because error: %s\n", err->ErrorText.c_str());
+    }
+    return NULL;
 }
 
 void fncBind_LeaveMenu(void* self) {
