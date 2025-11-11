@@ -45,8 +45,8 @@ AppGfx::AppGfx() {
     _screenW = 1080;
     _screenH = 1920;
 #else
-    _screenH = 768;
-    _screenW = 1024;
+    _screenH = 768; //960; //768;
+    _screenW = 1024;//540;//1024;
 #endif
     _Bpp = 0;
     _p_MusicManager = 0;
