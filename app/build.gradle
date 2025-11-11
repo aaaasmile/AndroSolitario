@@ -4,15 +4,15 @@ plugins {
 
 android {
     namespace "org.libsdl.app"
-    compileSdkVersion 34
+    compileSdkVersion 35
     defaultConfig {
-        minSdkVersion 19
-        targetSdkVersion 34
+        minSdkVersion 21
+        targetSdkVersion 35
         versionCode 2
-        versionName "2.3"
+        versionName "3.2"
         externalNativeBuild {
             ndkBuild {
-                arguments "APP_PLATFORM=android-19" 
+                arguments "APP_PLATFORM=android-21" 
                 arguments "APP_STL=c++_static"
                 //abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
                 //abiFilters 'armeabi-v7a'
