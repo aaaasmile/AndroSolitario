@@ -586,6 +586,7 @@ LPErrInApp SolitarioGfx::DrawInitialScene() {
         btoffsetY = 400;
         btposx = 500;
         btintraX = 50;
+        btwSymb = 90;
     }
     if (_p_Screen->w == 1024) {
         btposx = 500;
