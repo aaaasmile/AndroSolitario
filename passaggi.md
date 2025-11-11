@@ -1,7 +1,7 @@
 ## SDL 3.0
 Ho creato un branch sdl3 e cancellato tutti i sorgenti di SDL*
 Poi ho preso i sorgenti di SDL3.0 da https://github.com/libsdl-org/SDL/releases in formato zip
-dalla prerelease 3.1.6.
+Al momento uso SDL3-3.2.26.
 Ho fatto il git clone di AndroSolitario in una nuova directory AndroSolitario3. 
 Qui mi manca l'esecuzione di gradle in quanto il programma l'ho già installato (vedi https://github.com/aaaasmile/Solitario/blob/main/android.md alla voce Gradle).
 Ho ripreso le due directory con gli assets:
@@ -27,7 +27,24 @@ Ho avuto dei problemi con ttf nel generare il file libSDL3_ttf.so. Ho cambiato i
 includendo i sorgenti mancanti. 
 Per quanto riguarda sdl_mixer, sdl_image e sdl_ttf ho preso i sorgenti main latest al 11.11.2024.
 
-Quello che attualmente non compila è il mio programma, che è stato crato per SDL2.
+## Upgrade di SDL3
+Per aggiornare la libreria SDL con una nuova versione (sono passato da una prerelease a SDL3-3.2.26), 
+bisogna scaricare il tar da github e
+poi sostitutire i files di:
+
+    app/jni/SDL
+    app/src/main/java/org/libsdl/app
+In SDL non ho messo tutti i files del tar per non appesantire troppo la repository. Nel tar
+c'è un progetto demo di Android. In quel folder (per esempio \SDL3-3.2.26\android-project\app\src\main\java\org\libsdl\app) ci sono i files java da sostituire nel 
+mio progetto sotto app/src/main/java/org/libsdl/app. Quando sono riuscito a compilare per
+Android, nel far partire l'app ho avuto un crash immediato con l'errore:
+
+    JNI DETECTED ERROR IN APPLICATION: JNI FindClass called with pending exception java.lang.NoSuchMethodError: no static or non-static method "Lorg/libsdl/app/SDLActivity;.onNativePen(IIIFFF)V"
+Allora ho sostituito i files java con quelli attuali del tar.
+L'errore l'ho notato con il log genrico:
+
+    adb logcat
+
 
 ## Per Partire
 Nella finestra WSL UbuntuMinitoro vado nella directory ~/projects/AndroSolitario3 e lancio 
