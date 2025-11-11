@@ -66,7 +66,7 @@ Languages* GameSettings::GetLanguageMan() {
 LPErrInApp GameSettings::InitMusicManager() {
     if (_p_MusicManager == NULL) {
         _p_MusicManager = new MusicManager();
-    }else{
+    } else {
         return ERR_UTIL::ErrorCreate("Sound manager already initialized");
     }
     return _p_MusicManager->Initialize(MusicEnabled);
@@ -98,6 +98,7 @@ LPErrInApp GameSettings::LoadSettings() {
     uint8_t langId;
     uint8_t musEnabled;
     uint8_t backgroudType;
+    uint8_t nameSize;
 
     // if (SDL_RWread(src, &deckId, 1, 1) == 0) { SDL 2
     if (SDL_ReadIO(src, &deckId, 1) == 0) {
@@ -124,13 +125,19 @@ LPErrInApp GameSettings::LoadSettings() {
             SDL_GetError());
     }
     // player name
-    std::string playername;
-    playername.resize(20);
-
-    if (SDL_ReadIO(src, (void*)playername.data(), 20) == 0) {
+    if (SDL_ReadIO(src, &nameSize, 1) == 0) {
         return ERR_UTIL::ErrorCreate(
             "SDL_RWread on setting file error (file %s): %s\n", g_filepath,
             SDL_GetError());
+    }
+    std::string playername;
+    if (nameSize > 0) {
+        playername.resize(nameSize);
+        if (SDL_ReadIO(src, (void*)playername.data(), nameSize) == 0) {
+            return ERR_UTIL::ErrorCreate(
+                "SDL_RWread on setting file error (file %s): %s\n", g_filepath,
+                SDL_GetError());
+        }
     }
 
     // SDL_RWclose(src); SDL 2
@@ -141,34 +148,6 @@ LPErrInApp GameSettings::LoadSettings() {
     MusicEnabled = musEnabled;
     BackgroundType = (BackgroundTypeEnum)backgroudType;
     PlayerName = playername;
-    return NULL;
-}
-
-LPErrInApp GameSettings::LoadFonts() {
-    _p_fontAriblk = TTF_OpenFont(g_lpszIniFontAriblkFname, _fontBigSize);
-    if (_p_fontAriblk == NULL) {
-        return ERR_UTIL::ErrorCreate("Unable to load font %s, error: %s\n",
-                                     g_lpszIniFontAriblkFname, SDL_GetError());
-    }
-    _p_fontVera = TTF_OpenFont(g_lpszIniFontVeraFname, _fontSmallSize);
-    if (_p_fontVera == NULL) {
-        return ERR_UTIL::ErrorCreate("Unable to load font %s, error: %s\n",
-                                     g_lpszIniFontVeraFname, SDL_GetError());
-    }
-    _p_fontSymb = TTF_OpenFont(g_lpszFontSymbFname, _fontSymSize);
-    if (_p_fontSymb == NULL) {
-        return ERR_UTIL::ErrorCreate("Unable to load font %s, error: %s\n",
-                                     g_lpszFontSymbFname, SDL_GetError());
-    }
-    return NULL;
-}
-
-LPErrInApp GameSettings::setSettingFileName() {
-    if (SettingsDir == "" || GameName == "") {
-        return ERR_UTIL::ErrorCreate("User dir for setting is not defined");
-    }
-    snprintf(g_filepath, sizeof(g_filepath), "%s/%s.bin", SettingsDir.c_str(),
-             GameName.c_str());
     return NULL;
 }
 
@@ -198,35 +177,65 @@ LPErrInApp GameSettings::SaveSettings() {
     // int numWritten = SDL_RWwrite(dst, &deckId, 1, 1); SDL 2
     int numWritten = SDL_WriteIO(dst, &deckId, 1);
     if (numWritten < 1) {
-        return ERR_UTIL::ErrorCreate("SDL_WriteIO error %s\n",
-                                     SDL_GetError());
+        return ERR_UTIL::ErrorCreate("SDL_WriteIO error %s\n", SDL_GetError());
     }
     // numWritten = SDL_RWwrite(dst, &langId, 1, 1); SDL 2
     numWritten = SDL_WriteIO(dst, &langId, 1);
     if (numWritten < 1) {
-        return ERR_UTIL::ErrorCreate("SDL_WriteIO error %s\n",
-                                     SDL_GetError());
+        return ERR_UTIL::ErrorCreate("SDL_WriteIO error %s\n", SDL_GetError());
     }
     // numWritten = SDL_RWwrite(dst, &musEnabled, 1, 1); SDL 2
     numWritten = SDL_WriteIO(dst, &musEnabled, 1);
     if (numWritten < 1) {
-        return ERR_UTIL::ErrorCreate("SDL_WriteIO error %s\n",
-                                     SDL_GetError());
+        return ERR_UTIL::ErrorCreate("SDL_WriteIO error %s\n", SDL_GetError());
     }
     // numWritten = SDL_RWwrite(dst, &backgroudType, 1, 1); SDL 2
     numWritten = SDL_WriteIO(dst, &backgroudType, 1);
     if (numWritten < 1) {
-        return ERR_UTIL::ErrorCreate("SDL_WriteIO error %s\n",
-                                     SDL_GetError());
+        return ERR_UTIL::ErrorCreate("SDL_WriteIO error %s\n", SDL_GetError());
     }
 
-     numWritten = SDL_WriteIO(dst, PlayerName.c_str(), PlayerName.size());
+    // save len + string
+    uint8_t nameSize = PlayerName.size();
+    numWritten = SDL_WriteIO(dst, &nameSize, 1);
     if (numWritten < 1) {
-        return ERR_UTIL::ErrorCreate("SDL_WriteIO error %s\n",
-                                     SDL_GetError());
+        return ERR_UTIL::ErrorCreate("SDL_WriteIO error %s\n", SDL_GetError());
+    }
+
+    numWritten = SDL_WriteIO(dst, PlayerName.c_str(), nameSize);
+    if (numWritten < 1) {
+        return ERR_UTIL::ErrorCreate("SDL_WriteIO error %s\n", SDL_GetError());
     }
     // SDL_RWclose(dst); SDL 2
     SDL_CloseIO(dst);
+    return NULL;
+}
+
+LPErrInApp GameSettings::LoadFonts() {
+    _p_fontAriblk = TTF_OpenFont(g_lpszIniFontAriblkFname, _fontBigSize);
+    if (_p_fontAriblk == NULL) {
+        return ERR_UTIL::ErrorCreate("Unable to load font %s, error: %s\n",
+                                     g_lpszIniFontAriblkFname, SDL_GetError());
+    }
+    _p_fontVera = TTF_OpenFont(g_lpszIniFontVeraFname, _fontSmallSize);
+    if (_p_fontVera == NULL) {
+        return ERR_UTIL::ErrorCreate("Unable to load font %s, error: %s\n",
+                                     g_lpszIniFontVeraFname, SDL_GetError());
+    }
+    _p_fontSymb = TTF_OpenFont(g_lpszFontSymbFname, _fontSymSize);
+    if (_p_fontSymb == NULL) {
+        return ERR_UTIL::ErrorCreate("Unable to load font %s, error: %s\n",
+                                     g_lpszFontSymbFname, SDL_GetError());
+    }
+    return NULL;
+}
+
+LPErrInApp GameSettings::setSettingFileName() {
+    if (SettingsDir == "" || GameName == "") {
+        return ERR_UTIL::ErrorCreate("User dir for setting is not defined");
+    }
+    snprintf(g_filepath, sizeof(g_filepath), "%s/%s.bin", SettingsDir.c_str(),
+             GameName.c_str());
     return NULL;
 }
 
