@@ -192,8 +192,8 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
     } else {
         _rctPanelRedBox.w = _screenW - _box_X * 2;
         _rctPanelRedBox.h = _screenH - _box_Y * 2;
-        _rctPanelRedBox.w = max(_rctPanelRedBox.w, 800);
-        _rctPanelRedBox.h = max(_rctPanelRedBox.h, 600);
+        _rctPanelRedBox.w = std::max(_rctPanelRedBox.w, 800);
+        _rctPanelRedBox.h = std::max(_rctPanelRedBox.h, 600);
         if (_rctPanelRedBox.w > 1024) {
             _rctPanelRedBox.w = 1024;
         }
@@ -370,7 +370,7 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     int morePlaceY = 60;
     int intraOffset = (_rctPanelRedBox.h - 80) / NumOfMenuItems;
     int minIntraOffsetY = 80;
-    intraOffset = min(minIntraOffsetY, intraOffset);
+    intraOffset = std::min(minIntraOffsetY, intraOffset);
     LPGameSettings pGameSettings = GameSettings::GetSettings();
     LPLanguages pLanguages = pGameSettings->GetLanguageMan();
     if (pGameSettings->NeedScreenMagnify()) {
@@ -480,7 +480,7 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     currY += morePlaceY;
     currY = currY + intraOffset + 20;
     int lastY = _box_Y + _rctPanelRedBox.h - intraOffset - offsetY + 30;
-    lastY = max(lastY, currY);
+    lastY = std::max(lastY, currY);
     if (_focusedMenuItem != MenuItemEnum::QUIT) {
         color = g_color_off;
     } else {

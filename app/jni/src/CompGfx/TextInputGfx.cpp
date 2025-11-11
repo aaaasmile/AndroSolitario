@@ -1,5 +1,7 @@
 #include "TextInputGfx.h"
 
+#include <algorithm>
+
 #include "GameSettings.h"
 #include "GfxUtil.h"
 
@@ -50,17 +52,23 @@ void TextInputGfx::HandleEvent(const SDL_Event& event, SDL_Window* pWindow) {
         } else {
             SDL_StopTextInput(pWindow);
         }
-    } else if (_hasFocus && event.type == SDL_EVENT_TEXT_INPUT) {
-        _text += event.text.text;
     } else if (_hasFocus && event.type == SDL_EVENT_KEY_DOWN) {
         if (event.key.key == SDLK_BACKSPACE && !_text.empty()) {
             _text.pop_back();
-        } else if (event.key.key == SDLK_RETURN) {
+        } else if (event.key.key == SDLK_RETURN ||
+                   event.key.key == SDLK_TAB) {
             _hasFocus = false;
             SDL_StopTextInput(pWindow);
         }
     } else if (_hasFocus && event.type == SDL_EVENT_TEXT_INPUT) {
-        _text += event.text.text;
+        if (_text.length() < 20) {
+            std::string newText = event.text.text;
+            if (std::all_of(newText.begin(), newText.end(), [](char c) {
+                    return std::isalnum(c) || c == ' ' || c == '-';
+                })) {
+                _text += newText;
+            }
+        }
     }
 }
 
@@ -95,11 +103,12 @@ void TextInputGfx::DrawCtrl(SDL_Surface* pScreen) {
         GFX_UTIL::DrawString(pScreen, _text.c_str(), _rctCtrl.x + offsetX,
                              _rctCtrl.y + offsetY, GFX_UTIL_COLOR::White,
                              _p_fontText);
-    }else{
+    } else {
         LPGameSettings pGameSettings = GameSettings::GetSettings();
         Languages* pLang = pGameSettings->GetLanguageMan();
         int tx, ty;
-        const char* namePlaceHolder = pLang->GetCStringId(Languages::PLEASE_ENTER_NAME);
+        const char* namePlaceHolder =
+            pLang->GetCStringId(Languages::PLEASE_ENTER_NAME);
         TTF_GetStringSize(_p_fontText, namePlaceHolder, 0, &tx, &ty);
         int offsetY = (_rctCtrl.h - ty) / 2;
 
