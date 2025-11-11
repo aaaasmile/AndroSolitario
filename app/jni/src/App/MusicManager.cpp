@@ -44,7 +44,7 @@ void MusicManager::Terminate() {
 LPErrInApp MusicManager::Initialize(bool musicEnabled) {
     _musicDisabled = true;
     _musicHardwareAvail = false;
-    if (SDL_Init(SDL_INIT_AUDIO) < 0) {
+    if (!SDL_Init(SDL_INIT_AUDIO)) {
         return ERR_UTIL::ErrorCreate("Error on audio initialize: %s",
                                      SDL_GetError());
     }
@@ -55,7 +55,7 @@ LPErrInApp MusicManager::Initialize(bool musicEnabled) {
     audio_spec.channels = 2;  // Number of channels (Stereo)
 
     // if (Mix_OpenAudio(44100, AUDIO_S16, 2, 1024) < 0) { SDL2
-    if (Mix_OpenAudio(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &audio_spec) < 0) {
+    if (!Mix_OpenAudio(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &audio_spec)) {
         return ERR_UTIL::ErrorCreate("Error on Mix_OpenAudio: %s",
                                      SDL_GetError());
 

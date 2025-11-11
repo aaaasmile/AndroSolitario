@@ -86,7 +86,7 @@ LPErrInApp HighScore::SaveScore(int score, int numCard) {
     }
     if (j > -1) {
         LPGameSettings pGameSettings = GameSettings::GetSettings();
-        TRACE("Saving score for user %s\n", pGameSettings->PlayerName);
+        TRACE("Saving score for user %s\n", pGameSettings->PlayerName.c_str());
         ScoreInfo prev;
         for (int i = j; i < NUMOFSCORE; i++) {
             if (i == j) {

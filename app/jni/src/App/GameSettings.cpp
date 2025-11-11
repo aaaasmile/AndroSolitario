@@ -281,13 +281,13 @@ LPErrInApp GameSettings::CalcDisplaySize(int w, int h) {
 void GAMESET::GetNameWithAssets(const char* src_path, std::string& res) {
 #ifdef ANDROID
     char fpath[PATH_MAX];
-    snprintf(fpath, sizeof(fpath), "%s/%s", SDL_AndroidGetInternalStoragePath(),
+    snprintf(fpath, sizeof(fpath), "%s/%s", SDL_GetAndroidInternalStoragePath(),
              src_path);
     res = fpath;
 #else
     res = src_path;
 #endif
-    TRACE_DEBUG("[GetNameWithAssets] : %s\n", res);
+    TRACE_DEBUG("[GetNameWithAssets] : %s\n", res.c_str());
 }
 
 const char* GAMESET::GetExeAppFolder() {
@@ -309,7 +309,7 @@ const char* GAMESET::GetHomeFolder() {
     }
 #ifdef ANDROID
     sprintf(_settingsRootDir, "%s/.solitario",
-            SDL_AndroidGetInternalStoragePath());
+            SDL_GetAndroidInternalStoragePath());
     return _settingsRootDir;
 #endif
 #ifdef WIN32

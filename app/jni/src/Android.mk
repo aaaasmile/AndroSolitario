@@ -27,7 +27,7 @@ LOCAL_SRC_FILES := $(APP_PATH)/Main.cpp \
 			$(GAMEGFX_PATH)/CardRegionGfx.cpp \
             $(GAMEGFX_PATH)/CardStackGfx.cpp \
             $(GAMEGFX_PATH)/SolitarioGfx.cpp \
-            $(GAMEGFX_PATH)/CurrentTime.cpp \
+            $(APP_PATH)/CurrentTime.cpp \
             $(APP_PATH)/MusicManager.cpp \
             $(APP_PATH)/AppGfx.cpp \
             $(APP_PATH)/CardGfx.cpp \
@@ -48,6 +48,7 @@ LOCAL_SRC_FILES := $(APP_PATH)/Main.cpp \
             $(COMPGFX_PATH)/ComboGfx.cpp \
             $(COMPGFX_PATH)/MesgBoxGfx.cpp \
             $(COMPGFX_PATH)/LabelGfx.cpp \
+            $(COMPGFX_PATH)/TextInputGfx.cpp \
             $(ANDRO_SPEC_PATH)/AndroTrace.cpp
 
 LOCAL_SHARED_LIBRARIES := SDL3 SDL3_ttf SDL3_mixer SDL3_image 

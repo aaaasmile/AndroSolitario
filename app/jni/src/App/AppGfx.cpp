@@ -74,7 +74,7 @@ LPErrInApp AppGfx::Init() {
     }
 
     if (!SDL_WasInit(SDL_INIT_VIDEO)) {
-        if (SDL_Init(0) < 0) {
+        if (!SDL_Init(0)) {
             return ERR_UTIL::ErrorCreate("Couldn't initialize SDL: %s\n",
                                          SDL_GetError());
         }
@@ -90,7 +90,7 @@ LPErrInApp AppGfx::Init() {
     _p_GameSettings->SetCurrentLang();
     Languages* pLanguages = _p_GameSettings->GetLanguageMan();
 
-    if (TTF_Init() == -1) {
+    if (!TTF_Init()) {
         return ERR_UTIL::ErrorCreate("Font init error");
     }
     if (_p_GameSettings->NeedScreenMagnify()) {

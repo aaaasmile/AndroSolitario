@@ -39,8 +39,8 @@ STRING EntryTraceDetail::ToString() {
                 alpszDetTypeName[m_eTrType], strOnlyFileName.c_str(),
                 m_iLineNumber, m_strComment.c_str());
     } else {
-        sprintf(buff, "[%d][%s]%s", (int)m_ulTimeStamp, alpszDetTypeName[m_eTrType],
-                m_strComment.c_str());
+        sprintf(buff, "[%d][%s]%s", (int)m_ulTimeStamp,
+                alpszDetTypeName[m_eTrType], m_strComment.c_str());
     }
 
     strRes = buff;
@@ -209,6 +209,8 @@ void TraceService::flashTheEntry() {
             ::OutputDebugString(strEntry.c_str());
             break;
 #endif
+        default:
+            break;
     }
 }
 
@@ -219,7 +221,7 @@ void TraceService::SetOutputChannel(int iChannel, eOutType eVal,
     }
     if (iChannel >= 0 && iChannel < NUM_OF_CHANN) {
         m_aeChannelOut[iChannel] = eVal;
-        if (eVal == OT_FILE && lpszFileName != "") {
+        if (eVal == OT_FILE && strcmp(lpszFileName, "") != 0) {
             if (!m_abChannelMask[iChannel]) {
                 m_aChannelFiles[iChannel].open(lpszFileName);
                 m_abChannelMask[iChannel] = true;
