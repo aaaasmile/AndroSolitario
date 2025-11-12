@@ -171,6 +171,20 @@ Ha una risoluzione di 1080 x 2400
 Il RedMe, per il deployment, deve essere collegato ed accessibile in WSL2 con il cavo USB.
 Per il collegamento vedi la sezione Adb Devices
 
+## Target Nothing Phone 3a
+Ha lo stesso setup del RedMe. Ho fatto un upgrade della platform e gradle semplicememente
+cambiando il file build.gradle. Quando ho lanciato
+
+    ./gradlew compileDebugSources
+mi ha aggiornato la platform e il compiler ndk in modo automatico.
+Per eseguire il debug su Nothing Phone basta andare nel menu Settings > About phone > Software info > Build number
+E ripetere 7 volte il tap sul build number. Poi nel settings si abilita Usb debugging.
+A questo punto adb devices riconosce il nuovo device e gradle può installare la versione debug
+sul telefono.
+Su questo telefono ho avuto il problema che non partiva la app, al contrario di RedMe. Il problema
+era il file di settings.bin che ha un nuovo formato. L'ho risolto evitando di uscire dall'app se
+i settings non vengono caricati.
+
 ## Struttura del progetto
 Riferimento: https://wiki.libsdl.org/SDL2/Android#install_sdl_in_a_gcc_toolchain
 Ho messo i sorgenti di SDL nella directory app/jni/SDL
@@ -385,9 +399,9 @@ Questi sono i todo della conversione in Android.
 
 - Gli spin delle opzioni sono troppo piccoli (col finger down va bene) [DONE]
 - Le carte dei mazzi piacentina son troppo piccole
-- Quando finisce una partita, il nome del record è vuoto (data e ora vanno bene)
+- Quando finisce una partita, il nome del record è vuoto (data e ora vanno bene) [DONE]
 - GoTo Invido non funziona nella label gfx
-- Sound On/Off meglio un icona
+- Sound On/Off meglio un icona [DONE]
 - Doppio tap dovrebbe avere lo stesso effetto del tasto destro del mouse [DONE]
 - Problema con il formato dello schermo: il tavolo di gioco è troppo piccolo [DONE]
 - Nel tavolo da gioco ci vorrebbe un bottone per mettere la musica in pausa.[DONE]
@@ -401,6 +415,10 @@ Qui ho rimosso i file ini della libreria ini. Uso un formato binario con SDL. [D
 - A livello generale direi che il tap non ce l'ho sotto controllo [DONE]
 - Il menu Esci non mi fa funzionare il suono quando poi riavvio il programma. Questo è dovuto al fatto che le App in Android non hanno il comando Quit. Quando uso lo Swap, il programma termina in modo corretto e anche riparte in modo corretto. Per questo ho rimosso il comando Esci [DONE]
 - Rimosso il menu Guida in quanto non riesco a far partire la visualizzazione del pdf [DONE]
+
+## Problemi SDL3 in Android
+- Il doppio tab sugli assi non mi manda la carta sulla pila in automatico.
+
 
 ## Problemi SDL3 in WSL
 - Schermata del dialogo Opzioni è completamente traspararente anziché verde. [DONE]
