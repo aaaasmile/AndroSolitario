@@ -472,11 +472,10 @@ error:
 LPErrInApp AppGfx::showHelp() {
     const char* cmd = NULL;
     char cmdpath[PATH_MAX];
-#ifdef WIN32
+#if PLATFORM_WINDOWS
     cmd = "start";
     snprintf(cmdpath, sizeof(cmdpath), "%s .\\%s", cmd, g_lpszHelpFileName);
-#endif
-#ifdef ANDROID
+#elif PLATFORM_ANDROID
     // TODO open the pdf file
     TRACE_DEBUG("Wanna open file %s\n", g_lpszHelpFileName);
 #else
