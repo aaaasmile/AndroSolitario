@@ -113,6 +113,12 @@ Nota che il programma va a finire di dafult nella directory ./build/src.
 Cambio la destinazione con set_target_properties in CMakeFiles.
 Gli asset li ho copiati con un post build command.
 
+## Compilazione con target Windows (MySys2)
+
+    rm -r build
+    cmake -S app/jni/ -B build  -DSDL_WAYLAND=OFF
+    cmake --build build
+
 ## Directory Scratch
 Voglio creare dei piccoli progetti per testare delle funzionalità singole.
 Per esempio cd scratch/test_font vorrei compilare il programma hello.c.
