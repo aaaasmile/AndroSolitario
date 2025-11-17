@@ -119,6 +119,16 @@ Gli asset li ho copiati con un post build command.
     cmake -S app/jni/ -B build  -DSDL_WAYLAND=OFF
     cmake --build build
 
+Per far partire il Solitario occorre un device attaccato, altrimenti non parte.
+Siccome ho un'altra versione installata, quella col setup 2_0_1, ho bisogno di salvare
+i files in un'altra directory (.solitario + VERSION_HOME). 
+Asset e dlls non sono su github, le ho copiate nella dir root del progetto. 
+Le librerie di SDL vengono compilate nel progetto, ma non sono
+statiche bensì dll e vanno copiate alla fine della compilazione. Le dll mancanti, invece, vanno prese 
+da C:\msys64\ucrt64\bin.
+
+
+
 ## Directory Scratch
 Voglio creare dei piccoli progetti per testare delle funzionalità singole.
 Per esempio cd scratch/test_font vorrei compilare il programma hello.c.

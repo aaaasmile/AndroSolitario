@@ -4,6 +4,7 @@
 #define VERSION "Ver 3.0.2 20251111"
 #define PACKAGE_URL "https://invido.it"
 #define AUTHOR "igorrun"
+#define VERSION_HOME "030002"
 
 // Platform detection
 #if defined(__ANDROID__)

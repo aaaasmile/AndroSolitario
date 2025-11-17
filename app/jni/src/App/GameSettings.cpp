@@ -15,6 +15,7 @@
 
 #include "MusicManager.h"
 #include "WinTypeGlobal.h"
+#include "Config.h"
 
 static LPGameSettings _p_GameSettings = NULL;
 static char _settingsRootDir[1024] = "";
@@ -298,7 +299,9 @@ const char* GAMESET::GetExeAppFolder() {
     const char* path = SDL_GetBasePath();
 
     TRACE("Exe path: %s\n", path);
-    snprintf(_exeRootDir, sizeof(path), "%s", path);
+    snprintf(_exeRootDir, sizeof(_exeRootDir), "%s", path);
+
+    TRACE("RootDir: %s\n", _exeRootDir);
 
     return _exeRootDir;
 }
@@ -308,15 +311,15 @@ const char* GAMESET::GetHomeFolder() {
         return _settingsRootDir;
     }
 #ifdef ANDROID
-    sprintf(_settingsRootDir, "%s/.solitario",
-            SDL_GetAndroidInternalStoragePath());
+    sprintf(_settingsRootDir, "%s/.solitario%s",
+            SDL_GetAndroidInternalStoragePath(), VERSION_HOME);
     return _settingsRootDir;
 #endif
 #ifdef WIN32
-    sprintf(_settingsRootDir, "%s/%s/.solitario", getenv("HOMEDRIVE"),
-            getenv("HOMEPATH"));
+    sprintf(_settingsRootDir, "%s/%s/.solitario%s", getenv("HOMEDRIVE"),
+            getenv("HOMEPATH"), VERSION_HOME);
 #else
-    sprintf(_settingsRootDir, "%s/.solitario", getenv("HOME"));
+    sprintf(_settingsRootDir, "%s/.solitario%s", getenv("HOME"), VERSION_HOME);
 #endif
     return _settingsRootDir;
 }
