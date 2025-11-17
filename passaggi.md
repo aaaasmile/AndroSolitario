@@ -126,7 +126,15 @@ Asset e dlls non sono su github, le ho copiate nella dir root del progetto.
 Le librerie di SDL vengono compilate nel progetto, ma non sono
 statiche bensì dll e vanno copiate alla fine della compilazione. Le dll mancanti, invece, vanno prese 
 da C:\msys64\ucrt64\bin.
+Per far partire il programma:
 
+    .\build\solitario.exe
+I vari files, compresi i logs, vanno a finire in C:\Users\igor\.solitario030002
+
+### Problemi in Windows
+ - Quando scopre una carta sulla pila impiega troppo tempo per scoprirla
+ - L'icona dell'asso di bastoni non è trasparaente
+ - L'animazione finale della vittoria è troppo veloce
 
 
 ## Directory Scratch
@@ -143,7 +151,7 @@ A questo scopo ho creato un nuovo file CMakeList.txt che mi compila sdl e il fil
 ## Assets
 Gli Asset in Android sono piazzati in app/src/main.
 Gli asset in WSL2 vanno piazzati in una directory data di build/bin, che è la directory dove
-viene creato il solitario. Per questo task uso un cutom command in POST_BUILD definito nel 
+viene creato il solitario. Per questo task uso un custom command in POST_BUILD definito nel 
 file CMakeList.
 
 ## Debugger WSL

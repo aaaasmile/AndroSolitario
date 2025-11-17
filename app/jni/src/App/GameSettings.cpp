@@ -13,9 +13,9 @@
 #include <unistd.h>
 #endif
 
+#include "Config.h"
 #include "MusicManager.h"
 #include "WinTypeGlobal.h"
-#include "Config.h"
 
 static LPGameSettings _p_GameSettings = NULL;
 static char _settingsRootDir[1024] = "";
@@ -70,7 +70,11 @@ LPErrInApp GameSettings::InitMusicManager() {
     } else {
         return ERR_UTIL::ErrorCreate("Sound manager already initialized");
     }
-    return _p_MusicManager->Initialize(MusicEnabled);
+    LPErrInApp err = _p_MusicManager->Initialize(MusicEnabled);
+    if (err != NULL) {
+        TRACE("Music System error: %s\n", err->ErrorText.c_str());
+    }
+    return NULL;
 }
 
 void GameSettings::TerminateMusicManager() {

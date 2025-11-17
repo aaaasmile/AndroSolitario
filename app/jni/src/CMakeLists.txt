@@ -51,7 +51,7 @@ if(CMAKE_SYSTEM MATCHES Windows)
         message(STATUS "OK MySys on Windows is a supported target") 
         # all following commands are additions, specific for the target MySys, to previous definitions
         target_sources(${PROJECT_NAME} PRIVATE mysys2/Util-mysys.cpp)
-        target_compile_definitions(${PROJECT_NAME} PRIVATE TRACEINSERVICE)
+        target_compile_definitions(${PROJECT_NAME} PRIVATE _DEBUG TRACEINSERVICE)
         target_include_directories(${PROJECT_NAME} PRIVATE ../SDL/include ../SDL_image/include ../SDL_mixer/include ../SDL_ttf/include)
         set(SDL3_DIR "../../../build/SDL")
         # not needed to set: SDL3_image_DIR SDL3_mixer_DIR SDL3_ttf_DIR and find_package for SDL3_image, SDL3_mixer and SDL3_ttf 
@@ -75,6 +75,12 @@ if(CMAKE_SYSTEM MATCHES Windows)
               ${CMAKE_CURRENT_SOURCE_DIR}/../../src/main/assets/
               $<TARGET_FILE_DIR:${PROJECT_NAME}>/data/
           COMMENT "Copying assets directory to build directory"
+        )
+        add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+          COMMAND ${CMAKE_COMMAND} -E copy_directory
+              ${CMAKE_CURRENT_SOURCE_DIR}/../../../../MySys2_dlls/
+              $<TARGET_FILE_DIR:${PROJECT_NAME}>/
+          COMMENT "Copying dlls to build directory"
         )
     endif()
 else()

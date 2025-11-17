@@ -24,7 +24,7 @@ MusicManager::MusicManager() {
     _musicPaused = false;
 }
 
-MusicManager::~MusicManager() { TRACE_DEBUG("Destroy music manager"); }
+MusicManager::~MusicManager() { TRACE_DEBUG("Destroy music manager\n"); }
 
 void MusicManager::Terminate() {
     StopMusic(0);
@@ -38,7 +38,7 @@ void MusicManager::Terminate() {
     Mix_Quit();
 
     SDL_QuitSubSystem(SDL_INIT_AUDIO);
-    TRACE_DEBUG("Audio sub system shutdown");
+    TRACE_DEBUG("Audio sub system shutdown\n");
 }
 
 LPErrInApp MusicManager::Initialize(bool musicEnabled) {
@@ -76,6 +76,10 @@ LPErrInApp MusicManager::Initialize(bool musicEnabled) {
 }
 
 LPErrInApp MusicManager::LoadMusicRes() {
+    if (!_musicHardwareAvail){
+        TRACE_DEBUG("Avoid load music because Audio Hardware \n");
+        return NULL;
+    }
     for (int i = 0; i < NUM_OF_SOUNDS; i++) {
         STRING strFileTmp2 = lpszaSound_filenames[i];
 #ifdef WIN32
