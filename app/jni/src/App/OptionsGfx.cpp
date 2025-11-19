@@ -254,8 +254,8 @@ LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
     LPLanguages pLanguages = pGameSettings->GetLanguageMan();
     _headerText = strCaption;
     _terminated = false;
-    Uint32 uiInitialTick = SDL_GetTicks();
-    Uint32 uiLast_time = uiInitialTick;
+    Uint64 uiInitialTick = SDL_GetTicks();
+    Uint64 uiLast_time = uiInitialTick;
     int FPS = 3;
 
     // button ok
@@ -477,10 +477,10 @@ LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
         _p_textInput->Update();
 
         // synch to frame rate
-        Uint32 uiNowTime = SDL_GetTicks();
+        Uint64 uiNowTime = SDL_GetTicks();
         if (uiNowTime < uiLast_time + FPS) {
             SDL_Delay(uiLast_time + FPS - uiNowTime);
-            uiLast_time = uiNowTime;
+            uiLast_time = SDL_GetTicks();
         }
     }
     SDL_DestroySurface(pShadowSrf);

@@ -24,13 +24,13 @@ bool CurrentTime::IsMoreThenOneSecElapsed() {
         return false;
     }
     bool res = false;
-    Uint32 currTick = SDL_GetTicks();
-    Uint32 diff = currTick - _startSecondTick;
-    Uint32 secGap = diff / 1000;
+    Uint64 currTick = SDL_GetTicks();
+    Uint64 diff = currTick - _startSecondTick;
+    Uint64 secGap = diff / 1000;
     _deltaSec = secGap;
     if (secGap > 0) {
         res = true;
-        Uint32 remaind = diff % 1000;
+        Uint64 remaind = diff % 1000;
         _startSecondTick = currTick - remaind;
         _sec += secGap;
         if (_sec > 59) {

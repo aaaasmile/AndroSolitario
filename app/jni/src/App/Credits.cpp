@@ -145,7 +145,7 @@ void credits(SDL_Surface* p_surf_screen, SDL_Surface* pSurfTitle,
     uint32_t scroll;
     SDL_Rect src, dest;
     SDL_Event event;
-    Uint32 last_time, now_time;
+    Uint64 last_time, now_time;
     SDL_Keycode key;
     LPGameSettings pGameSettings = GameSettings::GetSettings();
     MusicManager* pMusicManager = pGameSettings->GetMusicManager();

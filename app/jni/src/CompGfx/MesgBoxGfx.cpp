@@ -128,8 +128,8 @@ int MesgBoxGfx::Show(SDL_Surface* pScene_background, LPCSTR lpsBut1Txt,
                      LPCSTR lpsBut2Txt, LPCSTR lpsMsgTxt) {
     _result = RES_YES;
     _terminated = false;
-    Uint32 uiInitialTick = SDL_GetTicks();
-    Uint32 uiLast_time = uiInitialTick;
+    Uint64 uiInitialTick = SDL_GetTicks();
+    Uint64 uiLast_time = uiInitialTick;
     int FPS = 3;
 
     _strMsgText = lpsMsgTxt;
@@ -255,7 +255,7 @@ int MesgBoxGfx::Show(SDL_Surface* pScene_background, LPCSTR lpsBut1Txt,
         Uint32 uiNowTime = SDL_GetTicks();
         if (uiNowTime < uiLast_time + FPS) {
             SDL_Delay(uiLast_time + FPS - uiNowTime);
-            uiLast_time = uiNowTime;
+            uiLast_time = SDL_GetTicks();
         }
     }
     SDL_DestroySurface(pShadowSrf);

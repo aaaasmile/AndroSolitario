@@ -152,7 +152,7 @@ LPErrInApp HighScore::Show(SDL_Surface* p_surf_screen, SDL_Surface* pSurfTitle,
                            SDL_Renderer* psdlRenderer) {
     SDL_Rect dest;
     SDL_Event event;
-    Uint32 last_time, now_time;
+    Uint64 last_time, now_time;
     SDL_Keycode key;
     LPGameSettings pGameSettings = GameSettings::GetSettings();
     LPLanguages pLanguages = pGameSettings->GetLanguageMan();
@@ -176,7 +176,7 @@ LPErrInApp HighScore::Show(SDL_Surface* p_surf_screen, SDL_Surface* pSurfTitle,
 
     SDL_BlitSurface(pSurfTitle, NULL, p_surf_screen, &dest);
     bool done = false;
-    Uint32 start_time = SDL_GetTicks();
+    Uint64 start_time = SDL_GetTicks();
     bool ignoreMouseEvent =
         pGameSettings->InputType == InputTypeEnum::TouchWithoutMouse;
     do {

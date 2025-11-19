@@ -145,7 +145,7 @@ bool MusicManager::IsPlayingMusic() {
 
 bool MusicManager::PlayMusic(int iID, eLoopType eVal) {
     if (_musicDisabled) {
-        TRACE_DEBUG("Ignore PlayMusic because is disabled");
+        TRACE_DEBUG("Ignore PlayMusic because is disabled\n");
     } else {
         TRACE_DEBUG("Playing music id: %d, loop: %d\n", iID, eVal);
     }

@@ -61,8 +61,14 @@
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/build/",
-            "environment": [],
+            "environment": [
+                {
+                    "name": "PATH",
+                    "value": "C:\\msys64\\ucrt64\\bin"
+                }
+            ],
             "externalConsole": false,
+            "MIMode": "gdb",
             "miDebuggerPath": "C:\\msys64\\ucrt64\\bin\\gdb.exe",
             "setupCommands": [
                 {

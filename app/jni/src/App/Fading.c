@@ -22,7 +22,7 @@ void Fade(SDL_Surface* p_surf_screen, SDL_Surface* p_surf_img,
     // Used when the Screen Surface equals the Image Surface
     SDL_Surface* p_surf_screen_copy = NULL;
     // Used to calculate the steps to make a fade in the given time:
-    Uint32 ui_old_time, ui_curr_time, ui_time_ms;
+    Uint64 ui_old_time, ui_curr_time, ui_time_ms;
     float f_alpha;
     // Becomes flag to pass when creating a Surface
     // Uint32 ui_flags = SDL_SWSURFACE;

@@ -671,7 +671,7 @@ LPErrInApp SolitarioGfx::DrawCardPac(int x, int y, int nCdIndex,
 
     int suitIx = nCdIndex / _deckType.GetNumCardInSuit();
     int cardIx = nCdIndex % _deckType.GetNumCardInSuit();
-    TRACE_DEBUG("Suit %d, card: %d\n", suitIx, cardIx);
+    //TRACE_DEBUG("Suit %d, card: %d\n", suitIx, cardIx);
 
     SDL_Rect srcCard;
     srcCard.x = suitIx * g_CardWidth;
@@ -772,7 +772,7 @@ LPErrInApp SolitarioGfx::DrawSymbolPac(int x, int y, int nSymbol,
 }
 
 LPErrInApp SolitarioGfx::VictoryAnimation() {
-    srand((unsigned)time(NULL));
+    TRACE("Victory animation \n");
     LPErrInApp err;
     int rotation;
     int id;
@@ -785,6 +785,9 @@ LPErrInApp SolitarioGfx::VictoryAnimation() {
     unsigned int max_y = _p_Screen->h;
     float bounce = 0.8f;
     SDL_Event event;
+    Uint64 uiInitialTick = SDL_GetTicks();
+    Uint64 uiLast_time = uiInitialTick;
+    int FPS = 5;
 
     while (1) {
         rotation = rand() % 2;
@@ -828,6 +831,14 @@ LPErrInApp SolitarioGfx::VictoryAnimation() {
                 return err;
             }
             updateTextureAsFlipScreen();
+            // synch to frame rate
+            Uint64 uiNowTime = SDL_GetTicks();
+            if (uiNowTime < uiLast_time + FPS) {
+                Uint32 delay = uiLast_time + FPS - uiNowTime;
+                //TRACE_DEBUG("[Animaytion] Delay %d\n", delay);
+                SDL_Delay(delay);
+                uiLast_time = SDL_GetTicks();
+            }
         } while ((x + g_CardWidth > 0) && (x < _p_Screen->w));
     }
     return NULL;
@@ -945,6 +956,7 @@ LPErrInApp SolitarioGfx::handleGameLoopKeyDownEvent(SDL_Event& event) {
         if (err != NULL) {
             return err;
         }
+        TRACE("Exit from victory animation \n");
         DrawStaticScene();
     }
     return NULL;
@@ -1195,6 +1207,7 @@ LPErrInApp SolitarioGfx::handleGameLoopMouseUpEvent(SDL_Event& event) {
         }
         DrawStaticScene();
         VictoryAnimation();
+        TRACE("Exit from victory animation \n");
         err = newGame();
         if (err != NULL) {
             return err;

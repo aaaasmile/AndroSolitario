@@ -19,8 +19,8 @@ private:
     int _sec;
     int _min;
     int _hour;
-    uint32_t _deltaSec;
-    uint32_t _startSecondTick;
+    uint64_t _deltaSec;
+    uint64_t _startSecondTick;
     bool _updateStopped;
 };
 

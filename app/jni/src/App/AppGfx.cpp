@@ -419,6 +419,7 @@ LPErrInApp AppGfx::MainLoop() {
                 err = startGameLoop();
                 if (err != NULL)
                     goto error;
+                TRACE("Exit from game loop \n");
                 LeaveMenu();
                 break;
 
@@ -456,6 +457,7 @@ LPErrInApp AppGfx::MainLoop() {
 
             case MenuItemEnum::QUIT:
             default:
+                TRACE("Quit Menu \n");
                 quit = true;
                 break;
         }
