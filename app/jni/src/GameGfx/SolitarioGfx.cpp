@@ -806,7 +806,7 @@ LPErrInApp SolitarioGfx::VictoryAnimation() {
     float bounce = 0.8f;
     SDL_Event event;
     int FPS = 5;
-
+    Uint64 last_time = SDL_GetTicks();
     while (1) {
         rotation = rand() % 2;
         id = rand() % _deckType.GetNumCards();
@@ -821,7 +821,6 @@ LPErrInApp SolitarioGfx::VictoryAnimation() {
         yspeed = 0;
 
         do {
-            Uint64 last_time = SDL_GetTicks();
             while (SDL_PollEvent(&event)) {
                 switch (event.type) {
                     case SDL_EVENT_QUIT:
@@ -855,6 +854,7 @@ LPErrInApp SolitarioGfx::VictoryAnimation() {
             if (now_time < last_time + FPS) {
                 Uint32 delay = last_time + FPS - now_time;
                 SDL_Delay(delay);
+                last_time = SDL_GetTicks();
             }
         } while ((x + g_CardWidth > 0) && (x < _p_Screen->w));
     }
