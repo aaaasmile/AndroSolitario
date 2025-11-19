@@ -187,7 +187,8 @@ LPErrInApp SolitarioGfx::DrawCardStack(SDL_Surface* s,
     if (pcardRegion == NULL) {
         return ERR_UTIL::ErrorCreate("DrawCardStack region is NULL");
     }
-    // TRACE_DEBUG("Draw card stack %d, visible %d\n", pcardRegion->RegionTypeId(),
+    // TRACE_DEBUG("Draw card stack %d, visible %d\n",
+    // pcardRegion->RegionTypeId(),
     //             pcardRegion->IsVisible());
 
     LPErrInApp err;
@@ -471,7 +472,7 @@ void SolitarioGfx::zoomDropCard(int& sx, int& sy, LPCardGfx pCard, int w,
     int dx = pCard->X();
     int dy = pCard->Y();
     float precision = 0.1f;
-    Uint64 FPS = 20;                                
+    Uint64 FPS = 20;
     for (float i = 0.0; i <= 1.0; i += precision) {
         Uint64 last_time = SDL_GetTicks();
         SDL_PumpEvents();
@@ -804,8 +805,6 @@ LPErrInApp SolitarioGfx::VictoryAnimation() {
     unsigned int max_y = _p_Screen->h;
     float bounce = 0.8f;
     SDL_Event event;
-    Uint64 uiInitialTick = SDL_GetTicks();
-    Uint64 uiLast_time = uiInitialTick;
     int FPS = 5;
 
     while (1) {
@@ -822,6 +821,7 @@ LPErrInApp SolitarioGfx::VictoryAnimation() {
         yspeed = 0;
 
         do {
+            Uint64 last_time = SDL_GetTicks();
             while (SDL_PollEvent(&event)) {
                 switch (event.type) {
                     case SDL_EVENT_QUIT:
@@ -851,12 +851,10 @@ LPErrInApp SolitarioGfx::VictoryAnimation() {
             }
             updateTextureAsFlipScreen();
             // synch to frame rate
-            Uint64 uiNowTime = SDL_GetTicks();
-            if (uiNowTime < uiLast_time + FPS) {
-                Uint32 delay = uiLast_time + FPS - uiNowTime;
-                // TRACE_DEBUG("[Animaytion] Delay %d\n", delay);
+            Uint64 now_time = SDL_GetTicks();
+            if (now_time < last_time + FPS) {
+                Uint32 delay = last_time + FPS - now_time;
                 SDL_Delay(delay);
-                uiLast_time = SDL_GetTicks();
             }
         } while ((x + g_CardWidth > 0) && (x < _p_Screen->w));
     }
