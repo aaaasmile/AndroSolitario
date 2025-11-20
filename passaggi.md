@@ -1,7 +1,7 @@
 ## SDL 3.0
-Ho creato un branch sdl3 e cancellato tutti i sorgenti di SDL*
-Poi ho preso i sorgenti di SDL3.0 da https://github.com/libsdl-org/SDL/releases in formato zip
-Al momento uso SDL3-3.2.26.
+Ho creato un branch sdl3 e cancellato tutti i sorgenti di SDL.
+Ho preso i sorgenti di SDL3.0 da https://github.com/libsdl-org/SDL/releases in formato zip
+Al momento uso SDL3-3.2.26 (vedi SDL CMakefileList.txt).
 Ho fatto il git clone di AndroSolitario in una nuova directory AndroSolitario3. 
 Qui mi manca l'esecuzione di gradle in quanto il programma l'ho già installato (vedi https://github.com/aaaasmile/Solitario/blob/main/android.md alla voce Gradle).
 Ho ripreso le due directory con gli assets:
@@ -13,8 +13,9 @@ Ho dovuto cancellare gradlew e gradle.bat perché non hanno funzionato dopo il c
     gradle wrapper
 _Could not create service of type ScriptPluginFactory using BuildScopeServices.createScriptPluginFactory()._
 
-Non so perché gradle e gradlew non funzionano. Ho bisogno sicuramente della directory gradle, che
-non è in git. L'ho copiata dalla altra directory e l'ho messa in git. La directory .gradle, invece, può essere tralasciata.
+Non so perché gradle e gradlew non funzionino. Ho bisogno sicuramente della directory gradle, che
+non è in git. L'ho copiata dalla altra directory e l'ho messa in git. 
+La directory .gradle, invece, può essere tralasciata.
 
 Il comando ./gradlew compileDebugSources mi dice che va tutto bene, ma non crea l'eseguibile. Provo il seguente:
 
@@ -23,6 +24,7 @@ che esegue solo un pre step, ma non chiama ndk. Questo viene eseguito con:
 
     ./gradlew installDebug
 e qui si devono correggere tutti gli errori. Per esempio gli header.
+
 Ho avuto dei problemi con ttf nel generare il file libSDL3_ttf.so. Ho cambiato il file android.mk
 includendo i sorgenti mancanti. 
 Per quanto riguarda sdl_mixer, sdl_image e sdl_ttf ho preso i sorgenti main latest al 11.11.2024.
@@ -131,11 +133,14 @@ Per far partire il programma:
     .\build\solitario.exe
 I vari files, compresi i logs, vanno a finire in C:\Users\igor\.solitario030002
 
-### Problemi in Windows
- - Quando scopre una carta sulla pila impiega troppo tempo per scoprirla
- - L'icona dell'asso di bastoni non è trasparaente
- - L'animazione finale della vittoria è troppo veloce
+Nota che in Windows le librerie die SDL sono tutte Dll.
 
+### Problemi in Windows
+- L'icona dell'asso di bastoni non è trasparaente
+- Il debugger in Visual Code e MySys2 non funziona
+- Quando scopre una carta sulla pila impiega troppo tempo per scoprirla. (ho dovuto mettere dei delay 
+ tra le varie update dello screen, per esempio nel drag e drop) [DONE]
+- L'animazione finale della vittoria è troppo veloce [DONE]
 
 ## Directory Scratch
 Voglio creare dei piccoli progetti per testare delle funzionalità singole.
@@ -158,25 +163,22 @@ file CMakeList.
 In Visual Code seezionare "Debug WSL", settare un break point e far partire il debugger
 di Visual Code. Funziona immediatamente senza problemi.
 
-# Versione Per SDL 2.0
-Qui di seguito ho messo tutte le istruzioni che ho usato per compilare la versione Android con 
-SDL2.0.
 
-## Solitario per Android
+## Versione Android
 
-AndroSolitario è il tentativo di compilare il progetto https://github.com/aaaasmile/Solitario per la piattaforma Android.
+AndroSolitario è il tentativo di compilare il progetto https://github.com/aaaasmile/Solitario anche per la piattaforma Android.
 Nota che ho già scritto alcune notte per lo sviluppo nel file https://github.com/aaaasmile/Solitario/blob/main/android.md
-In questo progetto ho compilato i sorgenti sia per Android che per WSL2.
+In questo progetto ho compilato i sorgenti sia per Android, WSL2 e Windows Mysys2.
 
 ## Info per partire con lo sviluppo
 (Vedi sotto per le versioni)
 Lo sviluppo l'ho eseguito su UbuntuMinitoro del mio Mini-k7. Sono partito dal progetto sdl-android-prj-hello
 in scratch ed ho poi aggiunto tutti i sorgenti.
 Le librerie da compilare sono:
-- "SDL2" (2.28.5)
-- "SDL2_image"
-- "SDL2_mixer"
-- "SDL2_ttf"
+- "SDL3" (per la versione vedi il file CMakeList.txt in SDL così come le altre libraries)
+- "SDL3_image"
+- "SDL3_mixer"
+- "SDL3_ttf"
 
 e devono essere presenti nel progetto con tutti i suoi sorgenti. Come IDE uso Visual Code. Ho installato l'SDK di
 Android, NDK e gradle (Prerequisiti: openjdk-17-jdk ant android-sdk-platform-tools-common). 
@@ -213,7 +215,7 @@ i settings non vengono caricati.
 Riferimento: https://wiki.libsdl.org/SDL2/Android#install_sdl_in_a_gcc_toolchain
 Ho messo i sorgenti di SDL nella directory app/jni/SDL
 Sono partito da SDL-release-2.26.5.tar.gz (che poi ho aggiornato a 2.28.5, vedi sotto) e ho copiato i files di root 
-le directory src e include. Tutte le altre no.
+le directory src e include. Tutte le altre no. Lo stesso ho fatto con SDL3.
 Nel file app/jni/src/Android.mk ho messo tutti i sorgenti che vengono compilati nel progetto.
 
 L'applicazione Android parte dai file in java messi all'interno di src/main/java.
@@ -222,9 +224,9 @@ il game loop del solitario.
 
 ## SDL_Images & Co.
 Ho bisogno di SDl e anche di altre librerie. 
-1) SDL_Image: https://github.com/libsdl-org/SDL_image/releases (SDL2_image-2.6.3)
-2) SDL_mixer: https://github.com/libsdl-org/SDL_mixer/releases (SDL2_mixer-2.6.3)
-3) SDL_ttf: https://github.com/libsdl-org/SDL_ttf/releases (SDL2_ttf-2.20.2)
+1) SDL_Image: https://github.com/libsdl-org/SDL_image/releases 
+2) SDL_mixer: https://github.com/libsdl-org/SDL_mixer/releases 
+3) SDL_ttf: https://github.com/libsdl-org/SDL_ttf/releases 
 
 Per quanto riguarda le librerie esterne (esempio ttf usa freetype e harfbuzz) esse vanno messe
 in external (vedi app/jni/SDL_image/Android.mk). Per esempio in app/jni/SDL_ttf/external ho copiato freetype e harfbuzz dallo zip scaricato da Github.
@@ -271,14 +273,12 @@ che ho risolto usando
 nel file build.gradle. Nota come in questo file ogni argomento aggiuntivo viene semplicemente inserito
 sotto.
 Più che altro è la creazione del file Andorid.mk che non è così intuitiva partendo dal mio file CLanguages.txt del progetto solitario di mysys2.
-Ho tolto libini.
 Ho incluso solo il file cpp per via del suffix. La direttiva include $(BUILD_STATIC_LIBRARY)
 compila la libreria in modo statico. Essa va poi referenziato con LOCAL_STATIC_LIBRARIES := inimod,
 mentre tutte le altre librerie di SDL sono qui: LOCAL_SHARED_LIBRARIES := SDL2 SDL2_ttf SDL2_mixer SDL2_image.
 
-### libini e settings files
-Alla fine l'ho tolta dal progetto in quanto non mi funzionava su Android (permission denied?).
-Ho deciso di usare lo stesso principio di HighScore dove salvo la lista in formato binario usando le
+### Score e Settings
+Ho deciso di usare, per i Settings, lo stesso principio di HighScore dove salvo la lista in formato binario usando le
 le funzioni di SDL che funzionano anche su Android. In questo modo rinuncio alla possibilità di 
 editare facilmente il file usando notepad. 
 Dove vanno a finire i files che vengono creati quando cambiano i settings oppure lo High Score?
@@ -372,7 +372,7 @@ del mio package e poi lo scarico. Questa la sequenza:
     adb pull /data/misc/profman/org.libsdl.app-primary.prof.txt
 
 Sul mio device riesco a scrivere sulla directory /sdcard/Documents/ e in linea di principio su /sdcard
-Ora non so dove si trova l'eseguibile e neanche se gli assets sono copiati nella directory di deployment.
+Ora non so dove si trova l'eseguibile e neanche se gli assets siano copiati nella directory di deployment.
 Non sembra che il comando installDebug trasferisca anche gli assets, perlomeno non nella stessa directory
 dove si trova il programma.
 Se guardo il contenuto del file generato app-debug.apk si nota questa struttura:
@@ -403,10 +403,10 @@ Sembra che per le funzioni che accedono agli assets, vale a dire tutti i files e
 della directory assets, sono accessibili dalle funzioni SDL senza alcun prefisso.
 Per creare una directory, oppure un file, bisogna invece usare SDL_AndroidGetInternalStoragePath().
 Siccome non ho più ini file, non devo copiare nulla. Semplicemente il file viene generato
-nella directory di Android quando cambiano i settings oppure high score.
+nella directory di Android quando cambiano i settings oppure l'high score.
 
 ## Editor C++
-Uso Visual Code con il plugin c/c++. Esso formatta in modalità Visual studio di Default.
+Uso Visual Code con il plugin c/c++. Esso formatta il sorgente nell'editor in modalità Visual studio di Default.
 Questo non è il mio modo preferito di formattare il codice, ma uso questa stringa 
 nella proprietà: C_Cpp:Clang_format_style
 
@@ -448,12 +448,12 @@ Qui ho rimosso i file ini della libreria ini. Uso un formato binario con SDL. [D
 - Schermata del dialogo Opzioni è completamente traspararente anziché verde. [DONE]
 - Schermata iniziale con i colori a palette fredda. (problema con create surface mask) [DONE]
 - Shuffle mazzo non va (spostato la dichiarazione di include sotto quella di vector) [DONE]
-- Nel gioco il tasto escape non interrompe la musica
-- Nel gioco il bottone della musica non va bene nella posizione
+- Nel gioco il tasto escape non interrompe la musica [DONE]
+- Nel gioco il bottone della musica non va bene nella posizione [DONE]
 - Il font della message box è troppo piccolo
 - Il nome del giocatore deve essere cambiato con le opzioni. Come default può andare bene usare env, 
-ma non va settato nella funzione save high score.
-- Il bottone dello stop della musica va messo come icona.
+ma non va settato nella funzione save high score. [DONE]
+- Il bottone dello stop della musica va messo come icona. [DONE]
 
 ## Mouse e Touch
 Una discussione interessante sull'argomento si trova su 
@@ -471,10 +471,11 @@ si possono vedere i traces di SDL prima e dopo la chiamata di main() del mio pro
 ## Compile, Deploy e Start App
 Per prima cosa collego il device e lancio in windows D:\Xiaomi\platform-tools_r34.0.5-windows\platform-tools\start_adb_server.bat
 Su WSL lancio ./start_adb_service.sh che è un terminal senza output, se tutto procede bene.
+Apro un altro terminal su UbuntuMiniToro e
 in ~/projects/AndroSolitario lancio 
     
     code .
-All'interno del terminal di Visual Code posso compilare, installare e lanciare il sfotware:
+All'interno del terminal di Visual Code posso compilare, installare e lanciare il software:
 
     source start_env.sh
     ./gradlew compileDebugSources

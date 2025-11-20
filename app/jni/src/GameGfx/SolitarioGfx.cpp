@@ -257,7 +257,7 @@ LPErrInApp SolitarioGfx::InitDrag(int x, int y, bool& isInitDrag,
 LPErrInApp SolitarioGfx::InitDrag(LPCardStackGfx pCargoStack, int x, int y,
                                   bool& isInitDrag,
                                   LPCardRegionGfx pSrcRegion) {
-    TRACE_DEBUG("  InitDrag - start \n");
+    //TRACE_DEBUG("  InitDrag - start \n");
     isInitDrag = false;
     LPErrInApp err;
 
@@ -298,9 +298,12 @@ LPErrInApp SolitarioGfx::InitDrag(LPCardStackGfx pCargoStack, int x, int y,
 
     _p_selectedCardRegion->InitCardCoords();
 
-    TRACE_DEBUG("  InitDrag - DrawStaticScene - start \n");
+    // TRACE_DEBUG("  InitDrag - DrawStaticScene - start \n");
     DrawStaticScene();
-    TRACE_DEBUG("  InitDrag - DrawStaticScene - end \n");
+    Uint64 last_time = SDL_GetTicks();
+    Uint64 FPS = 10;
+
+    // TRACE_DEBUG("  InitDrag - DrawStaticScene - end \n");
     CardRegionGfx dragRegion(
         RegionType::RT_DRAG_REGION,
         _p_selectedCardRegion->GetAttributes() | CRD_FACEUP, 0, 0, 0, 0, 0,
@@ -338,7 +341,6 @@ LPErrInApp SolitarioGfx::InitDrag(LPCardStackGfx pCargoStack, int x, int y,
         _p_Dragface, true,
         SDL_MapRGB(SDL_GetPixelFormatDetails(_p_Dragface->format), NULL, 0, 255,
                    0));
-
     err = DrawCardStack(_p_Screen, &dragRegion);
     if (err != NULL) {
         return err;
@@ -352,9 +354,14 @@ LPErrInApp SolitarioGfx::InitDrag(LPCardStackGfx pCargoStack, int x, int y,
     _oldx = x;
     _oldy = y;
 
+    Uint64 now_time = SDL_GetTicks();
+    if (now_time < last_time + FPS) {
+        Uint32 delay = last_time + FPS - now_time;
+        SDL_Delay(delay);
+    }
     updateTextureAsFlipScreen();
     isInitDrag = true;
-    TRACE_DEBUG("  InitDrag - end \n");
+    //TRACE_DEBUG("  InitDrag - end \n");
     return NULL;
 }
 
@@ -367,9 +374,9 @@ void SolitarioGfx::updateTextureAsFlipScreen() {
 }
 
 void SolitarioGfx::DoDrag(int x, int y) {
-    TRACE_DEBUG(
-        "DoDrag (x=%d, y=%d) => drag_x=%d, drag_y=%d. old_x=%d, old_y=%d\n", x,
-        y, _dragPileInfo.x, _dragPileInfo.y, _oldx, _oldy);
+    // TRACE_DEBUG(
+    //     "DoDrag (x=%d, y=%d) => drag_x=%d, drag_y=%d. old_x=%d, old_y=%d\n",
+    //     x, y, _dragPileInfo.x, _dragPileInfo.y, _oldx, _oldy);
     SDL_Rect rcs;
     SDL_Rect rcd;
 
