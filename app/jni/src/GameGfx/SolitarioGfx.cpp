@@ -6,6 +6,7 @@
 
 #include "CompGfx/ButtonGfx.h"
 #include "CompGfx/MesgBoxGfx.h"
+#include "Config.h"
 #include "CurrentTime.h"
 #include "Fading.h"
 #include "GfxUtil.h"
@@ -993,59 +994,27 @@ LPErrInApp SolitarioGfx::handleGameLoopFingerDownEvent(SDL_Event& event) {
     _p_BtQuit->FingerDown(event);
     _p_BtNewGame->FingerDown(event);
     _p_BtToggleSound->FingerDown(event);
-    return NULL;
+
+    SDL_Point pt;
+    LPGameSettings pGameSettings = GameSettings::GetSettings();
+    pGameSettings->GetTouchPoint(event.tfinger, &pt);
+    return singleTapOrLeftClick(pt);
 }
 
 LPErrInApp SolitarioGfx::handleGameLoopFingerUpEvent(SDL_Event& event) {
     Uint64 now_time = SDL_GetTicks();
     TRACE_DEBUG("handleGameLoopFingerUpEvent (tms %d) \n", now_time);
     if (_lastUpTimestamp + 500 > now_time) {
-        TRACE_DEBUG("Double Tap recognized\n");
-        LPErrInApp err;
-        CardRegionGfx* pRegion;
-        bool isInitDrag = false;
         SDL_Point pt;
         LPGameSettings pGameSettings = GameSettings::GetSettings();
         pGameSettings->GetTouchPoint(event.tfinger,
                                      &pt);  // rememeber here event.button.x and
                                             // event.button.y will not works
-
-        pRegion = SelectRegionOnPoint(pt.x, pt.y);
-
-        if (pRegion == NULL)
+        doubleTapOrRightClick(pt);
+    } else {
+        LPErrInApp err = endOfDragAndCheckForVictory();
+        if (err != NULL) {
             return NULL;
-        TRACE_DEBUG("[DT] Region found %d\n", pRegion->Size());
-
-        LPCardGfx pCard = pRegion->GetCard(pRegion->Size() - 1);
-        if (pCard == NULL) {
-            return NULL;
-        }
-        TRACE_DEBUG("[DT] Card found %s\n", pCard->Name());
-
-        if (((pRegion->RegionTypeId() == RegionType::RT_TABLEAU) ||
-             (pRegion->RegionTypeId() == RegionType::RT_DECKSTOCK_FACEUP)) &&
-            pCard->IsFaceUp() && pRegion->PtOnTop(pt.x, pt.y)) {
-            TRACE_DEBUG("[DT] Select card on region %s \n", pCard->Name());
-            LPCardRegionGfx pDropRegion =
-                FindDropRegion(RegionType::RT_ACE_FOUNDATION, pCard);
-            if (pDropRegion == NULL) {
-                return NULL;
-            }
-            TRACE_DEBUG("[DT] found drop region x=%d,y=%d \n", pDropRegion->X(),
-                        pDropRegion->Y());
-            LPCardStackGfx pCardStack = pRegion->PopStack(1);
-            if (pCardStack == NULL) {
-                return NULL;
-            }
-            TRACE_DEBUG("[DT] found cardStack size=%d \n", pCardStack->Size());
-            err = InitDrag(pCardStack, -1, -1, isInitDrag, pRegion);
-            if (err != NULL) {
-                return err;
-            }
-
-            DoDrop(pDropRegion);
-            updateScoreOnAce(pDropRegion->Size(), pDropRegion->GetSavedSize());
-            delete pCardStack;
         }
     }
     _lastUpTimestamp = SDL_GetTicks();
@@ -1053,25 +1022,79 @@ LPErrInApp SolitarioGfx::handleGameLoopFingerUpEvent(SDL_Event& event) {
     return NULL;
 }
 
-LPErrInApp SolitarioGfx::handleGameLoopMouseDownEvent(SDL_Event& event) {
-    if (event.button.button == SDL_BUTTON_LEFT) {
-        return handleLeftMouseDown(event);
-    } else if (event.button.button == SDL_BUTTON_RIGHT) {
-        return handleRightMouseDown(event);
+LPErrInApp SolitarioGfx::handleGameLoopFingerMotion(SDL_Event& event) {
+    if (_startdrag) {
+        SDL_Point pt;
+        LPGameSettings pGameSettings = GameSettings::GetSettings();
+        pGameSettings->GetTouchPoint(event.tfinger, &pt);
+        DoDrag(pt.x, pt.y);
     }
     return NULL;
 }
 
-LPErrInApp SolitarioGfx::handleLeftMouseDown(SDL_Event& event) {
-    TRACE_DEBUG("handleLeftMouseDown \n");
+LPErrInApp SolitarioGfx::handleGameLoopMouseDownEvent(SDL_Event& event) {
+    if (event.button.button == SDL_BUTTON_LEFT) {
+        SDL_Point pt;
+        pt.x = event.button.x;
+        pt.y = event.button.y;
+        return singleTapOrLeftClick(pt);
+    } else if (event.button.button == SDL_BUTTON_RIGHT) {
+        SDL_Point pt;
+        pt.x = event.button.x;
+        pt.y = event.button.y;
+        return doubleTapOrRightClick(pt);
+    }
+    return NULL;
+}
+
+LPErrInApp SolitarioGfx::doubleTapOrRightClick(SDL_Point& pt) {
+    TRACE_DEBUG("doubleTapOrRightClick recognized\n");
     LPErrInApp err;
     CardRegionGfx* srcReg;
     bool isInitDrag = false;
-    srcReg = SelectRegionOnPoint(event.button.x, event.button.y);
+    srcReg = SelectRegionOnPoint(pt.x, pt.y);
+    if (srcReg == NULL)
+        return NULL;
+    LPCardGfx pCard = srcReg->GetCard(srcReg->Size() - 1);
+    if (pCard == NULL) {
+        return NULL;
+    }
+
+    if (((srcReg->RegionTypeId() == RegionType::RT_TABLEAU) ||
+         (srcReg->RegionTypeId() == RegionType::RT_DECKSTOCK_FACEUP)) &&
+        pCard->IsFaceUp() && srcReg->PtOnTop(pt.x, pt.y)) {
+        LPCardRegionGfx pDropRegion =
+            FindDropRegion(RegionType::RT_ACE_FOUNDATION, pCard);
+        if (pDropRegion == NULL) {
+            return NULL;
+        }
+        LPCardStackGfx pCardStack = srcReg->PopStack(1);
+        if (pCardStack == NULL) {
+            return NULL;
+        }
+        err = InitDrag(pCardStack, -1, -1, isInitDrag, srcReg);
+        if (err != NULL) {
+            return err;
+        }
+
+        DoDrop(pDropRegion);
+        updateScoreOnAce(pDropRegion->Size(), pDropRegion->GetSavedSize());
+        delete pCardStack;
+    }
+    
+    return NULL;
+}
+
+LPErrInApp SolitarioGfx::singleTapOrLeftClick(SDL_Point& pt) {
+    TRACE_DEBUG("singleTapOrLeftClick \n");
+    LPErrInApp err;
+    CardRegionGfx* srcReg;
+    bool isInitDrag = false;
+    srcReg = SelectRegionOnPoint(pt.x, pt.y);
     if (srcReg == NULL)
         return NULL;
     if ((srcReg->RegionTypeId() == RegionType::RT_TABLEAU) &&
-        srcReg->PtOnTop(event.button.x, event.button.y)) {
+        srcReg->PtOnTop(pt.x, pt.y)) {
         int id = srcReg->Size() - 1;
         if (!srcReg->IsCardFaceUp(id)) {
             srcReg->SetCardFaceUp(true, id);
@@ -1083,7 +1106,7 @@ LPErrInApp SolitarioGfx::handleLeftMouseDown(SDL_Event& event) {
         (srcReg->RegionTypeId() == RegionType::RT_DECKSTOCK_FACEUP) ||
         (srcReg->RegionTypeId() == RegionType::RT_ACE_FOUNDATION)) {
         // clicked on region that can do dragging
-        err = InitDrag(event.button.x, event.button.y, isInitDrag, srcReg);
+        err = InitDrag(pt.x, pt.y, isInitDrag, srcReg);
         if (err != NULL) {
             return err;
         }
@@ -1111,8 +1134,8 @@ LPErrInApp SolitarioGfx::handleLeftMouseDown(SDL_Event& event) {
             delete pCardStack;
             updateBadScoreRedial();
         } else if (!srcReg->IsEmpty()) {
-            // the next card goes to the deck face up region: drag and drop to
-            // deck face up
+            // the next card goes to the deck face up region: drag and drop
+            // to deck face up
             LPCardStackGfx pCardStack = PopStackFromRegion(DeckPile_Ix, 1);
             pCardStack->SetCardsFaceUp(true);
             err = InitDrag(pCardStack, -1, -1, isInitDrag, srcReg);
@@ -1128,42 +1151,42 @@ LPErrInApp SolitarioGfx::handleLeftMouseDown(SDL_Event& event) {
     return NULL;
 }
 
-LPErrInApp SolitarioGfx::handleRightMouseDown(SDL_Event& event) {
-    TRACE_DEBUG("handleRightMouseDown \n");
-    LPErrInApp err;
-    CardRegionGfx* srcReg;
-    bool isInitDrag = false;
-    srcReg = SelectRegionOnPoint(event.button.x, event.button.y);
-    if (srcReg == NULL)
-        return NULL;
-    LPCardGfx pCard = srcReg->GetCard(srcReg->Size() - 1);
-    if (pCard == NULL) {
-        return NULL;
-    }
+// LPErrInApp SolitarioGfx::handleRightMouseDown(SDL_Event& event) {
+//     TRACE_DEBUG("handleRightMouseDown \n");
+//     LPErrInApp err;
+//     CardRegionGfx* srcReg;
+//     bool isInitDrag = false;
+//     srcReg = SelectRegionOnPoint(event.button.x, event.button.y);
+//     if (srcReg == NULL)
+//         return NULL;
+//     LPCardGfx pCard = srcReg->GetCard(srcReg->Size() - 1);
+//     if (pCard == NULL) {
+//         return NULL;
+//     }
 
-    if (((srcReg->RegionTypeId() == RegionType::RT_TABLEAU) ||
-         (srcReg->RegionTypeId() == RegionType::RT_DECKSTOCK_FACEUP)) &&
-        pCard->IsFaceUp() && srcReg->PtOnTop(event.button.x, event.button.y)) {
-        LPCardRegionGfx pDropRegion =
-            FindDropRegion(RegionType::RT_ACE_FOUNDATION, pCard);
-        if (pDropRegion == NULL) {
-            return NULL;
-        }
-        LPCardStackGfx pCardStack = srcReg->PopStack(1);
-        if (pCardStack == NULL) {
-            return NULL;
-        }
-        err = InitDrag(pCardStack, -1, -1, isInitDrag, srcReg);
-        if (err != NULL) {
-            return err;
-        }
+//     if (((srcReg->RegionTypeId() == RegionType::RT_TABLEAU) ||
+//          (srcReg->RegionTypeId() == RegionType::RT_DECKSTOCK_FACEUP)) &&
+//         pCard->IsFaceUp() && srcReg->PtOnTop(event.button.x, event.button.y)) {
+//         LPCardRegionGfx pDropRegion =
+//             FindDropRegion(RegionType::RT_ACE_FOUNDATION, pCard);
+//         if (pDropRegion == NULL) {
+//             return NULL;
+//         }
+//         LPCardStackGfx pCardStack = srcReg->PopStack(1);
+//         if (pCardStack == NULL) {
+//             return NULL;
+//         }
+//         err = InitDrag(pCardStack, -1, -1, isInitDrag, srcReg);
+//         if (err != NULL) {
+//             return err;
+//         }
 
-        DoDrop(pDropRegion);
-        updateScoreOnAce(pDropRegion->Size(), pDropRegion->GetSavedSize());
-        delete pCardStack;
-    }
-    return NULL;
-}
+//         DoDrop(pDropRegion);
+//         updateScoreOnAce(pDropRegion->Size(), pDropRegion->GetSavedSize());
+//         delete pCardStack;
+//     }
+//     return NULL;
+// }
 
 void SolitarioGfx::handleGameLoopMouseMoveEvent(SDL_Event& event) {
     // TRACE_DEBUG("handleGameLoopMouseMoveEvent \n");
@@ -1183,7 +1206,10 @@ LPErrInApp SolitarioGfx::handleGameLoopMouseUpEvent(SDL_Event& event) {
     _p_BtQuit->MouseUp(event);
     _p_BtNewGame->MouseUp(event);
     _p_BtToggleSound->MouseUp(event);
+    return endOfDragAndCheckForVictory();
+}
 
+LPErrInApp SolitarioGfx::endOfDragAndCheckForVictory() {
     if (_startdrag) {
         // TRACE_DEBUG("MouseUp start drag - end \n");
         _startdrag = false;
@@ -1361,6 +1387,7 @@ LPErrInApp SolitarioGfx::StartGameLoop() {
                     if (err != NULL)
                         return err;
                     break;
+#if HASTOUCH
                 case SDL_EVENT_FINGER_DOWN:
                     // TRACE_DEBUG("Event SDL_EVENT_FINGER_DOWN \n");
                     err = handleGameLoopFingerDownEvent(event);
@@ -1373,9 +1400,16 @@ LPErrInApp SolitarioGfx::StartGameLoop() {
                     if (err != NULL)
                         return err;
                     break;
-
+                case SDL_EVENT_FINGER_MOTION:
+                    err = handleGameLoopFingerMotion(event);
+                    if (err != NULL)
+                        return err;
+                    break;
+#endif
+#if HASMOUSE
                 case SDL_EVENT_MOUSE_BUTTON_DOWN:
-                    // TRACE_DEBUG("Event SDL_EVENT_MOUSE_BUTTON_DOWN - start
+                    // TRACE_DEBUG("Event SDL_EVENT_MOUSE_BUTTON_DOWN -
+                    // start
                     // \n");
                     err = handleGameLoopMouseDownEvent(event);
                     // TRACE_DEBUG("Event SDL_EVENT_MOUSE_BUTTON_DOWN - end
@@ -1394,11 +1428,12 @@ LPErrInApp SolitarioGfx::StartGameLoop() {
                     if (err != NULL)
                         return err;
                     break;
+#endif
             }
         }
         updateBadScoreScoreOnTime();
-        // write direct into the screen because it could be that a dragging is
-        // in action and the screen for a back buffer is dirty
+        // write direct into the screen because it could be that a dragging
+        // is in action and the screen for a back buffer is dirty
         err = drawScore(_p_Screen);
         if (err != NULL)
             return err;
@@ -1561,8 +1596,8 @@ LPErrInApp SolitarioGfx::drawScore(SDL_Surface* pScreen) {
     rcs.w = tx + 190;
     rcs.y = ty - 2;
     rcs.h = ty + 46;
-    // SDL_FillRect(_p_Screen, &rcs, SDL_MapRGBA(pScreen->format, 0, 0, 0, 0));
-    // SDL 2
+    // SDL_FillRect(_p_Screen, &rcs, SDL_MapRGBA(pScreen->format, 0, 0, 0,
+    // 0)); SDL 2
     SDL_FillSurfaceRect(_p_Screen, &rcs,
                         SDL_MapRGB(SDL_GetPixelFormatDetails(_p_Screen->format),
                                    NULL, 0, 0, 0));
