@@ -214,7 +214,7 @@ class SolitarioGfx {
     int _scoreGame;
     bool _scoreChanged;
     CurrentTime *_p_currentTime;
-    Uint32 _lastUpTimestamp;
+    Uint64 _lastUpTimestamp;
 };
 
 #endif

@@ -257,7 +257,7 @@ LPErrInApp SolitarioGfx::InitDrag(int x, int y, bool& isInitDrag,
 LPErrInApp SolitarioGfx::InitDrag(LPCardStackGfx pCargoStack, int x, int y,
                                   bool& isInitDrag,
                                   LPCardRegionGfx pSrcRegion) {
-    //TRACE_DEBUG("  InitDrag - start \n");
+    // TRACE_DEBUG("  InitDrag - start \n");
     isInitDrag = false;
     LPErrInApp err;
 
@@ -361,7 +361,7 @@ LPErrInApp SolitarioGfx::InitDrag(LPCardStackGfx pCargoStack, int x, int y,
     }
     updateTextureAsFlipScreen();
     isInitDrag = true;
-    //TRACE_DEBUG("  InitDrag - end \n");
+    // TRACE_DEBUG("  InitDrag - end \n");
     return NULL;
 }
 
@@ -997,9 +997,9 @@ LPErrInApp SolitarioGfx::handleGameLoopFingerDownEvent(SDL_Event& event) {
 }
 
 LPErrInApp SolitarioGfx::handleGameLoopFingerUpEvent(SDL_Event& event) {
-    TRACE_DEBUG("handleGameLoopFingerUpEvent (tms %d) \n",
-                event.tfinger.timestamp);
-    if (_lastUpTimestamp + 400 > event.tfinger.timestamp) {
+    Uint64 now_time = SDL_GetTicks();
+    TRACE_DEBUG("handleGameLoopFingerUpEvent (tms %d) \n", now_time);
+    if (_lastUpTimestamp + 500 > now_time) {
         TRACE_DEBUG("Double Tap recognized\n");
         LPErrInApp err;
         CardRegionGfx* pRegion;
@@ -1048,7 +1048,8 @@ LPErrInApp SolitarioGfx::handleGameLoopFingerUpEvent(SDL_Event& event) {
             delete pCardStack;
         }
     }
-    _lastUpTimestamp = event.tfinger.timestamp;
+    _lastUpTimestamp = SDL_GetTicks();
+
     return NULL;
 }
 
