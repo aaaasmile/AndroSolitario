@@ -154,7 +154,7 @@ Ho installato emsdk:
 	./emsdk activate latest
 Per avere il comando emcc:
 
-    source ./emsdk_env.sh 
+    source ~/emsdk/emsdk_env.sh 
 Ora nella root di questo progetto:
 
     rm -r -R build-web
@@ -163,6 +163,7 @@ Ora nella root di questo progetto:
 Se usi freetype integrato in sdl_ttf (consigliato):
 
     emcmake cmake ../app/jni/ -DSDL_WAYLAND=OFF -DSDLTTF_VENDORED=ON
+    emmake make -j$(nproc)
     
 Oppure con la libreria freetype che ho compilato a parte (non mi convince, ma istruttivo per includere altre librerie se sono necessarie):
 
