@@ -7,7 +7,7 @@
 #define VERSION_HOME "030002"
 
 // Platform detection
-#if defined(__ANDROID__)
+#if defined(__ANDROID__) || defined(ANDROID)
     #define PLATFORM_ANDROID 1
 #elif defined(_WIN32) || defined(_WIN64)
     #define PLATFORM_WINDOWS 1
@@ -40,5 +40,22 @@
         #define HASFULLSCREEN 0
     #endif
 #endif
+
+#ifndef HASTOUCH
+    #ifdef PLATFORM_ANDROID
+        #define HASTOUCH 1  // Android is touch
+    #else
+        #define HASTOUCH 0
+    #endif
+#endif
+
+#ifndef HASMOUSE
+    #ifdef PLATFORM_ANDROID
+        #define HASMOUSE 0  // Android no mouse support
+    #else
+        #define HASMOUSE 1
+    #endif
+#endif
+
 
 #endif // CONFIG_H

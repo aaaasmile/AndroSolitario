@@ -157,10 +157,12 @@ class SolitarioGfx {
     LPErrInApp handleGameLoopMouseDownEvent(SDL_Event &event);
     LPErrInApp handleGameLoopFingerDownEvent(SDL_Event &event);
     LPErrInApp handleGameLoopFingerUpEvent(SDL_Event &event);
+    LPErrInApp handleGameLoopFingerMotion(SDL_Event &event);
+    LPErrInApp singleTapOrLeftClick(SDL_Point& pt);
+    LPErrInApp doubleTapOrRightClick(SDL_Point& pt);
+    LPErrInApp endOfDragAndCheckForVictory();
     void handleGameLoopMouseMoveEvent(SDL_Event &event);
     LPErrInApp handleGameLoopMouseUpEvent(SDL_Event &event);
-    LPErrInApp handleLeftMouseDown(SDL_Event &event);
-    LPErrInApp handleRightMouseDown(SDL_Event &event);
     ClickCb prepClickQuitCb();
     ClickCb prepClickNewGameCb();
     ClickCb prepClickToggleSoundCb();
