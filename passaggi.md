@@ -160,12 +160,16 @@ Ora nella root di questo progetto:
     rm -r -R build-web
     mkdir build-web && cd build-web
 
-Se usi freetype integrato in sdl_ttf (consigliato):
-
     emcmake cmake ../app/jni/ -DSDL_WAYLAND=OFF -DSDLTTF_VENDORED=ON
     emmake make -j$(nproc)
+Per vedere la app nel browser, bisogna far partire il web server:
+
+    python -m http.server
+
+Nel browser al link:
+    http://localhost:8000/index.html
     
-Oppure con la libreria freetype che ho compilato a parte (non mi convince, ma istruttivo per includere altre librerie se sono necessarie):
+Oppure con la libreria freetype che ho compilato a parte (non mi convince, ma istruttivo per includere altre librerie se sono necessarie) invece di usare la libreria freetype integrata con SDL_ttf:
 
     emcmake cmake ../app/jni/ -DSDL_WAYLAND=OFF \
         -DFREETYPE_INCLUDE_DIRS="/home/igor/scratch/wasm/freetype/include" \
@@ -214,6 +218,9 @@ Il Linker di wasm mi manda il seguente warning:
     wasm-ld: warning: function signature mismatch: SDL_InsertIntoHashTable
 Il problema è che SDL e SDL_ttf entambe definiscono il proprio SDL_InsertIntoHashTable
 ed ha una signatura diversa, oltre che l'implementazione. 
+
+Gli assets devono essere integrati nel wasm. Per questo si setta in target_link_options
+l'opzione preload-file, che mi genera il file solitario.data con tutti gli assets.
 
 ## Directory Scratch di questo progetto
 Voglio creare dei piccoli progetti per testare delle funzionalità singole.

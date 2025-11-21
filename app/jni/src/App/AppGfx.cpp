@@ -89,7 +89,6 @@ LPErrInApp AppGfx::Init() {
     if (err != NULL) {
         return err;
     }
-
     _p_HighScore = new HighScore();
     _p_HighScore->Load();
 
@@ -102,6 +101,7 @@ LPErrInApp AppGfx::Init() {
     if (_p_GameSettings->NeedScreenMagnify()) {
         _p_GameSettings->UseBigFontSize();
     }
+    TRACE_DEBUG("Font initialized OK\n");
 
     const char* title = pLanguages->GetCStringId(Languages::ID_SOLITARIO);
     SDL_SetWindowTitle(_p_Window, title);
@@ -110,18 +110,23 @@ LPErrInApp AppGfx::Init() {
     if (psIcon == 0) {
         return ERR_UTIL::ErrorCreate("Icon not found");
     }
+    TRACE_DEBUG("Icon loaded OK\n");
     // SDL_SetColorKey(psIcon, true, SDL_MapRGB(psIcon->format, 0, 128, 0));
     // SDL2
     SDL_SetSurfaceColorKey(
         psIcon, true,
         SDL_MapRGB(SDL_GetPixelFormatDetails(psIcon->format), NULL, 0, 128, 0));
 
-    SDL_SetWindowIcon(_p_Window, psIcon);
-
+    if (!SDL_SetWindowIcon(_p_Window, psIcon)){
+        return ERR_UTIL::ErrorCreate("Couldn't set icon on window: %s\n",
+                                         SDL_GetError());
+    }
     _p_CreditTitle = IMG_Load(g_lpszTitleFile);
     if (_p_CreditTitle == 0) {
         return ERR_UTIL::ErrorCreate("Title image not found");
     }
+    TRACE_DEBUG("Credit loaded OK\n");
+
     err = loadSceneBackground();
     if (err != NULL) {
         return err;
@@ -130,6 +135,7 @@ LPErrInApp AppGfx::Init() {
     if (err != NULL) {
         return err;
     }
+    TRACE_DEBUG("Fonts and background loaded OK\n");
 
     clearBackground();
 

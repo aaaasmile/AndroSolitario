@@ -136,6 +136,9 @@ else()
           SDL3_mixer::SDL3_mixer  
           SDL3_ttf::SDL3_ttf
       )
+      target_link_options(${PROJECT_NAME} PRIVATE
+        "--preload-file=${CMAKE_CURRENT_SOURCE_DIR}/../../src/main/assets@/data"
+      )
       # Add any WSL2-specific configurations here
         # Set a new output name and different postfixes for Debug/Release builds
         set_target_properties(solitario PROPERTIES
@@ -148,9 +151,9 @@ else()
         message(STATUS "Current source dir: ${CMAKE_CURRENT_SOURCE_DIR}")
         add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
           COMMAND ${CMAKE_COMMAND} -E copy_directory
-              ${CMAKE_CURRENT_SOURCE_DIR}/../../src/main/assets/
-              $<TARGET_FILE_DIR:${PROJECT_NAME}>/data/
-          COMMENT "Copying assets directory to build directory"
+              ${CMAKE_CURRENT_SOURCE_DIR}/../../src/emscripten/
+              $<TARGET_FILE_DIR:${PROJECT_NAME}>
+          COMMENT "Copying stuff for web"
         )
     else()
       # Note on Android: it is built using gradle and mk files, so no cmake section here

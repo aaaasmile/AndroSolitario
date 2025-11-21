@@ -17,6 +17,7 @@ int main(int argc, char* argv[]) {
         TRACE("Fatal: %s\n", err->ErrorText.c_str());
         exit(1);
     }
+    TRACE("Initialization OK, ready for the main loop \n");
     err = app->MainLoop();
     if (err != NULL) {
         fprintf(stderr, "App error: %s\n", err->ErrorText.c_str());
