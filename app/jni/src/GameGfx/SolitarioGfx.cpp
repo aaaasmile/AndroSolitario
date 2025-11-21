@@ -991,6 +991,7 @@ LPErrInApp SolitarioGfx::handleGameLoopKeyDownEvent(SDL_Event& event) {
 // here use Finger only for button and mouse right click simulation
 LPErrInApp SolitarioGfx::handleGameLoopFingerDownEvent(SDL_Event& event) {
     TRACE_DEBUG("handleGameLoopFingerDownEvent \n");
+    Uint64 now_time = SDL_GetTicks();
     _p_BtQuit->FingerDown(event);
     _p_BtNewGame->FingerDown(event);
     _p_BtToggleSound->FingerDown(event);
@@ -998,34 +999,29 @@ LPErrInApp SolitarioGfx::handleGameLoopFingerDownEvent(SDL_Event& event) {
     SDL_Point pt;
     LPGameSettings pGameSettings = GameSettings::GetSettings();
     pGameSettings->GetTouchPoint(event.tfinger, &pt);
-    return singleTapOrLeftClick(pt);
-}
-
-LPErrInApp SolitarioGfx::handleGameLoopFingerUpEvent(SDL_Event& event) {
-    Uint64 now_time = SDL_GetTicks();
-    TRACE_DEBUG("handleGameLoopFingerUpEvent (tms %d) \n", now_time);
+    LPErrInApp err;
     if (_lastUpTimestamp + 500 > now_time) {
-        SDL_Point pt;
-        LPGameSettings pGameSettings = GameSettings::GetSettings();
-        pGameSettings->GetTouchPoint(event.tfinger,
-                                     &pt);  // rememeber here event.button.x and
-                                            // event.button.y will not works
-        LPErrInApp err = doubleTapOrRightClick(pt);
-        if (err != NULL) {
-            return NULL;
-        }
-        err = endOfDragAndCheckForVictory();
+        err = doubleTapOrRightClick(pt);
         if (err != NULL) {
             return NULL;
         }
     } else {
-        LPErrInApp err = endOfDragAndCheckForVictory();
+        err = singleTapOrLeftClick(pt);
         if (err != NULL) {
             return NULL;
         }
     }
     _lastUpTimestamp = SDL_GetTicks();
+    return NULL;
+}
 
+LPErrInApp SolitarioGfx::handleGameLoopFingerUpEvent(SDL_Event& event) {
+    TRACE_DEBUG("handleGameLoopFingerUpEvent\n");
+
+    LPErrInApp err = endOfDragAndCheckForVictory();
+    if (err != NULL) {
+        return NULL;
+    }
     return NULL;
 }
 

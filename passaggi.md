@@ -438,7 +438,7 @@ Questi sono i todo della conversione in Android.
 - Il menu Esci non mi fa funzionare il suono quando poi riavvio il programma. Questo è dovuto al fatto che le App in
       Android non hanno il comando Quit. Quando uso lo Swap, il programma termina in modo corretto e anche riparte in modo corretto. Per questo ho rimosso il comando Esci [DONE]
 - Rimosso il menu Guida in quanto non riesco a far partire la visualizzazione del pdf [DONE]
-- Double Tap non funziona
+- Double Tap non funziona [DONE]
 - Le carte dei mazzi piacentina son troppo piccole
 - GoTo Invido non funziona nella label gfx
 
