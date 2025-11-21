@@ -1010,7 +1010,14 @@ LPErrInApp SolitarioGfx::handleGameLoopFingerUpEvent(SDL_Event& event) {
         pGameSettings->GetTouchPoint(event.tfinger,
                                      &pt);  // rememeber here event.button.x and
                                             // event.button.y will not works
-        doubleTapOrRightClick(pt);
+        LPErrInApp err = doubleTapOrRightClick(pt);
+        if (err != NULL) {
+            return NULL;
+        }
+        err = endOfDragAndCheckForVictory();
+        if (err != NULL) {
+            return NULL;
+        }
     } else {
         LPErrInApp err = endOfDragAndCheckForVictory();
         if (err != NULL) {
@@ -1081,7 +1088,7 @@ LPErrInApp SolitarioGfx::doubleTapOrRightClick(SDL_Point& pt) {
         updateScoreOnAce(pDropRegion->Size(), pDropRegion->GetSavedSize());
         delete pCardStack;
     }
-    
+
     return NULL;
 }
 
@@ -1150,43 +1157,6 @@ LPErrInApp SolitarioGfx::singleTapOrLeftClick(SDL_Point& pt) {
     }
     return NULL;
 }
-
-// LPErrInApp SolitarioGfx::handleRightMouseDown(SDL_Event& event) {
-//     TRACE_DEBUG("handleRightMouseDown \n");
-//     LPErrInApp err;
-//     CardRegionGfx* srcReg;
-//     bool isInitDrag = false;
-//     srcReg = SelectRegionOnPoint(event.button.x, event.button.y);
-//     if (srcReg == NULL)
-//         return NULL;
-//     LPCardGfx pCard = srcReg->GetCard(srcReg->Size() - 1);
-//     if (pCard == NULL) {
-//         return NULL;
-//     }
-
-//     if (((srcReg->RegionTypeId() == RegionType::RT_TABLEAU) ||
-//          (srcReg->RegionTypeId() == RegionType::RT_DECKSTOCK_FACEUP)) &&
-//         pCard->IsFaceUp() && srcReg->PtOnTop(event.button.x, event.button.y)) {
-//         LPCardRegionGfx pDropRegion =
-//             FindDropRegion(RegionType::RT_ACE_FOUNDATION, pCard);
-//         if (pDropRegion == NULL) {
-//             return NULL;
-//         }
-//         LPCardStackGfx pCardStack = srcReg->PopStack(1);
-//         if (pCardStack == NULL) {
-//             return NULL;
-//         }
-//         err = InitDrag(pCardStack, -1, -1, isInitDrag, srcReg);
-//         if (err != NULL) {
-//             return err;
-//         }
-
-//         DoDrop(pDropRegion);
-//         updateScoreOnAce(pDropRegion->Size(), pDropRegion->GetSavedSize());
-//         delete pCardStack;
-//     }
-//     return NULL;
-// }
 
 void SolitarioGfx::handleGameLoopMouseMoveEvent(SDL_Event& event) {
     // TRACE_DEBUG("handleGameLoopMouseMoveEvent \n");

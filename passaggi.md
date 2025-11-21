@@ -422,9 +422,7 @@ questo _files to include_
 Questi sono i todo della conversione in Android.
 
 - Gli spin delle opzioni sono troppo piccoli (col finger down va bene) [DONE]
-- Le carte dei mazzi piacentina son troppo piccole
 - Quando finisce una partita, il nome del record è vuoto (data e ora vanno bene) [DONE]
-- GoTo Invido non funziona nella label gfx
 - Sound On/Off meglio un icona [DONE]
 - Doppio tap dovrebbe avere lo stesso effetto del tasto destro del mouse [DONE]
 - Problema con il formato dello schermo: il tavolo di gioco è troppo piccolo [DONE]
@@ -432,28 +430,31 @@ Questi sono i todo della conversione in Android.
 - Il programma sul RedMe si chiama Game invece di Solitario. (si cambia strings.xml) [DONE]
 - SoltarioIta: Fatal: Cannot create dir (null)/.solitario [DONE]
 - Fatal: loadProfile: Ini file error /data/data/org.libsdl.app/files/.solitario/options.ini
-Qui ho rimosso i file ini della libreria ini. Uso un formato binario con SDL. [DONE]
+      Qui ho rimosso i file ini della libreria ini. Uso un formato binario con SDL. [DONE]
 - Non mi funzionano poi i pulsanti [DONE]
 - Nei credits e hight score non si può tornare indietro, qui serve un "back by tap" in High Score [DONE]
 - shuffle_random è marcato obsoleto in ndk, il risultato è che non mescola un bel nulla [DONE]
 - A livello generale direi che il tap non ce l'ho sotto controllo [DONE]
-- Il menu Esci non mi fa funzionare il suono quando poi riavvio il programma. Questo è dovuto al fatto che le App in Android non hanno il comando Quit. Quando uso lo Swap, il programma termina in modo corretto e anche riparte in modo corretto. Per questo ho rimosso il comando Esci [DONE]
+- Il menu Esci non mi fa funzionare il suono quando poi riavvio il programma. Questo è dovuto al fatto che le App in
+      Android non hanno il comando Quit. Quando uso lo Swap, il programma termina in modo corretto e anche riparte in modo corretto. Per questo ho rimosso il comando Esci [DONE]
 - Rimosso il menu Guida in quanto non riesco a far partire la visualizzazione del pdf [DONE]
+- Double Tap non funziona
+- Le carte dei mazzi piacentina son troppo piccole
+- GoTo Invido non funziona nella label gfx
 
-## Problemi SDL3 in Android
-- Il doppio tab sugli assi non mi manda la carta sulla pila in automatico.
-
-
-## Problemi SDL3 in WSL
+## Problemi in WSL
 - Schermata del dialogo Opzioni è completamente traspararente anziché verde. [DONE]
 - Schermata iniziale con i colori a palette fredda. (problema con create surface mask) [DONE]
 - Shuffle mazzo non va (spostato la dichiarazione di include sotto quella di vector) [DONE]
 - Nel gioco il tasto escape non interrompe la musica [DONE]
 - Nel gioco il bottone della musica non va bene nella posizione [DONE]
-- Il font della message box è troppo piccolo
 - Il nome del giocatore deve essere cambiato con le opzioni. Come default può andare bene usare env, 
-ma non va settato nella funzione save high score. [DONE]
+       ma non va settato nella funzione save high score. [DONE]
 - Il bottone dello stop della musica va messo come icona. [DONE]
+- Il font della message box è troppo piccolo
+
+## Manca in Windows
+- Deploy per con l'installer
 
 ## Mouse e Touch
 Una discussione interessante sull'argomento si trova su 
