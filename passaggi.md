@@ -142,7 +142,79 @@ Nota che in Windows le librerie die SDL sono tutte Dll.
  tra le varie update dello screen, per esempio nel drag e drop) [DONE]
 - L'animazione finale della vittoria è troppo veloce [DONE]
 
-## Directory Scratch
+## Target web (Emscripten-1)
+Come riferimento per SDL3, vedi app/jni/SDL/docs/README-emscripten.md
+Ho installato emsdk:
+
+    cd ~
+    git clone https://github.com/emscripten-core/emsdk.git
+	cd ~/emsdk
+	git pull --all   (per avere l'ultima versione di https://github.com/emscripten-core/emsdk.git)
+	./emsdk install latest  (tonnellate di roba...)
+	./emsdk activate latest
+Per avere il comando emcc:
+
+    source ./emsdk_env.sh 
+Ora nella root di questo progetto:
+
+    rm -r -R build-web
+    mkdir build-web && cd build-web
+
+Se usi freetype integrato in sdl_ttf (consigliato):
+
+    emcmake cmake ../app/jni/ -DSDL_WAYLAND=OFF -DSDLTTF_VENDORED=ON
+    
+Oppure con la libreria freetype che ho compilato a parte (non mi convince, ma istruttivo per includere altre librerie se sono necessarie):
+
+    emcmake cmake ../app/jni/ -DSDL_WAYLAND=OFF \
+        -DFREETYPE_INCLUDE_DIRS="/home/igor/scratch/wasm/freetype/include" \
+        -DFREETYPE_LIBRARY="/home/igor/scratch/wasm/freetype/build-wasm/libfreetype.a"
+    
+Ora non rimane altro che compilare:
+
+    emmake make -j$(nproc)
+
+Rimanendo invece in root, come in wsl2 o windows, non mi funziona poi il build, che va fatto con emmake.
+    
+
+### Problemi col target Emscripten-1
+Ho avuto dei problemi con SDL_ttf. Il primo errore è quello che non trova SDL_3 dir. Siccome SDL_mixer e sdl_image
+sono configurati, ho trovato questa sezione in CMakeList.txt in SDL_mixer:
+
+    set(PLATFORM_SUPPORTS_SHARED ON)
+    if(EMSCRIPTEN OR VITA OR PSP OR PS2 OR N3DS OR RISCOS)
+        set(PLATFORM_SUPPORTS_SHARED OFF)
+    endif()
+La parte con EMSCRIPTEN nel CMakeList.txt di SDL_ttf mi manca, quindi l'ho aggiunta.
+
+Nel prosieguo, emcmake cmake non mi ha trovato libfreetype.so. Il normale cmake  per WSL2 lo trova benissimo.
+Il problema è che ci vuole una libreria freetype per wasm e quella di sistema non va proprio bene.
+Ho compilato la libreria freetype in wasm. L'ho messa in ~/scratch/wasm/freetype. Come?
+
+    git clone https://github.com/freetype/freetype.git
+    cd freetype
+    mkdir build-wasm && cd build-wasm
+    emcmake cmake .. \
+    -DFT_DISABLE_BZIP2=TRUE \
+    -DFT_DISABLE_PNG=TRUE \
+    -DFT_DISABLE_ZLIB=TRUE \
+    -DFT_DISABLE_BROTLI=TRUE \
+    -DCMAKE_BUILD_TYPE=Release
+e nella sub dir build-wasm ho la mia libreria libfreetype.a
+
+Però se guardi bene la repository di SDL_ttf c'è già incluso in external la libreria freetype,
+che viene usata per il target di Android. Quindi basta abilitarla con:
+
+    -DSDLTTF_VENDORED=ON
+al momento della configurazione del progetto.
+
+Il Linker di wasm mi manda il seguente warning:
+
+    wasm-ld: warning: function signature mismatch: SDL_InsertIntoHashTable
+Il problema è che SDL e SDL_ttf entambe definiscono il proprio SDL_InsertIntoHashTable
+ed ha una signatura diversa, oltre che l'implementazione. 
+
+## Directory Scratch di questo progetto
 Voglio creare dei piccoli progetti per testare delle funzionalità singole.
 Per esempio cd scratch/test_font vorrei compilare il programma hello.c.
 A questo scopo ho creato un nuovo file CMakeList.txt che mi compila sdl e il file.

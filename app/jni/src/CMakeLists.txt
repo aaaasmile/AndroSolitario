@@ -123,9 +123,23 @@ else()
           COMMENT "Copying assets directory to build directory"
         )
   else()
-    message(STATUS "Target system is: " ${CMAKE_SYSTEM})
-    target_compile_definitions(${PROJECT_NAME} PRIVATE TRACEINSERVICE _DEBUG)
-    target_link_libraries(${PROJECT_NAME} SDL3 SDL3_image SDL3_mixer SDL3_ttf)
+    if(CMAKE_SYSTEM MATCHES ".*Emscripten.*")
+      message(STATUS "** SRC Target system is: " ${CMAKE_SYSTEM})
+      target_compile_definitions(${PROJECT_NAME} PRIVATE TRACEINSERVICE _DEBUG)
+      target_include_directories(${PROJECT_NAME} PRIVATE ../SDL/include ../SDL_image/include ../SDL_mixer/include ../SDL_ttf/include)
+      set(SDL3_DIR "../../../build-web/SDL")
+      # not needed to set: SDL3_image_DIR SDL3_mixer_DIR SDL3_ttf_DIR and find_package for SDL3_image, SDL3_mixer and SDL3_ttf 
+      find_package(SDL3 REQUIRED)
+      target_link_libraries(${PROJECT_NAME}
+          SDL3::SDL3
+          SDL3_image::SDL3_image
+          SDL3_mixer::SDL3_mixer  
+          SDL3_ttf::SDL3_ttf
+      )
+    else()
+      # Note on Android: it is built using gradle and mk files, so no cmake section here
+      message(STATUS "=> TODO add cmake support please this Target: " ${CMAKE_SYSTEM})
+    endif()  
   endif()
 endif()
 

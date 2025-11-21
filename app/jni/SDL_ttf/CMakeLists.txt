@@ -47,7 +47,8 @@ include(GNUInstallDirs)
 include(CheckSymbolExists)
 
 set(PLATFORM_SUPPORTS_SHARED ON)
-if(VITA OR PSP OR PS2 OR N3DS OR RISCOS)
+#if(VITA OR PSP OR PS2 OR N3DS OR RISCOS) IGSA start
+if(EMSCRIPTEN OR VITA OR PSP OR PS2 OR N3DS OR RISCOS) #IGSA end (copied from sdl_mixer)
   set(PLATFORM_SUPPORTS_SHARED OFF)
 endif()
 

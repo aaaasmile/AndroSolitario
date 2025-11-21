@@ -205,7 +205,6 @@ class SolitarioGfx {
 
     bool _startdrag;
 
-    SDL_Rect _rctSrcCard;
     std::vector<CardRegionGfx> _cardRegionList;
     bool _terminated;
     bool _newgamerequest;

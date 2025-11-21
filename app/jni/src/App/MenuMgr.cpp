@@ -26,8 +26,6 @@ static const SDL_Color g_color_white = {255, 255, 255};
 static const SDL_Color g_color_ombre = {87, 87, 87, 50};
 static const SDL_Color g_color_black = {0, 0, 0};
 static const SDL_Color g_color_gray = {128, 128, 128};
-static const SDL_Color g_color_red = {255, 0, 0};
-static const SDL_Color g_color_green = {15, 255, 15};
 
 MenuItemEnum nextMenu(MenuItemEnum currMenu);
 MenuItemEnum previousMenu(MenuItemEnum currMenu);
