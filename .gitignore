@@ -7,3 +7,4 @@ asset_data_forwsl
 app/jni/SDL_2_26_5
 *.Zone.Identifier
 *.Identifier
+app/jni/SDL_ttf/external

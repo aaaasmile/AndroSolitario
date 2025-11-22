@@ -218,6 +218,9 @@ Il Linker di wasm mi manda il seguente warning:
     wasm-ld: warning: function signature mismatch: SDL_InsertIntoHashTable
 Il problema è che SDL e SDL_ttf entambe definiscono il proprio SDL_InsertIntoHashTable
 ed ha una signatura diversa, oltre che l'implementazione. 
+Ho fatto l'update di SDL_ttf alla versione 3.2.2 e il link warning è ora sparito.
+Anche cmake non ha avuto problemi nel riconoscere emscripten. In runtime il
+la app riesce ora a caricare i fonts.
 
 Gli assets devono essere integrati nel wasm. Per questo si setta in target_link_options
 l'opzione preload-file, che mi genera il file solitario.data con tutti gli assets.
