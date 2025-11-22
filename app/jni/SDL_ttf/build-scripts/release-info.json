@@ -16,6 +16,7 @@
   "source": {
     "checks": [
       "src/SDL_ttf.c",
+      "include/SDL3_ttf/SDL_textengine.h",
       "include/SDL3_ttf/SDL_ttf.h",
       "src/SDL_surface_textengine.c"
     ]
@@ -43,10 +44,10 @@
     },
     "files": {
       "": [
-        "CHANGES.txt",
+        "build-scripts/pkg-support/mingw/INSTALL.md.in:INSTALL.md",
+        "build-scripts/pkg-support/mingw/Makefile",
         "LICENSE.txt",
-        "README.txt",
-        "build-scripts/pkg-support/mingw/Makefile"
+        "README.md"
       ],
       "cmake": [
         "build-scripts/pkg-support/mingw/cmake/SDL3_ttfConfig.cmake",
@@ -81,10 +82,7 @@
         "lib/@<@ARCH@>@": [
           "VisualC/@<@PLATFORM@>@/@<@CONFIGURATION@>@/SDL3_ttf.dll",
           "VisualC/@<@PLATFORM@>@/@<@CONFIGURATION@>@/SDL3_ttf.lib",
-          "VisualC/@<@PLATFORM@>@/@<@CONFIGURATION@>@/SDL3_ttf.pdb",
-          "VisualC/external/lib/@<@ARCH@>@/LICENSE.freetype.txt",
-          "VisualC/external/lib/@<@ARCH@>@/LICENSE.harfbuzz.txt",
-          "VisualC/external/lib/@<@ARCH@>@/LICENSE.zlib.txt"
+          "VisualC/@<@PLATFORM@>@/@<@CONFIGURATION@>@/SDL3_ttf.pdb"
         ]
       }
     },
@@ -112,14 +110,16 @@
     },
     "files-lib": {
       "": [
-        "README.txt"
+        "build-scripts/pkg-support/msvc/@<@ARCH@>@/INSTALL.md.in:INSTALL.md",
+        "LICENSE.txt",
+        "README.md"
       ]
     },
     "files-devel": {
       "": [
-        "CHANGES.txt",
+        "build-scripts/pkg-support/msvc/INSTALL.md.in:INSTALL.md",
         "LICENSE.txt",
-        "README.txt"
+        "README.md"
       ],
       "cmake": [
         "build-scripts/pkg-support/msvc/cmake/SDL3_ttfConfig.cmake.in:SDL3_ttfConfig.cmake",
@@ -127,7 +127,7 @@
         "cmake/sdlcpu.cmake"
       ],
       "include/SDL3_ttf": [
-        "include/SDL3_ttf/SDL_ttf.h"
+        "include/SDL3_ttf/*.h"
       ]
     },
     "dependencies": {
@@ -176,24 +176,30 @@
     "api-minimum": 19,
     "api-target": 29,
     "ndk-minimum": 21,
-    "files": {
+    "aar-files": {
       "": [
-        "build-scripts/pkg-support/android/INSTALL.md.in:INSTALL.md",
-        "build-scripts/pkg-support/android/__main__.py.in:__main__.py",
-        "build-scripts/pkg-support/android/description.json.in:description.json"
+        "build-scripts/pkg-support/android/aar/__main__.py.in:__main__.py",
+        "build-scripts/pkg-support/android/aar/description.json.in:description.json"
       ],
       "META-INF": [
         "LICENSE.txt"
       ],
       "cmake": [
         "cmake/sdlcpu.cmake",
-        "build-scripts/pkg-support/android/cmake/SDL3_ttfConfig.cmake",
-        "build-scripts/pkg-support/android/cmake/SDL3_ttfConfigVersion.cmake.in:SDL3_ttfConfigVersion.cmake"
+        "build-scripts/pkg-support/android/aar/cmake/SDL3_ttfConfig.cmake",
+        "build-scripts/pkg-support/android/aar/cmake/SDL3_ttfConfigVersion.cmake.in:SDL3_ttfConfigVersion.cmake"
+      ]
+    },
+    "files": {
+      "": [
+        "build-scripts/pkg-support/android/INSTALL.md.in:INSTALL.md",
+        "LICENSE.txt",
+        "README.md"
       ]
     },
     "dependencies": {
       "SDL": {
-        "artifact": "SDL3-*.aar"
+        "artifact": "SDL3-devel-*-android.zip"
       }
     }
   }

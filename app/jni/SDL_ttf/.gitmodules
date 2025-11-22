@@ -1,7 +1,3 @@
-[submodule "external/SDL"]
-	path = external/SDL
-	url = https://github.com/libsdl-org/SDL.git
-	branch = main
 [submodule "external/freetype"]
 	path = external/freetype
 	url = https://github.com/libsdl-org/freetype.git
@@ -9,4 +5,12 @@
 [submodule "external/harfbuzz"]
 	path = external/harfbuzz
 	url = https://github.com/libsdl-org/harfbuzz.git
-	branch = 8.1.1-SDL
+	branch = 8.5.0-SDL
+[submodule "external/plutosvg"]
+	path = external/plutosvg
+	url = https://github.com/libsdl-org/plutosvg.git
+	branch = v0.0.6-SDL
+[submodule "external/plutovg"]
+	path = external/plutovg
+	url = https://github.com/libsdl-org/plutovg.git
+	branch = v0.0.12-SDL
