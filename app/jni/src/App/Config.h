@@ -9,12 +9,22 @@
 // Platform detection
 #if defined(__ANDROID__) || defined(ANDROID)
     #define PLATFORM_ANDROID 1
+#elif defined(EMSCRIPTEN)
+    #define PLATFORM_EMS 1
 #elif defined(_WIN32) || defined(_WIN64)
     #define PLATFORM_WINDOWS 1
 #elif defined(__linux__)
     #define PLATFORM_LINUX 1
 #elif defined(__APPLE__)
     #define PLATFORM_APPLE 1
+#endif
+
+#ifndef HASWINICON
+    #ifdef PLATFORM_EMS
+        #define HASWINICON 0  // no icon in emscripten
+    #else
+        #define HASWINICON 1  
+    #endif
 #endif
 
 #ifndef HASQUITMENU

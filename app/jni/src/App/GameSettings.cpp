@@ -217,11 +217,13 @@ LPErrInApp GameSettings::SaveSettings() {
 }
 
 LPErrInApp GameSettings::LoadFonts() {
+    TRACE_DEBUG("GameSettings::LoadFonts %s \n", g_lpszIniFontAriblkFname);
     _p_fontAriblk = TTF_OpenFont(g_lpszIniFontAriblkFname, _fontBigSize);
     if (_p_fontAriblk == NULL) {
         return ERR_UTIL::ErrorCreate("Unable to load font %s, error: %s\n",
                                      g_lpszIniFontAriblkFname, SDL_GetError());
     }
+    TRACE_DEBUG("LoadFonts Ariblk OK \n");
     _p_fontVera = TTF_OpenFont(g_lpszIniFontVeraFname, _fontSmallSize);
     if (_p_fontVera == NULL) {
         return ERR_UTIL::ErrorCreate("Unable to load font %s, error: %s\n",

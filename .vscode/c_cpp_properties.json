@@ -32,6 +32,22 @@
             "intelliSenseMode": "linux-gcc-x64"
         },
         {
+            "name": "Emscripten",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "/usr/include"
+            ],
+            "defines": [
+                "TRACEINSERVICE",
+                "_DEBUG",
+                "EMSCRIPTEN",
+                "USE_EMPTY_DATA_PREFIX"
+            ],
+            "compilerPath": "/usr/bin/gcc",
+            "cppStandard": "gnu++17",
+            "intelliSenseMode": "linux-gcc-x64"
+        },
+        {
             "name": "MySys2 Windows",
             "includePath": [
                 "${workspaceFolder}/**;C:/msys64/ucrt64/include",

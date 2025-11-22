@@ -6,6 +6,7 @@
 
 #include "AppGfx.h"
 #include "ErrorInfo.h"
+#include "Config.h"
 
 int main(int argc, char* argv[]) {
     TRACE("*** [Main] - start *** \n");
@@ -13,16 +14,18 @@ int main(int argc, char* argv[]) {
     app->ParseCmdLine(argc, argv);
     LPErrInApp err = app->Init();
     if (err != NULL) {
-        fprintf(stderr, "Init error: %s\n", err->ErrorText.c_str());
         TRACE("Fatal: %s\n", err->ErrorText.c_str());
-        exit(1);
+        fprintf(stderr, "Init error: %s\n", err->ErrorText.c_str());
+        delete app;
+        return EXIT_FAILURE;
     }
     TRACE("Initialization OK, ready for the main loop \n");
     err = app->MainLoop();
     if (err != NULL) {
-        fprintf(stderr, "App error: %s\n", err->ErrorText.c_str());
         TRACE("Fatal: %s\n", err->ErrorText.c_str());
-        exit(1);
+        fprintf(stderr, "App error: %s\n", err->ErrorText.c_str());
+        delete app;
+        return EXIT_FAILURE;
     }
     delete app; // othewise (error=Try to release egl_surface with context probably still active)
     TRACE("App terminated with success\n");

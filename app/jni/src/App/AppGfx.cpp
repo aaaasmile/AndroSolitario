@@ -116,11 +116,12 @@ LPErrInApp AppGfx::Init() {
     SDL_SetSurfaceColorKey(
         psIcon, true,
         SDL_MapRGB(SDL_GetPixelFormatDetails(psIcon->format), NULL, 0, 128, 0));
-
+#if HASWINICON
     if (!SDL_SetWindowIcon(_p_Window, psIcon)){
         return ERR_UTIL::ErrorCreate("Couldn't set icon on window: %s\n",
                                          SDL_GetError());
     }
+#endif
     _p_CreditTitle = IMG_Load(g_lpszTitleFile);
     if (_p_CreditTitle == 0) {
         return ERR_UTIL::ErrorCreate("Title image not found");
@@ -131,8 +132,10 @@ LPErrInApp AppGfx::Init() {
     if (err != NULL) {
         return err;
     }
+    TRACE_DEBUG("SceneBackground OK\n");
     err = _p_GameSettings->LoadFonts();
     if (err != NULL) {
+        TRACE_DEBUG("Error on Load fonts\n");
         return err;
     }
     TRACE_DEBUG("Fonts and background loaded OK\n");
