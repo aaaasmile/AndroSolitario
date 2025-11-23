@@ -15,6 +15,14 @@ static char g_filepath[1024];
 
 HighScore::HighScore() {
     _p_FadeAction = new FadeAction();
+    _p_sdlRenderer = NULL;
+    _p_surfScreen = NULL;
+    _p_SurfTitle = NULL;
+    _p_ScreenTexture = NULL;
+    _p_GameSettings = NULL;
+    _p_MusicManager = NULL;
+    _state = HighScore::READY_TO_START;
+
     for (int k = 0; k < 10; k++) {
         _scoreInfo[k].Score = 5940 - (k * 250);
         if (k > 1) {
@@ -143,6 +151,27 @@ LPErrInApp HighScore::Load() {
     return NULL;
 }
 
+LPErrInApp HighScore::HandleEvent(SDL_Event* pEvent) {
+    if (_state != HighScore::IN_PROGRESS) {
+        return NULL;
+    }
+    if (pEvent->type == SDL_EVENT_KEY_DOWN) {
+        if (pEvent->key.key == SDLK_ESCAPE || pEvent->key.key == SDLK_RETURN) {
+            _state = HighScore::DONE;
+        }
+    }
+    if (pEvent->type == SDL_EVENT_FINGER_DOWN) {
+        _state = HighScore::DONE;
+    }
+    if (pEvent->type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
+        if (_ignoreMouseEvent) {
+            return NULL;
+        }
+        _state = HighScore::DONE;
+    }
+    return NULL;
+}
+
 LPErrInApp HighScore::HandleIterate(bool& done) {
     SDL_Rect dest;
     if (_state == HighScore::READY_TO_START) {
@@ -150,6 +179,7 @@ LPErrInApp HighScore::HandleIterate(bool& done) {
     }
 
     if (_state == HighScore::INIT) {
+        TRACE("HighScore Init \n");
         if (_p_ScreenTexture != NULL) {
             SDL_DestroyTexture(_p_ScreenTexture);
         }
@@ -168,7 +198,6 @@ LPErrInApp HighScore::HandleIterate(bool& done) {
     }
 
     if (_state == HighScore::IN_PROGRESS) {
-        Uint64 last_time = SDL_GetTicks();
         dest.x = (_p_surfScreen->w - _p_SurfTitle->w) / 2;
         dest.y = 0;
         dest.w = _p_SurfTitle->w;
@@ -247,9 +276,6 @@ LPErrInApp HighScore::HandleIterate(bool& done) {
         SDL_RenderPresent(_p_sdlRenderer);
 
         Uint64 now_time = SDL_GetTicks();
-        if (now_time < last_time + (1000 / 20)) {
-            SDL_Delay(last_time + (1000 / 20) - now_time);
-        }
         uint32_t elapsed_sec = (now_time / 1000) - (_start_time / 1000);
         if (elapsed_sec > 30) {
             TRACE_DEBUG("after 30 sec, time to exit from high score\n");
@@ -260,6 +286,7 @@ LPErrInApp HighScore::HandleIterate(bool& done) {
     }
 
     if (_state == HighScore::DONE) {
+        TRACE("HighScore done \n");
         _p_FadeAction->Fade(_p_surfScreen, _p_surfScreen, 1, 1, _p_sdlRenderer,
                             NULL);
         _state = HighScore::TERMINATED;
@@ -267,6 +294,7 @@ LPErrInApp HighScore::HandleIterate(bool& done) {
     }
 
     if (_state == HighScore::TERMINATED) {
+        TRACE("HighScore terminated \n");
         done = true;
         _state = HighScore::READY_TO_START;
         return NULL;
@@ -275,26 +303,9 @@ LPErrInApp HighScore::HandleIterate(bool& done) {
     return NULL;
 }
 
-LPErrInApp HighScore::HandleEvent(SDL_Event* pEvent) {
-    if (pEvent->type == SDL_EVENT_KEY_DOWN) {
-        if (pEvent->key.key == SDLK_ESCAPE) {
-            _state = HighScore::DONE;
-        }
-    }
-    if (pEvent->type == SDL_EVENT_FINGER_DOWN) {
-        _state = HighScore::DONE;
-    }
-    if (pEvent->type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
-        if (_ignoreMouseEvent) {
-            return NULL;
-        }
-        _state = HighScore::DONE;
-    }
-    return NULL;
-}
-
 LPErrInApp HighScore::Show(SDL_Surface* p_surf_screen, SDL_Surface* pSurfTitle,
                            SDL_Renderer* psdlRenderer) {
+    TRACE("HighScore Show \n");
     _p_sdlRenderer = psdlRenderer;
     _p_surfScreen = p_surf_screen;
     _p_SurfTitle = pSurfTitle;

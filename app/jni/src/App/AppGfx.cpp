@@ -512,9 +512,12 @@ LPErrInApp AppGfx::MainLoopIterate() {
 }
 
 void AppGfx::backToMenuRootWithMusic() {
+    TRACE("Back to root menu\n");
     LeaveMenu();
     _p_MusicManager->PlayMusic(MusicManager::MUSIC_INIT_SND,
                                MusicManager::LOOP_ON);
+    _p_HighScore->Reset();
+    _p_CreditsView->Reset();
 }
 
 LPErrInApp AppGfx::startGameLoop() {

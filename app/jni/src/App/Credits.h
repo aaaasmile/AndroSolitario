@@ -20,9 +20,7 @@ class CreditsView {
               SDL_Renderer* psdlRenderer);
     LPErrInApp HandleEvent(SDL_Event* pEvent);
     LPErrInApp HandleIterate(bool& done);
-    bool IsOngoing() {
-        return (_state == INIT || _state == IN_PROGRESS || _state == DONE);
-    }
+    bool IsOngoing() { return (_state != READY_TO_START); }
     void Reset() { _state = READY_TO_START; }
 
    private:

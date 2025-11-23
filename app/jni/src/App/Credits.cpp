@@ -140,7 +140,13 @@ char const chars[38][5][6] = {{".###.", "#..##", "#.#.#", "##..#", ".###."},
 CreditsView::CreditsView() {
     _scroll = 0;
     _line = 0;
-    _state = READY_TO_START;
+    _state = CreditsView::READY_TO_START;
+    _p_sdlRenderer = NULL;
+    _p_surfScreen = NULL;
+    _p_SurfTitle = NULL;
+    _p_ScreenTexture = NULL;
+    _p_GameSettings = NULL;
+    _p_MusicManager = NULL;
     _p_FadeAction = new FadeAction();
 }
 
@@ -153,8 +159,11 @@ CreditsView::~CreditsView() {
 }
 
 LPErrInApp CreditsView::HandleEvent(SDL_Event* pEvent) {
+    if (_state != CreditsView::IN_PROGRESS) {
+        return NULL;
+    }
     if (pEvent->type == SDL_EVENT_KEY_DOWN) {
-        if (pEvent->key.key == SDLK_ESCAPE) {
+        if (pEvent->key.key == SDLK_ESCAPE || pEvent->key.key == SDLK_RETURN) {
             _state = CreditsView::DONE;
         }
     }
@@ -173,7 +182,7 @@ LPErrInApp CreditsView::HandleEvent(SDL_Event* pEvent) {
 LPErrInApp CreditsView::HandleIterate(bool& done) {
     SDL_Rect src, dest;
     done = false;
-    if (_state == CreditsView::READY_TO_START){
+    if (_state == CreditsView::READY_TO_START) {
         return NULL;
     }
 
