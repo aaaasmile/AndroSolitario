@@ -111,8 +111,6 @@ LPErrInApp AppGfx::Init() {
         return ERR_UTIL::ErrorCreate("Icon not found");
     }
     TRACE_DEBUG("Icon loaded OK\n");
-    // SDL_SetColorKey(psIcon, true, SDL_MapRGB(psIcon->format, 0, 128, 0));
-    // SDL2
     SDL_SetSurfaceColorKey(
         psIcon, true,
         SDL_MapRGB(SDL_GetPixelFormatDetails(psIcon->format), NULL, 0, 128, 0));
@@ -159,7 +157,6 @@ LPErrInApp AppGfx::Init() {
     if (err != NULL) {
         return err;
     }
-    // set main menu
     _histMenu.push(MenuItemEnum::QUIT);
     _histMenu.push(MenuItemEnum::MENU_ROOT);
 
@@ -187,31 +184,22 @@ LPErrInApp AppGfx::loadSceneBackground() {
             return ERR_UTIL::ErrorCreate("Backgound Type %d not supported\n",
                                          _p_GameSettings->BackgroundType);
         }
-        // SDL_RWops *srcBack = SDL_RWFromFile(strFileName.c_str(), "rb"); SDL2
         SDL_IOStream* srcBack = SDL_IOFromFile(strFileName.c_str(), "rb");
 
         if (srcBack == 0) {
             return ERR_UTIL::ErrorCreate("Unable to load %s background image\n",
                                          strFileName.c_str());
         }
-        //_p_SceneBackground = IMG_LoadJPG_RW(srcBack); SDL 2
         _p_SceneBackground = IMG_LoadTyped_IO(srcBack, false, "JPG");
         if (_p_SceneBackground == 0) {
             return ERR_UTIL::ErrorCreate("Unable to create splash");
         }
         SDL_CloseIO(srcBack);
     } else {
-        // _p_SceneBackground = SDL_CreateRGBSurface(SDL_SWSURFACE,
-        // _p_Screen->w,
-        //                                           _p_Screen->h, 32, 0, 0, 0,
-        //                                           0); SDL 2
         _p_SceneBackground = GFX_UTIL::SDL_CreateRGBSurface(
             _p_Screen->w, _p_Screen->h, 32, 0, 0, 0, 0);
 
-        // SDL_FillRect(_p_SceneBackground, &_p_SceneBackground->clip_rect,
-        //              SDL_MapRGBA(_p_SceneBackground->format, 0, 0, 0, 0));
-        //              SDL 2
-        SDL_Rect clipRect;  // SDL 3
+        SDL_Rect clipRect; 
         SDL_GetSurfaceClipRect(_p_SceneBackground, &clipRect);
         SDL_FillSurfaceRect(
             _p_SceneBackground, &clipRect,
@@ -224,7 +212,6 @@ LPErrInApp AppGfx::loadSceneBackground() {
 
 LPErrInApp AppGfx::createWindow() {
     TRACE_DEBUG("createWindow\n");
-    // int flagwin = 0; SDL 2
     SDL_WindowFlags flagwin;
     if (_p_Window != NULL) {
         _p_Window = NULL;
@@ -235,19 +222,14 @@ LPErrInApp AppGfx::createWindow() {
         _p_Screen = NULL;
     }
     if (_fullScreen) {
-        // flagwin = SDL_WINDOW_FULLSCREEN_DESKTOP; SDL 2
         flagwin = SDL_WINDOW_FULLSCREEN;
     } else {
-        // flagwin = SDL_WINDOW_SHOWN; SDL 2
         flagwin = SDL_WINDOW_RESIZABLE;
     }
 #ifdef ANDROID
     flagwin = SDL_WINDOW_FULLSCREEN;
 #endif
 
-    // _p_Window = SDL_CreateWindow(
-    //     _p_GameSettings->GameName.c_str(), SDL_WINDOWPOS_UNDEFINED,
-    //     SDL_WINDOWPOS_UNDEFINED, _screenW, _screenH, flagwin); SDL 2
     _p_Window = SDL_CreateWindow(_p_GameSettings->GameName.c_str(), _screenW,
                                  _screenH, flagwin);
 
@@ -263,7 +245,6 @@ LPErrInApp AppGfx::createWindow() {
     _screenW = _p_GameSettings->GetScreenWidth();
 
     _p_sdlRenderer =
-        // SDL_CreateRenderer(_p_Window, -1, SDL_RENDERER_ACCELERATED); SDL 2
         SDL_CreateRenderer(_p_Window, NULL);
 
     if (_p_sdlRenderer == NULL) {
@@ -271,9 +252,6 @@ LPErrInApp AppGfx::createWindow() {
                                      SDL_GetError());
     }
 
-    // _p_Screen = SDL_CreateRGBSurface(0, _screenW, _screenH, 32, 0x00FF0000,
-    //                                  0x0000FF00, 0x000000FF, 0xFF000000); SDL
-    //                                  2
     _p_Screen = GFX_UTIL::SDL_CreateRGBSurface(
         _screenW, _screenH, 32, 0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
 
@@ -314,7 +292,6 @@ LPErrInApp AppGfx::startGameLoop() {
 }
 
 void AppGfx::terminate() {
-    // SDL_ShowCursor(SDL_ENABLE);SDL2
     SDL_ShowCursor();
 
     if (_p_Screen != NULL) {
@@ -409,8 +386,6 @@ LPErrInApp AppGfx::SettingsChanged(bool backGroundChanged,
 
 void AppGfx::clearBackground() {
     TRACE_DEBUG("Clear background\n");
-    // SDL_FillRect(_p_Screen, &_p_Screen->clip_rect,
-    //              SDL_MapRGBA(_p_Screen->format, 0, 0, 0, 0)); SDL 2
     SDL_Rect clipRect;  // SDL 3
     SDL_GetSurfaceClipRect(_p_Screen, &clipRect);
     SDL_FillSurfaceRect(_p_Screen, &clipRect,
@@ -623,15 +598,16 @@ void AppGfx::updateScreenTexture() {
     SDL_RenderPresent(_p_sdlRenderer);
 }
 
-void AppGfx::ParseCmdLine(int argc, char* argv[]) {
+void AppGfx::ParseCmdLine(int argc, char* argv[], SDL_AppResult& res) {
+    res = SDL_APP_CONTINUE;
     for (int i = 1; i < argc; i++) {
         if (strcmp(argv[i], "--version") == 0 || strcmp(argv[i], "-v") == 0) {
             printf("Solitario version %s (c) 2004-2025 Invido.it\n", VERSION);
-            exit(0);
+            res = SDL_APP_SUCCESS;
         } else {
             printf("unknown option: %s\n", argv[i]);
             printf("\nUsage: %s --version \n", argv[0]);
-            exit(1);
+            res = SDL_APP_SUCCESS;
         }
     }
 }

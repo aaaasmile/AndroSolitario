@@ -85,7 +85,8 @@ o alternativo, molto meglio, senza cambiare la directory (-S è la source dir, -
 Una volta compilato:
 
     cd build
-    ./solitario
+    make  (eventuale, se si cambia il codice)
+    ./solitario 
 
 Problemi con la funzione random di std. Se uso
 

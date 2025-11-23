@@ -34,7 +34,7 @@ class AppGfx {
     void SetPlayerName(std::string strVal) {
         _p_GameSettings->PlayerName = strVal;
     }
-    void ParseCmdLine(int argc, char* argv[]);
+    void ParseCmdLine(int argc, char* argv[], SDL_AppResult& res);
     void LeaveMenu();
     void SetNextMenu(MenuItemEnum menuItem) { _histMenu.push(menuItem); }
     LPErrInApp SettingsChanged(bool backGroundChanged, bool languageChanged);
