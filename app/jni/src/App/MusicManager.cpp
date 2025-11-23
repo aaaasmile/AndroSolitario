@@ -54,7 +54,6 @@ LPErrInApp MusicManager::Initialize(bool musicEnabled) {
         SDL_AUDIO_S16LE;      // Sample format (16-bit signed integer)
     audio_spec.channels = 2;  // Number of channels (Stereo)
 
-    // if (Mix_OpenAudio(44100, AUDIO_S16, 2, 1024) < 0) { SDL2
     if (!Mix_OpenAudio(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &audio_spec)) {
         return ERR_UTIL::ErrorCreate("Error on Mix_OpenAudio: %s",
                                      SDL_GetError());

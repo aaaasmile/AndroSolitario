@@ -175,12 +175,10 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
     _p_sdlRenderer = pRenderer;
     _p_Window = pWindow;
 
-    SDL_Rect clipRect;  // SDL 3
+    SDL_Rect clipRect; 
     SDL_GetSurfaceClipRect(_p_Screen, &clipRect);
-    //_screenW = _p_Screen->clip_rect.w; SDL 2
     _screenW = clipRect.w;
     _box_X = _screenW / 6;
-    //_screenH = _p_Screen->clip_rect.h; // SDL 2
     _screenH = clipRect.h;
     _box_Y = _screenH / 5;
 
@@ -208,9 +206,6 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
           _rctPanelRedBox.w, _rctPanelRedBox.h);
     g_MenuItemBoxes.SetBox(_rctPanelRedBox);
 
-    // _p_ScreenBackbuffer = SDL_CreateRGBSurface(SDL_SWSURFACE, _p_Screen->w,
-    //                                            _p_Screen->h, 32, 0, 0, 0, 0);
-    //                                            SDL 2
     _p_ScreenBackbuffer = GFX_UTIL::SDL_CreateRGBSurface(
         _p_Screen->w, _p_Screen->h, 32, 0, 0, 0, 0);
 
@@ -225,18 +220,13 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
     _p_fontAriblk = pGameSettings->GetFontAriblk();
     _p_fontVera = pGameSettings->GetFontVera();
 
-    // _p_MenuBox = SDL_CreateRGBSurface(SDL_SWSURFACE, _rctPanelRedBox.w,
-    //                                   _rctPanelRedBox.h, 32, 0, 0, 0, 0);
     _p_MenuBox = GFX_UTIL::SDL_CreateRGBSurface(
         _rctPanelRedBox.w, _rctPanelRedBox.h, 32, 0, 0, 0, 0);
-    // SDL_FillRect(_p_MenuBox, NULL,
-    //              SDL_MapRGBA(_p_Screen->format, 136, 60, 60, 0)); SDL 2
     SDL_FillSurfaceRect(_p_MenuBox, NULL,
                         SDL_MapRGB(SDL_GetPixelFormatDetails(_p_Screen->format),
                                    NULL, 0, 0, 0));
 
     SDL_SetSurfaceBlendMode(_p_MenuBox, SDL_BLENDMODE_BLEND);
-    // SDL_SetSurfaceAlphaMod(_p_MenuBox, 127);
     SDL_SetSurfaceAlphaMod(_p_MenuBox, 120);
 
     // link to invido.it
@@ -285,9 +275,6 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
     _p_LabelVersion->SetState(LabelGfx::INVISIBLE);
     _p_LabelVersion->SetWindowText(g_lpszVersion);
 
-    // SDL_FillRect(_p_ScreenBackbuffer, &_p_ScreenBackbuffer->clip_rect,
-    //              SDL_MapRGBA(_p_ScreenBackbuffer->format, 60, 60, 60, 0));
-    //              SDL 2
     SDL_GetSurfaceClipRect(_p_ScreenBackbuffer, &clipRect);
     SDL_FillSurfaceRect(
         _p_ScreenBackbuffer, &clipRect,
@@ -306,7 +293,6 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
 
 LPErrInApp MenuMgr::drawStaticScene() {
     LPLanguages pLanguages = _p_GameSettings->GetLanguageMan();
-    // function called in loop
     SDL_Rect rctTarget;
     LPErrInApp err = NULL;
     rctTarget.x = (_p_ScreenBackbuffer->w - _p_SceneBackground->w) / 2;
@@ -318,7 +304,6 @@ LPErrInApp MenuMgr::drawStaticScene() {
     SDL_BlitSurface(_p_SceneBackground, NULL, _p_ScreenBackbuffer, &rctTarget);
 
     Uint32 colorBarTitle =
-        // SDL_MapRGB(_p_ScreenBackbuffer->format, 153, 202, 51); SDL 2
         SDL_MapRGB(SDL_GetPixelFormatDetails(_p_ScreenBackbuffer->format), NULL,
                    153, 202, 51);
 
@@ -501,9 +486,7 @@ LPErrInApp MenuMgr::drawMenuTextList() {
 
 LPErrInApp MenuMgr::HandleRootMenuEvent(SDL_Event* pEvent) {
     SDL_Point touchLocation;
-
     // TRACE_DEBUG("Ignore mouse events: %b", ignoreMouseEvent);
-
     if (pEvent->type == SDL_EVENT_QUIT) {
         (_menuDlgt.tc)->LeaveMenu(_menuDlgt.self);
         return NULL;

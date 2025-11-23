@@ -28,13 +28,9 @@ void ButtonGfx::Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
     _fncbClickEvent = fncbClickEvent;
     _rctButton = *pRect;
 
-    // _p_buttonSurface = SDL_CreateRGBSurface(SDL_SWSURFACE, _rctButton.w,
-    //                                         _rctButton.h, 32, 0, 0, 0, 0);
     _p_buttonSurface = GFX_UTIL::SDL_CreateRGBSurface(
         _rctButton.w, _rctButton.h, 32, 0, 0, 0, 0);
 
-    // SDL_FillRect(_p_buttonSurface, NULL,
-    //              SDL_MapRGBA(pScreen->format, 255, 0, 0, 0)); SDL 2
     SDL_FillSurfaceRect(_p_buttonSurface, NULL,
                         SDL_MapRGB(SDL_GetPixelFormatDetails(pScreen->format),
                                    NULL, 255, 0, 0));
@@ -164,7 +160,6 @@ void ButtonGfx::DrawButton(SDL_Surface* pScreen) {
     GFX_UTIL::DrawStaticSpriteEx(pScreen, 0, 0, _rctButton.w, _rctButton.h,
                                  _rctButton.x, _rctButton.y, _p_buttonSurface);
     int tx, ty;
-    // TTF_SizeText(_p_fontText, _buttonText.c_str(), &tx, &ty); SDL 2
     if (_buttonType == TEXT_BUTTON){
         TTF_GetStringSize(_p_fontText, _buttonText.c_str(), 0, &tx, &ty);
     }else {

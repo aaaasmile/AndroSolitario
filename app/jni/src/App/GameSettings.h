@@ -58,7 +58,7 @@ class GameSettings {
 
     Languages* GetLanguageMan();
     void SetCurrentLang();
-    
+
     MusicManager* GetMusicManager() { return _p_MusicManager; }
     LPErrInApp InitMusicManager();
     void TerminateMusicManager();

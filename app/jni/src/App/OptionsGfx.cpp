@@ -101,17 +101,12 @@ LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
     _p_fontText = _p_GameSettings->GetFontVera();
     _p_sdlRenderer = pRenderer;
 
-    // _p_surfBar = SDL_CreateRGBSurface(SDL_SWSURFACE, _rctOptBox.w,
-    // _rctOptBox.h,
-    //                                   32, 0, 0, 0, 0);
     _p_surfBar = GFX_UTIL::SDL_CreateRGBSurface(_rctOptBox.w, _rctOptBox.h, 32,
                                                 0, 0, 0, 0);
     if (_p_surfBar == NULL) {
         return ERR_UTIL::ErrorCreate("_p_surfBar error: %s\n", SDL_GetError());
     }
-    // SDL_FillRect(_p_surfBar, NULL,
-    //              SDL_MapRGBA(pScreen->format, 10, 100, 10, 0)); SDL 2
-
+    
     SDL_FillSurfaceRect(
         _p_surfBar, NULL,
         SDL_MapRGB(SDL_GetPixelFormatDetails(_p_surfBar->format), NULL, 10, 10,
@@ -320,8 +315,6 @@ LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
         labelOffsetY = 40;
     }
 
-    // SDL_Surface* pShadowSrf = SDL_CreateRGBSurface(
-    //     SDL_SWSURFACE, _p_screen->w, _p_screen->h, 32, 0, 0, 0, 0); SDL 2
     SDL_Surface* pShadowSrf = GFX_UTIL::SDL_CreateRGBSurface(
         _p_screen->w, _p_screen->h, 32, 0, 0, 0, 0);
 
@@ -331,9 +324,7 @@ LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
     bool mouseDownRec = false;
     while (!_terminated) {
         // center the background
-        // SDL_FillRect(pShadowSrf, &pShadowSrf->clip_rect,
-        //              SDL_MapRGBA(pShadowSrf->format, 0, 0, 0, 0)); SDL 2
-        SDL_Rect clipRect;  // SDL 3
+        SDL_Rect clipRect;
         SDL_GetSurfaceClipRect(pShadowSrf, &clipRect);
         SDL_FillSurfaceRect(
             pShadowSrf, &clipRect,

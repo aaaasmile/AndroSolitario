@@ -137,7 +137,6 @@ void CheckBoxGfx::DrawButton(SDL_Surface* pScreen) {
     yOffset = rctCheck.h;
 
     int tx, ty;
-    //TTF_SizeText(_p_FontText, _buttonText.c_str(), &tx, &ty);
     TTF_GetStringSize(_p_FontText, _buttonText.c_str(), 0, &tx, &ty);
 
     if (xOffset < 0) {

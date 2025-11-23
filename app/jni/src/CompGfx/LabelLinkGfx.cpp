@@ -23,16 +23,9 @@ void LabelLinkGfx::Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
                               ClickCb& fncbClickEvent) {
     _fncbClickEvent = fncbClickEvent;
     _rctCtrl = *pRect;
-
-    // black bar surface
-    // _p_SurfBar = SDL_CreateRGBSurface(SDL_SWSURFACE, _rctCtrl.w, _rctCtrl.h,
-    // 32,
-    //                                   0, 0, 0, 0); SDL 2
     _p_SurfBar =
         GFX_UTIL::SDL_CreateRGBSurface(_rctCtrl.w, _rctCtrl.h, 32, 0, 0, 0, 0);
 
-    // SDL_FillRect(_p_SurfBar, NULL, SDL_MapRGBA(pScreen->format, 255, 0, 0,
-    // 0)); SDL 2
     SDL_FillSurfaceRect(_p_SurfBar, NULL,
                         SDL_MapRGB(SDL_GetPixelFormatDetails(pScreen->format),
                                    NULL, 255, 0, 0));
@@ -122,7 +115,6 @@ void LabelLinkGfx::Draw(SDL_Surface* pScreen) {
             // end stuff mouse
 
             int tx, ty;
-            // TTF_SizeText(_p_FontText, _ctrlText.c_str(), &tx, &ty); SDL2
             TTF_GetStringSize(_p_FontText, _ctrlText.c_str(), 0, &tx, &ty);
             int iXOffSet = (_rctCtrl.w - tx) / 2;
             if (iXOffSet < 0) {

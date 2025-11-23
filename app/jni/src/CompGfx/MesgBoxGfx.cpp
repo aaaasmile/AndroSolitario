@@ -35,13 +35,9 @@ LPErrInApp MesgBoxGfx::Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
     _typeMsg = eval;
     _p_sdlRenderer = pRenderer;
 
-    // _p_Surf_Bar = SDL_CreateRGBSurface(SDL_SWSURFACE, _rctMsgBox.w,
-    //                                    _rctMsgBox.h, 32, 0, 0, 0, 0);
     _p_Surf_Bar = GFX_UTIL::SDL_CreateRGBSurface(_rctMsgBox.w, _rctMsgBox.h, 32,
                                                  0, 0, 0, 0);
 
-    // SDL_FillRect(_p_Surf_Bar, NULL,
-    //              SDL_MapRGBA(pScreen->format, 30, 80, 157, 0));
     SDL_FillSurfaceRect(_p_Surf_Bar, NULL,
                         SDL_MapRGB(SDL_GetPixelFormatDetails(pScreen->format),
                                    NULL, 30, 80, 157));
@@ -141,8 +137,6 @@ int MesgBoxGfx::Show(SDL_Surface* pScene_background, LPCSTR lpsBut1Txt,
         _p_BtButt2->SetButtonText(lpsBut2Txt);
         _p_BtButt2->SetVisibleState(ButtonGfx::VISIBLE);
     }
-    // SDL_Surface* pShadowSrf = SDL_CreateRGBSurface(
-    //     SDL_SWSURFACE, _p_Screen->w, _p_Screen->h, 32, 0, 0, 0, 0);
     SDL_Surface* pShadowSrf = GFX_UTIL::SDL_CreateRGBSurface(
         _p_Screen->w, _p_Screen->h, 32, 0, 0, 0, 0);
 
@@ -199,7 +193,6 @@ int MesgBoxGfx::Show(SDL_Surface* pScene_background, LPCSTR lpsBut1Txt,
             // draw text lines
             for (int i = 0; i < _dataStrings.size(); i++) {
                 STRING strText = _dataStrings[i];
-                // TTF_SizeText(_p_FontText, strText.c_str(), &tx, &ty); SDL 2
                 TTF_GetStringSize(_p_FontText, strText.c_str(), 0, &tx, &ty);
 
                 iXOffSet = (_rctMsgBox.w - tx) / 2;
@@ -211,7 +204,6 @@ int MesgBoxGfx::Show(SDL_Surface* pScene_background, LPCSTR lpsBut1Txt,
             }
         } else {
             // draw only a line in the middle
-            // TTF_SizeText(_p_FontText, _strMsgText.c_str(), &tx, &ty); SDL 2
             TTF_GetStringSize(_p_FontText, _strMsgText.c_str(), 0, &tx, &ty);
 
             iXOffSet = (_rctMsgBox.w - tx) / 2;

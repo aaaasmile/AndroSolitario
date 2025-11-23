@@ -134,9 +134,6 @@ LPErrInApp SolitarioGfx::Initialize(SDL_Surface* s, SDL_Renderer* r,
                                      SDL_GetError());
     }
 
-    // _p_AlphaDisplay = SDL_CreateRGBSurface(SDL_SWSURFACE, _p_Screen->w,
-    //                                        _p_Screen->h, 32, 0, 0, 0, 0);
-    //                                        //SDL2
     _p_AlphaDisplay = GFX_UTIL::SDL_CreateRGBSurface(_p_Screen->w, _p_Screen->h,
                                                      32, 0, 0, 0, 0);
     if (_p_AlphaDisplay == NULL) {
@@ -144,8 +141,6 @@ LPErrInApp SolitarioGfx::Initialize(SDL_Surface* s, SDL_Renderer* r,
                                      SDL_GetError());
     }
 
-    // _p_ScreenBackbufferDrag = SDL_CreateRGBSurface(
-    //     SDL_SWSURFACE, _p_Screen->w, _p_Screen->h, 32, 0, 0, 0, 0);//SDL2
     _p_ScreenBackbufferDrag = GFX_UTIL::SDL_CreateRGBSurface(
         _p_Screen->w, _p_Screen->h, 32, 0, 0, 0, 0);
 
@@ -189,9 +184,7 @@ LPErrInApp SolitarioGfx::DrawCardStack(SDL_Surface* s,
         return ERR_UTIL::ErrorCreate("DrawCardStack region is NULL");
     }
     // TRACE_DEBUG("Draw card stack %d, visible %d\n",
-    // pcardRegion->RegionTypeId(),
-    //             pcardRegion->IsVisible());
-
+    
     LPErrInApp err;
     if (!pcardRegion->IsVisible())
         return NULL;
@@ -324,20 +317,13 @@ LPErrInApp SolitarioGfx::InitDrag(LPCardStackGfx pCargoStack, int x, int y,
         SDL_DestroySurface(_p_Dragface);
     }
 
-    // _p_Dragface = SDL_CreateRGBSurface(SDL_SWSURFACE, _dragPileInfo.width,
-    //                                    _dragPileInfo.height, 32, 0, 0, 0, 0);
-    //                                    // SDL2
     _p_Dragface = GFX_UTIL::SDL_CreateRGBSurface(
         _dragPileInfo.width, _dragPileInfo.height, 32, 0, 0, 0, 0);
-    // SDL_FillRect(_p_Dragface, NULL, SDL_MapRGB(_p_Dragface->format, 0, 255,
-    // 0)); //SDL2
     SDL_FillSurfaceRect(
         _p_Dragface, NULL,
         SDL_MapRGB(SDL_GetPixelFormatDetails(_p_Dragface->format), NULL, 0, 255,
                    0));
 
-    // SDL_SetColorKey(_p_Dragface, true,
-    //                 SDL_MapRGB(_p_Dragface->format, 0, 255, 0)); // SDL2
     SDL_SetSurfaceColorKey(
         _p_Dragface, true,
         SDL_MapRGB(SDL_GetPixelFormatDetails(_p_Dragface->format), NULL, 0, 255,
@@ -369,7 +355,6 @@ LPErrInApp SolitarioGfx::InitDrag(LPCardStackGfx pCargoStack, int x, int y,
 void SolitarioGfx::updateTextureAsFlipScreen() {
     SDL_UpdateTexture(_p_ScreenTexture, NULL, _p_Screen->pixels,
                       _p_Screen->pitch);
-    // SDL_RenderCopy(_p_sdlRenderer, _p_ScreenTexture, NULL, NULL); SDL 2
     SDL_RenderTexture(_p_sdlRenderer, _p_ScreenTexture, NULL, NULL);
     SDL_RenderPresent(_p_sdlRenderer);
 }
@@ -533,8 +518,6 @@ LPCardRegionGfx SolitarioGfx::FindDropRegion(int id, LPCardStackGfx pStack) {
 void SolitarioGfx::DrawStaticScene() {
     // static scene is drawn directly into the screen.
     // Then the screen is copied into the back buffer for animations
-    // SDL_FillRect(_p_Screen, &_p_Screen->clip_rect,
-    // SDL_MapRGBA(_p_Screen->format, 0, 0, 0, 0));// SDL 2
     SDL_Rect clipRect;  // SDL 3
     SDL_GetSurfaceClipRect(_p_Screen, &clipRect);
     SDL_FillSurfaceRect(_p_Screen, &clipRect,
@@ -561,10 +544,6 @@ void SolitarioGfx::DrawStaticScene() {
     drawScore(_p_Screen);
     // it seems here that SDL_BlitSurface copy only the bitmap and not the fill
     // rect, do it also into the backbuffer
-    // SDL_FillRect(_p_ScreenBackbufferDrag,
-    // &_p_ScreenBackbufferDrag->clip_rect,
-    // SDL_MapRGBA(_p_ScreenBackbufferDrag->format, 0, 0, 0, 0)); //SDL 2
-    // SDL 3
     SDL_GetSurfaceClipRect(_p_ScreenBackbufferDrag, &clipRect);
     SDL_FillSurfaceRect(
         _p_ScreenBackbufferDrag, &clipRect,
@@ -579,8 +558,6 @@ void SolitarioGfx::DrawStaticScene() {
 LPErrInApp SolitarioGfx::DrawInitialScene() {
     TRACE("DrawInitialScene\n");
     LPGameSettings pGameSettings = GameSettings::GetSettings();
-    // SDL_FillRect(_p_Screen, &_p_Screen->clip_rect,
-    // SDL_MapRGBA(_p_Screen->format, 0, 0, 0, 0)); //SDL 2
     SDL_Rect clipRect;  // SDL 3
     SDL_GetSurfaceClipRect(_p_Screen, &clipRect);
     SDL_FillSurfaceRect(_p_Screen, &clipRect,
@@ -886,15 +863,12 @@ LPErrInApp SolitarioGfx::LoadSymbolsForPac() {
     Uint8 r, g, b;
     strFileSymbName += _deckType.GetSymbolFileName();
     if (_deckType.GetType() == eDeckType::TAROCK_PIEMONT) {
-        // SDL_RWops *srcSymb = SDL_RWFromFile(strFileSymbName.c_str(), "rb");
-        // // SDL 2
         SDL_IOStream* srcSymb =
             SDL_IOFromFile(strFileSymbName.c_str(), "rb");  // SDL 3
         if (srcSymb == NULL) {
             return ERR_UTIL::ErrorCreate(
                 "SDL_RWFromFile on symbols failed: %s\n", SDL_GetError());
         }
-        //_p_Symbols = IMG_LoadPNG_RW(srcSymb); SDL 2
         _p_Symbols = IMG_LoadTyped_IO(srcSymb, false, "PNG");
         if (_p_Symbols == NULL) {
             SDL_CloseIO(srcSymb);
@@ -902,9 +876,6 @@ LPErrInApp SolitarioGfx::LoadSymbolsForPac() {
                 "IMG_LoadPNG_RW on symbols file error (file %s): %s\n",
                 strFileSymbName.c_str(), SDL_GetError());
         }
-        // SDL_SetColorKey(_p_Symbols, true,
-        //                 SDL_MapRGB(_p_Symbols->format, 248, 0, 241)); // SDL
-        //                 2
         r = 248;
         g = 0;
         b = 241;
@@ -916,15 +887,10 @@ LPErrInApp SolitarioGfx::LoadSymbolsForPac() {
                                          SDL_GetError());
         }
         if (_deckType.GetSymbolFileName() == "symb_336.bmp") {
-            // SDL_SetColorKey(_p_Symbols, true,
-            //                 SDL_MapRGB(_p_Symbols->format, 242, 30, 206));
-            //                 SDL 2
             r = 242;
             g = 30;
             b = 206;
         } else {
-            // SDL_SetColorKey(_p_Symbols, true,
-            //                 SDL_MapRGB(_p_Symbols->format, 0, 128, 0)); SDL 2
             r = 0;
             g = 128;
             b = 0;
@@ -988,7 +954,6 @@ LPErrInApp SolitarioGfx::handleGameLoopKeyDownEvent(SDL_Event& event) {
 }
 
 // Remember Finger events are parallel with mouse events
-// here use Finger only for button and mouse right click simulation
 LPErrInApp SolitarioGfx::handleGameLoopFingerDownEvent(SDL_Event& event) {
     TRACE_DEBUG("handleGameLoopFingerDownEvent \n");
     Uint64 now_time = SDL_GetTicks();
@@ -1115,8 +1080,6 @@ LPErrInApp SolitarioGfx::singleTapOrLeftClick(SDL_Point& pt) {
         }
         if (isInitDrag) {
             _startdrag = true;
-            // SDL_ShowCursor(SDL_DISABLE); SDL 2
-            // SDL_SetWindowGrab(_p_Window, SDL_TRUE); SDL 2
             SDL_HideCursor();
             SDL_SetWindowMouseGrab(_p_Window, true);
         }
@@ -1180,8 +1143,6 @@ LPErrInApp SolitarioGfx::endOfDragAndCheckForVictory() {
         // TRACE_DEBUG("MouseUp start drag - end \n");
         _startdrag = false;
         LPCardRegionGfx pDestReg = DoDrop();
-        // SDL_ShowCursor(SDL_ENABLE);
-        // SDL_SetWindowGrab(_p_Window, SDL_FALSE); SDL 2
         SDL_ShowCursor();
         SDL_SetWindowMouseGrab(_p_Window, false);
 
@@ -1562,8 +1523,6 @@ LPErrInApp SolitarioGfx::drawScore(SDL_Surface* pScreen) {
     rcs.w = tx + 190;
     rcs.y = ty - 2;
     rcs.h = ty + 46;
-    // SDL_FillRect(_p_Screen, &rcs, SDL_MapRGBA(pScreen->format, 0, 0, 0,
-    // 0)); SDL 2
     SDL_FillSurfaceRect(_p_Screen, &rcs,
                         SDL_MapRGB(SDL_GetPixelFormatDetails(_p_Screen->format),
                                    NULL, 0, 0, 0));

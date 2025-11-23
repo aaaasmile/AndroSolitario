@@ -92,7 +92,6 @@ LPErrInApp GameSettings::LoadSettings() {
     }
 
     TRACE("Load setting file %s\n", g_filepath);
-    // SDL_RWops* src = SDL_RWFromFile(g_filepath, "rb"); SDL 2
     SDL_IOStream* src = SDL_IOFromFile(g_filepath, "rb");
     if (src == 0) {
         TRACE("No setting file found, no problem ignore it and use default\n");
@@ -105,25 +104,21 @@ LPErrInApp GameSettings::LoadSettings() {
     uint8_t backgroudType;
     uint8_t nameSize;
 
-    // if (SDL_RWread(src, &deckId, 1, 1) == 0) { SDL 2
     if (SDL_ReadIO(src, &deckId, 1) == 0) {
         return ERR_UTIL::ErrorCreate(
             "SDL_RWread on setting file error (file %s): %s\n", g_filepath,
             SDL_GetError());
     }
-    // if (SDL_RWread(src, &langId, 1, 1) == 0) { SDL 2
     if (SDL_ReadIO(src, &langId, 1) == 0) {
         return ERR_UTIL::ErrorCreate(
             "SDL_RWread on setting file error (file %s): %s\n", g_filepath,
             SDL_GetError());
     }
-    // if (SDL_RWread(src, &musEnabled, 1, 1) == 0) { SDL 2
     if (SDL_ReadIO(src, &musEnabled, 1) == 0) {
         return ERR_UTIL::ErrorCreate(
             "SDL_RWread on setting file error (file %s): %s\n", g_filepath,
             SDL_GetError());
     }
-    // if (SDL_RWread(src, &backgroudType, 1, 1) == 0) { SDL 2
     if (SDL_ReadIO(src, &backgroudType, 1) == 0) {
         return ERR_UTIL::ErrorCreate(
             "SDL_RWread on setting file error (file %s): %s\n", g_filepath,
@@ -145,7 +140,6 @@ LPErrInApp GameSettings::LoadSettings() {
         }
     }
 
-    // SDL_RWclose(src); SDL 2
     SDL_CloseIO(src);
 
     DeckTypeVal.SetTypeIndex(deckId);
@@ -173,28 +167,23 @@ LPErrInApp GameSettings::SaveSettings() {
     musEnabled = (uint8_t)MusicEnabled;
     backgroudType = (uint8_t)BackgroundType;
 
-    // SDL_RWops* dst = SDL_RWFromFile(g_filepath, "wb"); SDL 2
     SDL_IOStream* dst = SDL_IOFromFile(g_filepath, "wb");
     if (dst == 0) {
         return ERR_UTIL::ErrorCreate("Unable to save setting file %s",
                                      g_filepath);
     }
-    // int numWritten = SDL_RWwrite(dst, &deckId, 1, 1); SDL 2
     int numWritten = SDL_WriteIO(dst, &deckId, 1);
     if (numWritten < 1) {
         return ERR_UTIL::ErrorCreate("SDL_WriteIO error %s\n", SDL_GetError());
     }
-    // numWritten = SDL_RWwrite(dst, &langId, 1, 1); SDL 2
     numWritten = SDL_WriteIO(dst, &langId, 1);
     if (numWritten < 1) {
         return ERR_UTIL::ErrorCreate("SDL_WriteIO error %s\n", SDL_GetError());
     }
-    // numWritten = SDL_RWwrite(dst, &musEnabled, 1, 1); SDL 2
     numWritten = SDL_WriteIO(dst, &musEnabled, 1);
     if (numWritten < 1) {
         return ERR_UTIL::ErrorCreate("SDL_WriteIO error %s\n", SDL_GetError());
     }
-    // numWritten = SDL_RWwrite(dst, &backgroudType, 1, 1); SDL 2
     numWritten = SDL_WriteIO(dst, &backgroudType, 1);
     if (numWritten < 1) {
         return ERR_UTIL::ErrorCreate("SDL_WriteIO error %s\n", SDL_GetError());
@@ -211,7 +200,6 @@ LPErrInApp GameSettings::SaveSettings() {
     if (numWritten < 1) {
         return ERR_UTIL::ErrorCreate("SDL_WriteIO error %s\n", SDL_GetError());
     }
-    // SDL_RWclose(dst); SDL 2
     SDL_CloseIO(dst);
     return NULL;
 }

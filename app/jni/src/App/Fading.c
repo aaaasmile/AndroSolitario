@@ -25,13 +25,6 @@ void Fade(SDL_Surface* p_surf_screen, SDL_Surface* p_surf_img,
     Uint64 ui_old_time, ui_curr_time, ui_time_ms;
     float f_alpha;
     // Becomes flag to pass when creating a Surface
-    // Uint32 ui_flags = SDL_SWSURFACE;
-    // if ((p_surf_black = SDL_CreateRGBSurface(
-    //          ui_flags, p_surf_screen->w, p_surf_screen->h,
-    //          p_surf_screen->format->BitsPerPixel,
-    //          p_surf_screen->format->Rmask, p_surf_screen->format->Gmask,
-    //          p_surf_screen->format->Bmask, p_surf_screen->format->Amask)) ==
-    //          NULL) {
     p_surf_black = SDL_CreateRGBSurface(
         p_surf_screen->w, p_surf_screen->h,
         SDL_GetPixelFormatDetails(p_surf_screen->format)->bits_per_pixel,
@@ -40,28 +33,18 @@ void Fade(SDL_Surface* p_surf_screen, SDL_Surface* p_surf_img,
         SDL_GetPixelFormatDetails(p_surf_screen->format)->Bmask,
         SDL_GetPixelFormatDetails(p_surf_screen->format)->Amask);
 
-    // SDL_PIXELFORMAT_RGBA32);
     if (p_surf_black == NULL) {
         fprintf(stderr, "fade: could not create the black Surface. (%s)\n",
                 SDL_GetError());
         return;
     }
     SDL_SetSurfaceBlendMode(p_surf_black, SDL_BLENDMODE_BLEND);
-    // SDL_FillRect(p_surf_black, NULL,
-    //              SDL_MapRGB(p_surf_screen->format, 0, 0, 0)); //SDL 2
     SDL_FillSurfaceRect(
         p_surf_black, NULL,
         SDL_MapRGB(SDL_GetPixelFormatDetails(p_surf_black->format), NULL, 0, 0,
                    0));
 
     if (p_surf_screen == p_surf_img) {
-        // if ((p_surf_screen_copy = SDL_CreateRGBSurface(
-        //          ui_flags, p_surf_screen->w, p_surf_screen->h,
-        //          p_surf_screen->format->BitsPerPixel,
-        //          p_surf_screen->format->Rmask, p_surf_screen->format->Gmask,
-        //          p_surf_screen->format->Bmask, p_surf_screen->format->Amask))
-        //          ==
-        //     NULL) { //SDL 2
         p_surf_screen_copy = SDL_CreateRGBSurface(
             p_surf_screen->w, p_surf_screen->h,
             SDL_GetPixelFormatDetails(p_surf_screen->format)->bits_per_pixel,
@@ -136,15 +119,10 @@ void InstantFade(SDL_Surface* p_surf_screen) {
     dest.y = 0;
     dest.w = p_surf_screen->w;
     dest.h = p_surf_screen->h;
-    // SDL_Surface* pBlack = SDL_CreateRGBSurface(
-    //     SDL_SWSURFACE, p_surf_screen->w, p_surf_screen->h, 32, 0, 0, 0, 0);
-    //     SDL2
     SDL_Surface* pBlack = SDL_CreateSurface(p_surf_screen->w, p_surf_screen->h,
                                             SDL_PIXELFORMAT_RGBA32);
 
-    // SDL_FillRect(pBlack, &pBlack->clip_rect,
-    //              SDL_MapRGBA(pBlack->format, 0, 0, 0, 0)); SDL2
-    SDL_Rect clipRect;  // SDL 3
+    SDL_Rect clipRect;
     SDL_GetSurfaceClipRect(pBlack, &clipRect);
     SDL_FillSurfaceRect(
         pBlack, &clipRect,
