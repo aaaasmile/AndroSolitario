@@ -11,9 +11,9 @@ static SDL_Surface* SDL_CreateRGBSurface(int width, int height, int depth,
 // Fades the given surface in or out to the given screen within the given time
 //  If the image surface is the screen surface (pointer are equal), a copy is
 //  made first. We must do that because we are overwriting the Screen Surface.
-void FadeAction::Fade(SDL_Surface* p_surf_screen, SDL_Surface* p_surf_img,
-          Uint32 ui_seconds, int b_fade_out, SDL_Renderer* psdlRenderer,
-          SDL_Rect* prctTarget) {
+LPErrInApp FadeAction::Fade(SDL_Surface* p_surf_screen, SDL_Surface* p_surf_img,
+                            Uint32 ui_seconds, int b_fade_out,
+                            SDL_Renderer* psdlRenderer, SDL_Rect* prctTarget) {
     // Becomes the black surface
     SDL_Surface* p_surf_black = NULL;
     SDL_Texture* pScreenTexture =
@@ -34,9 +34,8 @@ void FadeAction::Fade(SDL_Surface* p_surf_screen, SDL_Surface* p_surf_img,
         SDL_GetPixelFormatDetails(p_surf_screen->format)->Amask);
 
     if (p_surf_black == NULL) {
-        fprintf(stderr, "fade: could not create the black Surface. (%s)\n",
-                SDL_GetError());
-        return;
+        return ERR_UTIL::ErrorCreate(
+            "fade: could not create the black Surface. (%s)\n", SDL_GetError());
     }
     SDL_SetSurfaceBlendMode(p_surf_black, SDL_BLENDMODE_BLEND);
     SDL_FillSurfaceRect(
@@ -54,12 +53,10 @@ void FadeAction::Fade(SDL_Surface* p_surf_screen, SDL_Surface* p_surf_img,
             SDL_GetPixelFormatDetails(p_surf_screen->format)->Amask);
 
         if (p_surf_screen_copy == NULL) {
-            fprintf(
-                stderr,
+            SDL_DestroySurface(p_surf_black);
+            return ERR_UTIL::ErrorCreate(
                 "fade: could not create a copy of the Screen Surface. (%s)\n",
                 SDL_GetError());
-            SDL_DestroySurface(p_surf_black);
-            return;
         }
         SDL_BlitSurface(p_surf_screen, NULL, p_surf_screen_copy, NULL);
         p_surf_img = p_surf_screen_copy;
@@ -111,6 +108,8 @@ void FadeAction::Fade(SDL_Surface* p_surf_screen, SDL_Surface* p_surf_img,
         SDL_DestroySurface(p_surf_screen_copy);
     }
     SDL_DestroyTexture(pScreenTexture);
+
+    return NULL;
 }
 
 void FadeAction::InstantFade(SDL_Surface* p_surf_screen) {

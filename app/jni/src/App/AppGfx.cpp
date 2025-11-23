@@ -200,7 +200,7 @@ LPErrInApp AppGfx::loadSceneBackground() {
         _p_SceneBackground = GFX_UTIL::SDL_CreateRGBSurface(
             _p_Screen->w, _p_Screen->h, 32, 0, 0, 0, 0);
 
-        SDL_Rect clipRect; 
+        SDL_Rect clipRect;
         SDL_GetSurfaceClipRect(_p_SceneBackground, &clipRect);
         SDL_FillSurfaceRect(
             _p_SceneBackground, &clipRect,
@@ -245,8 +245,7 @@ LPErrInApp AppGfx::createWindow() {
     _screenH = _p_GameSettings->GetScreenHeight();
     _screenW = _p_GameSettings->GetScreenWidth();
 
-    _p_sdlRenderer =
-        SDL_CreateRenderer(_p_Window, NULL);
+    _p_sdlRenderer = SDL_CreateRenderer(_p_Window, NULL);
 
     if (_p_sdlRenderer == NULL) {
         return ERR_UTIL::ErrorCreate("Cannot create renderer: %s\n",
@@ -424,11 +423,12 @@ LPErrInApp AppGfx::MainLoopEvent(SDL_Event* pEvent, SDL_AppResult& res) {
             break;
 
         case MenuItemEnum::MENU_CREDITS:
-            TRACE("TODO: menu credits event \n");
-            LeaveMenu();  // TODO
-            // err = showCredits();
-            // if (err != NULL)
-            //     return err;
+            err = showCredits();
+            if (err != NULL)
+                return err;
+            err = _p_CreditsView->HandleEvent(pEvent);
+            if (err != NULL)
+                return err;
             break;
 
         case MenuItemEnum::MENU_HIGHSCORE:
@@ -466,6 +466,8 @@ LPErrInApp AppGfx::MainLoopEvent(SDL_Event* pEvent, SDL_AppResult& res) {
 
 LPErrInApp AppGfx::MainLoopIterate() {
     LPErrInApp err;
+    bool done = false;
+    
     switch (_histMenu.top()) {
         case MenuItemEnum::MENU_ROOT:
             if (!_p_MusicManager->IsPlayingMusic()) {
@@ -491,10 +493,14 @@ LPErrInApp AppGfx::MainLoopIterate() {
             break;
 
         case MenuItemEnum::MENU_CREDITS:
-            // TODO
-            // err = showCredits();
-            // if (err != NULL)
-            //     goto error;
+            err = _p_CreditsView->HandleIterate(done);
+            if (err != NULL)
+                return err;
+            if (done) {
+                LeaveMenu();
+                _p_MusicManager->PlayMusic(MusicManager::MUSIC_INIT_SND,
+                                           MusicManager::LOOP_ON);
+            }
             break;
 
         case MenuItemEnum::MENU_HIGHSCORE:
@@ -560,13 +566,16 @@ LPErrInApp AppGfx::showHighScore() {
 }
 
 LPErrInApp AppGfx::showCredits() {
+    if (_p_CreditsView->IsOngoing()) {
+        return NULL;
+    }
     if (_p_MusicManager->IsPlayingMusic()) {
         _p_MusicManager->StopMusic(600);
     }
     _p_CreditsView->Show(_p_Screen, _p_CreditTitle, _p_sdlRenderer);
-    LeaveMenu();
-    _p_MusicManager->PlayMusic(MusicManager::MUSIC_INIT_SND,
-                               MusicManager::LOOP_ON);
+    // LeaveMenu();
+    //_p_MusicManager->PlayMusic(MusicManager::MUSIC_INIT_SND,
+    //                            MusicManager::LOOP_ON);
     return NULL;
 }
 

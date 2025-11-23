@@ -1,9 +1,10 @@
+#include "Credits.h"
+
 #include <SDL3/SDL.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "Credits.h"
 #include "Fading.h"
 #include "GameSettings.h"
 #include "MusicManager.h"
@@ -136,123 +137,147 @@ char const chars[38][5][6] = {{".###.", "#..##", "#.#.#", "##..#", ".###."},
 
                               {"..#..", "..#..", ".....", ".....", "....."}};
 
-static void draw_text(const char* str, int scroll, SDL_Surface* screen);
-
-static int g_line = 0;
-
-CreditsView::CreditsView(){
+CreditsView::CreditsView() {
+    _scroll = 0;
+    _line = 0;
+    _state = READY_TO_START;
     _p_FadeAction = new FadeAction();
 }
 
-CreditsView::~CreditsView(){
+CreditsView::~CreditsView() {
     delete _p_FadeAction;
+    if (_p_ScreenTexture != NULL) {
+        SDL_DestroyTexture(_p_ScreenTexture);
+        _p_ScreenTexture = NULL;
+    }
 }
 
-void CreditsView::Show(SDL_Surface* p_surf_screen, SDL_Surface* pSurfTitle,
-             SDL_Renderer* psdlRenderer) {
-    bool done;
-    uint32_t scroll;
-    SDL_Rect src, dest;
-    SDL_Event event;
-    Uint64 last_time, now_time;
-    SDL_Keycode key;
-    LPGameSettings pGameSettings = GameSettings::GetSettings();
-    MusicManager* pMusicManager = pGameSettings->GetMusicManager();
-    FadeAction* pFadeAction = new FadeAction();
-
-    SDL_Texture* pScreenTexture =
-        SDL_CreateTextureFromSurface(psdlRenderer, p_surf_screen);
-
-    if (pGameSettings->InputType != InputTypeEnum::TouchWithoutMouse) {
-        pFadeAction->Fade(p_surf_screen, p_surf_screen, 2, 1, psdlRenderer, NULL);
-    } else {
-        pFadeAction->InstantFade(p_surf_screen);
-    }
-    pMusicManager->PlayMusic(MusicManager::MUSIC_CREDITS_SND,
-                             MusicManager::LOOP_ON);
-
-    dest.x = (p_surf_screen->w - pSurfTitle->w) / 2;
-    dest.y = 0;
-    dest.w = pSurfTitle->w;
-    dest.h = pSurfTitle->h;
-
-    SDL_BlitSurface(pSurfTitle, NULL, p_surf_screen, &dest);
-    done = 0;
-    scroll = 0;
-    g_line = 0;
-    bool ignoreMouseEvent =
-        pGameSettings->InputType == InputTypeEnum::TouchWithoutMouse;
-    do {
-        last_time = SDL_GetTicks();
-        while (SDL_PollEvent(&event) > 0) {
-            if (event.type == SDL_EVENT_KEY_DOWN) {
-                key = event.key.key;
-                if (key == SDLK_ESCAPE) {
-                    done = 1;
-                }
-            }
-            if (event.type == SDL_EVENT_FINGER_DOWN) {
-                done = true;
-            }
-            if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
-                if (ignoreMouseEvent) {
-                    break;
-                }
-                done = true;
-            }
+LPErrInApp CreditsView::HandleEvent(SDL_Event* pEvent) {
+    if (pEvent->type == SDL_EVENT_KEY_DOWN) {
+        if (pEvent->key.key == SDLK_ESCAPE) {
+            _state = CreditsView::DONE;
         }
+    }
+    if (pEvent->type == SDL_EVENT_FINGER_DOWN) {
+        _state = CreditsView::DONE;
+    }
+    if (pEvent->type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
+        if (_ignoreMouseEvent) {
+            return NULL;
+        }
+        _state = CreditsView::DONE;
+    }
+    return NULL;
+}
+
+LPErrInApp CreditsView::HandleIterate(bool& done) {
+    SDL_Rect src, dest;
+    Uint64 last_time, now_time;
+    done = false;
+
+    if (_state == CreditsView::INIT) {
+        _line = 0;
+        _scroll = 0;
+        if (_p_ScreenTexture != NULL) {
+            SDL_DestroyTexture(_p_ScreenTexture);
+        }
+        _p_ScreenTexture =
+            SDL_CreateTextureFromSurface(_p_sdlRenderer, _p_surfScreen);
+        if (!_ignoreMouseEvent) {
+            _p_FadeAction->Fade(_p_surfScreen, _p_surfScreen, 2, 1,
+                                _p_sdlRenderer, NULL);
+        } else {
+            _p_FadeAction->InstantFade(_p_surfScreen);
+        }
+        _p_MusicManager->PlayMusic(MusicManager::MUSIC_CREDITS_SND,
+                                   MusicManager::LOOP_ON);
+        _state = CreditsView::IN_PROGRESS;
+        return NULL;
+    }
+
+    if (_state == CreditsView::IN_PROGRESS) {
+        last_time = SDL_GetTicks();
+        dest.x = (_p_surfScreen->w - _p_SurfTitle->w) / 2;
+        dest.y = 0;
+        dest.w = _p_SurfTitle->w;
+        dest.h = _p_SurfTitle->h;
+
+        SDL_BlitSurface(_p_SurfTitle, NULL, _p_surfScreen, &dest);
 
         src.x = 0;
-        src.y = (pSurfTitle->h) + 2;
-        src.w = p_surf_screen->w;
-        src.h = p_surf_screen->h - (pSurfTitle->h);
+        src.y = (_p_SurfTitle->h) + 2;
+        src.w = _p_surfScreen->w;
+        src.h = _p_surfScreen->h - (_p_SurfTitle->h);
 
         dest.x = 0;
-        dest.y = (pSurfTitle->h);
+        dest.y = (_p_SurfTitle->h);
         dest.w = src.w;
         dest.h = src.h;
 
-        SDL_BlitSurface(p_surf_screen, &src, p_surf_screen, &dest);
+        SDL_BlitSurface(_p_surfScreen, &src, _p_surfScreen, &dest);
 
         dest.x = 0;
-        dest.y = (p_surf_screen->h) - 2;
-        dest.w = p_surf_screen->w;
+        dest.y = (_p_surfScreen->h) - 2;
+        dest.w = _p_surfScreen->w;
         dest.h = 2;
 
         SDL_FillSurfaceRect(
-            p_surf_screen, &dest,
-            SDL_MapRGB(SDL_GetPixelFormatDetails(p_surf_screen->format), NULL,
+            _p_surfScreen, &dest,
+            SDL_MapRGB(SDL_GetPixelFormatDetails(_p_surfScreen->format), NULL,
                        0, 0, 0));
-        scroll++;
+        _scroll++;
 
-        draw_text(credit_text[g_line], scroll, p_surf_screen);
+        draw_text(credit_text[_line]);
 
-        if (scroll >= 9) {
-            scroll = 0;
-            g_line++;
+        if (_scroll >= 9) {
+            _scroll = 0;
+            _line++;
 
-            if (credit_text[g_line] == NULL)
-                done = 1;
+            if (credit_text[_line] == NULL)
+                _state = CreditsView::DONE;
         }
-        SDL_UpdateTexture(pScreenTexture, NULL, p_surf_screen->pixels,
-                          p_surf_screen->pitch);
-        SDL_RenderTexture(psdlRenderer, pScreenTexture, NULL, NULL);
-        SDL_RenderPresent(psdlRenderer);
+        SDL_UpdateTexture(_p_ScreenTexture, NULL, _p_surfScreen->pixels,
+                          _p_surfScreen->pitch);
+        SDL_RenderTexture(_p_sdlRenderer, _p_ScreenTexture, NULL, NULL);
+        SDL_RenderPresent(_p_sdlRenderer);
+    }
 
+    if (_state == CreditsView::DONE) {
         now_time = SDL_GetTicks();
         if (now_time < last_time + (1000 / 20)) {
             SDL_Delay(last_time + (1000 / 20) - now_time);
         }
-    } while (!done);
+        _p_FadeAction->Fade(_p_surfScreen, _p_surfScreen, 1, 1, _p_sdlRenderer,
+                            NULL);
 
-    pFadeAction->Fade(p_surf_screen, p_surf_screen, 1, 1, psdlRenderer, NULL);
-
-    if (pMusicManager->IsPlayingMusic()) {
-        pMusicManager->StopMusic(300);
+        _state = CreditsView::TERMINATED;
     }
+
+    if (_state == CreditsView::TERMINATED) {
+        if (_p_MusicManager->IsPlayingMusic()) {
+            _p_MusicManager->StopMusic(300);
+        }
+        done = true;
+        _state = CreditsView::READY_TO_START;
+    }
+
+    return NULL;
 }
 
-static void draw_text(char const* str, int scroll, SDL_Surface* screen) {
+void CreditsView::Show(SDL_Surface* p_surf_screen, SDL_Surface* pSurfTitle,
+                       SDL_Renderer* psdlRenderer) {
+    _p_sdlRenderer = psdlRenderer;
+    _p_surfScreen = p_surf_screen;
+    _p_SurfTitle = pSurfTitle;
+
+    _p_GameSettings = GameSettings::GetSettings();
+    _p_MusicManager = _p_GameSettings->GetMusicManager();
+    _ignoreMouseEvent =
+        _p_GameSettings->InputType == InputTypeEnum::TouchWithoutMouse;
+    _state = CreditsView::INIT;
+}
+
+void CreditsView::draw_text(char const* str) {
     int i, c, x, y, cur_x, start, hilite;
     SDL_Rect dest;
     Uint8 r, g, b;
@@ -265,7 +290,7 @@ static void draw_text(char const* str, int scroll, SDL_Surface* screen) {
         hilite = 0;
     }
 
-    cur_x = (screen->w - ((strlen(str) - start) * 18)) / 2;
+    cur_x = (_p_surfScreen->w - ((strlen(str) - start) * 18)) / 2;
 
     for (i = start; i < (int)strlen(str); i++) {
         c = -1;
@@ -282,9 +307,9 @@ static void draw_text(char const* str, int scroll, SDL_Surface* screen) {
         if (c != -1) {
             for (y = 0; y < 5; y++) {
                 if (hilite == 0) {
-                    r = 255 - ((g_line * y) % 256);
+                    r = 255 - ((_line * y) % 256);
                     g = 255 / (y + 2);
-                    b = (g_line * g_line * 2) % 256;
+                    b = (_line * _line * 2) % 256;
                 } else {
                     r = 128;
                     g = 192;
@@ -294,16 +319,16 @@ static void draw_text(char const* str, int scroll, SDL_Surface* screen) {
                 for (x = 0; x < 5; x++) {
                     if (chars[c][y][x] == '#') {
                         dest.x = cur_x + (x * 3);
-                        dest.y = ((screen->h - (5 * 3)) + (y * 3) +
-                                  (18 - scroll * 2));
+                        dest.y = ((_p_surfScreen->h - (5 * 3)) + (y * 3) +
+                                  (18 - _scroll * 2));
                         dest.w = 3;
                         dest.h = 3;
 
                         SDL_FillSurfaceRect(
-                            screen, &dest,
-                            SDL_MapRGB(
-                                SDL_GetPixelFormatDetails(screen->format), NULL,
-                                r, g, b));
+                            _p_surfScreen, &dest,
+                            SDL_MapRGB(SDL_GetPixelFormatDetails(
+                                           _p_surfScreen->format),
+                                       NULL, r, g, b));
                     }
                 }
             }
