@@ -14,6 +14,7 @@ using namespace std;
 static char g_filepath[1024];
 
 HighScore::HighScore() {
+    _p_FadeAction = new FadeAction();
     for (int k = 0; k < 10; k++) {
         _scoreInfo[k].Score = 5940 - (k * 250);
         if (k > 1) {
@@ -29,6 +30,7 @@ HighScore::HighScore() {
 
 HighScore::~HighScore() {
     TRACE_DEBUG("HighScore destructor\n");
+    delete _p_FadeAction;
 }
 
 LPErrInApp HighScore::Save() {
@@ -145,15 +147,14 @@ LPErrInApp HighScore::Show(SDL_Surface* p_surf_screen, SDL_Surface* pSurfTitle,
     SDL_Keycode key;
     LPGameSettings pGameSettings = GameSettings::GetSettings();
     LPLanguages pLanguages = pGameSettings->GetLanguageMan();
-    FadeAction* pFadeAction = new FadeAction();
 
     SDL_Texture* pScreenTexture =
         SDL_CreateTextureFromSurface(psdlRenderer, p_surf_screen);
 
     if (pGameSettings->InputType != InputTypeEnum::TouchWithoutMouse) {
-        pFadeAction->Fade(p_surf_screen, p_surf_screen, 2, 1, psdlRenderer, NULL);
+        _p_FadeAction->Fade(p_surf_screen, p_surf_screen, 2, 1, psdlRenderer, NULL);
     } else {
-        pFadeAction->InstantFade(p_surf_screen);
+        _p_FadeAction->InstantFade(p_surf_screen);
     }
     MusicManager* pMusicManager = pGameSettings->GetMusicManager();
     pMusicManager->PlayMusic(MusicManager::MUSIC_CREDITS_SND,
@@ -273,7 +274,7 @@ LPErrInApp HighScore::Show(SDL_Surface* p_surf_screen, SDL_Surface* pSurfTitle,
         }
     } while (!done);
 
-    pFadeAction->Fade(p_surf_screen, p_surf_screen, 1, 1, psdlRenderer, NULL);
+    _p_FadeAction->Fade(p_surf_screen, p_surf_screen, 1, 1, psdlRenderer, NULL);
 
     return NULL;
 }

@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "Credits.h"
 #include "Fading.h"
 #include "GameSettings.h"
 #include "MusicManager.h"
@@ -139,7 +140,15 @@ static void draw_text(const char* str, int scroll, SDL_Surface* screen);
 
 static int g_line = 0;
 
-void credits(SDL_Surface* p_surf_screen, SDL_Surface* pSurfTitle,
+CreditsView::CreditsView(){
+    _p_FadeAction = new FadeAction();
+}
+
+CreditsView::~CreditsView(){
+    delete _p_FadeAction;
+}
+
+void CreditsView::Show(SDL_Surface* p_surf_screen, SDL_Surface* pSurfTitle,
              SDL_Renderer* psdlRenderer) {
     bool done;
     uint32_t scroll;

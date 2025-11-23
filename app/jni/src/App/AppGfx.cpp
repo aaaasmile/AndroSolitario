@@ -54,6 +54,7 @@ AppGfx::AppGfx() {
     _p_CreditTitle = 0;
     _fullScreen = false;
     _p_GameSettings = GameSettings::GetSettings();
+    _p_CreditsView = new CreditsView();
 }
 
 AppGfx::~AppGfx() { terminate(); }
@@ -292,6 +293,7 @@ LPErrInApp AppGfx::startGameLoop() {
 }
 
 void AppGfx::terminate() {
+    delete _p_CreditsView;
     SDL_ShowCursor();
 
     if (_p_Screen != NULL) {
@@ -561,7 +563,7 @@ LPErrInApp AppGfx::showCredits() {
     if (_p_MusicManager->IsPlayingMusic()) {
         _p_MusicManager->StopMusic(600);
     }
-    credits(_p_Screen, _p_CreditTitle, _p_sdlRenderer);
+    _p_CreditsView->Show(_p_Screen, _p_CreditTitle, _p_sdlRenderer);
     LeaveMenu();
     _p_MusicManager->PlayMusic(MusicManager::MUSIC_INIT_SND,
                                MusicManager::LOOP_ON);

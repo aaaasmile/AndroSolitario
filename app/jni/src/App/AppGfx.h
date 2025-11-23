@@ -19,6 +19,7 @@
 class MusicManager;
 class HighScore;
 class MenuMgr;
+class CreditsView;
 
 using namespace traits;
 
@@ -66,6 +67,7 @@ class AppGfx {
     MusicManager* _p_MusicManager;
     HighScore* _p_HighScore;
     MenuMgr* _p_MenuMgr;
+    CreditsView* _p_CreditsView;
 
     int _screenW;
     int _screenH;

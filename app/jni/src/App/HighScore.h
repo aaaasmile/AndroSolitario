@@ -9,6 +9,8 @@
 #include "ErrorInfo.h"
 #include "Languages.h"
 
+class FadeAction;
+
 typedef struct {
     std::string Name;
     uint16_t Score;
@@ -29,6 +31,7 @@ class HighScore {
 
    private:
     ScoreInfo _scoreInfo[NUMOFSCORE];
+    FadeAction* _p_FadeAction;
 };
 
 #endif

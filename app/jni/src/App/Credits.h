@@ -1,7 +1,16 @@
-#ifndef CREDITS_H
-#define CREDITS_H
+#ifndef CREDITS_H__
+#define CREDITS_H__
 
-void credits(SDL_Surface* screen, SDL_Surface* pSurfTitle,
-             SDL_Renderer* psdlRenderer);
+class FadeAction;
 
+class CreditsView {
+   public:
+    CreditsView();
+    ~CreditsView();
+    void Show(SDL_Surface* screen, SDL_Surface* pSurfTitle,
+              SDL_Renderer* psdlRenderer);
+
+   private:
+    FadeAction* _p_FadeAction;
+};
 #endif
