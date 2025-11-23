@@ -14,6 +14,8 @@
 class Languages;
 class LabelLinkGfx;
 class LabelGfx;
+class GameSettings;
+class MusicManager;
 
 using namespace traits;
 
@@ -25,7 +27,8 @@ class MenuMgr {
     virtual ~MenuMgr();
     LPErrInApp Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
                           SDL_Window* pWindow, MenuDelegator& menuDelegator);
-    LPErrInApp HandleRootMenu();
+    LPErrInApp HandleRootMenuEvent(SDL_Event* pEvent);
+    LPErrInApp HandleRootMenuIterate();
     void SetBackground(SDL_Surface* pVal) { _p_SceneBackground = pVal; }
 
    private:
@@ -58,6 +61,9 @@ class MenuMgr {
     SDL_Rect _rctPanelRedBox;
     LabelGfx* _p_LabelVersion;
     LabelLinkGfx* _p_homeUrl;
+    GameSettings* _p_GameSettings;
+    MusicManager* _p_MusicManager;
+    bool _ignoreMouseEvent;
 };
 
 #endif

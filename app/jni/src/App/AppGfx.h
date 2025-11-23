@@ -18,16 +18,18 @@
 
 class MusicManager;
 class HighScore;
+class MenuMgr;
 
 using namespace traits;
 
 class AppGfx {
-public:
+   public:
     AppGfx();
     ~AppGfx();
 
     LPErrInApp Init();
-    LPErrInApp MainLoop();
+    LPErrInApp MainLoopEvent(SDL_Event* pEvent, SDL_AppResult& res);
+    LPErrInApp MainLoopIterate();
     std::string GetPlayerName() { return _p_GameSettings->PlayerName; }
     void SetPlayerName(std::string strVal) {
         _p_GameSettings->PlayerName = strVal;
@@ -37,7 +39,7 @@ public:
     void SetNextMenu(MenuItemEnum menuItem) { _histMenu.push(menuItem); }
     LPErrInApp SettingsChanged(bool backGroundChanged, bool languageChanged);
 
-private:
+   private:
     LPErrInApp startGameLoop();
     LPErrInApp createWindow();
     void terminate();
@@ -52,7 +54,7 @@ private:
     void clearBackground();
     LPErrInApp loadSceneBackground();
 
-private:
+   private:
     SDL_Surface* _p_Screen;
     SDL_Surface* _p_SceneBackground;
     SDL_Surface* _p_CreditTitle;
@@ -63,7 +65,7 @@ private:
     SolitarioGfx* _p_SolitarioGfx;
     MusicManager* _p_MusicManager;
     HighScore* _p_HighScore;
-    
+    MenuMgr* _p_MenuMgr;
 
     int _screenW;
     int _screenH;

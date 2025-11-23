@@ -115,6 +115,17 @@ Nota che il programma va a finire di dafult nella directory ./build/src.
 Cambio la destinazione con set_target_properties in CMakeFiles.
 Gli asset li ho copiati con un post build command.
 
+### Main e uso di callbacks
+L'uso dei callbacks anzichè della funzione main, ha un senso per quanto riguarda
+l'implementazione in wasm, che utilizza un meccanismo di polling. Queste sono le callback
+che bisogna implementare:
+SDL_AppInit, SDL_AppEvent, SDL_AppIterate, and SDL_AppQuit
+Nel file main.cpp uso anche (nota l'utilizzo di SDL_MAIN_USE_CALLBACKS):
+
+    #define SDL_MAIN_USE_CALLBACKS 1
+    #include <SDL3/SDL_main.h>
+
+
 ## Compilazione con target Windows (MySys2)
 
     rm -r build

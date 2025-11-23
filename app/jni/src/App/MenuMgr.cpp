@@ -296,12 +296,16 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
 
     SDL_BlitSurface(_p_Screen, NULL, _p_ScreenBackbuffer, NULL);
 
+    _p_GameSettings = GameSettings::GetSettings();
+    _p_MusicManager = _p_GameSettings->GetMusicManager();
+    _ignoreMouseEvent =
+        pGameSettings->InputType == InputTypeEnum::TouchWithoutMouse;
+
     return NULL;
 }
 
 LPErrInApp MenuMgr::drawStaticScene() {
-    LPGameSettings pGameSettings = GameSettings::GetSettings();
-    LPLanguages pLanguages = pGameSettings->GetLanguageMan();
+    LPLanguages pLanguages = _p_GameSettings->GetLanguageMan();
     // function called in loop
     SDL_Rect rctTarget;
     LPErrInApp err = NULL;
@@ -326,7 +330,7 @@ LPErrInApp MenuMgr::drawStaticScene() {
     // header bar
     int hbarOffset = 0;
     int hbar = 46;
-    if (pGameSettings->NeedScreenMagnify()) {
+    if (_p_GameSettings->NeedScreenMagnify()) {
         hbar = 65;
     }
     GFX_UTIL::FillRect(_p_ScreenBackbuffer, _box_X, _box_Y - (2 + hbarOffset),
@@ -369,9 +373,8 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     int intraOffset = (_rctPanelRedBox.h - 80) / NumOfMenuItems;
     int minIntraOffsetY = 80;
     intraOffset = std::min(minIntraOffsetY, intraOffset);
-    LPGameSettings pGameSettings = GameSettings::GetSettings();
-    LPLanguages pLanguages = pGameSettings->GetLanguageMan();
-    if (pGameSettings->NeedScreenMagnify()) {
+    LPLanguages pLanguages = _p_GameSettings->GetLanguageMan();
+    if (_p_GameSettings->NeedScreenMagnify()) {
         intraOffset += 50;
     }
     if (_rctPanelRedBox.h <= 600) {
@@ -496,7 +499,102 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     return NULL;
 }
 
-LPErrInApp MenuMgr::HandleRootMenu() {
+LPErrInApp MenuMgr::HandleRootMenuEvent(SDL_Event* pEvent) {
+    SDL_Point touchLocation;
+
+    // TRACE_DEBUG("Ignore mouse events: %b", ignoreMouseEvent);
+
+    if (pEvent->type == SDL_EVENT_QUIT) {
+        (_menuDlgt.tc)->LeaveMenu(_menuDlgt.self);
+        return NULL;
+    }
+
+    if (pEvent->type == SDL_EVENT_FINGER_DOWN) {
+        _p_GameSettings->GetTouchPoint(pEvent->tfinger, &touchLocation);
+        TRACE_DEBUG("Tap in x=%d, y=%d\n", touchLocation.x, touchLocation.y);
+        MenuItemBox tapInfoBox;
+        if (g_MenuItemBoxes.IsPointInside(touchLocation, tapInfoBox)) {
+            _focusedMenuItem = tapInfoBox.MenuItem;
+            TRACE_DEBUG("Select menu %s from Tap down\n",
+                        MenuItemEnumToString(_focusedMenuItem));
+            rootMenuNext();
+        } else {
+            TRACE_DEBUG("Tap outside the menu list\n");
+            _focusedMenuItem = MenuItemEnum::NOTHING;
+        }
+    }
+
+    if (pEvent->type == SDL_EVENT_KEY_DOWN) {
+        if (pEvent->key.key == SDLK_UP) {
+            _focusedMenuItem = previousMenu(_focusedMenuItem);
+            if (_focusedMenuItem != MenuItemEnum::NOTHING) {
+                _p_MusicManager->PlayEffect(MusicManager::EFFECT_OVER);
+            }
+        }
+        if (pEvent->key.key == SDLK_DOWN) {
+            _focusedMenuItem = nextMenu(_focusedMenuItem);
+            if (_focusedMenuItem != MenuItemEnum::NOTHING) {
+                _p_MusicManager->PlayEffect(MusicManager::EFFECT_OVER);
+            }
+        }
+        if (pEvent->key.key == SDLK_RETURN) {
+            TRACE_DEBUG("Select menu from return\n");
+            rootMenuNext();
+        }
+        if (pEvent->key.key == SDLK_ESCAPE) {
+            (_menuDlgt.tc)->LeaveMenu(_menuDlgt.self);
+        }
+    }
+    if (pEvent->type == SDL_EVENT_MOUSE_MOTION) {
+        if (_ignoreMouseEvent) {
+            return NULL;
+        }
+        SDL_Point motionLocation;
+        motionLocation.x = (int)pEvent->motion.x;
+        motionLocation.y = (int)pEvent->motion.y;
+
+        MenuItemBox mouseInfoBox;
+        if (g_MenuItemBoxes.IsPointInside(motionLocation, mouseInfoBox)) {
+            _focusedMenuItem = mouseInfoBox.MenuItem;
+            if (_focusedMenuItem != MenuItemEnum::NOTHING &&
+                _focusedMenuItem != _prevFocusedMenuItem) {
+                _p_MusicManager->PlayEffect(MusicManager::EFFECT_OVER);
+                _prevFocusedMenuItem = _focusedMenuItem;
+            }
+        } else {
+            _focusedMenuItem = MenuItemEnum::NOTHING;
+        }
+        _p_homeUrl->MouseMove(*pEvent);
+    }
+    if (pEvent->type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
+        if (_ignoreMouseEvent) {
+            return NULL;
+        }
+        MenuItemBox mouseInfoBox;
+        SDL_Point clickLocation;
+        clickLocation.x = (int)pEvent->button.x;
+        clickLocation.y = (int)pEvent->button.y;
+
+        if (g_MenuItemBoxes.IsPointInside(clickLocation, mouseInfoBox)) {
+            _focusedMenuItem = mouseInfoBox.MenuItem;
+            TRACE_DEBUG("Select menu %s from mouse down\n",
+                        MenuItemEnumToString(_focusedMenuItem));
+            rootMenuNext();
+        } else {
+            TRACE_DEBUG("Mouse outside the menu list\n");
+            _focusedMenuItem = MenuItemEnum::NOTHING;
+        }
+    } else if (pEvent->type == SDL_EVENT_MOUSE_BUTTON_UP) {
+        if (_ignoreMouseEvent) {
+            return NULL;
+        }
+        _p_homeUrl->MouseUp(*pEvent);
+    }
+
+    return NULL;
+}
+
+LPErrInApp MenuMgr::HandleRootMenuIterate() {
     LPErrInApp err;
     // show the link url label
     _p_homeUrl->SetState(LabelLinkGfx::VISIBLE);
@@ -509,105 +607,6 @@ LPErrInApp MenuMgr::HandleRootMenu() {
     err = drawMenuTextList();
     if (err != NULL) {
         return err;
-    }
-
-    SDL_Point touchLocation;
-    SDL_Event event;
-    LPGameSettings pGameSettings = GameSettings::GetSettings();
-    MusicManager* pMusicManager = pGameSettings->GetMusicManager();
-    bool ignoreMouseEvent =
-        pGameSettings->InputType == InputTypeEnum::TouchWithoutMouse;
-    // TRACE_DEBUG("Ignore mouse events: %b", ignoreMouseEvent);
-    while (SDL_PollEvent(&event)) {
-        if (event.type == SDL_EVENT_QUIT) {
-            (_menuDlgt.tc)->LeaveMenu(_menuDlgt.self);
-            break;
-        }
-
-        if (event.type == SDL_EVENT_FINGER_DOWN) {
-            pGameSettings->GetTouchPoint(event.tfinger, &touchLocation);
-            TRACE_DEBUG("Tap in x=%d, y=%d\n", touchLocation.x,
-                        touchLocation.y);
-            MenuItemBox tapInfoBox;
-            if (g_MenuItemBoxes.IsPointInside(touchLocation, tapInfoBox)) {
-                _focusedMenuItem = tapInfoBox.MenuItem;
-                TRACE_DEBUG("Select menu %s from Tap down\n",
-                            MenuItemEnumToString(_focusedMenuItem));
-                rootMenuNext();
-            } else {
-                TRACE_DEBUG("Tap outside the menu list\n");
-                _focusedMenuItem = MenuItemEnum::NOTHING;
-            }
-        }
-
-        if (event.type == SDL_EVENT_KEY_DOWN) {
-            if (event.key.key == SDLK_UP) {
-                _focusedMenuItem = previousMenu(_focusedMenuItem);
-                if (_focusedMenuItem != MenuItemEnum::NOTHING) {
-                    pMusicManager->PlayEffect(MusicManager::EFFECT_OVER);
-                }
-            }
-            if (event.key.key == SDLK_DOWN) {
-                _focusedMenuItem = nextMenu(_focusedMenuItem);
-                if (_focusedMenuItem != MenuItemEnum::NOTHING) {
-                    pMusicManager->PlayEffect(MusicManager::EFFECT_OVER);
-                }
-            }
-            if (event.key.key == SDLK_RETURN) {
-                TRACE_DEBUG("Select menu from return\n");
-                rootMenuNext();
-            }
-            if (event.key.key == SDLK_ESCAPE) {
-                (_menuDlgt.tc)->LeaveMenu(_menuDlgt.self);
-            }
-        }
-        if (event.type == SDL_EVENT_MOUSE_MOTION) {
-            if (ignoreMouseEvent) {
-                break;
-            }
-            // SDL_Point motionLocation = {event.motion.x, event.motion.y}; SDL
-            // 2
-            SDL_Point motionLocation;
-            motionLocation.x = (int)event.motion.x;
-            motionLocation.y = (int)event.motion.y;
-
-            MenuItemBox mouseInfoBox;
-            if (g_MenuItemBoxes.IsPointInside(motionLocation, mouseInfoBox)) {
-                _focusedMenuItem = mouseInfoBox.MenuItem;
-                if (_focusedMenuItem != MenuItemEnum::NOTHING && 
-                    _focusedMenuItem != _prevFocusedMenuItem) {
-                    pMusicManager->PlayEffect(MusicManager::EFFECT_OVER);
-                    _prevFocusedMenuItem = _focusedMenuItem;
-                }    
-            } else {
-                _focusedMenuItem = MenuItemEnum::NOTHING;
-            }
-            _p_homeUrl->MouseMove(event);
-        }
-        if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
-            if (ignoreMouseEvent) {
-                break;
-            }
-            MenuItemBox mouseInfoBox;
-            SDL_Point clickLocation;
-            clickLocation.x = (int)event.button.x;
-            clickLocation.y = (int)event.button.y;
-
-            if (g_MenuItemBoxes.IsPointInside(clickLocation, mouseInfoBox)) {
-                _focusedMenuItem = mouseInfoBox.MenuItem;
-                TRACE_DEBUG("Select menu %s from mouse down\n",
-                            MenuItemEnumToString(_focusedMenuItem));
-                rootMenuNext();
-            } else {
-                TRACE_DEBUG("Mouse outside the menu list\n");
-                _focusedMenuItem = MenuItemEnum::NOTHING;
-            }
-        } else if (event.type == SDL_EVENT_MOUSE_BUTTON_UP) {
-            if (ignoreMouseEvent) {
-                break;
-            }
-            _p_homeUrl->MouseUp(event);
-        }
     }
     _p_homeUrl->Draw(_p_ScreenBackbuffer);
     _p_LabelVersion->Draw(_p_ScreenBackbuffer);

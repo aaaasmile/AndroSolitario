@@ -45,8 +45,8 @@ AppGfx::AppGfx() {
     _screenW = 1080;
     _screenH = 1920;
 #else
-    _screenH = 768; //960; //768;
-    _screenW = 1024;//540;//1024;
+    _screenH = 768;   // 960; //768;
+    _screenW = 1024;  // 540;//1024;
 #endif
     _Bpp = 0;
     _p_MusicManager = 0;
@@ -117,9 +117,9 @@ LPErrInApp AppGfx::Init() {
         psIcon, true,
         SDL_MapRGB(SDL_GetPixelFormatDetails(psIcon->format), NULL, 0, 128, 0));
 #if HASWINICON
-    if (!SDL_SetWindowIcon(_p_Window, psIcon)){
+    if (!SDL_SetWindowIcon(_p_Window, psIcon)) {
         return ERR_UTIL::ErrorCreate("Couldn't set icon on window: %s\n",
-                                         SDL_GetError());
+                                     SDL_GetError());
     }
 #endif
     _p_CreditTitle = IMG_Load(g_lpszTitleFile);
@@ -148,7 +148,26 @@ LPErrInApp AppGfx::Init() {
     }
     _p_MusicManager = _p_GameSettings->GetMusicManager();
     err = _p_MusicManager->LoadMusicRes();
-    return err;
+    if (err != NULL) {
+        return err;
+    }
+
+    _p_MenuMgr = new MenuMgr();
+    MenuDelegator delegator = prepMenuDelegator();
+    err =
+        _p_MenuMgr->Initialize(_p_Screen, _p_sdlRenderer, _p_Window, delegator);
+    if (err != NULL) {
+        return err;
+    }
+    // set main menu
+    _histMenu.push(MenuItemEnum::QUIT);
+    _histMenu.push(MenuItemEnum::MENU_ROOT);
+
+    _p_MenuMgr->SetBackground(_p_SceneBackground);
+    if (err != NULL) {
+        return err;
+    }
+    return NULL;
 }
 
 LPErrInApp AppGfx::loadSceneBackground() {
@@ -313,6 +332,10 @@ void AppGfx::terminate() {
     if (_p_ScreenTexture != NULL) {
         SDL_DestroyTexture(_p_ScreenTexture);
     }
+    if (_p_MenuMgr != NULL) {
+        delete _p_MenuMgr;
+        _p_MenuMgr = NULL;
+    }
 
     delete _p_SolitarioGfx;
     delete _p_HighScore;
@@ -339,7 +362,7 @@ LPErrInApp AppGfx::loadProfile() {
 
     TRACE("Load profile\n");
     err = _p_GameSettings->LoadSettings();
-    if (err != NULL){
+    if (err != NULL) {
         TRACE("Ignore settings because error: %s\n", err->ErrorText.c_str());
     }
     return NULL;
@@ -396,88 +419,130 @@ void AppGfx::clearBackground() {
     updateScreenTexture();
 }
 
-LPErrInApp AppGfx::MainLoop() {
+LPErrInApp AppGfx::MainLoopEvent(SDL_Event* pEvent, SDL_AppResult& res) {
     LPErrInApp err;
-    bool quit = false;
+    res = SDL_APP_CONTINUE;
 
-    MenuMgr* pMenuMgr = new MenuMgr();
-    MenuDelegator delegator = prepMenuDelegator();
-    err = pMenuMgr->Initialize(_p_Screen, _p_sdlRenderer, _p_Window, delegator);
-    if (err != NULL)
-        goto error;
+    switch (_histMenu.top()) {
+        case MenuItemEnum::MENU_ROOT:
+            err = _p_MenuMgr->HandleRootMenuEvent(pEvent);
+            if (err != NULL)
+                return err;
+            break;
 
-    // set main menu
-    _histMenu.push(MenuItemEnum::QUIT);
-    _histMenu.push(MenuItemEnum::MENU_ROOT);
+        case MenuItemEnum::MENU_GAME:
+            TRACE("TODO: menu game event \n");
+            LeaveMenu();  // TODO
+            // err = startGameLoop();
+            // if (err != NULL)
+            //     return err;
+            // TRACE("Exit from game loop \n");
+            // LeaveMenu();
+            break;
 
-    pMenuMgr->SetBackground(_p_SceneBackground);
+        case MenuItemEnum::MENU_HELP:
+            err = showHelp();
+            if (err != NULL)
+                return err;
+            break;
 
-    while (!quit && !_histMenu.empty()) {
-        switch (_histMenu.top()) {
-            case MenuItemEnum::MENU_ROOT:
-                if (!_p_MusicManager->IsPlayingMusic()) {
-                    _p_MusicManager->PlayMusic(MusicManager::MUSIC_INIT_SND,
-                                               MusicManager::LOOP_ON);
-                }
-                err = pMenuMgr->HandleRootMenu();
-                if (err != NULL)
-                    goto error;
-                break;
+        case MenuItemEnum::MENU_CREDITS:
+            TRACE("TODO: menu credits event \n");
+            LeaveMenu();  // TODO
+            // err = showCredits();
+            // if (err != NULL)
+            //     return err;
+            break;
 
-            case MenuItemEnum::MENU_GAME:
-                err = startGameLoop();
-                if (err != NULL)
-                    goto error;
-                TRACE("Exit from game loop \n");
-                LeaveMenu();
-                break;
+        case MenuItemEnum::MENU_HIGHSCORE:
+            TRACE("TODO: menu high score event \n");
+            LeaveMenu();  // TODO
+            // err = showHighScore();
+            // if (err != NULL)
+            //     return err;
+            break;
 
-            case MenuItemEnum::MENU_HELP:
-                err = showHelp();
-                if (err != NULL)
-                    goto error;
-                break;
+        case MenuItemEnum::MENU_OPTIONS:
+            TRACE("TODO: menu options event \n");
+            LeaveMenu();  // TODO
+            // _backGroundChanged = false;
+            // err = showGeneralOptions();
+            // if (err != NULL)
+            //     return err;
+            // if (_backGroundChanged) {
+            //     err = loadSceneBackground();
+            //     if (err)
+            //         return err;
+            //     _p_MenuMgr->SetBackground(_p_SceneBackground);
+            //     _backGroundChanged = false;
+            // }
+            break;
 
-            case MenuItemEnum::MENU_CREDITS:
-                err = showCredits();
-                if (err != NULL)
-                    goto error;
-                break;
-
-            case MenuItemEnum::MENU_HIGHSCORE:
-                err = showHighScore();
-                if (err != NULL)
-                    goto error;
-                break;
-
-            case MenuItemEnum::MENU_OPTIONS:
-                _backGroundChanged = false;
-                err = showGeneralOptions();
-                if (err != NULL)
-                    goto error;
-                if (_backGroundChanged) {
-                    err = loadSceneBackground();
-                    if (err)
-                        goto error;
-                    pMenuMgr->SetBackground(_p_SceneBackground);
-                    _backGroundChanged = false;
-                }
-                break;
-
-            case MenuItemEnum::QUIT:
-            default:
-                TRACE("Quit Menu \n");
-                quit = true;
-                break;
-        }
-
-        updateScreenTexture();
+        case MenuItemEnum::QUIT:
+        default:
+            TRACE("Quit Menu \n");
+            res = SDL_APP_SUCCESS;
+            break;
     }
-    delete pMenuMgr;
     return NULL;
-error:
-    delete pMenuMgr;
-    return err;
+}
+
+LPErrInApp AppGfx::MainLoopIterate() {
+    LPErrInApp err;
+    switch (_histMenu.top()) {
+        case MenuItemEnum::MENU_ROOT:
+            if (!_p_MusicManager->IsPlayingMusic()) {
+                _p_MusicManager->PlayMusic(MusicManager::MUSIC_INIT_SND,
+                                           MusicManager::LOOP_ON);
+            }
+            err = _p_MenuMgr->HandleRootMenuIterate();
+            if (err != NULL)
+                return err;
+            break;
+
+        case MenuItemEnum::MENU_GAME:
+            // TODO
+            // err = startGameLoop();
+            // if (err != NULL)
+            //     goto error;
+            // TRACE("Exit from game loop \n");
+            // LeaveMenu();
+            break;
+
+        case MenuItemEnum::MENU_HELP:
+            // Nothing to render
+            break;
+
+        case MenuItemEnum::MENU_CREDITS:
+            // TODO
+            // err = showCredits();
+            // if (err != NULL)
+            //     goto error;
+            break;
+
+        case MenuItemEnum::MENU_HIGHSCORE:
+            // TODO
+            // err = showHighScore();
+            // if (err != NULL)
+            //     goto error;
+            break;
+
+        case MenuItemEnum::MENU_OPTIONS:
+            // TODO
+            // _backGroundChanged = false;
+            // err = showGeneralOptions();
+            // if (err != NULL)
+            //     goto error;
+            // if (_backGroundChanged) {
+            //     err = loadSceneBackground();
+            //     if (err)
+            //         goto error;
+            //     pMenuMgr->SetBackground(_p_SceneBackground);
+            //     _backGroundChanged = false;
+            // }
+            break;
+    }
+    return NULL;
 }
 
 LPErrInApp AppGfx::showHelp() {
