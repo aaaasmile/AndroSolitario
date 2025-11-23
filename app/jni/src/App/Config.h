@@ -19,12 +19,14 @@
     #define PLATFORM_APPLE 1
 #endif
 
+#if PLATFORM_EMS
+    #define HASWINICON 0
+    #define HASQUITMENU 0 
+    #define HASHELPMENU 0
+#endif
+
 #ifndef HASWINICON
-    #ifdef PLATFORM_EMS
-        #define HASWINICON 0  // no icon in emscripten
-    #else
-        #define HASWINICON 1  
-    #endif
+    #define HASWINICON 1  
 #endif
 
 #ifndef HASQUITMENU

@@ -636,12 +636,22 @@ MenuItemEnum previousMenu(MenuItemEnum currMenu) {
             return MenuItemEnum::MENU_OPTIONS;
         case MenuItemEnum::MENU_HELP:
             return MenuItemEnum::MENU_CREDITS;
+#if HASHELPMENU
         case MenuItemEnum::MENU_HIGHSCORE:
             return MenuItemEnum::MENU_HELP;
+#else
+           case MenuItemEnum::MENU_HIGHSCORE:
+            return MenuItemEnum::MENU_CREDITS;
+#endif
         case MenuItemEnum::QUIT:
             return MenuItemEnum::MENU_HIGHSCORE;
+#if HASQUITMENU
         case MenuItemEnum::NOTHING:
             return MenuItemEnum::QUIT;
+#else
+        case MenuItemEnum::NOTHING:
+            return MenuItemEnum::MENU_HIGHSCORE;
+#endif
         default:
             return currMenu;
     }
@@ -654,12 +664,22 @@ MenuItemEnum nextMenu(MenuItemEnum currMenu) {
             return MenuItemEnum::MENU_OPTIONS;
         case MenuItemEnum::MENU_OPTIONS:
             return MenuItemEnum::MENU_CREDITS;
+#if HASHELPMENU
         case MenuItemEnum::MENU_CREDITS:
             return MenuItemEnum::MENU_HELP;
+#else
+        case MenuItemEnum::MENU_CREDITS:
+            return MenuItemEnum::MENU_HIGHSCORE;
+#endif
         case MenuItemEnum::MENU_HELP:
             return MenuItemEnum::MENU_HIGHSCORE;
+#if HASQUITMENU
         case MenuItemEnum::MENU_HIGHSCORE:
             return MenuItemEnum::QUIT;
+#else
+        case MenuItemEnum::MENU_HIGHSCORE:
+            return MenuItemEnum::NOTHING;
+#endif
         case MenuItemEnum::QUIT:
             return MenuItemEnum::QUIT;
         case MenuItemEnum::NOTHING:

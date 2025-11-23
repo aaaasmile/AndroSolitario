@@ -397,12 +397,13 @@ LPErrInApp AppGfx::MainLoopEvent(SDL_Event* pEvent, SDL_AppResult& res) {
             // TRACE("Exit from game loop \n");
             // LeaveMenu();
             break;
-
+#if HASHELPMENU
         case MenuItemEnum::MENU_HELP:
             err = showHelp();
             if (err != NULL)
                 return err;
             break;
+#endif
 
         case MenuItemEnum::MENU_CREDITS:
             err = showCredits();
@@ -506,6 +507,12 @@ LPErrInApp AppGfx::MainLoopIterate() {
             //     pMenuMgr->SetBackground(_p_SceneBackground);
             //     _backGroundChanged = false;
             // }
+            break;
+        case MenuItemEnum::NOTHING:
+            break;
+        case MenuItemEnum::QUIT:
+            break;
+        default:
             break;
     }
     return NULL;

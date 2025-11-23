@@ -1,5 +1,5 @@
 #ifndef FADING_H___
-#define FADING_H__
+#define FADING_H___
 
 #include <SDL3/SDL.h>
 #include <stdio.h>
