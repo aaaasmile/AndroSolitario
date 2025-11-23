@@ -172,8 +172,10 @@ LPErrInApp CreditsView::HandleEvent(SDL_Event* pEvent) {
 
 LPErrInApp CreditsView::HandleIterate(bool& done) {
     SDL_Rect src, dest;
-    Uint64 last_time, now_time;
     done = false;
+    if (_state == CreditsView::READY_TO_START){
+        return NULL;
+    }
 
     if (_state == CreditsView::INIT) {
         _line = 0;
@@ -196,7 +198,6 @@ LPErrInApp CreditsView::HandleIterate(bool& done) {
     }
 
     if (_state == CreditsView::IN_PROGRESS) {
-        last_time = SDL_GetTicks();
         dest.x = (_p_surfScreen->w - _p_SurfTitle->w) / 2;
         dest.y = 0;
         dest.w = _p_SurfTitle->w;
@@ -243,10 +244,7 @@ LPErrInApp CreditsView::HandleIterate(bool& done) {
     }
 
     if (_state == CreditsView::DONE) {
-        now_time = SDL_GetTicks();
-        if (now_time < last_time + (1000 / 20)) {
-            SDL_Delay(last_time + (1000 / 20) - now_time);
-        }
+        TRACE("CreditsView done \n");
         _p_FadeAction->Fade(_p_surfScreen, _p_surfScreen, 1, 1, _p_sdlRenderer,
                             NULL);
 
@@ -257,6 +255,7 @@ LPErrInApp CreditsView::HandleIterate(bool& done) {
         if (_p_MusicManager->IsPlayingMusic()) {
             _p_MusicManager->StopMusic(300);
         }
+        TRACE("CreditsView terminated \n");
         done = true;
         _state = CreditsView::READY_TO_START;
     }

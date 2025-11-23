@@ -50,6 +50,7 @@ class AppGfx {
     LPErrInApp showCredits();
     LPErrInApp showHighScore();
     LPErrInApp showGeneralOptions();
+    void backToMenuRootWithMusic();
 
     MenuDelegator prepMenuDelegator();
     void clearBackground();

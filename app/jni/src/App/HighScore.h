@@ -10,6 +10,8 @@
 #include "Languages.h"
 
 class FadeAction;
+class MusicManager;
+class GameSettings;
 
 typedef struct {
     std::string Name;
@@ -19,6 +21,7 @@ typedef struct {
 
 class HighScore {
     enum { NUMOFSCORE = 10 };
+    enum eState { READY_TO_START, INIT, IN_PROGRESS, DONE, TERMINATED };
 
    public:
     HighScore();
@@ -28,10 +31,24 @@ class HighScore {
     LPErrInApp SaveScore(int score, int numCard);
     LPErrInApp Show(SDL_Surface* screen, SDL_Surface* pSurfTitle,
                     SDL_Renderer* psdlRenderer);
+    LPErrInApp HandleEvent(SDL_Event* pEvent);
+    LPErrInApp HandleIterate(bool& done);
+    bool IsOngoing() {
+        return (_state == INIT || _state == IN_PROGRESS || _state == DONE);
+    }
 
    private:
     ScoreInfo _scoreInfo[NUMOFSCORE];
     FadeAction* _p_FadeAction;
+    SDL_Renderer* _p_sdlRenderer;
+    SDL_Surface* _p_surfScreen;
+    SDL_Surface* _p_SurfTitle;
+    SDL_Texture* _p_ScreenTexture;
+    eState _state;
+    GameSettings* _p_GameSettings;
+    MusicManager* _p_MusicManager;
+    bool _ignoreMouseEvent;
+    Uint64 _start_time;
 };
 
 #endif

@@ -31,6 +31,10 @@ HighScore::HighScore() {
 HighScore::~HighScore() {
     TRACE_DEBUG("HighScore destructor\n");
     delete _p_FadeAction;
+    if (_p_ScreenTexture != NULL) {
+        SDL_DestroyTexture(_p_ScreenTexture);
+        _p_ScreenTexture = NULL;
+    }
 }
 
 LPErrInApp HighScore::Save() {
@@ -139,92 +143,71 @@ LPErrInApp HighScore::Load() {
     return NULL;
 }
 
-LPErrInApp HighScore::Show(SDL_Surface* p_surf_screen, SDL_Surface* pSurfTitle,
-                           SDL_Renderer* psdlRenderer) {
+LPErrInApp HighScore::HandleIterate(bool& done) {
     SDL_Rect dest;
-    SDL_Event event;
-    Uint64 last_time, now_time;
-    SDL_Keycode key;
-    LPGameSettings pGameSettings = GameSettings::GetSettings();
-    LPLanguages pLanguages = pGameSettings->GetLanguageMan();
-
-    SDL_Texture* pScreenTexture =
-        SDL_CreateTextureFromSurface(psdlRenderer, p_surf_screen);
-
-    if (pGameSettings->InputType != InputTypeEnum::TouchWithoutMouse) {
-        _p_FadeAction->Fade(p_surf_screen, p_surf_screen, 2, 1, psdlRenderer, NULL);
-    } else {
-        _p_FadeAction->InstantFade(p_surf_screen);
+    if (_state == HighScore::READY_TO_START) {
+        return NULL;
     }
-    MusicManager* pMusicManager = pGameSettings->GetMusicManager();
-    pMusicManager->PlayMusic(MusicManager::MUSIC_CREDITS_SND,
-                             MusicManager::LOOP_ON);
 
-    dest.x = (p_surf_screen->w - pSurfTitle->w) / 2;
-    dest.y = 0;
-    dest.w = pSurfTitle->w;
-    dest.h = pSurfTitle->h;
-
-    SDL_BlitSurface(pSurfTitle, NULL, p_surf_screen, &dest);
-    bool done = false;
-    Uint64 start_time = SDL_GetTicks();
-    bool ignoreMouseEvent =
-        pGameSettings->InputType == InputTypeEnum::TouchWithoutMouse;
-    do {
-        last_time = SDL_GetTicks();
-
-        while (SDL_PollEvent(&event) > 0) {
-            if (event.type == SDL_EVENT_QUIT) {
-                done = true;
-            } else if (event.type == SDL_EVENT_KEY_DOWN) {
-                key = event.key.key;
-
-                if (key == SDLK_ESCAPE) {
-                    done = true;
-                }
-            }
-            if (event.type == SDL_EVENT_FINGER_DOWN) {
-                done = true;
-            }
-            if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
-                if (ignoreMouseEvent) {
-                    break;
-                }
-                done = true;
-            }
+    if (_state == HighScore::INIT) {
+        if (_p_ScreenTexture != NULL) {
+            SDL_DestroyTexture(_p_ScreenTexture);
         }
+        _p_ScreenTexture =
+            SDL_CreateTextureFromSurface(_p_sdlRenderer, _p_surfScreen);
+        if (!_ignoreMouseEvent) {
+            _p_FadeAction->Fade(_p_surfScreen, _p_surfScreen, 2, 1,
+                                _p_sdlRenderer, NULL);
+        } else {
+            _p_FadeAction->InstantFade(_p_surfScreen);
+        }
+        _p_MusicManager->PlayMusic(MusicManager::MUSIC_CREDITS_SND,
+                                   MusicManager::LOOP_ON);
+        _state = HighScore::IN_PROGRESS;
+        return NULL;
+    }
+
+    if (_state == HighScore::IN_PROGRESS) {
+        Uint64 last_time = SDL_GetTicks();
+        dest.x = (_p_surfScreen->w - _p_SurfTitle->w) / 2;
+        dest.y = 0;
+        dest.w = _p_SurfTitle->w;
+        dest.h = _p_SurfTitle->h;
+
+        SDL_BlitSurface(_p_SurfTitle, NULL, _p_surfScreen, &dest);
         int ax = 70;
         int bx = 300;
         int cx = 100;
         int dx = 30;
         int ex = 50;
-        if (pGameSettings->NeedScreenMagnify()) {
+        if (_p_GameSettings->NeedScreenMagnify()) {
             ax = 100;
             bx = 550;
             cx = 180;
             dx = 50;
             ex = 100;
         }
-        int xIni = (p_surf_screen->w - (ax + bx + cx + dx + ex)) / 2;
+        int xIni = (_p_surfScreen->w - (ax + bx + cx + dx + ex)) / 2;
         int yIni = 200;
         int xOff, yOff;
         char buff[256];
         xOff = 0;
         yOff = 0;
-        TTF_Font* pFont = pGameSettings->GetFontAriblk();
-        TTF_Font* pFont2 = pGameSettings->GetFontVera();
+        TTF_Font* pFont = _p_GameSettings->GetFontAriblk();
+        TTF_Font* pFont2 = _p_GameSettings->GetFontVera();
+        LPLanguages pLanguages = _p_GameSettings->GetLanguageMan();
 
         xOff += ax;
         SDL_Color txtColor = GFX_UTIL_COLOR::Gray;
-        GFX_UTIL::DrawString(p_surf_screen,
+        GFX_UTIL::DrawString(_p_surfScreen,
                              pLanguages->GetCStringId(Languages::NAME),
                              xIni + xOff, yIni + yOff, txtColor, pFont2);
         xOff += bx;
-        GFX_UTIL::DrawString(p_surf_screen,
+        GFX_UTIL::DrawString(_p_surfScreen,
                              pLanguages->GetCStringId(Languages::POINTS),
                              xIni + xOff, yIni + yOff, txtColor, pFont2);
         xOff += cx;
-        GFX_UTIL::DrawString(p_surf_screen,
+        GFX_UTIL::DrawString(_p_surfScreen,
                              pLanguages->GetCStringId(Languages::CARDDECK),
                              xIni + xOff, yIni + yOff, txtColor, pFont2);
         yOff += dx;
@@ -241,40 +224,86 @@ LPErrInApp HighScore::Show(SDL_Surface* p_surf_screen, SDL_Surface* pSurfTitle,
             } else {
                 txtColor = GFX_UTIL_COLOR::White;
             }
-            GFX_UTIL::DrawString(p_surf_screen, buff, xIni + xOff, yIni + yOff,
+            GFX_UTIL::DrawString(_p_surfScreen, buff, xIni + xOff, yIni + yOff,
                                  txtColor, pFont);
             xOff += ax;
-            GFX_UTIL::DrawString(p_surf_screen, _scoreInfo[i].Name.c_str(),
+            GFX_UTIL::DrawString(_p_surfScreen, _scoreInfo[i].Name.c_str(),
                                  xIni + xOff, yIni + yOff, txtColor, pFont);
             xOff += bx;
             snprintf(buff, sizeof(buff), "%d", _scoreInfo[i].Score);
-            GFX_UTIL::DrawString(p_surf_screen, buff, xIni + xOff, yIni + yOff,
+            GFX_UTIL::DrawString(_p_surfScreen, buff, xIni + xOff, yIni + yOff,
                                  txtColor, pFont);
             xOff += cx;
             snprintf(buff, sizeof(buff), "%d", _scoreInfo[i].NumCard);
-            GFX_UTIL::DrawString(p_surf_screen, buff, xIni + xOff, yIni + yOff,
+            GFX_UTIL::DrawString(_p_surfScreen, buff, xIni + xOff, yIni + yOff,
                                  txtColor, pFont);
             yOff += ex;
             xOff = 0;
         }
 
-        SDL_UpdateTexture(pScreenTexture, NULL, p_surf_screen->pixels,
-                          p_surf_screen->pitch);
-        SDL_RenderTexture(psdlRenderer, pScreenTexture, NULL, NULL);
-        SDL_RenderPresent(psdlRenderer);
+        SDL_UpdateTexture(_p_ScreenTexture, NULL, _p_surfScreen->pixels,
+                          _p_surfScreen->pitch);
+        SDL_RenderTexture(_p_sdlRenderer, _p_ScreenTexture, NULL, NULL);
+        SDL_RenderPresent(_p_sdlRenderer);
 
-        now_time = SDL_GetTicks();
+        Uint64 now_time = SDL_GetTicks();
         if (now_time < last_time + (1000 / 20)) {
             SDL_Delay(last_time + (1000 / 20) - now_time);
         }
-        uint32_t elapsed_sec = (now_time / 1000) - (start_time / 1000);
+        uint32_t elapsed_sec = (now_time / 1000) - (_start_time / 1000);
         if (elapsed_sec > 30) {
             TRACE_DEBUG("after 30 sec, time to exit from high score\n");
-            done = true;
+            _state = HighScore::DONE;
         }
-    } while (!done);
 
-    _p_FadeAction->Fade(p_surf_screen, p_surf_screen, 1, 1, psdlRenderer, NULL);
+        return NULL;
+    }
 
+    if (_state == HighScore::DONE) {
+        _p_FadeAction->Fade(_p_surfScreen, _p_surfScreen, 1, 1, _p_sdlRenderer,
+                            NULL);
+        _state = HighScore::TERMINATED;
+        return NULL;
+    }
+
+    if (_state == HighScore::TERMINATED) {
+        done = true;
+        _state = HighScore::READY_TO_START;
+        return NULL;
+    }
+
+    return NULL;
+}
+
+LPErrInApp HighScore::HandleEvent(SDL_Event* pEvent) {
+    if (pEvent->type == SDL_EVENT_KEY_DOWN) {
+        if (pEvent->key.key == SDLK_ESCAPE) {
+            _state = HighScore::DONE;
+        }
+    }
+    if (pEvent->type == SDL_EVENT_FINGER_DOWN) {
+        _state = HighScore::DONE;
+    }
+    if (pEvent->type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
+        if (_ignoreMouseEvent) {
+            return NULL;
+        }
+        _state = HighScore::DONE;
+    }
+    return NULL;
+}
+
+LPErrInApp HighScore::Show(SDL_Surface* p_surf_screen, SDL_Surface* pSurfTitle,
+                           SDL_Renderer* psdlRenderer) {
+    _p_sdlRenderer = psdlRenderer;
+    _p_surfScreen = p_surf_screen;
+    _p_SurfTitle = pSurfTitle;
+    _start_time = SDL_GetTicks();
+
+    _p_GameSettings = GameSettings::GetSettings();
+    _p_MusicManager = _p_GameSettings->GetMusicManager();
+    _ignoreMouseEvent =
+        _p_GameSettings->InputType == InputTypeEnum::TouchWithoutMouse;
+    _state = HighScore::INIT;
     return NULL;
 }

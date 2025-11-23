@@ -273,24 +273,6 @@ LPErrInApp AppGfx::createWindow() {
     return NULL;
 }
 
-LPErrInApp AppGfx::startGameLoop() {
-    TRACE("Start Game Loop\n");
-    _p_MusicManager->StopMusic(700);
-
-    LPErrInApp err;
-    if (_p_SolitarioGfx != NULL) {
-        delete _p_SolitarioGfx;
-    }
-    _p_SolitarioGfx = new SolitarioGfx();
-
-    err = _p_SolitarioGfx->Initialize(_p_Screen, _p_sdlRenderer, _p_Window,
-                                      _p_SceneBackground, _p_HighScore);
-    if (err != NULL)
-        return err;
-
-    return _p_SolitarioGfx->StartGameLoop();
-}
-
 void AppGfx::terminate() {
     delete _p_CreditsView;
     SDL_ShowCursor();
@@ -432,11 +414,12 @@ LPErrInApp AppGfx::MainLoopEvent(SDL_Event* pEvent, SDL_AppResult& res) {
             break;
 
         case MenuItemEnum::MENU_HIGHSCORE:
-            TRACE("TODO: menu high score event \n");
-            LeaveMenu();  // TODO
-            // err = showHighScore();
-            // if (err != NULL)
-            //     return err;
+            err = showHighScore();
+            if (err != NULL)
+                return err;
+            err = _p_HighScore->HandleEvent(pEvent);
+            if (err != NULL)
+                return err;
             break;
 
         case MenuItemEnum::MENU_OPTIONS:
@@ -467,7 +450,7 @@ LPErrInApp AppGfx::MainLoopEvent(SDL_Event* pEvent, SDL_AppResult& res) {
 LPErrInApp AppGfx::MainLoopIterate() {
     LPErrInApp err;
     bool done = false;
-    
+
     switch (_histMenu.top()) {
         case MenuItemEnum::MENU_ROOT:
             if (!_p_MusicManager->IsPlayingMusic()) {
@@ -497,17 +480,17 @@ LPErrInApp AppGfx::MainLoopIterate() {
             if (err != NULL)
                 return err;
             if (done) {
-                LeaveMenu();
-                _p_MusicManager->PlayMusic(MusicManager::MUSIC_INIT_SND,
-                                           MusicManager::LOOP_ON);
+                backToMenuRootWithMusic();
             }
             break;
 
         case MenuItemEnum::MENU_HIGHSCORE:
-            // TODO
-            // err = showHighScore();
-            // if (err != NULL)
-            //     goto error;
+            err = _p_HighScore->HandleIterate(done);
+            if (err != NULL)
+                return err;
+            if (done) {
+                backToMenuRootWithMusic();
+            }
             break;
 
         case MenuItemEnum::MENU_OPTIONS:
@@ -526,6 +509,32 @@ LPErrInApp AppGfx::MainLoopIterate() {
             break;
     }
     return NULL;
+}
+
+void AppGfx::backToMenuRootWithMusic() {
+    LeaveMenu();
+    _p_MusicManager->PlayMusic(MusicManager::MUSIC_INIT_SND,
+                               MusicManager::LOOP_ON);
+}
+
+LPErrInApp AppGfx::startGameLoop() {
+    TRACE("Start Game Loop\n");
+    if (_p_MusicManager->IsPlayingMusic()) {
+        _p_MusicManager->StopMusic(600);
+    }
+
+    LPErrInApp err;
+    if (_p_SolitarioGfx != NULL) {
+        delete _p_SolitarioGfx;
+    }
+    _p_SolitarioGfx = new SolitarioGfx();
+
+    err = _p_SolitarioGfx->Initialize(_p_Screen, _p_sdlRenderer, _p_Window,
+                                      _p_SceneBackground, _p_HighScore);
+    if (err != NULL)
+        return err;
+
+    return _p_SolitarioGfx->StartGameLoop();
 }
 
 LPErrInApp AppGfx::showHelp() {
@@ -549,18 +558,13 @@ LPErrInApp AppGfx::showHelp() {
 }
 
 LPErrInApp AppGfx::showHighScore() {
+    if (_p_HighScore->IsOngoing()) {
+        return NULL;
+    }
     if (_p_MusicManager->IsPlayingMusic()) {
         _p_MusicManager->StopMusic(600);
     }
     _p_HighScore->Show(_p_Screen, _p_CreditTitle, _p_sdlRenderer);
-
-    LeaveMenu();
-
-    if (_p_MusicManager->IsPlayingMusic()) {
-        _p_MusicManager->StopMusic(300);
-        _p_MusicManager->PlayMusic(MusicManager::MUSIC_INIT_SND,
-                                   MusicManager::LOOP_ON);
-    }
 
     return NULL;
 }
@@ -573,9 +577,7 @@ LPErrInApp AppGfx::showCredits() {
         _p_MusicManager->StopMusic(600);
     }
     _p_CreditsView->Show(_p_Screen, _p_CreditTitle, _p_sdlRenderer);
-    // LeaveMenu();
-    //_p_MusicManager->PlayMusic(MusicManager::MUSIC_INIT_SND,
-    //                            MusicManager::LOOP_ON);
+
     return NULL;
 }
 
@@ -584,8 +586,7 @@ LPErrInApp AppGfx::showGeneralOptions() {
     OptionsGfx optGfx;
 
     MenuDelegator delegator = prepMenuDelegator();
-    LPGameSettings pGameSettings = GameSettings::GetSettings();
-    LPLanguages pLanguages = pGameSettings->GetLanguageMan();
+    LPLanguages pLanguages = _p_GameSettings->GetLanguageMan();
 
     STRING caption = pLanguages->GetStringId(Languages::ID_MEN_OPTIONS);
     LPErrInApp err = optGfx.Initialize(_p_Screen, _p_sdlRenderer, delegator);
@@ -597,7 +598,7 @@ LPErrInApp AppGfx::showGeneralOptions() {
         return err;
     }
 
-    LeaveMenu();
+    // LeaveMenu(); // TODO
     return NULL;
 }
 
