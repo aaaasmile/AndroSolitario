@@ -35,7 +35,7 @@ LOCAL_SRC_FILES := $(APP_PATH)/Main.cpp \
             $(APP_PATH)/GameSettings.cpp \
             $(APP_PATH)/GfxUtil.cpp \
             $(APP_PATH)/Languages.cpp \
-            $(APP_PATH)/Fading.c \
+            $(APP_PATH)/Fading.cpp \
             $(APP_PATH)/Credits.cpp \
             $(APP_PATH)/ErrorInfo.cpp \
             $(APP_PATH)/MenuMgr.cpp \

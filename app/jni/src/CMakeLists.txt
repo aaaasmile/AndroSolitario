@@ -17,7 +17,7 @@ set(SOURCES App/MusicManager.cpp
             App/GfxUtil.cpp
             App/Languages.cpp
             App/Main.cpp
-            App/Fading.c
+            App/Fading.cpp
             App/Credits.cpp
             App/ErrorInfo.cpp
             App/MenuMgr.cpp

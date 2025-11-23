@@ -149,14 +149,15 @@ void credits(SDL_Surface* p_surf_screen, SDL_Surface* pSurfTitle,
     SDL_Keycode key;
     LPGameSettings pGameSettings = GameSettings::GetSettings();
     MusicManager* pMusicManager = pGameSettings->GetMusicManager();
+    FadeAction* pFadeAction = new FadeAction();
 
     SDL_Texture* pScreenTexture =
         SDL_CreateTextureFromSurface(psdlRenderer, p_surf_screen);
 
     if (pGameSettings->InputType != InputTypeEnum::TouchWithoutMouse) {
-        Fade(p_surf_screen, p_surf_screen, 2, 1, psdlRenderer, NULL);
+        pFadeAction->Fade(p_surf_screen, p_surf_screen, 2, 1, psdlRenderer, NULL);
     } else {
-        InstantFade(p_surf_screen);
+        pFadeAction->InstantFade(p_surf_screen);
     }
     pMusicManager->PlayMusic(MusicManager::MUSIC_CREDITS_SND,
                              MusicManager::LOOP_ON);
@@ -235,7 +236,7 @@ void credits(SDL_Surface* p_surf_screen, SDL_Surface* pSurfTitle,
         }
     } while (!done);
 
-    Fade(p_surf_screen, p_surf_screen, 1, 1, psdlRenderer, NULL);
+    pFadeAction->Fade(p_surf_screen, p_surf_screen, 1, 1, psdlRenderer, NULL);
 
     if (pMusicManager->IsPlayingMusic()) {
         pMusicManager->StopMusic(300);

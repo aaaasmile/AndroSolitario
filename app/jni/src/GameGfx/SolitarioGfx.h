@@ -15,6 +15,7 @@ class ButtonGfx;
 class CurrentTime;
 class HighScore;
 class MusicManager;
+class  FadeAction;
 
 typedef std::vector<CardRegionGfx>::iterator regionVI;
 
@@ -216,6 +217,7 @@ class SolitarioGfx {
     bool _scoreChanged;
     CurrentTime *_p_currentTime;
     Uint64 _lastUpTimestamp;
+    FadeAction* _p_FadeAction;
 };
 
 #endif

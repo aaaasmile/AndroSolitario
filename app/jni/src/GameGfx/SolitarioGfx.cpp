@@ -40,6 +40,7 @@ SolitarioGfx::SolitarioGfx() {
     _newgamerequest = false;
     _terminated = true;
     _p_currentTime = new CurrentTime();
+    _p_FadeAction = new FadeAction();
 }
 
 SolitarioGfx::~SolitarioGfx() {
@@ -58,6 +59,7 @@ SolitarioGfx::~SolitarioGfx() {
         _p_BtToggleSound = NULL;
     }
     delete _p_currentTime;
+    delete _p_FadeAction;
 }
 
 void SolitarioGfx::clearSurface() {
@@ -571,10 +573,10 @@ LPErrInApp SolitarioGfx::DrawInitialScene() {
     rctTarget.h = _p_SceneBackground->h;
     if (!_sceneBackgroundIsBlack) {
         if (pGameSettings->InputType != InputTypeEnum::TouchWithoutMouse) {
-            Fade(_p_Screen, _p_SceneBackground, 2, 0, _p_sdlRenderer,
+            _p_FadeAction->Fade(_p_Screen, _p_SceneBackground, 2, 0, _p_sdlRenderer,
                  &rctTarget);
         } else {
-            InstantFade(_p_Screen);
+            _p_FadeAction->InstantFade(_p_Screen);
         }
     }
 
@@ -1303,7 +1305,7 @@ LPErrInApp SolitarioGfx::StartGameLoop() {
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
                 case SDL_EVENT_QUIT:
-                    Fade(_p_Screen, _p_Screen, 1, 1, _p_sdlRenderer, NULL);
+                    _p_FadeAction->Fade(_p_Screen, _p_Screen, 1, 1, _p_sdlRenderer, NULL);
                     return NULL;
 
                 case SDL_EVENT_KEY_DOWN:

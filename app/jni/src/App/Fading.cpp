@@ -11,7 +11,7 @@ static SDL_Surface* SDL_CreateRGBSurface(int width, int height, int depth,
 // Fades the given surface in or out to the given screen within the given time
 //  If the image surface is the screen surface (pointer are equal), a copy is
 //  made first. We must do that because we are overwriting the Screen Surface.
-void Fade(SDL_Surface* p_surf_screen, SDL_Surface* p_surf_img,
+void FadeAction::Fade(SDL_Surface* p_surf_screen, SDL_Surface* p_surf_img,
           Uint32 ui_seconds, int b_fade_out, SDL_Renderer* psdlRenderer,
           SDL_Rect* prctTarget) {
     // Becomes the black surface
@@ -113,7 +113,7 @@ void Fade(SDL_Surface* p_surf_screen, SDL_Surface* p_surf_img,
     SDL_DestroyTexture(pScreenTexture);
 }
 
-void InstantFade(SDL_Surface* p_surf_screen) {
+void FadeAction::InstantFade(SDL_Surface* p_surf_screen) {
     SDL_Rect dest;
     dest.x = 0;
     dest.y = 0;
