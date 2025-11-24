@@ -20,6 +20,7 @@ class MusicManager;
 class HighScore;
 class MenuMgr;
 class CreditsView;
+class OptionsGfx;
 
 using namespace traits;
 
@@ -51,8 +52,10 @@ class AppGfx {
     LPErrInApp showHighScore();
     LPErrInApp showGeneralOptions();
     void backToMenuRootWithMusic();
+    void backToMenuRootSameMusic();
 
     MenuDelegator prepMenuDelegator();
+    OptionDelegator prepOptionDelegator();
     void clearBackground();
     LPErrInApp loadSceneBackground();
 
@@ -69,6 +72,7 @@ class AppGfx {
     HighScore* _p_HighScore;
     MenuMgr* _p_MenuMgr;
     CreditsView* _p_CreditsView;
+    OptionsGfx* _p_optGfx;
 
     int _screenW;
     int _screenH;

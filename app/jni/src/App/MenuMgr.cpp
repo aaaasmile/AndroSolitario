@@ -547,7 +547,7 @@ LPErrInApp MenuMgr::HandleRootMenuEvent(SDL_Event* pEvent) {
         } else {
             _focusedMenuItem = MenuItemEnum::NOTHING;
         }
-        _p_homeUrl->MouseMove(*pEvent);
+        _p_homeUrl->MouseMove(pEvent);
     }
     if (pEvent->type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
         if (_ignoreMouseEvent) {
@@ -571,7 +571,7 @@ LPErrInApp MenuMgr::HandleRootMenuEvent(SDL_Event* pEvent) {
         if (_ignoreMouseEvent) {
             return NULL;
         }
-        _p_homeUrl->MouseUp(*pEvent);
+        _p_homeUrl->MouseUp(pEvent);
     }
 
     return NULL;

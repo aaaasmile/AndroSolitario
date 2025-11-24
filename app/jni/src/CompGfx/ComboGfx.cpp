@@ -130,14 +130,14 @@ void ComboGfx::SetVisibleState(VisbleState eVal) {
     }
 }
 
-void ComboGfx::MouseMove(SDL_Event& event, SDL_Surface* pScreen,
+void ComboGfx::MouseMove(SDL_Event* pEvent, SDL_Surface* pScreen,
                          SDL_Texture* pScene_background,
                          SDL_Texture* pScreenTexture) {
     if (_visibleState == VISIBLE && _enabled) {
-        if (event.motion.x >= _rctCtrl.x &&
-            event.motion.x <= _rctCtrl.x + _rctCtrl.w &&
-            event.motion.y >= _rctCtrl.y &&
-            event.motion.y <= _rctCtrl.y + _rctCtrl.h) {
+        if (pEvent->motion.x >= _rctCtrl.x &&
+            pEvent->motion.x <= _rctCtrl.x + _rctCtrl.w &&
+            pEvent->motion.y >= _rctCtrl.y &&
+            pEvent->motion.y <= _rctCtrl.y + _rctCtrl.h) {
             // mouse inner button
             _color = GFX_UTIL_COLOR::Orange;
             RedrawButton(pScreen, pScene_background, pScreenTexture);
@@ -162,9 +162,9 @@ static bool IsPointInsideBox(const SDL_Rect& rct, const SDL_Point& pt) {
     return false;
 }
 
-void ComboGfx::FingerDown(SDL_Event& event) {
+void ComboGfx::FingerDown(SDL_Event* pEvent) {
     SDL_Point pt;
-    _p_GameSettings->GetTouchPoint(event.tfinger, &pt);
+    _p_GameSettings->GetTouchPoint(pEvent->tfinger, &pt);
     if (IsPointInsideBox(_rctBoxUp, pt)) {
         // mouse on up box
         _currDataIndex++;
@@ -187,13 +187,13 @@ void ComboGfx::FingerDown(SDL_Event& event) {
     }
 }
 
-void ComboGfx::MouseUp(SDL_Event& event) {
+void ComboGfx::MouseUp(SDL_Event* pEvent) {
     if (_p_GameSettings->InputType == InputTypeEnum::TouchWithoutMouse) {
         return;
     }
     if (_visibleState == VISIBLE && _enabled) {
-        int mx = event.motion.x;
-        int my = event.motion.y;
+        int mx = pEvent->motion.x;
+        int my = pEvent->motion.y;
         if (mx >= _rctBoxUp.x && mx <= _rctBoxUp.x + _rctBoxUp.w &&
             my >= _rctBoxUp.y && my <= _rctBoxUp.y + _rctBoxUp.h) {
             // mouse on up box

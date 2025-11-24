@@ -15,11 +15,11 @@ class TextInputGfx {
     TextInputGfx();
     ~TextInputGfx();
 
-    void Initialize(SDL_Rect* pRect, SDL_Surface* pScreen, TTF_Font* pFont);
+    void Initialize(SDL_Rect* pRect, SDL_Surface* pScreen, TTF_Font* pFont, SDL_Window* pWindow);
     const std::string& GetText() const { return _text; }
     void SetText(const std::string& newText) { _text = newText; }
     bool GetHasFocus() const { return _hasFocus; }
-    void HandleEvent(SDL_Event& event, SDL_Window* pWindow);
+    void HandleEvent(SDL_Event* pEvent);
     void SetVisibleState(VisbleState eVal) { _visibleState = eVal; }
     void DrawCtrl(SDL_Surface* pScreen);
     void Update();
@@ -36,6 +36,7 @@ class TextInputGfx {
     SDL_Rect _rctCtrl;
     bool _cursorVisible;
     Uint64 _lastBlinkTime;
+    SDL_Window* _p_Window;
 };
 
 #endif

@@ -48,12 +48,12 @@ void LabelLinkGfx::SetState(eSate eVal) {
     _isDirty = true;
 }
 
-void LabelLinkGfx::MouseMove(SDL_Event& event) {
+void LabelLinkGfx::MouseMove(SDL_Event* pEvent) {
     if (_stateGfx == VISIBLE && _isEnabled) {
-        if (event.motion.x >= _rctCtrl.x &&
-            event.motion.x <= _rctCtrl.x + _rctCtrl.w &&
-            event.motion.y >= _rctCtrl.y &&
-            event.motion.y <= _rctCtrl.y + _rctCtrl.h) {
+        if (pEvent->motion.x >= _rctCtrl.x &&
+            pEvent->motion.x <= _rctCtrl.x + _rctCtrl.w &&
+            pEvent->motion.y >= _rctCtrl.y &&
+            pEvent->motion.y <= _rctCtrl.y + _rctCtrl.h) {
             // mouse inner button
             if (_mouseOuside) {
                 _isDirty = true;
@@ -69,12 +69,12 @@ void LabelLinkGfx::MouseMove(SDL_Event& event) {
     }
 }
 
-void LabelLinkGfx::MouseUp(SDL_Event& event) {
+void LabelLinkGfx::MouseUp(SDL_Event* pEvent) {
     if (_stateGfx == VISIBLE && _isEnabled) {
-        if (event.motion.x >= _rctCtrl.x &&
-            event.motion.x <= _rctCtrl.x + _rctCtrl.w &&
-            event.motion.y >= _rctCtrl.y &&
-            event.motion.y <= _rctCtrl.y + _rctCtrl.h) {
+        if (pEvent->motion.x >= _rctCtrl.x &&
+            pEvent->motion.x <= _rctCtrl.x + _rctCtrl.w &&
+            pEvent->motion.y >= _rctCtrl.y &&
+            pEvent->motion.y <= _rctCtrl.y + _rctCtrl.h) {
             // mouse go up inner the button
             // send a click event
             if ((_fncbClickEvent.tc) != NULL)

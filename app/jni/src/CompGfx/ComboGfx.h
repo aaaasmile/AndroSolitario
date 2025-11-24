@@ -18,10 +18,10 @@ public:
                     int iButID, SDL_Renderer* psdlRenderer,
                     ClickCb& fncbClickEvent);
     void SetButtonText(LPCSTR strCaption) { _buttonText = strCaption; }
-    void MouseMove(SDL_Event& event, SDL_Surface* pScreen,
+    void MouseMove(SDL_Event* pEvent, SDL_Surface* pScreen,
                    SDL_Texture* pScene_background, SDL_Texture* pScreenTexture);
-    void FingerDown(SDL_Event& event);
-    void MouseUp(SDL_Event& event);
+    void FingerDown(SDL_Event* pEvent);
+    void MouseUp(SDL_Event* pEvent);
     void DrawButton(SDL_Surface* pScreen);
     void EnableWindow(bool bVal) { _enabled = bVal; }
     void SetVisibleState(VisbleState eVal);

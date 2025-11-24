@@ -49,12 +49,13 @@ AppGfx::AppGfx() {
     _screenW = 1024;  // 540;//1024;
 #endif
     _Bpp = 0;
-    _p_MusicManager = 0;
-    _p_HighScore = 0;
-    _p_CreditTitle = 0;
+    _p_MusicManager = NULL;
+    _p_CreditTitle = NULL;
     _fullScreen = false;
     _p_GameSettings = GameSettings::GetSettings();
     _p_CreditsView = new CreditsView();
+    _p_optGfx = new OptionsGfx();
+    _p_HighScore = new HighScore();
 }
 
 AppGfx::~AppGfx() { terminate(); }
@@ -90,7 +91,6 @@ LPErrInApp AppGfx::Init() {
     if (err != NULL) {
         return err;
     }
-    _p_HighScore = new HighScore();
     _p_HighScore->Load();
 
     _p_GameSettings->SetCurrentLang();
@@ -139,6 +139,14 @@ LPErrInApp AppGfx::Init() {
     }
     TRACE_DEBUG("Fonts and background loaded OK\n");
 
+    OptionDelegator optionDelegator = prepOptionDelegator();
+
+    err = _p_optGfx->Initialize(_p_Screen, _p_sdlRenderer, optionDelegator,
+                                _p_Window);
+    if (err) {
+        return err;
+    }
+
     clearBackground();
 
     err = _p_GameSettings->InitMusicManager();
@@ -151,10 +159,10 @@ LPErrInApp AppGfx::Init() {
         return err;
     }
 
+    MenuDelegator menuDelegator = prepMenuDelegator();
     _p_MenuMgr = new MenuMgr();
-    MenuDelegator delegator = prepMenuDelegator();
-    err =
-        _p_MenuMgr->Initialize(_p_Screen, _p_sdlRenderer, _p_Window, delegator);
+    err = _p_MenuMgr->Initialize(_p_Screen, _p_sdlRenderer, _p_Window,
+                                 menuDelegator);
     if (err != NULL) {
         return err;
     }
@@ -275,6 +283,8 @@ LPErrInApp AppGfx::createWindow() {
 
 void AppGfx::terminate() {
     delete _p_CreditsView;
+    delete _p_optGfx;
+
     SDL_ShowCursor();
 
     if (_p_Screen != NULL) {
@@ -301,7 +311,6 @@ void AppGfx::terminate() {
     delete _p_HighScore;
     _p_SolitarioGfx = NULL;
     _p_GameSettings->TerminateMusicManager();
-    _p_HighScore = NULL;
 
     SDL_DestroyWindow(_p_Window);
     SDL_Quit();
@@ -346,12 +355,18 @@ LPErrInApp fncBind_SettingsChanged(void* self, bool backGroundChanged,
 
 MenuDelegator AppGfx::prepMenuDelegator() {
     // Use only static otherwise you loose it
-    static VMenuDelegator const tc = {
-        .LeaveMenu = (&fncBind_LeaveMenu),
-        .SetNextMenu = (&fncBind_SetNextMenu),
-        .SettingsChanged = (&fncBind_SettingsChanged)};
+    static VMenuDelegator const tc = {.LeaveMenu = (&fncBind_LeaveMenu),
+                                      .SetNextMenu = (&fncBind_SetNextMenu)};
 
     return (MenuDelegator){.tc = &tc, .self = this};
+}
+
+OptionDelegator AppGfx::prepOptionDelegator() {
+    // Use only static otherwise you loose it
+    static VOptionDelegator const tc = {.SettingsChanged =
+                                            (&fncBind_SettingsChanged)};
+
+    return (OptionDelegator){.tc = &tc, .self = this};
 }
 
 void AppGfx::LeaveMenu() {
@@ -424,19 +439,13 @@ LPErrInApp AppGfx::MainLoopEvent(SDL_Event* pEvent, SDL_AppResult& res) {
             break;
 
         case MenuItemEnum::MENU_OPTIONS:
-            TRACE("TODO: menu options event \n");
-            LeaveMenu();  // TODO
-            // _backGroundChanged = false;
-            // err = showGeneralOptions();
-            // if (err != NULL)
-            //     return err;
-            // if (_backGroundChanged) {
-            //     err = loadSceneBackground();
-            //     if (err)
-            //         return err;
-            //     _p_MenuMgr->SetBackground(_p_SceneBackground);
-            //     _backGroundChanged = false;
-            // }
+            _backGroundChanged = false;
+            err = showGeneralOptions();
+            if (err != NULL)
+                return err;
+            err = _p_optGfx->HandleEvent(pEvent);
+            if (err != NULL)
+                return err;
             break;
 
         case MenuItemEnum::QUIT:
@@ -495,22 +504,28 @@ LPErrInApp AppGfx::MainLoopIterate() {
             break;
 
         case MenuItemEnum::MENU_OPTIONS:
-            // TODO
-            // _backGroundChanged = false;
-            // err = showGeneralOptions();
-            // if (err != NULL)
-            //     goto error;
-            // if (_backGroundChanged) {
-            //     err = loadSceneBackground();
-            //     if (err)
-            //         goto error;
-            //     pMenuMgr->SetBackground(_p_SceneBackground);
-            //     _backGroundChanged = false;
-            // }
+            if (_p_optGfx->IsInProgress()) {
+                err = _p_optGfx->HandleIterate(done);
+                if (err != NULL)
+                    return err;
+                if (done) {
+                    backToMenuRootSameMusic();
+                    if (_backGroundChanged) {
+                        TRACE_DEBUG("Background changed by options \n");
+                        err = loadSceneBackground();
+                        if (err != NULL)
+                            return err;
+                        _p_MenuMgr->SetBackground(_p_SceneBackground);
+                        _backGroundChanged = false;
+                    }
+                }
+            }
             break;
         case MenuItemEnum::NOTHING:
+            // Nothing to render
             break;
         case MenuItemEnum::QUIT:
+            // Nothing to render
             break;
         default:
             break;
@@ -525,6 +540,12 @@ void AppGfx::backToMenuRootWithMusic() {
                                MusicManager::LOOP_ON);
     _p_HighScore->Reset();
     _p_CreditsView->Reset();
+}
+
+void AppGfx::backToMenuRootSameMusic() {
+    TRACE("Back to root menu same music\n");
+    LeaveMenu();
+    _p_optGfx->Reset();
 }
 
 LPErrInApp AppGfx::startGameLoop() {
@@ -592,23 +613,17 @@ LPErrInApp AppGfx::showCredits() {
 }
 
 LPErrInApp AppGfx::showGeneralOptions() {
+    if (_p_optGfx->IsInProgress()) {
+        return NULL;
+    }
     TRACE("Show general Options\n");
-    OptionsGfx optGfx;
 
-    MenuDelegator delegator = prepMenuDelegator();
     LPLanguages pLanguages = _p_GameSettings->GetLanguageMan();
-
     STRING caption = pLanguages->GetStringId(Languages::ID_MEN_OPTIONS);
-    LPErrInApp err = optGfx.Initialize(_p_Screen, _p_sdlRenderer, delegator);
+    LPErrInApp err = _p_optGfx->Show(_p_SceneBackground, caption);
     if (err) {
         return err;
     }
-    err = optGfx.Show(_p_SceneBackground, caption, _p_Window);
-    if (err) {
-        return err;
-    }
-
-    // LeaveMenu(); // TODO
     return NULL;
 }
 

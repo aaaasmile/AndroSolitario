@@ -18,6 +18,7 @@ TextInputGfx::TextInputGfx() {
     _lastBlinkTime = 0;
     _hasFocus = false;
     _cursorVisible = false;
+    _p_Window = NULL;
 }
 
 TextInputGfx::~TextInputGfx() {
@@ -28,8 +29,9 @@ TextInputGfx::~TextInputGfx() {
 }
 
 void TextInputGfx::Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
-                              TTF_Font* pFont) {
+                              TTF_Font* pFont, SDL_Window* pWindow) {
     _rctCtrl = *pRect;
+    _p_Window = pWindow;
 
     _p_ctrlSurface =
         GFX_UTIL::SDL_CreateRGBSurface(_rctCtrl.w, _rctCtrl.h, 32, 0, 0, 0, 0);
@@ -43,49 +45,50 @@ void TextInputGfx::Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
     _p_fontText = pFont;
 }
 
-void TextInputGfx::HandleEvent(SDL_Event& event, SDL_Window* pWindow) {
+void TextInputGfx::HandleEvent(SDL_Event* pEvent) {
     LPGameSettings pGameSettings = GameSettings::GetSettings();
 
-    if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
+    if (pEvent->type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
         if (pGameSettings->InputType == InputTypeEnum::TouchWithoutMouse) {
             return;
         }
-        int mouseX = event.button.x;
-        int mouseY = event.button.y;
+        int mouseX = pEvent->button.x;
+        int mouseY = pEvent->button.y;
 
         _hasFocus =
             (mouseX >= _rctCtrl.x && mouseX <= _rctCtrl.x + _rctCtrl.w &&
              mouseY >= _rctCtrl.y && mouseY <= _rctCtrl.y + _rctCtrl.h);
 
         if (_hasFocus) {
-            SDL_StartTextInput(pWindow);
+            SDL_StartTextInput(_p_Window);
         } else {
-            SDL_StopTextInput(pWindow);
+            SDL_StopTextInput(_p_Window);
         }
-    } else if (_hasFocus && event.type == SDL_EVENT_KEY_DOWN) {
-        if (event.key.key == SDLK_BACKSPACE && !_text.empty()) {
+    } else if (_hasFocus && pEvent->type == SDL_EVENT_KEY_DOWN) {
+        if (pEvent->key.key == SDLK_BACKSPACE && !_text.empty()) {
             _text.pop_back();
-        } else if (event.key.key == SDLK_RETURN || event.key.key == SDLK_TAB) {
+        } else if (pEvent->key.key == SDLK_RETURN ||
+                   pEvent->key.key == SDLK_TAB) {
             _hasFocus = false;
-            SDL_StopTextInput(pWindow);
+            SDL_StopTextInput(_p_Window);
         }
-    } else if (_hasFocus && event.type == SDL_EVENT_TEXT_INPUT) {
+    } else if (_hasFocus && pEvent->type == SDL_EVENT_TEXT_INPUT) {
         if (_text.length() < 20) {
-            std::string newText = event.text.text;
+            std::string newText = pEvent->text.text;
             if (std::all_of(newText.begin(), newText.end(), [](char c) {
                     return std::isalnum(c) || c == ' ' || c == '-';
                 })) {
                 _text += newText;
             }
         }
-    } else if (event.type == SDL_EVENT_FINGER_DOWN) {
+    } else if (pEvent->type == SDL_EVENT_FINGER_DOWN) {
         SDL_Point pt;
-        pGameSettings->GetTouchPoint(event.tfinger, &pt);
+        pGameSettings->GetTouchPoint(pEvent->tfinger, &pt);
         _hasFocus = IsPointInsideCtrl(_rctCtrl, pt);
         if (_hasFocus) {
-            SDL_StartTextInput(pWindow);
+            SDL_StartTextInput(_p_Window);
         } else {
-            SDL_StopTextInput(pWindow);
+            SDL_StopTextInput(_p_Window);
         }
     }
 }

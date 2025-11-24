@@ -7,7 +7,6 @@
 #include "CompGfx/CheckBoxGfx.h"
 #include "CompGfx/ComboGfx.h"
 #include "CompGfx/TextInputGfx.h"
-
 #include "GfxUtil.h"
 #include "MusicManager.h"
 
@@ -16,9 +15,12 @@ OptionsGfx::OptionsGfx() {
     _p_fontText = 0;
     _p_surfBar = 0;
     _p_buttonOK = 0;
-    _terminated = false;
     _p_MusicManager = 0;
     _p_GameSettings = GameSettings::GetSettings();
+    _mouseDownRec = false;
+    _p_ScreenTexture = NULL;
+    _p_ShadowSrf = NULL;
+    _inProgress = false;
 }
 
 OptionsGfx::~OptionsGfx() {
@@ -79,7 +81,7 @@ CheckboxClickCb OptionsGfx::prepCheckBoxClickMusic() {
 }
 
 LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
-                                  MenuDelegator& menuDlg) {
+                                  OptionDelegator& optDlg, SDL_Window* pWindow) {
     if (pScreen == NULL) {
         return ERR_UTIL::ErrorCreate("pScreen is null");
     }
@@ -95,7 +97,7 @@ LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
                 _rctOptBox.y, _rctOptBox.w, _rctOptBox.h);
 
     _p_screen = pScreen;
-    _menuDlgt = menuDlg;
+    _optDlgt = optDlg;
     _p_MusicManager = _p_GameSettings->GetMusicManager();
     _p_fontCtrl = _p_GameSettings->GetFontAriblk();
     _p_fontText = _p_GameSettings->GetFontVera();
@@ -106,7 +108,7 @@ LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
     if (_p_surfBar == NULL) {
         return ERR_UTIL::ErrorCreate("_p_surfBar error: %s\n", SDL_GetError());
     }
-    
+
     SDL_FillSurfaceRect(
         _p_surfBar, NULL,
         SDL_MapRGB(SDL_GetPixelFormatDetails(_p_surfBar->format), NULL, 10, 10,
@@ -184,17 +186,17 @@ LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
     _p_textInput = new TextInputGfx();
     rctBt1.w = comboW;
     rctBt1.h = comboH;
-    rctBt1.y = _p_comboBackground->PosY() + _p_comboBackground->Height() + combo2OffsetY;
+    rctBt1.y = _p_comboBackground->PosY() + _p_comboBackground->Height() +
+               combo2OffsetY;
     rctBt1.x = _p_comboBackground->PosX();
-    _p_textInput->Initialize(&rctBt1, pScreen, _p_fontText);
-        
+    _p_textInput->Initialize(&rctBt1, pScreen, _p_fontText, pWindow);
+
     // Deck
     // combo deck selection
     _p_comboDeck = new ComboGfx();
     rctBt1.w = comboW;
     rctBt1.h = comboH;
-    rctBt1.y = _p_textInput->PosY() + _p_textInput->Height() +
-               combo3OffsetY;
+    rctBt1.y = _p_textInput->PosY() + _p_textInput->Height() + combo3OffsetY;
     rctBt1.x = _p_textInput->PosX();
 
     _p_comboDeck->Initialize(&rctBt1, pScreen, _p_fontText, MYIDCOMBODECK,
@@ -242,16 +244,166 @@ LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
     return NULL;
 }
 
+LPErrInApp OptionsGfx::HandleEvent(SDL_Event* pEvent) {
+    LPErrInApp err;
+    if (pEvent->type == SDL_EVENT_QUIT) {
+        _inProgress = false;
+    }
+    if (pEvent->type == SDL_EVENT_KEY_DOWN) {
+        if (pEvent->key.key == SDLK_RETURN) {
+            err = ButEndOPtClicked(MYIDOK);
+            if (err)
+                return err;
+        } else if (pEvent->key.key == SDLK_ESCAPE) {
+            err = ButEndOPtClicked(MYIDCANCEL);
+            if (err)
+                return err;
+        }
+    }
+    if (pEvent->type == SDL_EVENT_FINGER_DOWN) {
+        _p_buttonOK->FingerDown(pEvent);
+        _p_checkMusic->FingerDown(pEvent);
+        _p_comboLang->FingerDown(pEvent);
+        _p_comboBackground->FingerDown(pEvent);
+        _p_comboDeck->FingerDown(pEvent);
+    }
+    if (pEvent->type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
+        _mouseDownRec = true;
+    }
+    if (pEvent->type == SDL_EVENT_MOUSE_BUTTON_UP) {
+        if (_mouseDownRec) {
+            _p_buttonOK->MouseUp(pEvent);
+            _p_comboLang->MouseUp(pEvent);
+            _p_checkMusic->MouseUp(pEvent);
+            _p_comboBackground->MouseUp(pEvent);
+            _p_comboDeck->MouseUp(pEvent);
+            _mouseDownRec = false;
+        }
+    }
+    _p_textInput->HandleEvent(pEvent);
+    return NULL;
+}
+
+LPErrInApp OptionsGfx::HandleIterate(bool& done) {
+    // the background of the option box
+    GFX_UTIL::DrawStaticSpriteEx(_p_ShadowSrf, 0, 0, _rctOptBox.w, _rctOptBox.h,
+                                 _rctOptBox.x, _rctOptBox.y, _p_surfBar);
+    // draw border
+    GFX_UTIL::DrawRect(_p_ShadowSrf, _rctOptBox.x - 1, _rctOptBox.y - 1,
+                       _rctOptBox.x + _rctOptBox.w + 1,
+                       _rctOptBox.y + _rctOptBox.h + 1, GFX_UTIL_COLOR::Gray);
+    GFX_UTIL::DrawRect(_p_ShadowSrf, _rctOptBox.x - 2, _rctOptBox.y - 2,
+                       _rctOptBox.x + _rctOptBox.w + 2,
+                       _rctOptBox.y + _rctOptBox.h + 2, GFX_UTIL_COLOR::Black);
+    GFX_UTIL::DrawRect(_p_ShadowSrf, _rctOptBox.x, _rctOptBox.y,
+                       _rctOptBox.x + _rctOptBox.w, _rctOptBox.y + _rctOptBox.h,
+                       _color);
+
+    // header bar
+    SDL_Rect rectHeader;
+    Uint32 colorHeader =  // SDL_MapRGB(_p_screen->format, 153, 202, 51);
+                          // //SDL 2
+        SDL_MapRGB(SDL_GetPixelFormatDetails(_p_screen->format), NULL, 153, 202,
+                   51);
+    rectHeader.x = _rctOptBox.x + 1;
+    rectHeader.y = _rctOptBox.y + 1;
+    rectHeader.h = _hbar;
+    rectHeader.w = _rctOptBox.w - 1;
+    // SDL_FillRect(_p_ShadowSrf, &rectHeader, colorHeader); SDL 2
+    SDL_FillSurfaceRect(_p_ShadowSrf, &rectHeader, colorHeader);
+
+    GFX_UTIL::DrawStaticLine(
+        _p_ShadowSrf, rectHeader.x, rectHeader.y + rectHeader.h,
+        rectHeader.x + rectHeader.w, rectHeader.y + rectHeader.h,
+        GFX_UTIL_COLOR::White);
+    // text header
+    GFX_UTIL::DrawString(_p_ShadowSrf, _headerText.c_str(),
+                         rectHeader.x + _captionOffsetX, rectHeader.y,
+                         GFX_UTIL_COLOR::White, _p_fontCtrl);
+
+    // Button OK
+    _p_buttonOK->DrawButton(_p_ShadowSrf);
+
+    // Combo Language: Label and crontrol
+    LPLanguages pLanguages = _p_GameSettings->GetLanguageMan();
+    STRING strSelectLanguage =
+        pLanguages->GetStringId(Languages::ID_CHOOSELANGUA);
+    GFX_UTIL::DrawString(_p_ShadowSrf, strSelectLanguage.c_str(),
+                         _p_comboLang->PosX(),
+                         _p_comboLang->PosY() - _labelOffsetY,
+                         GFX_UTIL_COLOR::Orange, _p_fontText);
+
+    _p_comboLang->DrawButton(_p_ShadowSrf);
+
+    // Checkbox music
+    _p_checkMusic->DrawButton(_p_ShadowSrf);
+
+    // Combo Background: Label and control
+    STRING strSelectBackGround =
+        pLanguages->GetStringId(Languages::ID_CHOOSEBACKGROUND);
+    GFX_UTIL::DrawString(_p_ShadowSrf, strSelectBackGround.c_str(),
+                         _p_comboBackground->PosX(),
+                         _p_comboBackground->PosY() - _labelOffsetY,
+                         GFX_UTIL_COLOR::Orange, _p_fontText);
+    _p_comboBackground->DrawButton(_p_ShadowSrf);
+
+    // player name
+    _p_textInput->DrawCtrl(_p_ShadowSrf);
+
+    // Combo Deck: Label and control
+    STRING strDeckSelectTitle =
+        pLanguages->GetStringId(Languages::ID_CHOOSEMAZZO);
+    GFX_UTIL::DrawString(_p_ShadowSrf, strDeckSelectTitle.c_str(),
+                         _p_comboDeck->PosX(),
+                         _p_comboDeck->PosY() - _labelOffsetY,
+                         GFX_UTIL_COLOR::Orange, _p_fontText);
+
+    _p_comboDeck->DrawButton(_p_ShadowSrf);
+
+    // Deck example Cards
+    int iCurrIndex = _p_comboDeck->GetSelectedIndex();
+    _cardOnEachDeck[0][iCurrIndex].DrawCardPac(_p_ShadowSrf);
+    _cardOnEachDeck[1][iCurrIndex].DrawCardPac(_p_ShadowSrf);
+    _cardOnEachDeck[2][iCurrIndex].DrawCardPac(_p_ShadowSrf);
+
+    // render the dialogbox
+    SDL_BlitSurface(_p_ShadowSrf, NULL, _p_screen, NULL);
+    SDL_UpdateTexture(_p_ScreenTexture, NULL, _p_screen->pixels,
+                      _p_screen->pitch);
+    SDL_RenderTexture(_p_sdlRenderer, _p_ScreenTexture, NULL, NULL);
+    SDL_RenderPresent(_p_sdlRenderer);
+
+    _p_textInput->Update();
+    if (!_inProgress) {
+        if (_p_ShadowSrf != NULL) {
+            SDL_DestroySurface(_p_ShadowSrf);
+            _p_ShadowSrf = NULL;
+        }
+        if (_p_ScreenTexture != NULL) {
+            SDL_DestroyTexture(_p_ScreenTexture);
+            _p_ScreenTexture = NULL;
+        }
+        done = true;
+    }
+
+    return NULL;
+}
+
 LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
-                            STRING& strCaption, SDL_Window* pWindow) {
+                            STRING& strCaption) {
     TRACE_DEBUG("Options - Show\n");
-    LPGameSettings pGameSettings = GameSettings::GetSettings();
-    LPLanguages pLanguages = pGameSettings->GetLanguageMan();
+    if (_inProgress) {
+        return ERR_UTIL::ErrorCreate(
+            "Fade is already in progess, use iterate\n");
+    }
+    _inProgress = true;
+
+    LPLanguages pLanguages = _p_GameSettings->GetLanguageMan();
     _headerText = strCaption;
-    _terminated = false;
-    Uint64 uiInitialTick = SDL_GetTicks();
-    Uint64 uiLast_time = uiInitialTick;
-    int FPS = 3;
+    // _terminated = false;
+    // Uint64 uiInitialTick = SDL_GetTicks();
+    // Uint64 uiLast_time = uiInitialTick;
+    // int FPS = 3;
 
     // button ok
     STRING strTextBt;
@@ -260,8 +412,6 @@ LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
     _p_buttonOK->SetVisibleState(ButtonGfx::VISIBLE);
 
     // combobox language selection
-    STRING strSelectLanguage =
-        pLanguages->GetStringId(Languages::ID_CHOOSELANGUA);
     strTextBt = pLanguages->GetStringId(Languages::ID_ITALIANO);
     _p_comboLang->AddLineText(strTextBt.c_str());
     strTextBt = pLanguages->GetStringId(Languages::ID_DIALETMN);
@@ -279,8 +429,6 @@ LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
     _p_checkMusic->SetCheckState(_p_GameSettings->MusicEnabled);
 
     // combobox background selection
-    STRING strSelectBackGround =
-        pLanguages->GetStringId(Languages::ID_CHOOSEBACKGROUND);
     strTextBt = pLanguages->GetStringId(Languages::ID_COMMESSAGGIO);
     _p_comboBackground->AddLineText(strTextBt.c_str());
     strTextBt = pLanguages->GetStringId(Languages::ID_MANTOVA);
@@ -291,12 +439,10 @@ LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
     _p_comboBackground->SelectIndex(_p_GameSettings->BackgroundType);
 
     // player name
-    _p_textInput->SetText(pGameSettings->PlayerName);
+    _p_textInput->SetText(_p_GameSettings->PlayerName);
     _p_textInput->SetVisibleState(TextInputGfx::VISIBLE);
 
     // combobox deck selection
-    STRING strDeckSelectTitle =
-        pLanguages->GetStringId(Languages::ID_CHOOSEMAZZO);
     DeckType dt;
     for (int i = 0; i < eDeckType::NUM_OF_DECK; i++) {
         dt.SetTypeIndex(i);
@@ -306,182 +452,187 @@ LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
     _p_comboDeck->SetVisibleState(ComboGfx::VISIBLE);
     _p_comboDeck->SelectIndex(_p_GameSettings->DeckTypeVal.GetTypeIndex());
 
-    int hbar = 30;
-    int captionOffsetX = 10;
-    int labelOffsetY = 20;
+    _hbar = 30;
+    _captionOffsetX = 10;
+    _labelOffsetY = 20;
     if (_p_GameSettings->NeedScreenMagnify()) {
-        hbar = 65;
-        captionOffsetX = 20;
-        labelOffsetY = 40;
+        _hbar = 65;
+        _captionOffsetX = 20;
+        _labelOffsetY = 40;
     }
-
-    SDL_Surface* pShadowSrf = GFX_UTIL::SDL_CreateRGBSurface(
-        _p_screen->w, _p_screen->h, 32, 0, 0, 0, 0);
-
-    SDL_Texture* pScreenTexture =
-        SDL_CreateTextureFromSurface(_p_sdlRenderer, pShadowSrf);
-    LPErrInApp err = NULL;
-    bool mouseDownRec = false;
-    while (!_terminated) {
-        // center the background
-        SDL_Rect clipRect;
-        SDL_GetSurfaceClipRect(pShadowSrf, &clipRect);
-        SDL_FillSurfaceRect(
-            pShadowSrf, &clipRect,
-            SDL_MapRGBA(SDL_GetPixelFormatDetails(pShadowSrf->format), NULL, 0,
-                        0, 0, 0));
-
-        SDL_Rect rctTarget;
-        rctTarget.x = (pShadowSrf->w - pScene_background->w) / 2;
-        rctTarget.y = (pShadowSrf->h - pScene_background->h) / 2;
-        rctTarget.w = pScene_background->w;
-        rctTarget.h = pScene_background->h;
-        SDL_BlitSurface(pScene_background, NULL, pShadowSrf, &rctTarget);
-
-        SDL_Event event;
-        while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_EVENT_QUIT) {
-                _terminated = true;
-                break;
-            }
-            if (event.type == SDL_EVENT_KEY_DOWN) {
-                if (event.key.key == SDLK_RETURN) {
-                    err = ButEndOPtClicked(MYIDOK);
-                    if (err)
-                        return err;
-                    break;
-                } else if (event.key.key == SDLK_ESCAPE) {
-                    err = ButEndOPtClicked(MYIDCANCEL);
-                    if (err)
-                        return err;
-                    break;
-                }
-            }
-            if (event.type == SDL_EVENT_FINGER_DOWN) {
-                _p_buttonOK->FingerDown(event);
-                _p_checkMusic->FingerDown(event);
-                _p_comboLang->FingerDown(event);
-                _p_comboBackground->FingerDown(event);
-                _p_comboDeck->FingerDown(event);
-            }
-            if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
-                mouseDownRec = true;
-            }
-            if (event.type == SDL_EVENT_MOUSE_BUTTON_UP) {
-                if (mouseDownRec) {
-                    _p_buttonOK->MouseUp(event);
-                    _p_comboLang->MouseUp(event);
-                    _p_checkMusic->MouseUp(event);
-                    _p_comboBackground->MouseUp(event);
-                    _p_comboDeck->MouseUp(event);
-                    mouseDownRec = false;
-                }
-            }
-            _p_textInput->HandleEvent(event, pWindow);
-        }
-
-        // the background of the option box
-        GFX_UTIL::DrawStaticSpriteEx(pShadowSrf, 0, 0, _rctOptBox.w,
-                                     _rctOptBox.h, _rctOptBox.x, _rctOptBox.y,
-                                     _p_surfBar);
-        // draw border
-        GFX_UTIL::DrawRect(pShadowSrf, _rctOptBox.x - 1, _rctOptBox.y - 1,
-                           _rctOptBox.x + _rctOptBox.w + 1,
-                           _rctOptBox.y + _rctOptBox.h + 1,
-                           GFX_UTIL_COLOR::Gray);
-        GFX_UTIL::DrawRect(pShadowSrf, _rctOptBox.x - 2, _rctOptBox.y - 2,
-                           _rctOptBox.x + _rctOptBox.w + 2,
-                           _rctOptBox.y + _rctOptBox.h + 2,
-                           GFX_UTIL_COLOR::Black);
-        GFX_UTIL::DrawRect(pShadowSrf, _rctOptBox.x, _rctOptBox.y,
-                           _rctOptBox.x + _rctOptBox.w,
-                           _rctOptBox.y + _rctOptBox.h, _color);
-
-        // header bar
-        SDL_Rect rectHeader;
-        Uint32 colorHeader =  // SDL_MapRGB(_p_screen->format, 153, 202, 51);
-                              // //SDL 2
-            SDL_MapRGB(SDL_GetPixelFormatDetails(_p_screen->format), NULL, 153,
-                       202, 51);
-        rectHeader.x = _rctOptBox.x + 1;
-        rectHeader.y = _rctOptBox.y + 1;
-        rectHeader.h = hbar;
-        rectHeader.w = _rctOptBox.w - 1;
-        // SDL_FillRect(pShadowSrf, &rectHeader, colorHeader); SDL 2
-        SDL_FillSurfaceRect(pShadowSrf, &rectHeader, colorHeader);
-
-        GFX_UTIL::DrawStaticLine(
-            pShadowSrf, rectHeader.x, rectHeader.y + rectHeader.h,
-            rectHeader.x + rectHeader.w, rectHeader.y + rectHeader.h,
-            GFX_UTIL_COLOR::White);
-        // text header
-        GFX_UTIL::DrawString(pShadowSrf, _headerText.c_str(),
-                             rectHeader.x + captionOffsetX, rectHeader.y,
-                             GFX_UTIL_COLOR::White, _p_fontCtrl);
-
-        // Button OK
-        _p_buttonOK->DrawButton(pShadowSrf);
-
-        // Combo Language: Label and crontrol
-        GFX_UTIL::DrawString(pShadowSrf, strSelectLanguage.c_str(),
-                             _p_comboLang->PosX(),
-                             _p_comboLang->PosY() - labelOffsetY,
-                             GFX_UTIL_COLOR::Orange, _p_fontText);
-
-        _p_comboLang->DrawButton(pShadowSrf);
-
-        // Checkbox music
-        _p_checkMusic->DrawButton(pShadowSrf);
-
-        // Combo Background: Label and control
-        GFX_UTIL::DrawString(pShadowSrf, strSelectBackGround.c_str(),
-                             _p_comboBackground->PosX(),
-                             _p_comboBackground->PosY() - labelOffsetY,
-                             GFX_UTIL_COLOR::Orange, _p_fontText);
-        _p_comboBackground->DrawButton(pShadowSrf);
-
-        // player name
-        _p_textInput->DrawCtrl(pShadowSrf);
-
-        // Combo Deck: Label and control
-        GFX_UTIL::DrawString(pShadowSrf, strDeckSelectTitle.c_str(),
-                             _p_comboDeck->PosX(),
-                             _p_comboDeck->PosY() - labelOffsetY,
-                             GFX_UTIL_COLOR::Orange, _p_fontText);
-
-        _p_comboDeck->DrawButton(pShadowSrf);
-
-        // Deck example Cards
-        int iCurrIndex = _p_comboDeck->GetSelectedIndex();
-        _cardOnEachDeck[0][iCurrIndex].DrawCardPac(pShadowSrf);
-        _cardOnEachDeck[1][iCurrIndex].DrawCardPac(pShadowSrf);
-        _cardOnEachDeck[2][iCurrIndex].DrawCardPac(pShadowSrf);
-
-        // render the dialogbox
-        SDL_BlitSurface(pShadowSrf, NULL, _p_screen, NULL);
-        SDL_UpdateTexture(pScreenTexture, NULL, _p_screen->pixels,
-                          _p_screen->pitch);
-        SDL_RenderTexture(_p_sdlRenderer, pScreenTexture, NULL, NULL);
-        SDL_RenderPresent(_p_sdlRenderer);
-        
-        // update controls
-        _p_textInput->Update();
-
-        // synch to frame rate
-        Uint64 uiNowTime = SDL_GetTicks();
-        if (uiNowTime < uiLast_time + FPS) {
-            SDL_Delay(uiLast_time + FPS - uiNowTime);
-            uiLast_time = SDL_GetTicks();
-        }
+    if (_p_ShadowSrf != NULL) {
+        SDL_DestroySurface(_p_ShadowSrf);
     }
-    SDL_DestroySurface(pShadowSrf);
-    SDL_DestroyTexture(pScreenTexture);
+    _p_ShadowSrf = GFX_UTIL::SDL_CreateRGBSurface(_p_screen->w, _p_screen->h,
+                                                  32, 0, 0, 0, 0);
+    if (_p_ScreenTexture != NULL) {
+        SDL_DestroyTexture(_p_ScreenTexture);
+    }
+    _p_ScreenTexture =
+        SDL_CreateTextureFromSurface(_p_sdlRenderer, _p_ShadowSrf);
+    // LPErrInApp err = NULL;
+    // bool _mouseDownRec = false;
+    // while (!_terminated) {
+    //  center the background
+    SDL_Rect clipRect;
+    SDL_GetSurfaceClipRect(_p_ShadowSrf, &clipRect);
+    SDL_FillSurfaceRect(
+        _p_ShadowSrf, &clipRect,
+        SDL_MapRGBA(SDL_GetPixelFormatDetails(_p_ShadowSrf->format), NULL, 0, 0,
+                    0, 0));
+
+    SDL_Rect rctTarget;
+    rctTarget.x = (_p_ShadowSrf->w - pScene_background->w) / 2;
+    rctTarget.y = (_p_ShadowSrf->h - pScene_background->h) / 2;
+    rctTarget.w = pScene_background->w;
+    rctTarget.h = pScene_background->h;
+    SDL_BlitSurface(pScene_background, NULL, _p_ShadowSrf, &rctTarget);
+
+    // SDL_Event event;
+    // while (SDL_PollEvent(&event)) {
+    //     if (event.type == SDL_EVENT_QUIT) {
+    //         _terminated = true;
+    //         break;
+    //     }
+    //     if (event.type == SDL_EVENT_KEY_DOWN) {
+    //         if (event.key.key == SDLK_RETURN) {
+    //             err = ButEndOPtClicked(MYIDOK);
+    //             if (err)
+    //                 return err;
+    //             break;
+    //         } else if (event.key.key == SDLK_ESCAPE) {
+    //             err = ButEndOPtClicked(MYIDCANCEL);
+    //             if (err)
+    //                 return err;
+    //             break;
+    //         }
+    //     }
+    //     if (event.type == SDL_EVENT_FINGER_DOWN) {
+    //         _p_buttonOK->FingerDown(event);
+    //         _p_checkMusic->FingerDown(event);
+    //         _p_comboLang->FingerDown(event);
+    //         _p_comboBackground->FingerDown(event);
+    //         _p_comboDeck->FingerDown(event);
+    //     }
+    //     if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
+    //         _mouseDownRec = true;
+    //     }
+    //     if (event.type == SDL_EVENT_MOUSE_BUTTON_UP) {
+    //         if (_mouseDownRec) {
+    //             _p_buttonOK->MouseUp(event);
+    //             _p_comboLang->MouseUp(event);
+    //             _p_checkMusic->MouseUp(event);
+    //             _p_comboBackground->MouseUp(event);
+    //             _p_comboDeck->MouseUp(event);
+    //             _mouseDownRec = false;
+    //         }
+    //     }
+    //     _p_textInput->HandleEvent(event, pWindow);
+    // }
+
+    // // the background of the option box
+    // GFX_UTIL::DrawStaticSpriteEx(_p_ShadowSrf, 0, 0, _rctOptBox.w,
+    // _rctOptBox.h,
+    //                              _rctOptBox.x, _rctOptBox.y, _p_surfBar);
+    // // draw border
+    // GFX_UTIL::DrawRect(_p_ShadowSrf, _rctOptBox.x - 1, _rctOptBox.y - 1,
+    //                    _rctOptBox.x + _rctOptBox.w + 1,
+    //                    _rctOptBox.y + _rctOptBox.h + 1,
+    //                    GFX_UTIL_COLOR::Gray);
+    // GFX_UTIL::DrawRect(_p_ShadowSrf, _rctOptBox.x - 2, _rctOptBox.y - 2,
+    //                    _rctOptBox.x + _rctOptBox.w + 2,
+    //                    _rctOptBox.y + _rctOptBox.h + 2,
+    //                    GFX_UTIL_COLOR::Black);
+    // GFX_UTIL::DrawRect(_p_ShadowSrf, _rctOptBox.x, _rctOptBox.y,
+    //                    _rctOptBox.x + _rctOptBox.w, _rctOptBox.y +
+    //                    _rctOptBox.h, _color);
+
+    // // header bar
+    // SDL_Rect rectHeader;
+    // Uint32 colorHeader =  // SDL_MapRGB(_p_screen->format, 153, 202, 51);
+    //                       // //SDL 2
+    //     SDL_MapRGB(SDL_GetPixelFormatDetails(_p_screen->format), NULL, 153,
+    //     202,
+    //                51);
+    // rectHeader.x = _rctOptBox.x + 1;
+    // rectHeader.y = _rctOptBox.y + 1;
+    // rectHeader.h = _hbar;
+    // rectHeader.w = _rctOptBox.w - 1;
+    // // SDL_FillRect(_p_ShadowSrf, &rectHeader, colorHeader); SDL 2
+    // SDL_FillSurfaceRect(_p_ShadowSrf, &rectHeader, colorHeader);
+
+    // GFX_UTIL::DrawStaticLine(
+    //     _p_ShadowSrf, rectHeader.x, rectHeader.y + rectHeader.h,
+    //     rectHeader.x + rectHeader.w, rectHeader.y + rectHeader.h,
+    //     GFX_UTIL_COLOR::White);
+    // // text header
+    // GFX_UTIL::DrawString(_p_ShadowSrf, _headerText.c_str(),
+    //                      rectHeader.x + _captionOffsetX, rectHeader.y,
+    //                      GFX_UTIL_COLOR::White, _p_fontCtrl);
+
+    // // Button OK
+    // _p_buttonOK->DrawButton(_p_ShadowSrf);
+
+    // // Combo Language: Label and crontrol
+    // GFX_UTIL::DrawString(_p_ShadowSrf, strSelectLanguage.c_str(),
+    //                      _p_comboLang->PosX(),
+    //                      _p_comboLang->PosY() - _labelOffsetY,
+    //                      GFX_UTIL_COLOR::Orange, _p_fontText);
+
+    // _p_comboLang->DrawButton(_p_ShadowSrf);
+
+    // // Checkbox music
+    // _p_checkMusic->DrawButton(_p_ShadowSrf);
+
+    // // Combo Background: Label and control
+    // GFX_UTIL::DrawString(_p_ShadowSrf, strSelectBackGround.c_str(),
+    //                      _p_comboBackground->PosX(),
+    //                      _p_comboBackground->PosY() - _labelOffsetY,
+    //                      GFX_UTIL_COLOR::Orange, _p_fontText);
+    // _p_comboBackground->DrawButton(_p_ShadowSrf);
+
+    // // player name
+    // _p_textInput->DrawCtrl(_p_ShadowSrf);
+
+    // // Combo Deck: Label and control
+    // GFX_UTIL::DrawString(_p_ShadowSrf, strDeckSelectTitle.c_str(),
+    //                      _p_comboDeck->PosX(),
+    //                      _p_comboDeck->PosY() - _labelOffsetY,
+    //                      GFX_UTIL_COLOR::Orange, _p_fontText);
+
+    // _p_comboDeck->DrawButton(_p_ShadowSrf);
+
+    // // Deck example Cards
+    // int iCurrIndex = _p_comboDeck->GetSelectedIndex();
+    // _cardOnEachDeck[0][iCurrIndex].DrawCardPac(_p_ShadowSrf);
+    // _cardOnEachDeck[1][iCurrIndex].DrawCardPac(_p_ShadowSrf);
+    // _cardOnEachDeck[2][iCurrIndex].DrawCardPac(_p_ShadowSrf);
+
+    // // render the dialogbox
+    // SDL_BlitSurface(_p_ShadowSrf, NULL, _p_screen, NULL);
+    // SDL_UpdateTexture(_p_ScreenTexture, NULL, _p_screen->pixels,
+    //                   _p_screen->pitch);
+    // SDL_RenderTexture(_p_sdlRenderer, _p_ScreenTexture, NULL, NULL);
+    // SDL_RenderPresent(_p_sdlRenderer);
+
+    // // update controls
+    // _p_textInput->Update();
+
+    // // synch to frame rate
+    // Uint64 uiNowTime = SDL_GetTicks();
+    // if (uiNowTime < uiLast_time + FPS) {
+    //     SDL_Delay(uiLast_time + FPS - uiNowTime);
+    //     uiLast_time = SDL_GetTicks();
+    // }
+    // //}
+    // SDL_DestroySurface(_p_ShadowSrf);
+    // SDL_DestroyTexture(_p_ScreenTexture);
     return NULL;
 }
 
 LPErrInApp OptionsGfx::ButEndOPtClicked(int butID) {
-    _terminated = true;
     TRACE("OK options clicked %d\n", butID);
+    _inProgress = false;
     Languages::eLangId prevLangId = _p_GameSettings->CurrentLanguage;
     eDeckType prevDeckType = _p_GameSettings->DeckTypeVal.GetType();
     bool prevMusicEnabled = _p_GameSettings->MusicEnabled;
@@ -528,12 +679,11 @@ LPErrInApp OptionsGfx::ButEndOPtClicked(int butID) {
         (_p_GameSettings->BackgroundType != prevBackgroundType) ||
         (_p_GameSettings->PlayerName != prevName) ||
         (_p_GameSettings->CurrentLanguage != prevLangId)) {
-         
         TRACE("Settings are changed\n");
         _p_GameSettings->SetCurrentLang();
 
-        LPErrInApp err = _menuDlgt.tc->SettingsChanged(
-            _menuDlgt.self,
+        LPErrInApp err = _optDlgt.tc->SettingsChanged(
+            _optDlgt.self,
             (_p_GameSettings->BackgroundType != prevBackgroundType),
             (_p_GameSettings->CurrentLanguage != prevLangId));
         if (err) {
