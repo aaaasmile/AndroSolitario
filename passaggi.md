@@ -236,6 +236,10 @@ la app riesce ora a caricare i fonts.
 
 Gli assets devono essere integrati nel wasm. Per questo si setta in target_link_options
 l'opzione preload-file, che mi genera il file solitario.data con tutti gli assets.
+Però per settare anche le atre opzioni, meglio usare:
+
+    set_target_properties(${PROJECT_NAME} PROPERTIES
+In quanto con target_link_options non mi ha funzionato ALLOW_MEMORY_GROWTH
 
 ## Directory Scratch di questo progetto
 Voglio creare dei piccoli progetti per testare delle funzionalità singole.

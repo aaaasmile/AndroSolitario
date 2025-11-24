@@ -186,6 +186,17 @@ LPErrInApp CreditsView::HandleIterate(bool& done) {
         return NULL;
     }
 
+    if (_state == CreditsView::WAIT_FOR_FADING){
+        if (_p_FadeAction->IsInProgress()){
+            _p_FadeAction->Iterate();
+            return NULL;
+        }
+        if(_state == _stateAfter){
+            return ERR_UTIL::ErrorCreate("Next state could not be WAIT_FOR_FADING\n");
+        }
+        _state = _stateAfter;
+    }
+
     if (_state == CreditsView::INIT) {
         _line = 0;
         _scroll = 0;
@@ -195,18 +206,22 @@ LPErrInApp CreditsView::HandleIterate(bool& done) {
         _p_ScreenTexture =
             SDL_CreateTextureFromSurface(_p_sdlRenderer, _p_surfScreen);
         if (!_ignoreMouseEvent) {
-            _p_FadeAction->Fade(_p_surfScreen, _p_surfScreen, 2, 1,
+            _p_FadeAction->Fade(_p_surfScreen, _p_surfScreen, 2, true,
                                 _p_sdlRenderer, NULL);
+            _state = CreditsView::WAIT_FOR_FADING;
+            _stateAfter = CreditsView::IN_PROGRESS;
         } else {
             _p_FadeAction->InstantFade(_p_surfScreen);
+            _state = CreditsView::IN_PROGRESS;
         }
         _p_MusicManager->PlayMusic(MusicManager::MUSIC_CREDITS_SND,
                                    MusicManager::LOOP_ON);
-        _state = CreditsView::IN_PROGRESS;
+        
         return NULL;
     }
 
     if (_state == CreditsView::IN_PROGRESS) {
+        
         dest.x = (_p_surfScreen->w - _p_SurfTitle->w) / 2;
         dest.y = 0;
         dest.w = _p_SurfTitle->w;
@@ -254,10 +269,10 @@ LPErrInApp CreditsView::HandleIterate(bool& done) {
 
     if (_state == CreditsView::DONE) {
         TRACE("CreditsView done \n");
-        _p_FadeAction->Fade(_p_surfScreen, _p_surfScreen, 1, 1, _p_sdlRenderer,
+        _p_FadeAction->Fade(_p_surfScreen, _p_surfScreen, 1, true, _p_sdlRenderer,
                             NULL);
-
-        _state = CreditsView::TERMINATED;
+        _state = CreditsView::WAIT_FOR_FADING;
+        _stateAfter = CreditsView::TERMINATED;
     }
 
     if (_state == CreditsView::TERMINATED) {

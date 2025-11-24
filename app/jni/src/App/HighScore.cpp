@@ -177,6 +177,7 @@ LPErrInApp HighScore::HandleIterate(bool& done) {
     if (_state == HighScore::READY_TO_START) {
         return NULL;
     }
+    // TODO: fading state!!!
 
     if (_state == HighScore::INIT) {
         TRACE("HighScore Init \n");
@@ -186,7 +187,7 @@ LPErrInApp HighScore::HandleIterate(bool& done) {
         _p_ScreenTexture =
             SDL_CreateTextureFromSurface(_p_sdlRenderer, _p_surfScreen);
         if (!_ignoreMouseEvent) {
-            _p_FadeAction->Fade(_p_surfScreen, _p_surfScreen, 2, 1,
+            _p_FadeAction->Fade(_p_surfScreen, _p_surfScreen, 2, true,
                                 _p_sdlRenderer, NULL);
         } else {
             _p_FadeAction->InstantFade(_p_surfScreen);
@@ -287,7 +288,7 @@ LPErrInApp HighScore::HandleIterate(bool& done) {
 
     if (_state == HighScore::DONE) {
         TRACE("HighScore done \n");
-        _p_FadeAction->Fade(_p_surfScreen, _p_surfScreen, 1, 1, _p_sdlRenderer,
+        _p_FadeAction->Fade(_p_surfScreen, _p_surfScreen, 1, true, _p_sdlRenderer,
                             NULL);
         _state = HighScore::TERMINATED;
         return NULL;

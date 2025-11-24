@@ -10,7 +10,7 @@ class GameSettings;
 class MusicManager;
 
 class CreditsView {
-    enum eState { READY_TO_START, INIT, IN_PROGRESS, DONE, TERMINATED };
+    enum eState { READY_TO_START, WAIT_FOR_FADING, INIT, IN_PROGRESS, DONE, TERMINATED };
 
    public:
     CreditsView();
@@ -36,6 +36,7 @@ class CreditsView {
     SDL_Surface* _p_SurfTitle;
 
     eState _state;
+    eState _stateAfter;
     uint32_t _scroll;
     uint32_t _line;
 };
