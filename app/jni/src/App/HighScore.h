@@ -21,7 +21,7 @@ typedef struct {
 
 class HighScore {
     enum { NUMOFSCORE = 10 };
-    enum eState { READY_TO_START, INIT, IN_PROGRESS, DONE, TERMINATED };
+    enum eState { READY_TO_START, WAIT_FOR_FADING, INIT, IN_PROGRESS, DONE, TERMINATED };
 
    public:
     HighScore();
@@ -48,6 +48,7 @@ class HighScore {
     MusicManager* _p_MusicManager;
     bool _ignoreMouseEvent;
     Uint64 _start_time;
+    eState _stateAfter;
 };
 
 #endif

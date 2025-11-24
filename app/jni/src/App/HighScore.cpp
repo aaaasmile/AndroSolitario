@@ -177,7 +177,16 @@ LPErrInApp HighScore::HandleIterate(bool& done) {
     if (_state == HighScore::READY_TO_START) {
         return NULL;
     }
-    // TODO: fading state!!!
+    if (_state == HighScore::WAIT_FOR_FADING){
+        if (_p_FadeAction->IsInProgress()){
+            _p_FadeAction->Iterate();
+            return NULL;
+        }
+        if(_state == _stateAfter){
+            return ERR_UTIL::ErrorCreate("Next state could not be WAIT_FOR_FADING\n");
+        }
+        _state = _stateAfter;
+    }
 
     if (_state == HighScore::INIT) {
         TRACE("HighScore Init \n");
@@ -189,12 +198,14 @@ LPErrInApp HighScore::HandleIterate(bool& done) {
         if (!_ignoreMouseEvent) {
             _p_FadeAction->Fade(_p_surfScreen, _p_surfScreen, 2, true,
                                 _p_sdlRenderer, NULL);
+            _state = HighScore::WAIT_FOR_FADING;
+            _stateAfter = HighScore::IN_PROGRESS;
         } else {
             _p_FadeAction->InstantFade(_p_surfScreen);
+            _state = HighScore::IN_PROGRESS;
         }
         _p_MusicManager->PlayMusic(MusicManager::MUSIC_CREDITS_SND,
                                    MusicManager::LOOP_ON);
-        _state = HighScore::IN_PROGRESS;
         return NULL;
     }
 
