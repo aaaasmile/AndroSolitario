@@ -8,6 +8,7 @@
 
 class FadeAction {
    public:
+    ~FadeAction();
     LPErrInApp Fade(SDL_Surface* pSurfScreen, SDL_Surface* pSurfImg,
                     Uint32 uiSeconds, bool fadeOut, SDL_Renderer* p_sdlRenderer,
                     SDL_Rect* p_rctTarget);
@@ -15,6 +16,9 @@ class FadeAction {
     void InstantFade(SDL_Surface* p_surf_screen);
     bool IsInProgress() { return _inProgress; }
     void Iterate();
+
+   private:
+    void cleanUp();
 
    private:
     bool _inProgress;

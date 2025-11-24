@@ -177,13 +177,15 @@ LPErrInApp HighScore::HandleIterate(bool& done) {
     if (_state == HighScore::READY_TO_START) {
         return NULL;
     }
-    if (_state == HighScore::WAIT_FOR_FADING){
-        if (_p_FadeAction->IsInProgress()){
+    if (_state == HighScore::WAIT_FOR_FADING) {
+        if (_p_FadeAction->IsInProgress()) {
             _p_FadeAction->Iterate();
             return NULL;
         }
-        if(_state == _stateAfter){
-            return ERR_UTIL::ErrorCreate("Next state could not be WAIT_FOR_FADING\n");
+        TRACE("HighScore Init - fade end \n");
+        if (_state == _stateAfter) {
+            return ERR_UTIL::ErrorCreate(
+                "Next state could not be WAIT_FOR_FADING\n");
         }
         _state = _stateAfter;
     }
@@ -196,6 +198,7 @@ LPErrInApp HighScore::HandleIterate(bool& done) {
         _p_ScreenTexture =
             SDL_CreateTextureFromSurface(_p_sdlRenderer, _p_surfScreen);
         if (!_ignoreMouseEvent) {
+            TRACE("HighScore Init - fade start \n");
             _p_FadeAction->Fade(_p_surfScreen, _p_surfScreen, 2, true,
                                 _p_sdlRenderer, NULL);
             _state = HighScore::WAIT_FOR_FADING;
@@ -299,9 +302,10 @@ LPErrInApp HighScore::HandleIterate(bool& done) {
 
     if (_state == HighScore::DONE) {
         TRACE("HighScore done \n");
-        _p_FadeAction->Fade(_p_surfScreen, _p_surfScreen, 1, true, _p_sdlRenderer,
-                            NULL);
-        _state = HighScore::TERMINATED;
+        _p_FadeAction->Fade(_p_surfScreen, _p_surfScreen, 1, true,
+                            _p_sdlRenderer, NULL);
+        _state = HighScore::WAIT_FOR_FADING;
+        _stateAfter = HighScore::TERMINATED;
         return NULL;
     }
 

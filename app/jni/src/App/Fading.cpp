@@ -1,5 +1,9 @@
 #include "Fading.h"
 
+#include <inttypes.h>
+
+#include "WinTypeGlobal.h"
+
 static SDL_Surface* SDL_CreateRGBSurface(int width, int height, int depth,
                                          Uint32 Rmask, Uint32 Gmask,
                                          Uint32 Bmask, Uint32 Amask) {
@@ -8,12 +12,30 @@ static SDL_Surface* SDL_CreateRGBSurface(int width, int height, int depth,
         SDL_GetPixelFormatForMasks(depth, Rmask, Gmask, Bmask, Amask));
 }
 
+FadeAction::~FadeAction() { cleanUp(); }
+
+void FadeAction::cleanUp() {
+    if (_p_surf_black != NULL) {
+        SDL_DestroySurface(_p_surf_black);
+        _p_surf_black = NULL;
+    }
+    if (_p_surf_screen_copy != NULL) {
+        SDL_DestroySurface(_p_surf_screen_copy);
+        _p_surf_screen_copy = NULL;
+    }
+    if (_p_ScreenTexture != NULL) {
+        SDL_DestroyTexture(_p_ScreenTexture);
+        _p_ScreenTexture = NULL;
+    }
+}
+
 // Fades the given surface in or out to the given screen within the given time
 //  If the image surface is the screen surface (pointer are equal), a copy is
 //  made first. We must do that because we are overwriting the Screen Surface.
 LPErrInApp FadeAction::Fade(SDL_Surface* pSurfScreen, SDL_Surface* pSurfImg,
                             Uint32 uiSeconds, bool fadeOut,
-                            SDL_Renderer* p_sdlRenderer, SDL_Rect* p_rctTarget) {
+                            SDL_Renderer* p_sdlRenderer,
+                            SDL_Rect* p_rctTarget) {
     if (_inProgress) {
         return ERR_UTIL::ErrorCreate(
             "Fade is already in progess, use iterate\n");
@@ -78,46 +100,13 @@ LPErrInApp FadeAction::Fade(SDL_Surface* pSurfScreen, SDL_Surface* pSurfImg,
     // ui_curr_time = ui_old_time;
     //  Convert the given time in seconds into miliseconds.
     _ui_time_ms = uiSeconds * 1000;
+    TRACE_DEBUG("[Fade] Ticks initial %" PRIu64 ", end of fading %" PRIu64 "\n",
+                _ui_old_time, _ui_time_ms);
     if (fadeOut) {
         _f_alpha = 0.0;
-        // Loop until the alpha value exceeds 255 (this is the maximum alpha
-        // value)
-        // while (f_alpha < 255.0) {
-        //     SDL_BlitSurface(p_surf_img, NULL, p_surf_screen, prctTarget);
-        //     SDL_SetSurfaceAlphaMod(p_surf_black, (Uint8)f_alpha);
-        //     SDL_BlitSurface(p_surf_black, NULL, p_surf_screen, NULL);
-        //     ui_old_time = ui_curr_time;
-        //     ui_curr_time = SDL_GetTicks();
-        //     SDL_UpdateTexture(pScreenTexture, NULL, p_surf_screen->pixels,
-        //                       p_surf_screen->pitch);
-        //     SDL_RenderTexture(psdlRenderer, pScreenTexture, NULL, NULL);
-        //     SDL_RenderPresent(psdlRenderer);
-
-        //     f_alpha += 255 * ((float)(ui_curr_time - ui_old_time) /
-        //     ui_time_ms);
-        // }
     } else {
         _f_alpha = 255.0;
-        // while (f_alpha > 0.0) {
-        //     SDL_BlitSurface(p_surf_img, NULL, p_surf_screen, prctTarget);
-        //     SDL_SetSurfaceAlphaMod(p_surf_black, (Uint8)f_alpha);
-        //     SDL_BlitSurface(p_surf_black, NULL, p_surf_screen, NULL);
-        //     ui_old_time = ui_curr_time;
-        //     ui_curr_time = SDL_GetTicks();
-        //     SDL_UpdateTexture(pScreenTexture, NULL, p_surf_screen->pixels,
-        //                       p_surf_screen->pitch);
-        //     SDL_RenderTexture(psdlRenderer, pScreenTexture, NULL, NULL);
-        //     SDL_RenderPresent(psdlRenderer);
-
-        //     f_alpha -= 255 * ((float)(ui_curr_time - ui_old_time) /
-        //     ui_time_ms);
-        // }
     }
-    // SDL_DestroySurface(p_surf_black);
-    // if (p_surf_screen_copy != NULL) {
-    //     SDL_DestroySurface(p_surf_screen_copy);
-    // }
-    // SDL_DestroyTexture(pScreenTexture);
 
     return NULL;
 }
@@ -161,18 +150,8 @@ void FadeAction::Iterate() {
         }
     }
     if (!_inProgress) {
-        if (_p_surf_black != NULL) {
-            SDL_DestroySurface(_p_surf_black);
-            _p_surf_black = NULL;
-        }
-        if (_p_surf_screen_copy != NULL) {
-            SDL_DestroySurface(_p_surf_screen_copy);
-            _p_surf_screen_copy = NULL;
-        }
-        if (_p_ScreenTexture != NULL) {
-            SDL_DestroyTexture(_p_ScreenTexture);
-            _p_ScreenTexture = NULL;
-        }
+        TRACE_DEBUG("[Fade] process terminated\n");
+        cleanUp();
     }
 }
 
