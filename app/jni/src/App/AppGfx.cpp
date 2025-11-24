@@ -54,7 +54,7 @@ AppGfx::AppGfx() {
     _fullScreen = false;
     _p_GameSettings = GameSettings::GetSettings();
     _p_CreditsView = new CreditsView();
-    _p_optGfx = new OptionsGfx();
+    _p_OptGfx = new OptionsGfx();
     _p_HighScore = new HighScore();
 }
 
@@ -141,7 +141,7 @@ LPErrInApp AppGfx::Init() {
 
     OptionDelegator optionDelegator = prepOptionDelegator();
 
-    err = _p_optGfx->Initialize(_p_Screen, _p_sdlRenderer, optionDelegator,
+    err = _p_OptGfx->Initialize(_p_Screen, _p_sdlRenderer, optionDelegator,
                                 _p_Window);
     if (err) {
         return err;
@@ -283,7 +283,7 @@ LPErrInApp AppGfx::createWindow() {
 
 void AppGfx::terminate() {
     delete _p_CreditsView;
-    delete _p_optGfx;
+    delete _p_OptGfx;
 
     SDL_ShowCursor();
 
@@ -337,14 +337,14 @@ LPErrInApp AppGfx::loadProfile() {
     return NULL;
 }
 
-void fncBind_LeaveMenu(void* self) {
+LPErrInApp fncBind_LeaveMenu(void* self) {
     AppGfx* pApp = (AppGfx*)self;
-    pApp->LeaveMenu();
+    return pApp->LeaveMenu();
 }
 
-void fncBind_SetNextMenu(void* self, MenuItemEnum menuItem) {
+LPErrInApp fncBind_EnterMenu(void* self, MenuItemEnum menuItem) {
     AppGfx* pApp = (AppGfx*)self;
-    pApp->SetNextMenu(menuItem);
+    return pApp->EnterMenu(menuItem);
 }
 
 LPErrInApp fncBind_SettingsChanged(void* self, bool backGroundChanged,
@@ -356,7 +356,7 @@ LPErrInApp fncBind_SettingsChanged(void* self, bool backGroundChanged,
 MenuDelegator AppGfx::prepMenuDelegator() {
     // Use only static otherwise you loose it
     static VMenuDelegator const tc = {.LeaveMenu = (&fncBind_LeaveMenu),
-                                      .SetNextMenu = (&fncBind_SetNextMenu)};
+                                      .EnterMenu = (&fncBind_EnterMenu)};
 
     return (MenuDelegator){.tc = &tc, .self = this};
 }
@@ -369,27 +369,44 @@ OptionDelegator AppGfx::prepOptionDelegator() {
     return (OptionDelegator){.tc = &tc, .self = this};
 }
 
-void AppGfx::LeaveMenu() {
+LPErrInApp AppGfx::LeaveMenu() {
     clearBackground();
     _histMenu.pop();
-}
-
-LPErrInApp AppGfx::SettingsChanged(bool backGroundChanged,
-                                   bool languageChanged) {
-    if (backGroundChanged) {
-        _backGroundChanged = true;
-    }
     return NULL;
 }
 
-void AppGfx::clearBackground() {
-    TRACE_DEBUG("Clear background\n");
-    SDL_Rect clipRect;  // SDL 3
-    SDL_GetSurfaceClipRect(_p_Screen, &clipRect);
-    SDL_FillSurfaceRect(_p_Screen, &clipRect,
-                        SDL_MapRGB(SDL_GetPixelFormatDetails(_p_Screen->format),
-                                   NULL, 0, 0, 0));
-    updateScreenTexture();
+LPErrInApp AppGfx::EnterMenu(MenuItemEnum menuItem) {
+    _histMenu.push(menuItem);
+    LPErrInApp err;
+    switch (menuItem) {
+        case MenuItemEnum::MENU_GAME:
+            // TODO start game
+            break;
+        case MenuItemEnum::MENU_HELP:
+            err = showHelp();
+            if (err != NULL)
+                return err;
+            break;
+        case MenuItemEnum::MENU_CREDITS:
+            err = showCredits();
+            if (err != NULL)
+                return err;
+            break;
+        case MenuItemEnum::MENU_HIGHSCORE:
+            err = showHighScore();
+            if (err != NULL)
+                return err;
+            break;
+        case MenuItemEnum::MENU_OPTIONS:
+            err = showGeneralOptions();
+            if (err != NULL)
+                return err;
+            break;
+        default:
+            // Nothing to do
+            break;
+    }
+    return NULL;
 }
 
 LPErrInApp AppGfx::MainLoopEvent(SDL_Event* pEvent, SDL_AppResult& res) {
@@ -412,38 +429,37 @@ LPErrInApp AppGfx::MainLoopEvent(SDL_Event* pEvent, SDL_AppResult& res) {
             // TRACE("Exit from game loop \n");
             // LeaveMenu();
             break;
-#if HASHELPMENU
+
         case MenuItemEnum::MENU_HELP:
-            err = showHelp();
-            if (err != NULL)
-                return err;
+            // Nothing to loop
+            // err = showHelp();
+            // if (err != NULL)
+            //     return err;
             break;
-#endif
 
         case MenuItemEnum::MENU_CREDITS:
-            err = showCredits();
-            if (err != NULL)
-                return err;
+            // err = showCredits();
+            // if (err != NULL)
+            //     return err;
             err = _p_CreditsView->HandleEvent(pEvent);
             if (err != NULL)
                 return err;
             break;
 
         case MenuItemEnum::MENU_HIGHSCORE:
-            err = showHighScore();
-            if (err != NULL)
-                return err;
+            // err = showHighScore();
+            // if (err != NULL)
+            //     return err;
             err = _p_HighScore->HandleEvent(pEvent);
             if (err != NULL)
                 return err;
             break;
 
         case MenuItemEnum::MENU_OPTIONS:
-            _backGroundChanged = false;
-            err = showGeneralOptions();
-            if (err != NULL)
-                return err;
-            err = _p_optGfx->HandleEvent(pEvent);
+            // err = showGeneralOptions();
+            // if (err != NULL)
+            //     return err;
+            err = _p_OptGfx->HandleEvent(pEvent);
             if (err != NULL)
                 return err;
             break;
@@ -504,20 +520,18 @@ LPErrInApp AppGfx::MainLoopIterate() {
             break;
 
         case MenuItemEnum::MENU_OPTIONS:
-            if (_p_optGfx->IsInProgress()) {
-                err = _p_optGfx->HandleIterate(done);
-                if (err != NULL)
-                    return err;
-                if (done) {
-                    backToMenuRootSameMusic();
-                    if (_backGroundChanged) {
-                        TRACE_DEBUG("Background changed by options \n");
-                        err = loadSceneBackground();
-                        if (err != NULL)
-                            return err;
-                        _p_MenuMgr->SetBackground(_p_SceneBackground);
-                        _backGroundChanged = false;
-                    }
+            err = _p_OptGfx->HandleIterate(done);
+            if (err != NULL)
+                return err;
+            if (done) {
+                backToMenuRootSameMusic();
+                if (_backGroundChanged) {
+                    TRACE_DEBUG("Background changed by options \n");
+                    err = loadSceneBackground();
+                    if (err != NULL)
+                        return err;
+                    _p_MenuMgr->SetBackground(_p_SceneBackground);
+                    _backGroundChanged = false;
                 }
             }
             break;
@@ -531,21 +545,6 @@ LPErrInApp AppGfx::MainLoopIterate() {
             break;
     }
     return NULL;
-}
-
-void AppGfx::backToMenuRootWithMusic() {
-    TRACE("Back to root menu\n");
-    LeaveMenu();
-    _p_MusicManager->PlayMusic(MusicManager::MUSIC_INIT_SND,
-                               MusicManager::LOOP_ON);
-    _p_HighScore->Reset();
-    _p_CreditsView->Reset();
-}
-
-void AppGfx::backToMenuRootSameMusic() {
-    TRACE("Back to root menu same music\n");
-    LeaveMenu();
-    _p_optGfx->Reset();
 }
 
 LPErrInApp AppGfx::startGameLoop() {
@@ -569,6 +568,7 @@ LPErrInApp AppGfx::startGameLoop() {
 }
 
 LPErrInApp AppGfx::showHelp() {
+    TRACE("Show Help\n");
     const char* cmd = NULL;
     char cmdpath[PATH_MAX];
 #if PLATFORM_WINDOWS
@@ -589,6 +589,10 @@ LPErrInApp AppGfx::showHelp() {
 }
 
 LPErrInApp AppGfx::showHighScore() {
+    TRACE("Show HighScore\n");
+    if (_p_HighScore->IsOngoing()) {
+        return ERR_UTIL::ErrorCreate("Credit already started");
+    }
     if (_p_HighScore->IsOngoing()) {
         return NULL;
     }
@@ -601,8 +605,9 @@ LPErrInApp AppGfx::showHighScore() {
 }
 
 LPErrInApp AppGfx::showCredits() {
+    TRACE("Show Credits\n");
     if (_p_CreditsView->IsOngoing()) {
-        return NULL;
+        return ERR_UTIL::ErrorCreate("Credit already started");
     }
     if (_p_MusicManager->IsPlayingMusic()) {
         _p_MusicManager->StopMusic(600);
@@ -613,18 +618,53 @@ LPErrInApp AppGfx::showCredits() {
 }
 
 LPErrInApp AppGfx::showGeneralOptions() {
-    if (_p_optGfx->IsInProgress()) {
-        return NULL;
-    }
     TRACE("Show general Options\n");
+    if (_p_OptGfx->IsOngoing()) {
+        return ERR_UTIL::ErrorCreate("General Options already started");
+    }
+    _backGroundChanged = false;
 
     LPLanguages pLanguages = _p_GameSettings->GetLanguageMan();
     STRING caption = pLanguages->GetStringId(Languages::ID_MEN_OPTIONS);
-    LPErrInApp err = _p_optGfx->Show(_p_SceneBackground, caption);
+    LPErrInApp err = _p_OptGfx->Show(_p_SceneBackground, caption);
     if (err) {
         return err;
     }
     return NULL;
+}
+
+
+void AppGfx::backToMenuRootWithMusic() {
+    TRACE("Back to root menu\n");
+    LeaveMenu();
+    _p_MusicManager->PlayMusic(MusicManager::MUSIC_INIT_SND,
+                               MusicManager::LOOP_ON);
+    _p_HighScore->Reset();
+    _p_CreditsView->Reset();
+}
+
+void AppGfx::backToMenuRootSameMusic() {
+    TRACE("Back to root menu same music\n");
+    LeaveMenu();
+    _p_OptGfx->Reset();
+}
+
+LPErrInApp AppGfx::SettingsChanged(bool backGroundChanged,
+                                   bool languageChanged) {
+    if (backGroundChanged) {
+        _backGroundChanged = true;
+    }
+    return NULL;
+}
+
+void AppGfx::clearBackground() {
+    TRACE_DEBUG("Clear background\n");
+    SDL_Rect clipRect;
+    SDL_GetSurfaceClipRect(_p_Screen, &clipRect);
+    SDL_FillSurfaceRect(_p_Screen, &clipRect,
+                        SDL_MapRGB(SDL_GetPixelFormatDetails(_p_Screen->format),
+                                   NULL, 0, 0, 0));
+    updateScreenTexture();
 }
 
 void AppGfx::updateScreenTexture() {

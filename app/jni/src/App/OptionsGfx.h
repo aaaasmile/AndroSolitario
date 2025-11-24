@@ -44,7 +44,7 @@ class OptionsGfx {
     LPErrInApp ButEndOPtClicked(int iButID);
     void CheckboxMusicClicked(bool state);
     void Reset() { _inProgress = false; }
-    bool IsInProgress() { return _inProgress; }
+    bool IsOngoing() { return _inProgress; }
 
    private:
     ClickCb prepClickCb();

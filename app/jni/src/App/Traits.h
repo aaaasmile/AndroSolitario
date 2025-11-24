@@ -20,8 +20,8 @@ enum MenuItemEnum {
 namespace traits {
 // trait for menu
 typedef struct {
-    void (*const LeaveMenu)(void* self);
-    void (*const SetNextMenu)(void* self, MenuItemEnum menuItem);
+    LPErrInApp (*const LeaveMenu)(void* self);
+    LPErrInApp (*const EnterMenu)(void* self, MenuItemEnum menuItem);
 } VMenuDelegator, *LPVMenuDelegator;
 
 typedef struct {

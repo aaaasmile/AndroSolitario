@@ -37,8 +37,8 @@ class AppGfx {
         _p_GameSettings->PlayerName = strVal;
     }
     void ParseCmdLine(int argc, char* argv[], SDL_AppResult& res);
-    void LeaveMenu();
-    void SetNextMenu(MenuItemEnum menuItem) { _histMenu.push(menuItem); }
+    LPErrInApp LeaveMenu();
+    LPErrInApp EnterMenu(MenuItemEnum menuItem); 
     LPErrInApp SettingsChanged(bool backGroundChanged, bool languageChanged);
 
    private:
@@ -72,7 +72,7 @@ class AppGfx {
     HighScore* _p_HighScore;
     MenuMgr* _p_MenuMgr;
     CreditsView* _p_CreditsView;
-    OptionsGfx* _p_optGfx;
+    OptionsGfx* _p_OptGfx;
 
     int _screenW;
     int _screenH;

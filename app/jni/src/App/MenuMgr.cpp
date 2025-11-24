@@ -486,6 +486,7 @@ LPErrInApp MenuMgr::drawMenuTextList() {
 
 LPErrInApp MenuMgr::HandleRootMenuEvent(SDL_Event* pEvent) {
     SDL_Point touchLocation;
+    LPErrInApp err;
     // TRACE_DEBUG("Ignore mouse events: %b", ignoreMouseEvent);
     if (pEvent->type == SDL_EVENT_QUIT) {
         (_menuDlgt.tc)->LeaveMenu(_menuDlgt.self);
@@ -500,7 +501,10 @@ LPErrInApp MenuMgr::HandleRootMenuEvent(SDL_Event* pEvent) {
             _focusedMenuItem = tapInfoBox.MenuItem;
             TRACE_DEBUG("Select menu %s from Tap down\n",
                         MenuItemEnumToString(_focusedMenuItem));
-            rootMenuNext();
+            err = rootMenuNext();
+            if(err != NULL){
+                return err;
+            }
         } else {
             TRACE_DEBUG("Tap outside the menu list\n");
             _focusedMenuItem = MenuItemEnum::NOTHING;
@@ -522,7 +526,10 @@ LPErrInApp MenuMgr::HandleRootMenuEvent(SDL_Event* pEvent) {
         }
         if (pEvent->key.key == SDLK_RETURN) {
             TRACE_DEBUG("Select menu from return\n");
-            rootMenuNext();
+            err = rootMenuNext();
+            if(err != NULL){
+                return err;
+            }
         }
         if (pEvent->key.key == SDLK_ESCAPE) {
             (_menuDlgt.tc)->LeaveMenu(_menuDlgt.self);
@@ -562,7 +569,10 @@ LPErrInApp MenuMgr::HandleRootMenuEvent(SDL_Event* pEvent) {
             _focusedMenuItem = mouseInfoBox.MenuItem;
             TRACE_DEBUG("Select menu %s from mouse down\n",
                         MenuItemEnumToString(_focusedMenuItem));
-            rootMenuNext();
+            err = rootMenuNext();
+            if(err != NULL){
+                return err;
+            }
         } else {
             TRACE_DEBUG("Mouse outside the menu list\n");
             _focusedMenuItem = MenuItemEnum::NOTHING;
@@ -617,13 +627,15 @@ void MenuMgr::updateTextureAsFlipScreen() {
     SDL_RenderPresent(_p_sdlRenderer);
 }
 
-void MenuMgr::rootMenuNext() {
+LPErrInApp MenuMgr::rootMenuNext() {
+    LPErrInApp err;
     TRACE_DEBUG("Menu selected %s\n", MenuItemEnumToString(_focusedMenuItem));
     if (_focusedMenuItem == MenuItemEnum::QUIT) {
-        (_menuDlgt.tc)->LeaveMenu(_menuDlgt.self);
+        err = (_menuDlgt.tc)->LeaveMenu(_menuDlgt.self);
     } else {
-        (_menuDlgt.tc)->SetNextMenu(_menuDlgt.self, _focusedMenuItem);
+        err = (_menuDlgt.tc)->EnterMenu(_menuDlgt.self, _focusedMenuItem);
     }
+    return err;
 }
 
 MenuItemEnum previousMenu(MenuItemEnum currMenu) {

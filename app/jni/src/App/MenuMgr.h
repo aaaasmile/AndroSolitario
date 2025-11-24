@@ -36,7 +36,7 @@ class MenuMgr {
                             SDL_Color& color, TTF_Font* customfont);
     LPErrInApp drawStaticScene();
     LPErrInApp drawMenuTextList();
-    void rootMenuNext();
+    LPErrInApp rootMenuNext();
     void updateTextureAsFlipScreen();
 
    private:
