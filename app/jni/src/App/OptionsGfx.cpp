@@ -326,7 +326,7 @@ LPErrInApp OptionsGfx::HandleIterate(bool& done) {
 
     if (_p_comboBackground->GetSelectedIndex() !=
         _p_GameSettings->BackgroundType) {
-        TRACE_DEBUG("Backaground selection changed \n");
+        TRACE_DEBUG("Backaground selection changed to %d \n", _p_comboBackground->GetSelectedIndex());
         setBackgoundTypeInGameSettings();
 
         err = _optDlgt.tc->ChangeSceneBackground(_optDlgt.self,

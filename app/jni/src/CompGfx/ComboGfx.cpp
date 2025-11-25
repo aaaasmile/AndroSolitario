@@ -207,8 +207,8 @@ void ComboGfx::MouseUp(SDL_Event* pEvent) {
                     ->Click(_fncbClickEvent.self, _currDataIndex);
         }
     }
-    TRACE_DEBUG("[combo] Index %d, size %d \n", _currDataIndex,
-                _vctDataStrings.size());
+    // TRACE_DEBUG("[combo] Index %d, size %d \n", _currDataIndex,
+    //             _vctDataStrings.size());
 }
 
 void ComboGfx::DrawButton(SDL_Surface* pScreen) {
