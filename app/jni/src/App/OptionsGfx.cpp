@@ -268,9 +268,16 @@ LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
         _cardOnEachDeck[2][i].SetCardLoc(_cardOnEachDeck[1][i].X() + 10 + ww,
                                          y_pos);
         _cardOnEachDeck[2][i].SetDeckSurface(_p_deckAll[i]);
-        
+
         if (!_p_GameSettings->NeedScreenMagnify()) {
+            SDL_Surface* surface = _p_deckAll[i];
             if (dt.GetType() == eDeckType::TAROCK_PIEMONT) {
+                TRACE_DEBUG("[TAROCK_PIEMONT] Deck format: %s, w: %d, h: %d\n",
+                            SDL_GetPixelFormatName(surface->format), surface->w,
+                            surface->h);
+                TRACE_DEBUG("[TAROCK_PIEMONT] pScreen buffer format: %s, w: %d, h: %d\n",
+                            SDL_GetPixelFormatName(pScreen->format), pScreen->w,
+                            pScreen->h);
                 float factor = 0.7;
                 for (int j = 0; j < 3; j++) {
                     _cardOnEachDeck[j][i].SetScaleFactor(factor);
@@ -538,6 +545,10 @@ LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
     }
     _p_ScreenTexture =
         SDL_CreateTextureFromSurface(_p_sdlRenderer, _p_ShadowSrf);
+
+    TRACE_DEBUG("[TAROCK_PIEMONT] _p_ShadowSrf buffer format: %s, w: %d, h: %d\n",
+                            SDL_GetPixelFormatName(_p_ShadowSrf->format), _p_ShadowSrf->w,
+                            _p_ShadowSrf->h);
     return NULL;
 }
 
