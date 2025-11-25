@@ -323,10 +323,17 @@ LPErrInApp OptionsGfx::HandleIterate(bool& done) {
         _p_ShadowSrf, &clipRect,
         SDL_MapRGBA(SDL_GetPixelFormatDetails(_p_ShadowSrf->format), NULL, 0, 0,
                     0, 0));
-
+    if (_p_comboLang->GetSelectedIndex() != _p_GameSettings->CurrentLanguage) {
+        TRACE_DEBUG("Language selection changed to %d \n",
+                    _p_comboLang->GetSelectedIndex());
+        setLanguageInGameSettings();
+        _p_GameSettings->SetCurrentLang();
+        setControlLocalCaptions();
+    }
     if (_p_comboBackground->GetSelectedIndex() !=
         _p_GameSettings->BackgroundType) {
-        TRACE_DEBUG("Backaground selection changed to %d \n", _p_comboBackground->GetSelectedIndex());
+        TRACE_DEBUG("Backaground selection changed to %d \n",
+                    _p_comboBackground->GetSelectedIndex());
         setBackgoundTypeInGameSettings();
 
         err = _optDlgt.tc->ChangeSceneBackground(_optDlgt.self,
@@ -455,8 +462,13 @@ LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
     }
     _inProgress = true;
     _p_Scene_background = pScene_background;
-
     _headerText = strCaption;
+    _prevLangId = _p_GameSettings->CurrentLanguage;
+    _prevDeckType = _p_GameSettings->DeckTypeVal.GetType();
+    _prevMusicEnabled = _p_GameSettings->MusicEnabled;
+    _prevBackgroundType = _p_GameSettings->BackgroundType;
+    _prevName = _p_GameSettings->PlayerName;
+
     // _terminated = false;
     // Uint64 uiInitialTick = SDL_GetTicks();
     // Uint64 uiLast_time = uiInitialTick;
@@ -464,38 +476,20 @@ LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
     // combobox language selection (remeber add is without clear, so only at
     // once)
 
-    LPLanguages pLanguages = _p_GameSettings->GetLanguageMan();
-
     // combo language
-    STRING strTextBt = pLanguages->GetStringId(Languages::ID_ITALIANO);
-    _p_comboLang->ClearLines();
-    _p_comboLang->AddLineText(strTextBt.c_str());
-    strTextBt = pLanguages->GetStringId(Languages::ID_DIALETMN);
-    _p_comboLang->AddLineText(strTextBt.c_str());
-    strTextBt = pLanguages->GetStringId(Languages::ID_ENGLISH);
-    _p_comboLang->AddLineText(strTextBt.c_str());
+    setControlLocalCaptions();
+
     _p_comboLang->SetVisibleState(ComboGfx::VISIBLE);
     _p_comboLang->SelectIndex(_p_GameSettings->CurrentLanguage);
 
     // Button ok
-    strTextBt = pLanguages->GetStringId(Languages::ID_OK);
-    _p_buttonOK->SetButtonText(strTextBt.c_str());
     _p_buttonOK->SetVisibleState(ButtonGfx::VISIBLE);
 
     // checkbox music
-    strTextBt = pLanguages->GetStringId(Languages::ID_SOUNDOPT);
-    _p_checkMusic->SetWindowText(strTextBt.c_str());
     _p_checkMusic->SetVisibleState(CheckBoxGfx::VISIBLE);
     _p_checkMusic->SetCheckState(_p_GameSettings->MusicEnabled);
 
     // combobox background selection
-    strTextBt = pLanguages->GetStringId(Languages::ID_COMMESSAGGIO);
-    _p_comboBackground->ClearLines();
-    _p_comboBackground->AddLineText(strTextBt.c_str());
-    strTextBt = pLanguages->GetStringId(Languages::ID_MANTOVA);
-    _p_comboBackground->AddLineText(strTextBt.c_str());
-    strTextBt = pLanguages->GetStringId(Languages::ID_BLACK);
-    _p_comboBackground->AddLineText(strTextBt.c_str());
     _p_comboBackground->SetVisibleState(ComboGfx::VISIBLE);
     _p_comboBackground->SelectIndex(_p_GameSettings->BackgroundType);
 
@@ -506,10 +500,11 @@ LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
     // combobox deck selection
     _p_comboDeck->ClearLines();
     DeckType dt;
+    STRING deckName;
     for (int i = 0; i < eDeckType::NUM_OF_DECK; i++) {
         dt.SetTypeIndex(i);
-        strTextBt = dt.GetDeckName();
-        _p_comboDeck->AddLineText(strTextBt.c_str());
+        deckName = dt.GetDeckName();
+        _p_comboDeck->AddLineText(deckName.c_str());
     }
     _p_comboDeck->SetVisibleState(ComboGfx::VISIBLE);
     _p_comboDeck->SelectIndex(_p_GameSettings->DeckTypeVal.GetTypeIndex());
@@ -678,15 +673,70 @@ LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
     return NULL;
 }
 
+void OptionsGfx::setControlLocalCaptions() {
+    LPLanguages pLanguages = _p_GameSettings->GetLanguageMan();
+    STRING strTextBt;
+    // Commbo languages
+    _p_comboLang->ClearLines();
+    strTextBt = pLanguages->GetStringId(Languages::ID_ITALIANO);
+    _p_comboLang->AddLineText(strTextBt.c_str());
+    strTextBt = pLanguages->GetStringId(Languages::ID_DIALETMN);
+    _p_comboLang->AddLineText(strTextBt.c_str());
+    strTextBt = pLanguages->GetStringId(Languages::ID_ENGLISH);
+    _p_comboLang->AddLineText(strTextBt.c_str());
+
+    // Button OK
+    strTextBt = pLanguages->GetStringId(Languages::ID_OK);
+    _p_buttonOK->SetButtonText(strTextBt.c_str());
+
+    // checkbox music
+    strTextBt = pLanguages->GetStringId(Languages::ID_SOUNDOPT);
+    _p_checkMusic->SetWindowText(strTextBt.c_str());
+
+    // combobox background selection
+    _p_comboBackground->ClearLines();
+    strTextBt = pLanguages->GetStringId(Languages::ID_COMMESSAGGIO);
+    _p_comboBackground->AddLineText(strTextBt.c_str());
+    strTextBt = pLanguages->GetStringId(Languages::ID_MANTOVA);
+    _p_comboBackground->AddLineText(strTextBt.c_str());
+    strTextBt = pLanguages->GetStringId(Languages::ID_BLACK);
+    _p_comboBackground->AddLineText(strTextBt.c_str());
+}
+
 LPErrInApp OptionsGfx::ButEndOPtClicked(int butID) {
     TRACE("OK options clicked %d\n", butID);
     _inProgress = false;
-    Languages::eLangId prevLangId = _p_GameSettings->CurrentLanguage;
-    eDeckType prevDeckType = _p_GameSettings->DeckTypeVal.GetType();
-    bool prevMusicEnabled = _p_GameSettings->MusicEnabled;
-    BackgroundTypeEnum prevBackgroundType = _p_GameSettings->BackgroundType;
-    std::string prevName = _p_GameSettings->PlayerName;
 
+    setLanguageInGameSettings();
+    setBackgoundTypeInGameSettings();
+
+    DeckType dt;
+    dt.SetTypeIndex(_p_comboDeck->GetSelectedIndex());
+    _p_GameSettings->DeckTypeVal.CopyFrom(dt);
+    _p_GameSettings->MusicEnabled = _p_checkMusic->GetCheckState();
+    _p_GameSettings->PlayerName = _p_textInput->GetText();
+
+    if ((_p_GameSettings->MusicEnabled != _prevMusicEnabled) ||
+        (_p_GameSettings->DeckTypeVal.GetType() != _prevDeckType) ||
+        (_p_GameSettings->BackgroundType != _prevBackgroundType) ||
+        (_p_GameSettings->PlayerName != _prevName) ||
+        (_p_GameSettings->CurrentLanguage != _prevLangId)) {
+        TRACE("Settings are changed\n");
+        _p_GameSettings->SetCurrentLang();
+
+        LPErrInApp err = _optDlgt.tc->SettingsChanged(
+            _optDlgt.self,
+            (_p_GameSettings->BackgroundType != _prevBackgroundType),
+            (_p_GameSettings->CurrentLanguage != _prevLangId));
+        if (err) {
+            return err;
+        }
+        return _p_GameSettings->SaveSettings();
+    }
+    return NULL;
+}
+
+void OptionsGfx::setLanguageInGameSettings() {
     switch (_p_comboLang->GetSelectedIndex()) {
         case 0:
             _p_GameSettings->CurrentLanguage = Languages::eLangId::LANG_ITA;
@@ -701,33 +751,6 @@ LPErrInApp OptionsGfx::ButEndOPtClicked(int butID) {
         default:
             break;
     }
-
-    setBackgoundTypeInGameSettings();
-
-    DeckType dt;
-    dt.SetTypeIndex(_p_comboDeck->GetSelectedIndex());
-    _p_GameSettings->DeckTypeVal.CopyFrom(dt);
-    _p_GameSettings->MusicEnabled = _p_checkMusic->GetCheckState();
-    _p_GameSettings->PlayerName = _p_textInput->GetText();
-
-    if ((_p_GameSettings->MusicEnabled != prevMusicEnabled) ||
-        (_p_GameSettings->DeckTypeVal.GetType() != prevDeckType) ||
-        (_p_GameSettings->BackgroundType != prevBackgroundType) ||
-        (_p_GameSettings->PlayerName != prevName) ||
-        (_p_GameSettings->CurrentLanguage != prevLangId)) {
-        TRACE("Settings are changed\n");
-        _p_GameSettings->SetCurrentLang();
-
-        LPErrInApp err = _optDlgt.tc->SettingsChanged(
-            _optDlgt.self,
-            (_p_GameSettings->BackgroundType != prevBackgroundType),
-            (_p_GameSettings->CurrentLanguage != prevLangId));
-        if (err) {
-            return err;
-        }
-        return _p_GameSettings->SaveSettings();
-    }
-    return NULL;
 }
 
 void OptionsGfx::setBackgoundTypeInGameSettings() {

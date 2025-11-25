@@ -50,6 +50,8 @@ class OptionsGfx {
     ClickCb prepClickCb();
     CheckboxClickCb prepCheckBoxClickMusic();
     void setBackgoundTypeInGameSettings();
+    void setLanguageInGameSettings();
+    void setControlLocalCaptions();
 
    private:
     SDL_Renderer* _p_sdlRenderer;
@@ -80,6 +82,12 @@ class OptionsGfx {
     int _labelOffsetY;
     int _captionOffsetX;
     bool _initilized;
+    // previous settings    
+    Languages::eLangId _prevLangId;
+    eDeckType _prevDeckType;
+    bool _prevMusicEnabled;
+    BackgroundTypeEnum _prevBackgroundType;
+    std::string _prevName;
 };
 
 #endif
