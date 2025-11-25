@@ -309,7 +309,7 @@ LPErrInApp OptionsGfx::HandleEvent(SDL_Event* pEvent) {
 }
 
 LPErrInApp OptionsGfx::HandleIterate(bool& done) {
-     //  center the background
+    //  center the background
     SDL_Rect clipRect;
     SDL_GetSurfaceClipRect(_p_ShadowSrf, &clipRect);
     SDL_FillSurfaceRect(
@@ -398,6 +398,9 @@ LPErrInApp OptionsGfx::HandleIterate(bool& done) {
 
     // Deck example Cards
     int iCurrIndex = _p_comboDeck->GetSelectedIndex();
+    if (iCurrIndex < 0 || iCurrIndex >= eDeckType::NUM_OF_DECK) {
+        return ERR_UTIL::ErrorCreate("i out of range: %d", iCurrIndex);
+    }
     _cardOnEachDeck[0][iCurrIndex].DrawCardPac(_p_ShadowSrf);
     _cardOnEachDeck[1][iCurrIndex].DrawCardPac(_p_ShadowSrf);
     _cardOnEachDeck[2][iCurrIndex].DrawCardPac(_p_ShadowSrf);
@@ -510,7 +513,6 @@ LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
     // LPErrInApp err = NULL;
     // bool _mouseDownRec = false;
     // while (!_terminated) {
-   
 
     // SDL_Event event;
     // while (SDL_PollEvent(&event)) {
