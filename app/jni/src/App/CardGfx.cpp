@@ -134,6 +134,7 @@ LPErrInApp CardGfx::DrawCardPac(SDL_Surface* s) {
         //     "[DrawCardPac] scaling tarock height from %d to %d and width %d to "
         //     "%d \n",
         //     srcCard.h, dest.h, srcCard.w, dest.w);
+        // NOte: I can't get SDL_SCALEMODE_LINEAR working
         if (!SDL_BlitSurfaceScaled(_pPacDeck, &srcCard, s, &dest,
                                    SDL_SCALEMODE_NEAREST)) {
             return ERR_UTIL::ErrorCreate(
