@@ -41,7 +41,7 @@ class OptionsGfx {
     LPErrInApp HandleEvent(SDL_Event* pEvent);
     LPErrInApp HandleIterate(bool& done);
     void SetCaption(STRING& strCaption) { _headerText = strCaption; }
-    LPErrInApp ButEndOPtClicked(int iButID);
+    LPErrInApp OptionsEnd();
     void CheckboxMusicClicked(bool state);
     void Reset() { _inProgress = false; }
     bool IsOngoing() { return _inProgress; }

@@ -61,7 +61,7 @@ OptionsGfx::~OptionsGfx() {
 // Prepare the Click() trait
 void fncBind_ButtonClicked(void* self, int iVal) {
     OptionsGfx* pOptionsGfx = (OptionsGfx*)self;
-    pOptionsGfx->ButEndOPtClicked(iVal);
+    pOptionsGfx->OptionsEnd();
 }
 
 // Buttons, ok and cancel
@@ -282,12 +282,12 @@ LPErrInApp OptionsGfx::HandleEvent(SDL_Event* pEvent) {
     if (pEvent->type == SDL_EVENT_KEY_DOWN) {
         if (pEvent->key.key == SDLK_RETURN) {
             if (!_p_textInput->GetHasFocus()) {
-                err = ButEndOPtClicked(MYIDOK);
+                err = OptionsEnd();
                 if (err)
                     return err;
             }
         } else if (pEvent->key.key == SDLK_ESCAPE) {
-            err = ButEndOPtClicked(MYIDCANCEL);
+            err = OptionsEnd();
             if (err)
                 return err;
         }
@@ -317,7 +317,6 @@ LPErrInApp OptionsGfx::HandleEvent(SDL_Event* pEvent) {
 }
 
 LPErrInApp OptionsGfx::HandleIterate(bool& done) {
-    //  center the background
     LPErrInApp err;
     SDL_Rect clipRect;
     SDL_GetSurfaceClipRect(_p_ShadowSrf, &clipRect);
@@ -344,6 +343,7 @@ LPErrInApp OptionsGfx::HandleIterate(bool& done) {
             return err;
         }
     }
+     //  center the background
     SDL_Rect rctTarget;
     rctTarget.x = (_p_ShadowSrf->w - _p_Scene_background->w) / 2;
     rctTarget.y = (_p_ShadowSrf->h - _p_Scene_background->h) / 2;
@@ -351,7 +351,7 @@ LPErrInApp OptionsGfx::HandleIterate(bool& done) {
     rctTarget.h = _p_Scene_background->h;
     SDL_BlitSurface(_p_Scene_background, NULL, _p_ShadowSrf, &rctTarget);
 
-    // the background of the option box
+    // option box background
     GFX_UTIL::DrawStaticSpriteEx(_p_ShadowSrf, 0, 0, _rctOptBox.w, _rctOptBox.h,
                                  _rctOptBox.x, _rctOptBox.y, _p_surfBar);
     // draw border
@@ -440,7 +440,9 @@ LPErrInApp OptionsGfx::HandleIterate(bool& done) {
     SDL_RenderPresent(_p_sdlRenderer);
 
     _p_textInput->Update();
+
     if (!_inProgress) {
+        // time to leave
         if (_p_ShadowSrf != NULL) {
             SDL_DestroySurface(_p_ShadowSrf);
             _p_ShadowSrf = NULL;
@@ -451,7 +453,6 @@ LPErrInApp OptionsGfx::HandleIterate(bool& done) {
         }
         done = true;
     }
-
     return NULL;
 }
 
@@ -555,8 +556,8 @@ void OptionsGfx::setControlLocalCaptions() {
     _p_comboBackground->AddLineText(strTextBt.c_str());
 }
 
-LPErrInApp OptionsGfx::ButEndOPtClicked(int butID) {
-    TRACE("OK options clicked %d\n", butID);
+LPErrInApp OptionsGfx::OptionsEnd() {
+    TRACE("Options End\n");
     _inProgress = false;
 
     setLanguageInGameSettings();
