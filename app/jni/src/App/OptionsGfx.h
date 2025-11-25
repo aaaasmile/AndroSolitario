@@ -49,7 +49,7 @@ class OptionsGfx {
    private:
     ClickCb prepClickCb();
     CheckboxClickCb prepCheckBoxClickMusic();
-    
+
    private:
     SDL_Renderer* _p_sdlRenderer;
     SDL_Rect _rctOptBox;
@@ -78,6 +78,7 @@ class OptionsGfx {
     int _hbar;
     int _labelOffsetY;
     int _captionOffsetX;
+    bool _initilized;
 };
 
 #endif

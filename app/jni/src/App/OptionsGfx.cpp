@@ -28,6 +28,7 @@ OptionsGfx::OptionsGfx() {
     _p_comboBackground = NULL;
     _p_textInput = NULL;
     _p_Scene_background = NULL;
+    _initilized = false;
 }
 
 OptionsGfx::~OptionsGfx() {
@@ -98,6 +99,10 @@ CheckboxClickCb OptionsGfx::prepCheckBoxClickMusic() {
 LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
                                   OptionDelegator& optDlg,
                                   SDL_Window* pWindow) {
+    if (_initilized) {
+        TRACE("[OptionsGfx::Initialize] Already initialized\n");
+    }
+    _initilized = true;
     if (pScreen == NULL) {
         return ERR_UTIL::ErrorCreate("pScreen is null");
     }
@@ -264,6 +269,7 @@ LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
                                          y_pos);
         _cardOnEachDeck[2][i].SetDeckSurface(_p_deckAll[i]);
     }
+
     TRACE_DEBUG("Options - Initialized OK\n");
     return NULL;
 }
@@ -438,29 +444,30 @@ LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
     _inProgress = true;
     _p_Scene_background = pScene_background;
 
-    LPLanguages pLanguages = _p_GameSettings->GetLanguageMan();
     _headerText = strCaption;
     // _terminated = false;
     // Uint64 uiInitialTick = SDL_GetTicks();
     // Uint64 uiLast_time = uiInitialTick;
     // int FPS = 3;
+    // combobox language selection (remeber add is without clear, so only at once)
 
-    // button ok
-    STRING strTextBt;
-    strTextBt = pLanguages->GetStringId(Languages::ID_OK);
-    _p_buttonOK->SetButtonText(strTextBt.c_str());
-    _p_buttonOK->SetVisibleState(ButtonGfx::VISIBLE);
+    LPLanguages pLanguages = _p_GameSettings->GetLanguageMan();
 
-    // combobox language selection
-    strTextBt = pLanguages->GetStringId(Languages::ID_ITALIANO);
+    // combo language
+    STRING strTextBt = pLanguages->GetStringId(Languages::ID_ITALIANO);
+    _p_comboLang->ClearLines();
     _p_comboLang->AddLineText(strTextBt.c_str());
     strTextBt = pLanguages->GetStringId(Languages::ID_DIALETMN);
     _p_comboLang->AddLineText(strTextBt.c_str());
     strTextBt = pLanguages->GetStringId(Languages::ID_ENGLISH);
     _p_comboLang->AddLineText(strTextBt.c_str());
-
     _p_comboLang->SetVisibleState(ComboGfx::VISIBLE);
     _p_comboLang->SelectIndex(_p_GameSettings->CurrentLanguage);
+
+    // Button ok
+    strTextBt = pLanguages->GetStringId(Languages::ID_OK);
+    _p_buttonOK->SetButtonText(strTextBt.c_str());
+    _p_buttonOK->SetVisibleState(ButtonGfx::VISIBLE);
 
     // checkbox music
     strTextBt = pLanguages->GetStringId(Languages::ID_SOUNDOPT);
@@ -470,6 +477,7 @@ LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
 
     // combobox background selection
     strTextBt = pLanguages->GetStringId(Languages::ID_COMMESSAGGIO);
+    _p_comboBackground->ClearLines();
     _p_comboBackground->AddLineText(strTextBt.c_str());
     strTextBt = pLanguages->GetStringId(Languages::ID_MANTOVA);
     _p_comboBackground->AddLineText(strTextBt.c_str());
@@ -483,6 +491,7 @@ LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
     _p_textInput->SetVisibleState(TextInputGfx::VISIBLE);
 
     // combobox deck selection
+    _p_comboDeck->ClearLines();
     DeckType dt;
     for (int i = 0; i < eDeckType::NUM_OF_DECK; i++) {
         dt.SetTypeIndex(i);

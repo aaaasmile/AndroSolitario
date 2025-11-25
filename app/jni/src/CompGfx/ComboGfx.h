@@ -8,7 +8,7 @@ using namespace traits;
 class GameSettings;
 
 class ComboGfx {
-public:
+   public:
     enum VisbleState { VISIBLE, INVISIBLE, PRESSED };
 
     ComboGfx();
@@ -34,8 +34,9 @@ public:
     int PosX() { return _rctCtrl.x; }
     int PosY() { return _rctCtrl.y; }
     int Height() { return _rctCtrl.h; }
+    void ClearLines() { _vctDataStrings.clear(); }
 
-private:
+   private:
     VisbleState _visibleState;
     SDL_Rect _rctCtrl;
     SDL_Rect _rctText;
