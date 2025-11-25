@@ -61,14 +61,9 @@ void ComboGfx::Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
     _rctBoxDown.w = boxIncW;
     _rctBoxDown.h = boxIncH;
 
-    //_p_surfBar = SDL_CreateRGBSurface(SDL_SWSURFACE, _rctCtrl.w, _rctCtrl.h,
-    // 32,
-    //                                  0, 0, 0, 0); SDL 2
     _p_surfBar =
         GFX_UTIL::SDL_CreateRGBSurface(_rctCtrl.w, _rctCtrl.h, 32, 0, 0, 0, 0);
 
-    // SDL_FillRect(_p_surfBar, NULL,
-    //              SDL_MapRGBA(pScreen->format, 255, 128, 30, 0));
     SDL_FillSurfaceRect(_p_surfBar, NULL,
                         SDL_MapRGB(SDL_GetPixelFormatDetails(pScreen->format),
                                    NULL, 255, 128, 30));
@@ -76,13 +71,9 @@ void ComboGfx::Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
     SDL_SetSurfaceBlendMode(_p_surfBar, SDL_BLENDMODE_BLEND);
     SDL_SetSurfaceAlphaMod(_p_surfBar, 127);
 
-    // _p_surfBoxSel = SDL_CreateRGBSurface(SDL_SWSURFACE, _rctBoxUp.w,
-    //                                      _rctBoxUp.h, 32, 0, 0, 0, 0); SDL 2
     _p_surfBoxSel = GFX_UTIL::SDL_CreateRGBSurface(_rctBoxUp.w, _rctBoxUp.h, 32,
                                                    0, 0, 0, 0);
 
-    // SDL_FillRect(_p_surfBoxSel, NULL,
-    //              SDL_MapRGBA(pScreen->format, 200, 200, 130, 0)); SDL 2
     SDL_FillSurfaceRect(_p_surfBoxSel, NULL,
                         SDL_MapRGB(SDL_GetPixelFormatDetails(pScreen->format),
                                    NULL, 200, 200, 130));
@@ -90,13 +81,9 @@ void ComboGfx::Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
     SDL_SetSurfaceBlendMode(_p_surfBoxSel, SDL_BLENDMODE_BLEND);
     SDL_SetSurfaceAlphaMod(_p_surfBoxSel, 127);
 
-    // _p_surfBoxUNSel = SDL_CreateRGBSurface(SDL_SWSURFACE, _rctBoxUp.w,
-    //                                        _rctBoxUp.h, 32, 0, 0, 0, 0);
     _p_surfBoxUNSel = GFX_UTIL::SDL_CreateRGBSurface(_rctBoxUp.w, _rctBoxUp.h,
                                                      32, 0, 0, 0, 0);
 
-    // SDL_FillRect(_p_surfBoxUNSel, NULL,
-    //              SDL_MapRGBA(pScreen->format, 255, 128, 30, 0));
     SDL_FillSurfaceRect(_p_surfBoxUNSel, NULL,
                         SDL_MapRGB(SDL_GetPixelFormatDetails(pScreen->format),
                                    NULL, 255, 128, 30));

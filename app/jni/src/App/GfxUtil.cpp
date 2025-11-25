@@ -226,8 +226,7 @@ LPErrInApp GFX_UTIL::LoadCardPac(SDL_Surface** pp_Deck, DeckType& deckType,
     std::string strFileName = g_lpszDeckDir;
     strFileName += deckType.GetResFileName();
 
-    // SDL_RWops *src = SDL_RWFromFile(strFileName.c_str(), "rb"); //SDL 2
-    SDL_IOStream* src = SDL_IOFromFile(strFileName.c_str(), "rb");  // SDL 3
+    SDL_IOStream* src = SDL_IOFromFile(strFileName.c_str(), "rb");
     if (src == 0) {
         return ERR_UTIL::ErrorCreate(
             "SDL_RWFromFile on pac file error (file %s): %s\n",

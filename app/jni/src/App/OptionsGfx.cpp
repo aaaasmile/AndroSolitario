@@ -81,7 +81,8 @@ CheckboxClickCb OptionsGfx::prepCheckBoxClickMusic() {
 }
 
 LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
-                                  OptionDelegator& optDlg, SDL_Window* pWindow) {
+                                  OptionDelegator& optDlg,
+                                  SDL_Window* pWindow) {
     if (pScreen == NULL) {
         return ERR_UTIL::ErrorCreate("pScreen is null");
     }
@@ -301,15 +302,12 @@ LPErrInApp OptionsGfx::HandleIterate(bool& done) {
 
     // header bar
     SDL_Rect rectHeader;
-    Uint32 colorHeader =  // SDL_MapRGB(_p_screen->format, 153, 202, 51);
-                          // //SDL 2
-        SDL_MapRGB(SDL_GetPixelFormatDetails(_p_screen->format), NULL, 153, 202,
-                   51);
+    Uint32 colorHeader = SDL_MapRGB(
+        SDL_GetPixelFormatDetails(_p_screen->format), NULL, 153, 202, 51);
     rectHeader.x = _rctOptBox.x + 1;
     rectHeader.y = _rctOptBox.y + 1;
     rectHeader.h = _hbar;
     rectHeader.w = _rctOptBox.w - 1;
-    // SDL_FillRect(_p_ShadowSrf, &rectHeader, colorHeader); SDL 2
     SDL_FillSurfaceRect(_p_ShadowSrf, &rectHeader, colorHeader);
 
     GFX_UTIL::DrawStaticLine(

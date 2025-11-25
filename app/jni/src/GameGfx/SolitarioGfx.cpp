@@ -520,7 +520,7 @@ LPCardRegionGfx SolitarioGfx::FindDropRegion(int id, LPCardStackGfx pStack) {
 void SolitarioGfx::DrawStaticScene() {
     // static scene is drawn directly into the screen.
     // Then the screen is copied into the back buffer for animations
-    SDL_Rect clipRect;  // SDL 3
+    SDL_Rect clipRect;
     SDL_GetSurfaceClipRect(_p_Screen, &clipRect);
     SDL_FillSurfaceRect(_p_Screen, &clipRect,
                         SDL_MapRGB(SDL_GetPixelFormatDetails(_p_Screen->format),
@@ -558,9 +558,9 @@ void SolitarioGfx::DrawStaticScene() {
 }
 
 LPErrInApp SolitarioGfx::DrawInitialScene() {
-    TRACE("DrawInitialScene\n");
+    TRACE("[SolitarioGfx] DrawInitialScene\n");
     LPGameSettings pGameSettings = GameSettings::GetSettings();
-    SDL_Rect clipRect;  // SDL 3
+    SDL_Rect clipRect;
     SDL_GetSurfaceClipRect(_p_Screen, &clipRect);
     SDL_FillSurfaceRect(_p_Screen, &clipRect,
                         SDL_MapRGB(SDL_GetPixelFormatDetails(_p_Screen->format),
@@ -867,7 +867,7 @@ LPErrInApp SolitarioGfx::LoadSymbolsForPac() {
     strFileSymbName += _deckType.GetSymbolFileName();
     if (_deckType.GetType() == eDeckType::TAROCK_PIEMONT) {
         SDL_IOStream* srcSymb =
-            SDL_IOFromFile(strFileSymbName.c_str(), "rb");  // SDL 3
+            SDL_IOFromFile(strFileSymbName.c_str(), "rb");
         if (srcSymb == NULL) {
             return ERR_UTIL::ErrorCreate(
                 "SDL_RWFromFile on symbols failed: %s\n", SDL_GetError());
@@ -1403,9 +1403,7 @@ int SolitarioGfx::showYesNoMsgBox(LPCSTR strText) {
     MsgBox.Initialize(&rctBox, _p_Screen, _p_FontSmallText,
                       MesgBoxGfx::TY_MB_YES_NO, _p_sdlRenderer);
     DrawStaticScene();
-    // SDL_FillRect(_p_AlphaDisplay, &_p_AlphaDisplay->clip_rect,
-    //              SDL_MapRGBA(_p_AlphaDisplay->format, 0, 0, 0, 0)); SDL 2
-    SDL_Rect clipRect;  // SDL 3
+    SDL_Rect clipRect;
     SDL_GetSurfaceClipRect(_p_AlphaDisplay, &clipRect);
     SDL_FillSurfaceRect(
         _p_AlphaDisplay, &clipRect,
@@ -1442,9 +1440,7 @@ void SolitarioGfx::showOkMsgBox(LPCSTR strText) {
     MsgBox.Initialize(&rctBox, _p_Screen, _p_FontSmallText, MesgBoxGfx::TY_MBOK,
                       _p_sdlRenderer);
     DrawStaticScene();
-    // SDL_FillRect(_p_AlphaDisplay, &_p_AlphaDisplay->clip_rect,
-    //              SDL_MapRGBA(_p_AlphaDisplay->format, 0, 0, 0, 0)); SDL 2
-    SDL_Rect clipRect;  // SDL 3
+    SDL_Rect clipRect;
     SDL_GetSurfaceClipRect(_p_AlphaDisplay, &clipRect);
     SDL_FillSurfaceRect(
         _p_AlphaDisplay, &clipRect,
