@@ -70,6 +70,7 @@ class OptionsGfx {
     OptionDelegator _optDlgt;
     GameSettings* _p_GameSettings;
     MusicManager* _p_MusicManager;
+    SDL_Surface* _p_Scene_background;
     bool _inProgress;
     bool _mouseDownRec;
     SDL_Texture* _p_ScreenTexture;

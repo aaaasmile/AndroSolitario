@@ -11,23 +11,26 @@
 #include "MusicManager.h"
 
 OptionsGfx::OptionsGfx() {
-    _p_screen = 0;
-    _p_fontText = 0;
-    _p_surfBar = 0;
-    _p_buttonOK = 0;
-    _p_MusicManager = 0;
+    _p_screen = NULL;
+    _p_fontText = NULL;
+    _p_surfBar = NULL;
+    _p_buttonOK = NULL;
+    _p_MusicManager = NULL;
     _p_GameSettings = GameSettings::GetSettings();
     _mouseDownRec = false;
     _p_ScreenTexture = NULL;
     _p_ShadowSrf = NULL;
     _inProgress = false;
+    _p_sdlRenderer = NULL;
+    _p_checkMusic = NULL;
+    _p_comboLang = NULL;
+    _p_comboDeck = NULL;
+    _p_comboBackground = NULL;
+    _p_textInput = NULL;
+    _p_Scene_background = NULL;
 }
 
 OptionsGfx::~OptionsGfx() {
-    if (_p_surfBar) {
-        SDL_DestroySurface(_p_surfBar);
-        _p_surfBar = NULL;
-    }
     delete _p_buttonOK;
     delete _p_comboLang;
     delete _p_checkMusic;
@@ -39,6 +42,18 @@ OptionsGfx::~OptionsGfx() {
         if (_p_deckAll[i]) {
             SDL_DestroySurface(_p_deckAll[i]);
         }
+    }
+    if (_p_surfBar != NULL) {
+        SDL_DestroySurface(_p_surfBar);
+        _p_surfBar = NULL;
+    }
+    if (_p_ShadowSrf != NULL) {
+        SDL_DestroySurface(_p_ShadowSrf);
+        _p_ShadowSrf = NULL;
+    }
+    if (_p_ScreenTexture != NULL) {
+        SDL_DestroyTexture(_p_ScreenTexture);
+        _p_ScreenTexture = NULL;
     }
 }
 
@@ -219,6 +234,14 @@ LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
         }
         int ww = pac_w / 4;
         int hh = pac_h / dt.GetNumCardInSuit();
+        if (ww <= 0) {
+            return ERR_UTIL::ErrorCreate("Deck width is zero: %s\n",
+                                         dt.GetDeckName().c_str());
+        }
+        if (hh <= 0) {
+            return ERR_UTIL::ErrorCreate("Deck height is zero: %s\n",
+                                         dt.GetDeckName().c_str());
+        }
         int x_pos = rctBt1.x;
         int y_pos = rctBt1.y + rctBt1.h + 20;
         _cardOnEachDeck[0][i].SetIdx(9, dt);
@@ -286,6 +309,21 @@ LPErrInApp OptionsGfx::HandleEvent(SDL_Event* pEvent) {
 }
 
 LPErrInApp OptionsGfx::HandleIterate(bool& done) {
+     //  center the background
+    SDL_Rect clipRect;
+    SDL_GetSurfaceClipRect(_p_ShadowSrf, &clipRect);
+    SDL_FillSurfaceRect(
+        _p_ShadowSrf, &clipRect,
+        SDL_MapRGBA(SDL_GetPixelFormatDetails(_p_ShadowSrf->format), NULL, 0, 0,
+                    0, 0));
+
+    SDL_Rect rctTarget;
+    rctTarget.x = (_p_ShadowSrf->w - _p_Scene_background->w) / 2;
+    rctTarget.y = (_p_ShadowSrf->h - _p_Scene_background->h) / 2;
+    rctTarget.w = _p_Scene_background->w;
+    rctTarget.h = _p_Scene_background->h;
+    SDL_BlitSurface(_p_Scene_background, NULL, _p_ShadowSrf, &rctTarget);
+
     // the background of the option box
     GFX_UTIL::DrawStaticSpriteEx(_p_ShadowSrf, 0, 0, _rctOptBox.w, _rctOptBox.h,
                                  _rctOptBox.x, _rctOptBox.y, _p_surfBar);
@@ -395,6 +433,7 @@ LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
             "Fade is already in progess, use iterate\n");
     }
     _inProgress = true;
+    _p_Scene_background = pScene_background;
 
     LPLanguages pLanguages = _p_GameSettings->GetLanguageMan();
     _headerText = strCaption;
@@ -471,20 +510,7 @@ LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
     // LPErrInApp err = NULL;
     // bool _mouseDownRec = false;
     // while (!_terminated) {
-    //  center the background
-    SDL_Rect clipRect;
-    SDL_GetSurfaceClipRect(_p_ShadowSrf, &clipRect);
-    SDL_FillSurfaceRect(
-        _p_ShadowSrf, &clipRect,
-        SDL_MapRGBA(SDL_GetPixelFormatDetails(_p_ShadowSrf->format), NULL, 0, 0,
-                    0, 0));
-
-    SDL_Rect rctTarget;
-    rctTarget.x = (_p_ShadowSrf->w - pScene_background->w) / 2;
-    rctTarget.y = (_p_ShadowSrf->h - pScene_background->h) / 2;
-    rctTarget.w = pScene_background->w;
-    rctTarget.h = pScene_background->h;
-    SDL_BlitSurface(pScene_background, NULL, _p_ShadowSrf, &rctTarget);
+   
 
     // SDL_Event event;
     // while (SDL_PollEvent(&event)) {

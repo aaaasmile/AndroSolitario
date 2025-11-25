@@ -139,14 +139,6 @@ LPErrInApp AppGfx::Init() {
     }
     TRACE_DEBUG("Fonts and background loaded OK\n");
 
-    OptionDelegator optionDelegator = prepOptionDelegator();
-
-    err = _p_OptGfx->Initialize(_p_Screen, _p_sdlRenderer, optionDelegator,
-                                _p_Window);
-    if (err) {
-        return err;
-    }
-
     clearBackground();
 
     err = _p_GameSettings->InitMusicManager();
@@ -171,6 +163,13 @@ LPErrInApp AppGfx::Init() {
 
     _p_MenuMgr->SetBackground(_p_SceneBackground);
     if (err != NULL) {
+        return err;
+    }
+    OptionDelegator optionDelegator = prepOptionDelegator();
+
+    err = _p_OptGfx->Initialize(_p_Screen, _p_sdlRenderer, optionDelegator,
+                                _p_Window);
+    if (err) {
         return err;
     }
     return NULL;
@@ -632,7 +631,6 @@ LPErrInApp AppGfx::showGeneralOptions() {
     }
     return NULL;
 }
-
 
 void AppGfx::backToMenuRootWithMusic() {
     TRACE("Back to root menu\n");
