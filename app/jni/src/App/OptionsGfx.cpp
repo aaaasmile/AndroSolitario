@@ -281,9 +281,11 @@ LPErrInApp OptionsGfx::HandleEvent(SDL_Event* pEvent) {
     }
     if (pEvent->type == SDL_EVENT_KEY_DOWN) {
         if (pEvent->key.key == SDLK_RETURN) {
-            err = ButEndOPtClicked(MYIDOK);
-            if (err)
-                return err;
+            if (!_p_textInput->GetHasFocus()) {
+                err = ButEndOPtClicked(MYIDOK);
+                if (err)
+                    return err;
+            }
         } else if (pEvent->key.key == SDLK_ESCAPE) {
             err = ButEndOPtClicked(MYIDCANCEL);
             if (err)
@@ -469,13 +471,6 @@ LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
     _prevBackgroundType = _p_GameSettings->BackgroundType;
     _prevName = _p_GameSettings->PlayerName;
 
-    // _terminated = false;
-    // Uint64 uiInitialTick = SDL_GetTicks();
-    // Uint64 uiLast_time = uiInitialTick;
-    // int FPS = 3;
-    // combobox language selection (remeber add is without clear, so only at
-    // once)
-
     // combo language
     setControlLocalCaptions();
 
@@ -527,149 +522,6 @@ LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
     }
     _p_ScreenTexture =
         SDL_CreateTextureFromSurface(_p_sdlRenderer, _p_ShadowSrf);
-    // LPErrInApp err = NULL;
-    // bool _mouseDownRec = false;
-    // while (!_terminated) {
-
-    // SDL_Event event;
-    // while (SDL_PollEvent(&event)) {
-    //     if (event.type == SDL_EVENT_QUIT) {
-    //         _terminated = true;
-    //         break;
-    //     }
-    //     if (event.type == SDL_EVENT_KEY_DOWN) {
-    //         if (event.key.key == SDLK_RETURN) {
-    //             err = ButEndOPtClicked(MYIDOK);
-    //             if (err)
-    //                 return err;
-    //             break;
-    //         } else if (event.key.key == SDLK_ESCAPE) {
-    //             err = ButEndOPtClicked(MYIDCANCEL);
-    //             if (err)
-    //                 return err;
-    //             break;
-    //         }
-    //     }
-    //     if (event.type == SDL_EVENT_FINGER_DOWN) {
-    //         _p_buttonOK->FingerDown(event);
-    //         _p_checkMusic->FingerDown(event);
-    //         _p_comboLang->FingerDown(event);
-    //         _p_comboBackground->FingerDown(event);
-    //         _p_comboDeck->FingerDown(event);
-    //     }
-    //     if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
-    //         _mouseDownRec = true;
-    //     }
-    //     if (event.type == SDL_EVENT_MOUSE_BUTTON_UP) {
-    //         if (_mouseDownRec) {
-    //             _p_buttonOK->MouseUp(event);
-    //             _p_comboLang->MouseUp(event);
-    //             _p_checkMusic->MouseUp(event);
-    //             _p_comboBackground->MouseUp(event);
-    //             _p_comboDeck->MouseUp(event);
-    //             _mouseDownRec = false;
-    //         }
-    //     }
-    //     _p_textInput->HandleEvent(event, pWindow);
-    // }
-
-    // // the background of the option box
-    // GFX_UTIL::DrawStaticSpriteEx(_p_ShadowSrf, 0, 0, _rctOptBox.w,
-    // _rctOptBox.h,
-    //                              _rctOptBox.x, _rctOptBox.y, _p_surfBar);
-    // // draw border
-    // GFX_UTIL::DrawRect(_p_ShadowSrf, _rctOptBox.x - 1, _rctOptBox.y - 1,
-    //                    _rctOptBox.x + _rctOptBox.w + 1,
-    //                    _rctOptBox.y + _rctOptBox.h + 1,
-    //                    GFX_UTIL_COLOR::Gray);
-    // GFX_UTIL::DrawRect(_p_ShadowSrf, _rctOptBox.x - 2, _rctOptBox.y - 2,
-    //                    _rctOptBox.x + _rctOptBox.w + 2,
-    //                    _rctOptBox.y + _rctOptBox.h + 2,
-    //                    GFX_UTIL_COLOR::Black);
-    // GFX_UTIL::DrawRect(_p_ShadowSrf, _rctOptBox.x, _rctOptBox.y,
-    //                    _rctOptBox.x + _rctOptBox.w, _rctOptBox.y +
-    //                    _rctOptBox.h, _color);
-
-    // // header bar
-    // SDL_Rect rectHeader;
-    // Uint32 colorHeader =  // SDL_MapRGB(_p_screen->format, 153, 202, 51);
-    //                       // //SDL 2
-    //     SDL_MapRGB(SDL_GetPixelFormatDetails(_p_screen->format), NULL, 153,
-    //     202,
-    //                51);
-    // rectHeader.x = _rctOptBox.x + 1;
-    // rectHeader.y = _rctOptBox.y + 1;
-    // rectHeader.h = _hbar;
-    // rectHeader.w = _rctOptBox.w - 1;
-    // // SDL_FillRect(_p_ShadowSrf, &rectHeader, colorHeader); SDL 2
-    // SDL_FillSurfaceRect(_p_ShadowSrf, &rectHeader, colorHeader);
-
-    // GFX_UTIL::DrawStaticLine(
-    //     _p_ShadowSrf, rectHeader.x, rectHeader.y + rectHeader.h,
-    //     rectHeader.x + rectHeader.w, rectHeader.y + rectHeader.h,
-    //     GFX_UTIL_COLOR::White);
-    // // text header
-    // GFX_UTIL::DrawString(_p_ShadowSrf, _headerText.c_str(),
-    //                      rectHeader.x + _captionOffsetX, rectHeader.y,
-    //                      GFX_UTIL_COLOR::White, _p_fontCtrl);
-
-    // // Button OK
-    // _p_buttonOK->DrawButton(_p_ShadowSrf);
-
-    // // Combo Language: Label and crontrol
-    // GFX_UTIL::DrawString(_p_ShadowSrf, strSelectLanguage.c_str(),
-    //                      _p_comboLang->PosX(),
-    //                      _p_comboLang->PosY() - _labelOffsetY,
-    //                      GFX_UTIL_COLOR::Orange, _p_fontText);
-
-    // _p_comboLang->DrawButton(_p_ShadowSrf);
-
-    // // Checkbox music
-    // _p_checkMusic->DrawButton(_p_ShadowSrf);
-
-    // // Combo Background: Label and control
-    // GFX_UTIL::DrawString(_p_ShadowSrf, strSelectBackGround.c_str(),
-    //                      _p_comboBackground->PosX(),
-    //                      _p_comboBackground->PosY() - _labelOffsetY,
-    //                      GFX_UTIL_COLOR::Orange, _p_fontText);
-    // _p_comboBackground->DrawButton(_p_ShadowSrf);
-
-    // // player name
-    // _p_textInput->DrawCtrl(_p_ShadowSrf);
-
-    // // Combo Deck: Label and control
-    // GFX_UTIL::DrawString(_p_ShadowSrf, strDeckSelectTitle.c_str(),
-    //                      _p_comboDeck->PosX(),
-    //                      _p_comboDeck->PosY() - _labelOffsetY,
-    //                      GFX_UTIL_COLOR::Orange, _p_fontText);
-
-    // _p_comboDeck->DrawButton(_p_ShadowSrf);
-
-    // // Deck example Cards
-    // int iCurrIndex = _p_comboDeck->GetSelectedIndex();
-    // _cardOnEachDeck[0][iCurrIndex].DrawCardPac(_p_ShadowSrf);
-    // _cardOnEachDeck[1][iCurrIndex].DrawCardPac(_p_ShadowSrf);
-    // _cardOnEachDeck[2][iCurrIndex].DrawCardPac(_p_ShadowSrf);
-
-    // // render the dialogbox
-    // SDL_BlitSurface(_p_ShadowSrf, NULL, _p_screen, NULL);
-    // SDL_UpdateTexture(_p_ScreenTexture, NULL, _p_screen->pixels,
-    //                   _p_screen->pitch);
-    // SDL_RenderTexture(_p_sdlRenderer, _p_ScreenTexture, NULL, NULL);
-    // SDL_RenderPresent(_p_sdlRenderer);
-
-    // // update controls
-    // _p_textInput->Update();
-
-    // // synch to frame rate
-    // Uint64 uiNowTime = SDL_GetTicks();
-    // if (uiNowTime < uiLast_time + FPS) {
-    //     SDL_Delay(uiLast_time + FPS - uiNowTime);
-    //     uiLast_time = SDL_GetTicks();
-    // }
-    // //}
-    // SDL_DestroySurface(_p_ShadowSrf);
-    // SDL_DestroyTexture(_p_ScreenTexture);
     return NULL;
 }
 
