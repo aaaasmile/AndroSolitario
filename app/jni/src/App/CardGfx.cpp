@@ -113,12 +113,12 @@ LPErrInApp CardGfx::DrawCardPac(SDL_Surface* s) {
             "CardGfx - DrawCardPac size is not defined");
     }
 
-    int iSegnoIx = index / num_cards_insuit;
-    int iCartaIx = index % num_cards_insuit;
+    int suitIx = index / num_cards_insuit;
+    int cardIx = index % num_cards_insuit;
     SDL_Rect srcCard;
 
-    srcCard.x = iSegnoIx * _width;
-    srcCard.y = iCartaIx * _height;
+    srcCard.x = suitIx * _width;
+    srcCard.y = cardIx * _height;
     srcCard.w = _width;
     srcCard.h = _height;
 

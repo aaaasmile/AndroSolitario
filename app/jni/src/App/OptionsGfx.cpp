@@ -415,7 +415,7 @@ LPErrInApp OptionsGfx::HandleIterate(bool& done) {
 
     // Combo Deck: Label and control
     STRING strDeckSelectTitle =
-        pLanguages->GetStringId(Languages::ID_CHOOSEMAZZO);
+        pLanguages->GetStringId(Languages::ID_CHOOSEDECK);
     GFX_UTIL::DrawString(_p_ShadowSrf, strDeckSelectTitle.c_str(),
                          _p_comboDeck->PosX(),
                          _p_comboDeck->PosY() - _labelOffsetY,

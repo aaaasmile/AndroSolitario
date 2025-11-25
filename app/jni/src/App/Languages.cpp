@@ -36,12 +36,12 @@ Languages::Languages() {
     _mtxLangString[LANG_DIAL_BREDA][ID_CMD_CHATLIST] =
         "La lista adla gent in dla chat:";
     _mtxLangString[LANG_DIAL_BREDA][ID_SOLITARIO] = "Sulitari";
-    _mtxLangString[LANG_DIAL_BREDA][ID_MAZZONAME] = "Mas ad li carti";
+    _mtxLangString[LANG_DIAL_BREDA][ID_DECKNAME] = "Mas ad li carti";
     _mtxLangString[LANG_DIAL_BREDA][ID_SOUNDOPT] = "Müsica";
     _mtxLangString[LANG_DIAL_BREDA][ID_ABILITATO] = "Impisada";
     _mtxLangString[LANG_DIAL_BREDA][ID_DISABILITATO] = "Smorsa";
 
-    _mtxLangString[LANG_DIAL_BREDA][ID_CHOOSEMAZZO] =
+    _mtxLangString[LANG_DIAL_BREDA][ID_CHOOSEDECK] =
         "Cata föra al mas ad lì carti";
     _mtxLangString[LANG_DIAL_BREDA][ID_PIACENTINA] = "Piacentini";
     _mtxLangString[LANG_DIAL_BREDA][ID_BERGAMO] = "Bergum";
@@ -116,8 +116,8 @@ Languages::Languages() {
     _mtxLangString[LANG_ITA][ID_DISABILITATO] = "Disabilitato";
 
     _mtxLangString[LANG_ITA][ID_SOLITARIO] = "Solitario";
-    _mtxLangString[LANG_ITA][ID_MAZZONAME] = "Mazzi di carte";
-    _mtxLangString[LANG_ITA][ID_CHOOSEMAZZO] = "Scegli il mazzo di carte";
+    _mtxLangString[LANG_ITA][ID_DECKNAME] = "Mazzi di carte";
+    _mtxLangString[LANG_ITA][ID_CHOOSEDECK] = "Scegli il mazzo di carte";
     _mtxLangString[LANG_ITA][ID_PIACENTINA] = "Piacentine";
     _mtxLangString[LANG_ITA][ID_BERGAMO] = "Bergamesche";
     _mtxLangString[LANG_ITA][ID_BOLOGNA] = "Bolognesi";
@@ -189,8 +189,8 @@ Languages::Languages() {
     _mtxLangString[LANG_ENG][ID_DISABILITATO] = "Disabled";
 
     _mtxLangString[LANG_ENG][ID_SOLITARIO] = "Solitaire";
-    _mtxLangString[LANG_ENG][ID_MAZZONAME] = "Card decks";
-    _mtxLangString[LANG_ENG][ID_CHOOSEMAZZO] = "Choose the deck of cards";
+    _mtxLangString[LANG_ENG][ID_DECKNAME] = "Card decks";
+    _mtxLangString[LANG_ENG][ID_CHOOSEDECK] = "Choose the deck of cards";
     _mtxLangString[LANG_ENG][ID_PIACENTINA] = "Piacentine";
     _mtxLangString[LANG_ENG][ID_BERGAMO] = "Bergamesche";
     _mtxLangString[LANG_ENG][ID_BOLOGNA] = "Bolognesi";
