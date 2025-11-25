@@ -316,6 +316,7 @@ LPErrInApp OptionsGfx::HandleEvent(SDL_Event* pEvent) {
 
 LPErrInApp OptionsGfx::HandleIterate(bool& done) {
     //  center the background
+    LPErrInApp err;
     SDL_Rect clipRect;
     SDL_GetSurfaceClipRect(_p_ShadowSrf, &clipRect);
     SDL_FillSurfaceRect(
@@ -323,6 +324,17 @@ LPErrInApp OptionsGfx::HandleIterate(bool& done) {
         SDL_MapRGBA(SDL_GetPixelFormatDetails(_p_ShadowSrf->format), NULL, 0, 0,
                     0, 0));
 
+    if (_p_comboBackground->GetSelectedIndex() !=
+        _p_GameSettings->BackgroundType) {
+        TRACE_DEBUG("Backaground selection changed \n");
+        setBackgoundTypeInGameSettings();
+
+        err = _optDlgt.tc->ChangeSceneBackground(_optDlgt.self,
+                                                 &_p_Scene_background);
+        if (err != NULL) {
+            return err;
+        }
+    }
     SDL_Rect rctTarget;
     rctTarget.x = (_p_ShadowSrf->w - _p_Scene_background->w) / 2;
     rctTarget.y = (_p_ShadowSrf->h - _p_Scene_background->h) / 2;
@@ -449,7 +461,8 @@ LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
     // Uint64 uiInitialTick = SDL_GetTicks();
     // Uint64 uiLast_time = uiInitialTick;
     // int FPS = 3;
-    // combobox language selection (remeber add is without clear, so only at once)
+    // combobox language selection (remeber add is without clear, so only at
+    // once)
 
     LPLanguages pLanguages = _p_GameSettings->GetLanguageMan();
 
@@ -689,19 +702,7 @@ LPErrInApp OptionsGfx::ButEndOPtClicked(int butID) {
             break;
     }
 
-    switch (_p_comboBackground->GetSelectedIndex()) {
-        case 0:
-            _p_GameSettings->BackgroundType = BackgroundTypeEnum::Commessaggio;
-            break;
-        case 1:
-            _p_GameSettings->BackgroundType = BackgroundTypeEnum::Mantova;
-            break;
-        case 2:
-            _p_GameSettings->BackgroundType = BackgroundTypeEnum::Black;
-            break;
-        default:
-            break;
-    }
+    setBackgoundTypeInGameSettings();
 
     DeckType dt;
     dt.SetTypeIndex(_p_comboDeck->GetSelectedIndex());
@@ -727,6 +728,22 @@ LPErrInApp OptionsGfx::ButEndOPtClicked(int butID) {
         return _p_GameSettings->SaveSettings();
     }
     return NULL;
+}
+
+void OptionsGfx::setBackgoundTypeInGameSettings() {
+    switch (_p_comboBackground->GetSelectedIndex()) {
+        case 0:
+            _p_GameSettings->BackgroundType = BackgroundTypeEnum::Commessaggio;
+            break;
+        case 1:
+            _p_GameSettings->BackgroundType = BackgroundTypeEnum::Mantova;
+            break;
+        case 2:
+            _p_GameSettings->BackgroundType = BackgroundTypeEnum::Black;
+            break;
+        default:
+            break;
+    }
 }
 
 void OptionsGfx::CheckboxMusicClicked(bool state) {

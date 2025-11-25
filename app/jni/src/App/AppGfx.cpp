@@ -175,6 +175,18 @@ LPErrInApp AppGfx::Init() {
     return NULL;
 }
 
+LPErrInApp AppGfx::ChangeSceneBackground(SDL_Surface** ppSceneBackground) {
+    LPErrInApp err;
+    err = loadSceneBackground();
+    if (err != NULL) {
+        return err;
+    }
+    _p_MenuMgr->SetBackground(_p_SceneBackground);
+
+    *ppSceneBackground = _p_SceneBackground;
+    return NULL;
+}
+
 LPErrInApp AppGfx::loadSceneBackground() {
     if (_p_SceneBackground != NULL) {
         SDL_DestroySurface(_p_SceneBackground);
@@ -306,9 +318,12 @@ void AppGfx::terminate() {
         _p_MenuMgr = NULL;
     }
 
-    delete _p_SolitarioGfx;
+    if (_p_SolitarioGfx != NULL){
+        delete _p_SolitarioGfx;
+        _p_SolitarioGfx = NULL;
+    }
+    
     delete _p_HighScore;
-    _p_SolitarioGfx = NULL;
     _p_GameSettings->TerminateMusicManager();
 
     SDL_DestroyWindow(_p_Window);
@@ -352,6 +367,12 @@ LPErrInApp fncBind_SettingsChanged(void* self, bool backGroundChanged,
     return pApp->SettingsChanged(backGroundChanged, languageChanged);
 }
 
+LPErrInApp fncBind_ChangeSceneBackground(void* self,
+                                         SDL_Surface** ppSceneBackground) {
+    AppGfx* pApp = (AppGfx*)self;
+    return pApp->ChangeSceneBackground(ppSceneBackground);
+}
+
 MenuDelegator AppGfx::prepMenuDelegator() {
     // Use only static otherwise you loose it
     static VMenuDelegator const tc = {.LeaveMenu = (&fncBind_LeaveMenu),
@@ -362,8 +383,9 @@ MenuDelegator AppGfx::prepMenuDelegator() {
 
 OptionDelegator AppGfx::prepOptionDelegator() {
     // Use only static otherwise you loose it
-    static VOptionDelegator const tc = {.SettingsChanged =
-                                            (&fncBind_SettingsChanged)};
+    static VOptionDelegator const tc = {
+        .SettingsChanged = (&fncBind_SettingsChanged),
+        .ChangeSceneBackground = (&fncBind_ChangeSceneBackground)};
 
     return (OptionDelegator){.tc = &tc, .self = this};
 }
@@ -524,14 +546,14 @@ LPErrInApp AppGfx::MainLoopIterate() {
                 return err;
             if (done) {
                 backToMenuRootSameMusic();
-                if (_backGroundChanged) {
-                    TRACE_DEBUG("Background changed by options \n");
-                    err = loadSceneBackground();
-                    if (err != NULL)
-                        return err;
-                    _p_MenuMgr->SetBackground(_p_SceneBackground);
-                    _backGroundChanged = false;
-                }
+                // if (_backGroundChanged) {
+
+                //     err = loadSceneBackground();
+                //     if (err != NULL)
+                //         return err;
+                //     _p_MenuMgr->SetBackground(_p_SceneBackground);
+                //     _backGroundChanged = false;
+                // }
             }
             break;
         case MenuItemEnum::NOTHING:
@@ -621,7 +643,6 @@ LPErrInApp AppGfx::showGeneralOptions() {
     if (_p_OptGfx->IsOngoing()) {
         return ERR_UTIL::ErrorCreate("General Options already started");
     }
-    _backGroundChanged = false;
 
     LPLanguages pLanguages = _p_GameSettings->GetLanguageMan();
     STRING caption = pLanguages->GetStringId(Languages::ID_MEN_OPTIONS);
@@ -649,9 +670,9 @@ void AppGfx::backToMenuRootSameMusic() {
 
 LPErrInApp AppGfx::SettingsChanged(bool backGroundChanged,
                                    bool languageChanged) {
-    if (backGroundChanged) {
-        _backGroundChanged = true;
-    }
+    TRACE_DEBUG("Settings changed, background: %s, language: %s\n",
+                backGroundChanged ? "true" : "false",
+                languageChanged ? "true" : "false");
     return NULL;
 }
 

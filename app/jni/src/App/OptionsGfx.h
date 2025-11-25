@@ -49,6 +49,7 @@ class OptionsGfx {
    private:
     ClickCb prepClickCb();
     CheckboxClickCb prepCheckBoxClickMusic();
+    void setBackgoundTypeInGameSettings();
 
    private:
     SDL_Renderer* _p_sdlRenderer;

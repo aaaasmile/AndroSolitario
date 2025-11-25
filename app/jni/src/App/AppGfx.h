@@ -40,6 +40,7 @@ class AppGfx {
     LPErrInApp LeaveMenu();
     LPErrInApp EnterMenu(MenuItemEnum menuItem); 
     LPErrInApp SettingsChanged(bool backGroundChanged, bool languageChanged);
+    LPErrInApp ChangeSceneBackground(SDL_Surface** ppSceneBackground);
 
    private:
     LPErrInApp startGameLoop();
@@ -77,10 +78,7 @@ class AppGfx {
     int _screenW;
     int _screenH;
     int _Bpp;
-
     bool _fullScreen;
-    bool _backGroundChanged;
-
     std::stack<MenuItemEnum> _histMenu;
 };
 

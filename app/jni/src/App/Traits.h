@@ -32,12 +32,13 @@ typedef struct {
 typedef struct {
     LPErrInApp (*const SettingsChanged)(void* self, bool backGroundChanged,
                                         bool languageChanged);
+    LPErrInApp (*const ChangeSceneBackground)(void* self, SDL_Surface** ppSceneBackground);
 } VOptionDelegator, *LPVOptionDelegator;
 
 typedef struct {
     VOptionDelegator const* tc;
     void* self;
-}OptionDelegator, *LPOptionDelegator;
+} OptionDelegator, *LPOptionDelegator;
 
 // trait for button click
 typedef struct {
