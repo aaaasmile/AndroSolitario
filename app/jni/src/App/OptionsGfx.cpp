@@ -268,6 +268,21 @@ LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
         _cardOnEachDeck[2][i].SetCardLoc(_cardOnEachDeck[1][i].X() + 10 + ww,
                                          y_pos);
         _cardOnEachDeck[2][i].SetDeckSurface(_p_deckAll[i]);
+        
+        if (!_p_GameSettings->NeedScreenMagnify()) {
+            if (dt.GetType() == eDeckType::TAROCK_PIEMONT) {
+                float factor = 0.7;
+                for (int j = 0; j < 3; j++) {
+                    _cardOnEachDeck[j][i].SetScaleFactor(factor);
+                    if (j > 0) {
+                        _cardOnEachDeck[j][i].SetCardLoc(
+                            _cardOnEachDeck[j - 1][i].X() + 10 +
+                                (int)(ww * factor),
+                            y_pos);
+                    }
+                }
+            }
+        }
     }
 
     TRACE_DEBUG("Options - Initialized OK\n");
@@ -343,7 +358,7 @@ LPErrInApp OptionsGfx::HandleIterate(bool& done) {
             return err;
         }
     }
-     //  center the background
+    //  center the background
     SDL_Rect rctTarget;
     rctTarget.x = (_p_ShadowSrf->w - _p_Scene_background->w) / 2;
     rctTarget.y = (_p_ShadowSrf->h - _p_Scene_background->h) / 2;
