@@ -11,6 +11,8 @@ endif()
 # Solitario program
 set(SOURCES scale.cpp 
             ../../app/jni/src/App/GfxUtil.cpp
+            ../../app/jni/src/App/DeckType.cpp
+            ../../app/jni/src/App/CardGfx.cpp
             ../../app/jni/src/App/ErrorInfo.cpp
             ../../app/jni/src/UnixSys/UnixsysTrace.cpp)
 
