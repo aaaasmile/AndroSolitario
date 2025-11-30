@@ -616,29 +616,29 @@ void SolitarioGfx::DrawStaticScene() {
 LPErrInApp SolitarioGfx::DrawInitialScene() {
     TRACE("[SolitarioGfx] DrawInitialScene, trigger initial fading\n");
     LPGameSettings pGameSettings = GameSettings::GetSettings();
-    SDL_Rect clipRect;
-    SDL_GetSurfaceClipRect(_p_Screen, &clipRect);
-    SDL_FillSurfaceRect(_p_Screen, &clipRect,
-                        SDL_MapRGB(SDL_GetPixelFormatDetails(_p_Screen->format),
-                                   NULL, 0, 0, 0));
+    // SDL_Rect clipRect;
+    // SDL_GetSurfaceClipRect(_p_Screen, &clipRect);
+    // SDL_FillSurfaceRect(_p_Screen, &clipRect,
+    //                     SDL_MapRGB(SDL_GetPixelFormatDetails(_p_Screen->format),
+    //                                NULL, 0, 0, 0));
 
-    SDL_Rect rctTarget;
-    rctTarget.x = (_p_Screen->w - _p_SceneBackground->w) / 2;
-    rctTarget.y = (_p_Screen->h - _p_SceneBackground->h) / 2;
-    rctTarget.w = _p_SceneBackground->w;
-    rctTarget.h = _p_SceneBackground->h;
-    if (!_sceneBackgroundIsBlack) {
-        if (pGameSettings->InputType != InputTypeEnum::TouchWithoutMouse) {
-            _p_FadeAction->Fade(_p_Screen, _p_SceneBackground, 2, false,
-                                _p_sdlRenderer, &rctTarget);
-            _state = SolitarioGfx::WAIT_FOR_FADING;
-            _stateAfter = SolitarioGfx::FIRST_SCENE;
-            return NULL;
-        } else {
-            _p_FadeAction->InstantFade(_p_Screen);
-        }
+    // SDL_Rect rctTarget;
+    // rctTarget.x = (_p_Screen->w - _p_SceneBackground->w) / 2;
+    // rctTarget.y = (_p_Screen->h - _p_SceneBackground->h) / 2;
+    // rctTarget.w = _p_SceneBackground->w;
+    // rctTarget.h = _p_SceneBackground->h;
+    // if (!_sceneBackgroundIsBlack) {
+    if (pGameSettings->InputType == InputTypeEnum::TouchWithoutMouse) {
+        _p_FadeAction->InstantFade(_p_Screen);
+        _state = SolitarioGfx::FIRST_SCENE;
+    } else {
+        _p_FadeAction->Fade(_p_Screen, _p_Screen, 2, true, _p_sdlRenderer,
+                            NULL);
+        _state = SolitarioGfx::WAIT_FOR_FADING;
+        _stateAfter = SolitarioGfx::FIRST_SCENE;
+        return NULL;
     }
-    _state = SolitarioGfx::FIRST_SCENE;
+    //}
 
     // SDL_Rect rctBt1;
     // int btw = 120;
@@ -1277,7 +1277,7 @@ LPErrInApp SolitarioGfx::handleGameLoopMouseUpEvent(SDL_Event* pEvent) {
     _p_BtQuit->MouseUp(pEvent);
     _p_BtNewGame->MouseUp(pEvent);
     _p_BtToggleSound->MouseUp(pEvent);
-    //return endOfDragAndCheckForVictory(); // TODO
+    // return endOfDragAndCheckForVictory(); // TODO
     return NULL;
 }
 
@@ -1440,7 +1440,7 @@ LPErrInApp SolitarioGfx::HandleIterate(bool& done) {
         DrawInitialScene();
         return NULL;
     }
-     if (_state == SolitarioGfx::FIRST_SCENE) {
+    if (_state == SolitarioGfx::FIRST_SCENE) {
         TRACE_DEBUG("[SolitarioGfx - Iterate] first scene\n");
         DrawStaticScene();
         _state = SolitarioGfx::IN_GAME;

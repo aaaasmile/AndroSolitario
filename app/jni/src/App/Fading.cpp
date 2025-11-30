@@ -100,8 +100,8 @@ LPErrInApp FadeAction::Fade(SDL_Surface* pSurfScreen, SDL_Surface* pSurfImg,
     // ui_curr_time = ui_old_time;
     //  Convert the given time in seconds into miliseconds.
     _ui_time_ms = uiSeconds * 1000;
-    TRACE_DEBUG("[Fade] Ticks initial %" PRIu64 ", end of fading %" PRIu64 "\n",
-                _ui_old_time, _ui_time_ms);
+    TRACE_DEBUG("[Fade] Ticks initial %" PRIu64 ", end of fading %" PRIu64 ", fading out %d\n",
+                _ui_old_time, _ui_time_ms, fadeOut);
     if (fadeOut) {
         _f_alpha = 0.0;
     } else {
