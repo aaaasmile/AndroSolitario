@@ -41,11 +41,13 @@ SolitarioGfx::SolitarioGfx() {
     _terminated = true;
     _p_currentTime = new CurrentTime();
     _p_FadeAction = new FadeAction();
+    _state = READY_TO_START;
 }
 
 SolitarioGfx::~SolitarioGfx() {
     CleanUpRegion();
     clearSurface();
+    clearAnimation();
     if (_p_BtNewGame != NULL) {
         delete _p_BtNewGame;
         _p_BtNewGame = NULL;
@@ -164,8 +166,62 @@ LPErrInApp SolitarioGfx::Initialize(SDL_Surface* s, SDL_Renderer* r,
     } else {
         return ERR_UTIL::ErrorCreate("Only pac file supported");
     }
+    SDL_Rect rctBt1;
+    int btw = 120;
+    int btwSymb = 60;
+    int bth = 28;
+    int btoffsetY = 70;
+    int btposx = 150;
+    int btintraX = 30;
+    if (pGameSettings->NeedScreenMagnify()) {
+        btw = 200;
+        bth = 70;
+        btoffsetY = 400;
+        btposx = 500;
+        btintraX = 50;
+        btwSymb = 90;
+    }
+    if (_p_Screen->w == 1024) {
+        btposx = 500;
+    }
+    // button Quit
+    ClickCb cbBtQuit = prepClickQuitCb();
+    _p_BtQuit = new ButtonGfx();
+    rctBt1.w = btw;
+    rctBt1.h = bth;
+    rctBt1.y = _p_Screen->h - btoffsetY;
+    rctBt1.x = btposx;
+    _p_BtQuit->Initialize(&rctBt1, _p_Screen, _p_FontBigText, MYIDQUIT,
+                          cbBtQuit);
+    _p_BtQuit->SetVisibleState(ButtonGfx::INVISIBLE);
 
-    return DrawInitialScene();
+    // button new game
+    ClickCb cbBtNewGame = prepClickNewGameCb();
+    _p_BtNewGame = new ButtonGfx();
+    rctBt1.x = rctBt1.x + rctBt1.w + btintraX;
+    _p_BtNewGame->Initialize(&rctBt1, _p_Screen, _p_FontBigText, MYIDNEWGAME,
+                             cbBtNewGame);
+    _p_BtNewGame->SetVisibleState(ButtonGfx::INVISIBLE);
+    // button toggle sound
+    int tx = btposx;
+    int offsetY = 30;
+    if (pGameSettings->NeedScreenMagnify()) {
+        tx = btposx;
+        offsetY = 250;
+    }
+    rctBt1.y = _p_Screen->h - offsetY;
+    rctBt1.x = tx;
+    rctBt1.w = btwSymb;
+    ClickCb cbBtToggleSound = prepClickToggleSoundCb();
+    _p_BtToggleSound = new ButtonGfx();
+    _p_BtToggleSound->InitializeAsSymbol(&rctBt1, _p_Screen,
+                                         pGameSettings->GetFontSymb(),
+                                         MYIDTOGGLESOUND, cbBtToggleSound);
+    _p_BtToggleSound->SetVisibleState(ButtonGfx::INVISIBLE);
+
+    TRACE_DEBUG("Solitario initialized \n");
+    // return DrawInitialScene();
+    return NULL;
 }
 
 void SolitarioGfx::InitAllCoords() {
@@ -186,7 +242,7 @@ LPErrInApp SolitarioGfx::DrawCardStack(SDL_Surface* s,
         return ERR_UTIL::ErrorCreate("DrawCardStack region is NULL");
     }
     // TRACE_DEBUG("Draw card stack %d, visible %d\n",
-    
+
     LPErrInApp err;
     if (!pcardRegion->IsVisible())
         return NULL;
@@ -296,8 +352,8 @@ LPErrInApp SolitarioGfx::InitDrag(LPCardStackGfx pCargoStack, int x, int y,
 
     // TRACE_DEBUG("  InitDrag - DrawStaticScene - start \n");
     DrawStaticScene();
-    Uint64 last_time = SDL_GetTicks();
-    Uint64 FPS = 10;
+    // Uint64 last_time = SDL_GetTicks();
+    // Uint64 FPS = 10;
 
     // TRACE_DEBUG("  InitDrag - DrawStaticScene - end \n");
     CardRegionGfx dragRegion(
@@ -343,11 +399,11 @@ LPErrInApp SolitarioGfx::InitDrag(LPCardStackGfx pCargoStack, int x, int y,
     _oldx = x;
     _oldy = y;
 
-    Uint64 now_time = SDL_GetTicks();
-    if (now_time < last_time + FPS) {
-        Uint32 delay = last_time + FPS - now_time;
-        SDL_Delay(delay);
-    }
+    // Uint64 now_time = SDL_GetTicks();
+    // if (now_time < last_time + FPS) {
+    //     Uint32 delay = last_time + FPS - now_time;
+    //     SDL_Delay(delay);
+    // }
     updateTextureAsFlipScreen();
     isInitDrag = true;
     // TRACE_DEBUG("  InitDrag - end \n");
@@ -467,9 +523,9 @@ void SolitarioGfx::zoomDropCard(int& sx, int& sy, LPCardGfx pCard, int w,
     int dx = pCard->X();
     int dy = pCard->Y();
     float precision = 0.1f;
-    Uint64 FPS = 20;
+    // Uint64 FPS = 20;
     for (float i = 0.0; i <= 1.0; i += precision) {
-        Uint64 last_time = SDL_GetTicks();
+        // Uint64 last_time = SDL_GetTicks();
         SDL_PumpEvents();
         calcPt(sx, sy, dx, dy, i, px, py);
 
@@ -491,11 +547,11 @@ void SolitarioGfx::zoomDropCard(int& sx, int& sy, LPCardGfx pCard, int w,
 
         SDL_BlitSurface(_p_ScreenBackbufferDrag, &rcs, _p_Screen, &rcd);
         SDL_BlitSurface(_p_Dragface, NULL, _p_Screen, &dest);
-        Uint64 now_time = SDL_GetTicks();
-        if (now_time < last_time + FPS) {
-            Uint32 delay = last_time + FPS - now_time;
-            SDL_Delay(delay);
-        }
+        // Uint64 now_time = SDL_GetTicks();
+        // if (now_time < last_time + FPS) {
+        //     Uint32 delay = last_time + FPS - now_time;
+        //     SDL_Delay(delay);
+        // }
         updateTextureAsFlipScreen();
     }
     _scoreChanged = true;
@@ -558,7 +614,7 @@ void SolitarioGfx::DrawStaticScene() {
 }
 
 LPErrInApp SolitarioGfx::DrawInitialScene() {
-    TRACE("[SolitarioGfx] DrawInitialScene\n");
+    TRACE("[SolitarioGfx] DrawInitialScene, trigger initial fading\n");
     LPGameSettings pGameSettings = GameSettings::GetSettings();
     SDL_Rect clipRect;
     SDL_GetSurfaceClipRect(_p_Screen, &clipRect);
@@ -573,65 +629,69 @@ LPErrInApp SolitarioGfx::DrawInitialScene() {
     rctTarget.h = _p_SceneBackground->h;
     if (!_sceneBackgroundIsBlack) {
         if (pGameSettings->InputType != InputTypeEnum::TouchWithoutMouse) {
-            _p_FadeAction->Fade(_p_Screen, _p_SceneBackground, 2, false, _p_sdlRenderer,
-                 &rctTarget);
+            _p_FadeAction->Fade(_p_Screen, _p_SceneBackground, 2, false,
+                                _p_sdlRenderer, &rctTarget);
+            _state = SolitarioGfx::WAIT_FOR_FADING;
+            _stateAfter = SolitarioGfx::FIRST_SCENE;
+            return NULL;
         } else {
             _p_FadeAction->InstantFade(_p_Screen);
         }
     }
+    _state = SolitarioGfx::FIRST_SCENE;
 
-    SDL_Rect rctBt1;
-    int btw = 120;
-    int btwSymb = 60;
-    int bth = 28;
-    int btoffsetY = 70;
-    int btposx = 150;
-    int btintraX = 30;
-    if (pGameSettings->NeedScreenMagnify()) {
-        btw = 200;
-        bth = 70;
-        btoffsetY = 400;
-        btposx = 500;
-        btintraX = 50;
-        btwSymb = 90;
-    }
-    if (_p_Screen->w == 1024) {
-        btposx = 500;
-    }
-    // button Quit
-    ClickCb cbBtQuit = prepClickQuitCb();
-    _p_BtQuit = new ButtonGfx();
-    rctBt1.w = btw;
-    rctBt1.h = bth;
-    rctBt1.y = _p_Screen->h - btoffsetY;
-    rctBt1.x = btposx;
-    _p_BtQuit->Initialize(&rctBt1, _p_Screen, _p_FontBigText, MYIDQUIT,
-                          cbBtQuit);
-    _p_BtQuit->SetVisibleState(ButtonGfx::INVISIBLE);
+    // SDL_Rect rctBt1;
+    // int btw = 120;
+    // int btwSymb = 60;
+    // int bth = 28;
+    // int btoffsetY = 70;
+    // int btposx = 150;
+    // int btintraX = 30;
+    // if (pGameSettings->NeedScreenMagnify()) {
+    //     btw = 200;
+    //     bth = 70;
+    //     btoffsetY = 400;
+    //     btposx = 500;
+    //     btintraX = 50;
+    //     btwSymb = 90;
+    // }
+    // if (_p_Screen->w == 1024) {
+    //     btposx = 500;
+    // }
+    // // button Quit
+    // ClickCb cbBtQuit = prepClickQuitCb();
+    // _p_BtQuit = new ButtonGfx();
+    // rctBt1.w = btw;
+    // rctBt1.h = bth;
+    // rctBt1.y = _p_Screen->h - btoffsetY;
+    // rctBt1.x = btposx;
+    // _p_BtQuit->Initialize(&rctBt1, _p_Screen, _p_FontBigText, MYIDQUIT,
+    //                       cbBtQuit);
+    // _p_BtQuit->SetVisibleState(ButtonGfx::INVISIBLE);
 
-    // button new game
-    ClickCb cbBtNewGame = prepClickNewGameCb();
-    _p_BtNewGame = new ButtonGfx();
-    rctBt1.x = rctBt1.x + rctBt1.w + btintraX;
-    _p_BtNewGame->Initialize(&rctBt1, _p_Screen, _p_FontBigText, MYIDNEWGAME,
-                             cbBtNewGame);
-    _p_BtNewGame->SetVisibleState(ButtonGfx::INVISIBLE);
-    // button toggle sound
-    int tx = btposx;
-    int offsetY = 30;
-    if (pGameSettings->NeedScreenMagnify()) {
-        tx = btposx;
-        offsetY = 250;
-    }
-    rctBt1.y = _p_Screen->h - offsetY;
-    rctBt1.x = tx;
-    rctBt1.w = btwSymb;
-    ClickCb cbBtToggleSound = prepClickToggleSoundCb();
-    _p_BtToggleSound = new ButtonGfx();
-    _p_BtToggleSound->InitializeAsSymbol(&rctBt1, _p_Screen,
-                                         pGameSettings->GetFontSymb(),
-                                         MYIDTOGGLESOUND, cbBtToggleSound);
-    _p_BtToggleSound->SetVisibleState(ButtonGfx::INVISIBLE);
+    // // button new game
+    // ClickCb cbBtNewGame = prepClickNewGameCb();
+    // _p_BtNewGame = new ButtonGfx();
+    // rctBt1.x = rctBt1.x + rctBt1.w + btintraX;
+    // _p_BtNewGame->Initialize(&rctBt1, _p_Screen, _p_FontBigText, MYIDNEWGAME,
+    //                          cbBtNewGame);
+    // _p_BtNewGame->SetVisibleState(ButtonGfx::INVISIBLE);
+    // // button toggle sound
+    // int tx = btposx;
+    // int offsetY = 30;
+    // if (pGameSettings->NeedScreenMagnify()) {
+    //     tx = btposx;
+    //     offsetY = 250;
+    // }
+    // rctBt1.y = _p_Screen->h - offsetY;
+    // rctBt1.x = tx;
+    // rctBt1.w = btwSymb;
+    // ClickCb cbBtToggleSound = prepClickToggleSoundCb();
+    // _p_BtToggleSound = new ButtonGfx();
+    // _p_BtToggleSound->InitializeAsSymbol(&rctBt1, _p_Screen,
+    //                                      pGameSettings->GetFontSymb(),
+    //                                      MYIDTOGGLESOUND, cbBtToggleSound);
+    // _p_BtToggleSound->SetVisibleState(ButtonGfx::INVISIBLE);
     return NULL;
 }
 
@@ -778,8 +838,86 @@ LPErrInApp SolitarioGfx::DrawSymbolPac(int x, int y, int nSymbol,
     return NULL;
 }
 
+typedef struct victoryInfo {
+    int rotation;
+    int id;
+    int x;
+    unsigned int y;
+    int xspeed;
+    int yspeed;
+    int gravity = 1;
+    float bounce = 0.8f;
+    int max_y;
+}* LPcitoryInfo;
+static LPcitoryInfo g_pVict = NULL;
+
+void SolitarioGfx::clearAnimation() {
+    if (g_pVict != NULL) {
+        delete g_pVict;
+        g_pVict = NULL;
+    }
+}
+
+bool SolitarioGfx::isInVictoryState() {
+    return (_state == SolitarioGfx::IN_CARD_VICTORY ||
+            _state == SolitarioGfx::START_VICTORY ||
+            _state == SolitarioGfx::NEW_CARD_VICTORY);
+}
+
 LPErrInApp SolitarioGfx::VictoryAnimation() {
-    TRACE("Victory animation \n");
+    if (!isInVictoryState()) {
+        return ERR_UTIL::ErrorCreate(
+            "[VictoryAnimation] called in worng state");
+    }
+
+    if (_state == SolitarioGfx::START_VICTORY) {
+        TRACE("Victory animation - Start \n");
+        if (g_pVict != NULL) {
+            delete g_pVict;
+        }
+        g_pVict = new victoryInfo();
+        g_pVict->max_y = _p_Screen->h;
+        DrawStaticScene();
+        _state = SolitarioGfx::NEW_CARD_VICTORY;
+        return NULL;
+    }
+
+    if (_state != SolitarioGfx::NEW_CARD_VICTORY) {
+        g_pVict->rotation = rand() % 2;
+        g_pVict->id = rand() % _deckType.GetNumCards();
+        g_pVict->x = rand() % _p_Screen->w;
+        g_pVict->y = rand() % _p_Screen->h / 2;
+
+        if (g_pVict->rotation)
+            g_pVict->xspeed = -4;
+        else
+            g_pVict->xspeed = 4;
+
+        g_pVict->yspeed = 0;
+        _state = SolitarioGfx::IN_CARD_VICTORY;
+    }
+    if (_state == SolitarioGfx::IN_CARD_VICTORY) {
+        g_pVict->yspeed = g_pVict->yspeed + g_pVict->gravity;
+        g_pVict->x += g_pVict->xspeed;
+        g_pVict->y += g_pVict->yspeed;
+
+        if (g_pVict->y + g_CardHeight > g_pVict->max_y) {
+            g_pVict->y = g_pVict->max_y - g_CardHeight;
+            g_pVict->yspeed = int(-g_pVict->yspeed * g_pVict->bounce);
+        }
+        LPErrInApp err =
+            DrawCard(g_pVict->x, g_pVict->y, g_pVict->id, _p_Screen);
+        if (err != NULL) {
+            return err;
+        }
+        updateTextureAsFlipScreen();
+
+        if ((g_pVict->x + g_CardWidth > 0) && (g_pVict->x < _p_Screen->w)) {
+            _state = SolitarioGfx::NEW_CARD_VICTORY;
+        }
+    }
+    return NULL;
+
     // TODO
     // LPErrInApp err;
     // int rotation;
@@ -866,8 +1004,7 @@ LPErrInApp SolitarioGfx::LoadSymbolsForPac() {
     Uint8 r, g, b;
     strFileSymbName += _deckType.GetSymbolFileName();
     if (_deckType.GetType() == eDeckType::TAROCK_PIEMONT) {
-        SDL_IOStream* srcSymb =
-            SDL_IOFromFile(strFileSymbName.c_str(), "rb");
+        SDL_IOStream* srcSymb = SDL_IOFromFile(strFileSymbName.c_str(), "rb");
         if (srcSymb == NULL) {
             return ERR_UTIL::ErrorCreate(
                 "SDL_RWFromFile on symbols failed: %s\n", SDL_GetError());
@@ -911,7 +1048,7 @@ LPErrInApp SolitarioGfx::LoadSymbolsForPac() {
 }
 
 LPErrInApp SolitarioGfx::newGame() {
-    TRACE("New Game\n");
+    TRACE("[SolitarioGfx] newGame\n");
     LPErrInApp err;
     SetSymbol(DeckPile_Ix, CRD_OSYMBOL);
     CleanUpRegion();
@@ -941,18 +1078,20 @@ LPErrInApp SolitarioGfx::newGame() {
 }
 
 LPErrInApp SolitarioGfx::handleGameLoopKeyDownEvent(SDL_Event* pEvent) {
-    LPErrInApp err;
-    if (pEvent->key.key == SDLK_N) {
-        _newgamerequest = true;
-    }
-    if (pEvent->key.key == SDLK_A) {
-        err = VictoryAnimation();
-        if (err != NULL) {
-            return err;
-        }
-        TRACE("Exit from victory animation \n");
-        DrawStaticScene();
-    }
+    // TODO Remove this
+    // LPErrInApp err;
+    // if (pEvent->key.key == SDLK_N) {
+    //     _newgamerequest = true;
+    // }
+    // if (pEvent->key.key == SDLK_A) {
+    //     _state = SolitarioGfx::START_VICTORY;
+    //     // err = VictoryAnimation();
+    //     // if (err != NULL) {
+    //     //     return err;
+    //     // }
+    //     // TRACE("Exit from victory animation \n");
+    //     // DrawStaticScene();
+    // }
     return NULL;
 }
 
@@ -1138,7 +1277,8 @@ LPErrInApp SolitarioGfx::handleGameLoopMouseUpEvent(SDL_Event* pEvent) {
     _p_BtQuit->MouseUp(pEvent);
     _p_BtNewGame->MouseUp(pEvent);
     _p_BtToggleSound->MouseUp(pEvent);
-    return endOfDragAndCheckForVictory();
+    //return endOfDragAndCheckForVictory(); // TODO
+    return NULL;
 }
 
 LPErrInApp SolitarioGfx::endOfDragAndCheckForVictory() {
@@ -1177,209 +1317,384 @@ LPErrInApp SolitarioGfx::endOfDragAndCheckForVictory() {
         _p_currentTime->StopTimer();
         bonusScore();
         DrawStaticScene();
-        char buff[1024];
-        LPGameSettings pGameSettings = GameSettings::GetSettings();
-        LPLanguages pLanguages = pGameSettings->GetLanguageMan();
-        snprintf(buff, 1024, pLanguages->GetCStringId(Languages::FINAL_SCORE),
-                 _scoreGame);
-        showOkMsgBox(buff);
         err = _p_HighScore->SaveScore(_scoreGame, _deckType.GetNumCards());
         if (err != NULL) {
             return err;
         }
-        DrawStaticScene();
-        VictoryAnimation();
-        TRACE("Exit from victory animation \n");
-        err = newGame();
-        if (err != NULL) {
-            return err;
-        }
-        DrawStaticScene();
+
+        // TODO: do it with state
+        // char buff[1024];
+        // LPGameSettings pGameSettings = GameSettings::GetSettings();
+        // LPLanguages pLanguages = pGameSettings->GetLanguageMan();
+        // snprintf(buff, 1024,
+        // pLanguages->GetCStringId(Languages::FINAL_SCORE),
+        //          _scoreGame);
+        // showOkMsgBox(buff);
+
+        // DrawStaticScene();
+        // VictoryAnimation();
+        // TRACE("Exit from victory animation \n");
+        // err = newGame();
+        // if (err != NULL) {
+        //     return err;
+        // }
+        // DrawStaticScene();
     }
 
     return NULL;
 }
 
-LPErrInApp SolitarioGfx::StartGameLoop() {
-    TRACE_DEBUG("StartGameLoop, card width %d, height %d\n", g_CardWidth,
-                g_CardHeight);
-    // TODO
-//     LPGameSettings pGameSettings = GameSettings::GetSettings();
-//     LPLanguages pLanguages = pGameSettings->GetLanguageMan();
+LPErrInApp SolitarioGfx::HandleEvent(SDL_Event* pEvent) {
+    LPErrInApp err = NULL;
+    if (isInVictoryState()) {
+        switch (pEvent->type) {
+            case SDL_EVENT_QUIT:
+                _state = SolitarioGfx::DO_NEWGAME;
+                return NULL;
+            case SDL_EVENT_KEY_DOWN:
+                if (pEvent->key.key == SDLK_ESCAPE) {
+                    _state = SolitarioGfx::DO_NEWGAME;
+                    return NULL;
+                }
+                break;
+            case SDL_EVENT_MOUSE_BUTTON_DOWN:
+                _state = SolitarioGfx::DO_NEWGAME;
+                return NULL;
+            case SDL_EVENT_FINGER_DOWN:
+                _state = SolitarioGfx::DO_NEWGAME;
+                return NULL;
+        }
+        return NULL;
+    }
 
-//     _p_MusicManager->PlayMusic(MusicManager::MUSIC_PLAY_SND,
-//                                MusicManager::eLoopType::LOOP_ON);
-//     // button Quit
-//     STRING strTextBt;
-//     strTextBt = pLanguages->GetStringId(Languages::ID_EXIT);
-//     _p_BtQuit->SetButtonText(strTextBt.c_str());
-//     _p_BtQuit->SetVisibleState(ButtonGfx::VISIBLE);
-//     // button New Game
-//     strTextBt = pLanguages->GetStringId(Languages::ID_NEWGAME);
-//     _p_BtNewGame->SetButtonText(strTextBt.c_str());
-//     _p_BtNewGame->SetVisibleState(ButtonGfx::VISIBLE);
-//     // button Toggle Sound
-//     if (_p_MusicManager->IsMusicEnabled()) {
-//         if (_p_MusicManager->IsPlayingMusic()) {
-//             strTextBt = "🔊";  //_p_Languages->GetStringId(Languages::ON);
-//         } else {
-//             strTextBt = "🔇";  //_p_Languages->GetStringId(Languages::OFF);
-//         }
-//         _p_BtToggleSound->SetButtonText(strTextBt.c_str());
-//         _p_BtToggleSound->SetVisibleState(ButtonGfx::VISIBLE);
-//     }
+    switch (pEvent->type) {
+        case SDL_EVENT_QUIT:
+            TRACE_DEBUG("[SolitarioGfx - event] quit\n");
+            _state = SolitarioGfx::FADING_OUT;
+            return NULL;
 
-//     int xLine0 = 35;
-//     int yLine0 = 10;
-//     int yoffsetLine0 = 40;
-//     int yOverlapCard = 32;
-//     int xOffsetIntraStack = 17;
-//     int xOffsetFaceUp = 25;
-//     if (pGameSettings->NeedScreenMagnify()) {
-//         if (g_CardWidth <= 127) {
-//             xLine0 = 50;
-//             yLine0 = 150;
-//             yoffsetLine0 = 150;
-//             yOverlapCard = 56;
-//             xOffsetIntraStack = 40;
-//             xOffsetFaceUp = 60;
-//         } else {
-//             xLine0 = 20;
-//             yLine0 = 120;
-//             yoffsetLine0 = 130;
-//             yOverlapCard = 40;
-//             xOffsetIntraStack = 24;
-//             xOffsetFaceUp = 48;
-//         }
-//     }
+        case SDL_EVENT_KEY_DOWN:
+            if (pEvent->key.key == SDLK_ESCAPE) {
+                TRACE_DEBUG("[SolitarioGfx - event] escape\n");
+                _state = SolitarioGfx::TERMINATED;
+                return NULL;
+            }
+            if (pEvent->key.key == SDLK_A) {
+                TRACE_DEBUG("[SolitarioGfx - event] animation victory\n");
+                _state = SolitarioGfx::START_VICTORY;
+            }
+            // err = handleGameLoopKeyDownEvent(pEvent);
+            // if (err != NULL)
+            //     return err;
+            break;
+#if HASTOUCH
+        case SDL_EVENT_FINGER_DOWN:
+            // TRACE_DEBUG("Event SDL_EVENT_FINGER_DOWN \n");
+            err = handleGameLoopFingerDownEvent(pEvent);
+            if (err != NULL)
+                return err;
+            break;
+        case SDL_EVENT_FINGER_UP:
+            // TRACE_DEBUG("Event SDL_EVENT_FINGER_UP \n");
+            err = handleGameLoopFingerUpEvent(pEvent);
+            if (err != NULL)
+                return err;
+            break;
+        case SDL_EVENT_FINGER_MOTION:
+            err = handleGameLoopFingerMotion(pEvent);
+            if (err != NULL)
+                return err;
+            break;
+#endif
+#if HASMOUSE
+        case SDL_EVENT_MOUSE_BUTTON_DOWN:
+            // TRACE_DEBUG("Event SDL_EVENT_MOUSE_BUTTON_DOWN -
+            // start
+            // \n");
+            err = handleGameLoopMouseDownEvent(pEvent);
+            // TRACE_DEBUG("Event SDL_EVENT_MOUSE_BUTTON_DOWN - end
+            // \n");
+            if (err != NULL)
+                return err;
+            break;
 
-//     // index 0 (deck with face down)
-//     CreateRegion(RT_DECKSTOCK,           // ID
-//                  CRD_VISIBLE | CRD_3D,   // attributes
-//                  CRD_DONOTHING,          // Accept mode
-//                  CRD_DONOTHING,          // drag mode
-//                  CRD_OSYMBOL,            // symbol
-//                  xLine0, yLine0, 2, 2);  // x, y, x offset, yoffset
-//     // index 1-7
-//     int i;
-//     for (i = 1; i <= 7; i++) {
-//         CreateRegion(RegionType::RT_TABLEAU,
-//                      CRD_VISIBLE | CRD_DODRAG | CRD_DODROP,  // attributes
-//                      CRD_DOOPCOLOR | CRD_DOLOWER | CRD_DOLOWERBY1 |
-//                          CRD_DOKING,  // accept mode
-//                      CRD_DRAGFACEUP,  // drag mode
-//                      CRD_HSYMBOL,     // symbol
-//                      (g_CardWidth * (i - 1)) + (i * xOffsetIntraStack),
-//                      g_CardHeight + yoffsetLine0 + yLine0, 0,
-//                      yOverlapCard);  // x, y, x offset, yoffset
-//     }
+        case SDL_EVENT_MOUSE_MOTION:
+            handleGameLoopMouseMoveEvent(pEvent);
+            break;
 
-//     // index 8 (deck face up)
-//     CreateRegion(RegionType::RT_DECKSTOCK_FACEUP,
-//                  CRD_VISIBLE | CRD_FACEUP | CRD_DODRAG | CRD_3D,  // Attributes
-//                  CRD_DOALL,                                       // accept mode
-//                  CRD_DRAGTOP,                                     // drag mode
-//                  CRD_NSYMBOL,                                     // symbol
-//                  xLine0 + g_CardWidth + xOffsetFaceUp, yLine0, 0,
-//                  0);  // x, y, x offset, yoffset
+        case SDL_EVENT_MOUSE_BUTTON_UP:
+            // TRACE_DEBUG("Event SDL_EVENT_MOUSE_BUTTON_UP \n");
+            err = handleGameLoopMouseUpEvent(pEvent);
+            if (err != NULL)
+                return err;
+            break;
+#endif
+    }
+    return NULL;
+}
 
-//     // index 9-12 (4 aces place on the top)
-//     for (i = 4; i <= 7; i++) {
-//         CreateRegion(
-//             RegionType::RT_ACE_FOUNDATION,
-//             CRD_VISIBLE | CRD_3D | CRD_DODRAG | CRD_DODROP,  // Attributes
-//             CRD_DOSINGLE | CRD_DOHIGHER | CRD_DOHIGHERBY1 | CRD_DOACE |
-//                 CRD_DOSUIT,  // Accept mode
-//             CRD_DRAGTOP,     // drop mode
-//             CRD_HSYMBOL,     // symbol
-//             (g_CardWidth * (i - 1)) + (i * xOffsetIntraStack), yLine0, 0,
-//             0);  // x, y, x offset, yoffset
-//     }
+LPErrInApp SolitarioGfx::HandleIterate(bool& done) {
+    LPErrInApp err = NULL;
+    if (_state == SolitarioGfx::READY_TO_START) {
+        TRACE_DEBUG("[SolitarioGfx - Iterate] ready to start\n");
+        DrawInitialScene();
+        return NULL;
+    }
+     if (_state == SolitarioGfx::FIRST_SCENE) {
+        TRACE_DEBUG("[SolitarioGfx - Iterate] first scene\n");
+        DrawStaticScene();
+        _state = SolitarioGfx::IN_GAME;
+        return NULL;
+    }
+    if (_state == SolitarioGfx::WAIT_FOR_FADING) {
+        if (_p_FadeAction->IsInProgress()) {
+            _p_FadeAction->Iterate();
+            return NULL;
+        }
+        TRACE(
+            "[SolitarioGfx - Iterate] - fade end, from %d to next state %d \n",
+            _state, _stateAfter);
+        if (_state == _stateAfter) {
+            return ERR_UTIL::ErrorCreate(
+                "Next state could not be WAIT_FOR_FADING\n");
+        }
+        _state = _stateAfter;
+    }
 
-//     LPErrInApp err = newGame();
-//     if (err != NULL)
-//         return err;
-//     DrawStaticScene();
+    if (_state == SolitarioGfx::FADING_OUT) {
+        TRACE_DEBUG("[SolitarioGfx - Iterate] - enter in state FADING_OUT \n");
+        _p_FadeAction->Fade(_p_Screen, _p_Screen, 1, true, _p_sdlRenderer,
+                            NULL);
+        if (_p_MusicManager->IsPlayingMusic()) {
+            _p_MusicManager->StopMusic(300);
+        }
+        _state = SolitarioGfx::WAIT_FOR_FADING;
+        _stateAfter = SolitarioGfx::TERMINATED;
+        return NULL;
+    }
+    if (isInVictoryState()) {
+        return VictoryAnimation();
+    }
+    if (_state == SolitarioGfx::TERMINATED) {
+        TRACE_DEBUG("[SolitarioGfx - Iterate] state Terminated \n");
+        if (_p_MusicManager->IsPlayingMusic()) {
+            _p_MusicManager->StopMusic(0);
+        }
+        done = true;
+    }
+    if (_state == SolitarioGfx::DO_NEWGAME) {
+        TRACE_DEBUG("[SolitarioGfx - Iterate] state DO_NEWGAME \n");
+        DrawStaticScene();
+        newGame();
+        _state = SolitarioGfx::IN_GAME;
+    }
 
-//     SDL_Event event;
-//     _terminated = false;
-//     while (!_terminated) {
-//         while (SDL_PollEvent(&event)) {
-//             switch (pEvent->type) {
-//                 case SDL_EVENT_QUIT:
-//                     _p_FadeAction->Fade(_p_Screen, _p_Screen, 1, true, _p_sdlRenderer, NULL);
-//                     return NULL;
+    if (_state == SolitarioGfx::IN_GAME) {
+        updateBadScoreScoreOnTime();
+        // write direct into the screen because it could be that a
+        // is in action and the screen for a back buffer is dirty
+        err = drawScore(_p_Screen);
+        if (err != NULL)
+            return err;
+    }
 
-//                 case SDL_EVENT_KEY_DOWN:
-//                     if (pEvent->key.key == SDLK_ESCAPE) {
-//                         return NULL;
-//                     }
-//                     err = handleGameLoopKeyDownEvent(event);
-//                     if (err != NULL)
-//                         return err;
-//                     break;
-// #if HASTOUCH
-//                 case SDL_EVENT_FINGER_DOWN:
-//                     // TRACE_DEBUG("Event SDL_EVENT_FINGER_DOWN \n");
-//                     err = handleGameLoopFingerDownEvent(event);
-//                     if (err != NULL)
-//                         return err;
-//                     break;
-//                 case SDL_EVENT_FINGER_UP:
-//                     // TRACE_DEBUG("Event SDL_EVENT_FINGER_UP \n");
-//                     err = handleGameLoopFingerUpEvent(event);
-//                     if (err != NULL)
-//                         return err;
-//                     break;
-//                 case SDL_EVENT_FINGER_MOTION:
-//                     err = handleGameLoopFingerMotion(event);
-//                     if (err != NULL)
-//                         return err;
-//                     break;
-// #endif
-// #if HASMOUSE
-//                 case SDL_EVENT_MOUSE_BUTTON_DOWN:
-//                     // TRACE_DEBUG("Event SDL_EVENT_MOUSE_BUTTON_DOWN -
-//                     // start
-//                     // \n");
-//                     err = handleGameLoopMouseDownEvent(event);
-//                     // TRACE_DEBUG("Event SDL_EVENT_MOUSE_BUTTON_DOWN - end
-//                     // \n");
-//                     if (err != NULL)
-//                         return err;
-//                     break;
+    // if (_newgamerequest) { // TODO
+    //     _newgamerequest = false;
+    //     err = newGame();
+    //     if (err != NULL) {
+    //         return err;
+    //     }
+    //     DrawStaticScene();
+    // }
 
-//                 case SDL_EVENT_MOUSE_MOTION:
-//                     handleGameLoopMouseMoveEvent(event);
-//                     break;
+    return NULL;
+}
 
-//                 case SDL_EVENT_MOUSE_BUTTON_UP:
-//                     // TRACE_DEBUG("Event SDL_EVENT_MOUSE_BUTTON_UP \n");
-//                     err = handleGameLoopMouseUpEvent(event);
-//                     if (err != NULL)
-//                         return err;
-//                     break;
-// #endif
-//             }
-//         }
-//         updateBadScoreScoreOnTime();
-//         // write direct into the screen because it could be that a dragging
-//         // is in action and the screen for a back buffer is dirty
-//         err = drawScore(_p_Screen);
-//         if (err != NULL)
-//             return err;
-//         if (_newgamerequest) {
-//             _newgamerequest = false;
-//             err = newGame();
-//             if (err != NULL) {
-//                 return err;
-//             }
-//             DrawStaticScene();
-//         }
-//     }
-//     if (_p_MusicManager->IsPlayingMusic()) {
-//         _p_MusicManager->StopMusic(300);
-//     }
+LPErrInApp SolitarioGfx::Show() {
+    TRACE_DEBUG("[SolitarioGfx] Show, card size: width %d, height %d\n",
+                g_CardWidth, g_CardHeight);
+
+    LPGameSettings pGameSettings = GameSettings::GetSettings();
+    LPLanguages pLanguages = pGameSettings->GetLanguageMan();
+
+    _p_MusicManager->PlayMusic(MusicManager::MUSIC_PLAY_SND,
+                               MusicManager::eLoopType::LOOP_ON);
+    // button Quit
+    STRING strTextBt;
+    strTextBt = pLanguages->GetStringId(Languages::ID_EXIT);
+    _p_BtQuit->SetButtonText(strTextBt.c_str());
+    _p_BtQuit->SetVisibleState(ButtonGfx::VISIBLE);
+    // button New Game
+    strTextBt = pLanguages->GetStringId(Languages::ID_NEWGAME);
+    _p_BtNewGame->SetButtonText(strTextBt.c_str());
+    _p_BtNewGame->SetVisibleState(ButtonGfx::VISIBLE);
+    // button Toggle Sound
+    if (_p_MusicManager->IsMusicEnabled()) {
+        if (_p_MusicManager->IsPlayingMusic()) {
+            strTextBt = "🔊";  //_p_Languages->GetStringId(Languages::ON);
+        } else {
+            strTextBt = "🔇";  //_p_Languages->GetStringId(Languages::OFF);
+        }
+        _p_BtToggleSound->SetButtonText(strTextBt.c_str());
+        _p_BtToggleSound->SetVisibleState(ButtonGfx::VISIBLE);
+    }
+
+    int xLine0 = 35;
+    int yLine0 = 10;
+    int yoffsetLine0 = 40;
+    int yOverlapCard = 32;
+    int xOffsetIntraStack = 17;
+    int xOffsetFaceUp = 25;
+    if (pGameSettings->NeedScreenMagnify()) {
+        if (g_CardWidth <= 127) {
+            xLine0 = 50;
+            yLine0 = 150;
+            yoffsetLine0 = 150;
+            yOverlapCard = 56;
+            xOffsetIntraStack = 40;
+            xOffsetFaceUp = 60;
+        } else {
+            xLine0 = 20;
+            yLine0 = 120;
+            yoffsetLine0 = 130;
+            yOverlapCard = 40;
+            xOffsetIntraStack = 24;
+            xOffsetFaceUp = 48;
+        }
+    }
+
+    // index 0 (deck with face down)
+    CreateRegion(RT_DECKSTOCK,           // ID
+                 CRD_VISIBLE | CRD_3D,   // attributes
+                 CRD_DONOTHING,          // Accept mode
+                 CRD_DONOTHING,          // drag mode
+                 CRD_OSYMBOL,            // symbol
+                 xLine0, yLine0, 2, 2);  // x, y, x offset, yoffset
+    // index 1-7
+    int i;
+    for (i = 1; i <= 7; i++) {
+        CreateRegion(RegionType::RT_TABLEAU,
+                     CRD_VISIBLE | CRD_DODRAG | CRD_DODROP,  // attributes
+                     CRD_DOOPCOLOR | CRD_DOLOWER | CRD_DOLOWERBY1 |
+                         CRD_DOKING,  // accept mode
+                     CRD_DRAGFACEUP,  // drag mode
+                     CRD_HSYMBOL,     // symbol
+                     (g_CardWidth * (i - 1)) + (i * xOffsetIntraStack),
+                     g_CardHeight + yoffsetLine0 + yLine0, 0,
+                     yOverlapCard);  // x, y, x offset, yoffset
+    }
+
+    // index 8 (deck face up)
+    CreateRegion(RegionType::RT_DECKSTOCK_FACEUP,
+                 CRD_VISIBLE | CRD_FACEUP | CRD_DODRAG | CRD_3D,  // Attributes
+                 CRD_DOALL,                                       // accept mode
+                 CRD_DRAGTOP,                                     // drag mode
+                 CRD_NSYMBOL,                                     // symbol
+                 xLine0 + g_CardWidth + xOffsetFaceUp, yLine0, 0,
+                 0);  // x, y, x offset, yoffset
+
+    // index 9-12 (4 aces place on the top)
+    for (i = 4; i <= 7; i++) {
+        CreateRegion(
+            RegionType::RT_ACE_FOUNDATION,
+            CRD_VISIBLE | CRD_3D | CRD_DODRAG | CRD_DODROP,  // Attributes
+            CRD_DOSINGLE | CRD_DOHIGHER | CRD_DOHIGHERBY1 | CRD_DOACE |
+                CRD_DOSUIT,  // Accept mode
+            CRD_DRAGTOP,     // drop mode
+            CRD_HSYMBOL,     // symbol
+            (g_CardWidth * (i - 1)) + (i * xOffsetIntraStack), yLine0, 0,
+            0);  // x, y, x offset, yoffset
+    }
+
+    LPErrInApp err = newGame();
+    if (err != NULL)
+        return err;
+    _state = SolitarioGfx::READY_TO_START;
+
+    //     DrawStaticScene();
+
+    //     SDL_Event event;
+    //     _terminated = false;
+    //     while (!_terminated) {
+    //         while (SDL_PollEvent(&event)) {
+    //             switch (pEvent->type) {
+    //                 case SDL_EVENT_QUIT:
+    //                     _p_FadeAction->Fade(_p_Screen, _p_Screen, 1,
+    //                     true, _p_sdlRenderer, NULL); return NULL;
+
+    //                 case SDL_EVENT_KEY_DOWN:
+    //                     if (pEvent->key.key == SDLK_ESCAPE) {
+    //                         return NULL;
+    //                     }
+    //                     err = handleGameLoopKeyDownEvent(event);
+    //                     if (err != NULL)
+    //                         return err;
+    //                     break;
+    // #if HASTOUCH
+    //                 case SDL_EVENT_FINGER_DOWN:
+    //                     // TRACE_DEBUG("Event SDL_EVENT_FINGER_DOWN \n");
+    //                     err = handleGameLoopFingerDownEvent(event);
+    //                     if (err != NULL)
+    //                         return err;
+    //                     break;
+    //                 case SDL_EVENT_FINGER_UP:
+    //                     // TRACE_DEBUG("Event SDL_EVENT_FINGER_UP \n");
+    //                     err = handleGameLoopFingerUpEvent(event);
+    //                     if (err != NULL)
+    //                         return err;
+    //                     break;
+    //                 case SDL_EVENT_FINGER_MOTION:
+    //                     err = handleGameLoopFingerMotion(event);
+    //                     if (err != NULL)
+    //                         return err;
+    //                     break;
+    // #endif
+    // #if HASMOUSE
+    //                 case SDL_EVENT_MOUSE_BUTTON_DOWN:
+    //                     // TRACE_DEBUG("Event SDL_EVENT_MOUSE_BUTTON_DOWN
+    //                     -
+    //                     // start
+    //                     // \n");
+    //                     err = handleGameLoopMouseDownEvent(event);
+    //                     // TRACE_DEBUG("Event SDL_EVENT_MOUSE_BUTTON_DOWN
+    //                     - end
+    //                     // \n");
+    //                     if (err != NULL)
+    //                         return err;
+    //                     break;
+
+    //                 case SDL_EVENT_MOUSE_MOTION:
+    //                     handleGameLoopMouseMoveEvent(event);
+    //                     break;
+
+    //                 case SDL_EVENT_MOUSE_BUTTON_UP:
+    //                     // TRACE_DEBUG("Event SDL_EVENT_MOUSE_BUTTON_UP
+    //                     \n"); err = handleGameLoopMouseUpEvent(event); if
+    //                     (err != NULL)
+    //                         return err;
+    //                     break;
+    // #endif
+    //             }
+    //         }
+    //         updateBadScoreScoreOnTime();
+    //         // write direct into the screen because it could be that a
+    //         dragging
+    //         // is in action and the screen for a back buffer is dirty
+    //         err = drawScore(_p_Screen);
+    //         if (err != NULL)
+    //             return err;
+    //         if (_newgamerequest) {
+    //             _newgamerequest = false;
+    //             err = newGame();
+    //             if (err != NULL) {
+    //                 return err;
+    //             }
+    //             DrawStaticScene();
+    //         }
+    //     }
+    //     if (_p_MusicManager->IsPlayingMusic()) {
+    //         _p_MusicManager->StopMusic(300);
+    //     }
     return NULL;
 }
 
@@ -1415,7 +1730,7 @@ int SolitarioGfx::showYesNoMsgBox(LPCSTR strText) {
     STRING strTextYes = pLanguages->GetStringId(Languages::ID_YES);
     STRING strTextNo = pLanguages->GetStringId(Languages::ID_NO);
     MsgBox.Show(_p_AlphaDisplay, strTextYes.c_str(), strTextNo.c_str(),
-                       strText);
+                strText);
 
     return MsgBox.GetResult();
 }

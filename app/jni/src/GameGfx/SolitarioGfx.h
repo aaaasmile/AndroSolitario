@@ -48,6 +48,18 @@ class SolitarioGfx {
         Ace_Ix3 = 11,
         Ace_Ix4 = 12
     };
+    enum eState {
+        READY_TO_START,
+        FIRST_SCENE,
+        IN_GAME,
+        START_VICTORY,
+        NEW_CARD_VICTORY,
+        IN_CARD_VICTORY,
+        DO_NEWGAME,
+        FADING_OUT,
+        WAIT_FOR_FADING,
+        TERMINATED
+    };
 
    public:
     SolitarioGfx();
@@ -55,7 +67,9 @@ class SolitarioGfx {
 
     LPErrInApp Initialize(SDL_Surface* s, SDL_Renderer* r, SDL_Window* w,
                           SDL_Surface* pSceneBackground, HighScore* pHighScore);
-    LPErrInApp StartGameLoop();
+    LPErrInApp HandleEvent(SDL_Event* pEvent);
+    LPErrInApp HandleIterate(bool& done);
+    LPErrInApp Show();
 
     int RegionSize(int regionNo) { return _cardRegionList[regionNo].Size(); }
     void CleanUpRegion();
@@ -146,6 +160,8 @@ class SolitarioGfx {
     void BtQuitClick();
     void BtNewGameClick();
     void BtToggleSoundClick();
+    bool isInVictoryState();
+    void clearAnimation();
 
    private:
     void updateTextureAsFlipScreen();
@@ -217,6 +233,8 @@ class SolitarioGfx {
     CurrentTime* _p_currentTime;
     Uint64 _lastUpTimestamp;
     FadeAction* _p_FadeAction;
+    eState _state;
+    eState _stateAfter;
 };
 
 #endif

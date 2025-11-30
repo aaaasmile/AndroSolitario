@@ -182,7 +182,7 @@ LPErrInApp HighScore::HandleIterate(bool& done) {
             _p_FadeAction->Iterate();
             return NULL;
         }
-        TRACE("HighScore Init - fade end \n");
+        TRACE("HighScore - fade end \n");
         if (_state == _stateAfter) {
             return ERR_UTIL::ErrorCreate(
                 "Next state could not be WAIT_FOR_FADING\n");

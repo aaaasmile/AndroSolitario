@@ -22,7 +22,7 @@ LPErrInApp CardStackGfx::NewDeck(DeckType& deckType, int widthEmpty,
 }
 
 void CardStackGfx::CleanUp() {
-    TRACE_DEBUG("CleanUp: delete card stack %d\n", _vct_lpCardGfx.size());
+    //TRACE_DEBUG("CleanUp: delete card stack %d\n", _vct_lpCardGfx.size());
     for (VI vi = _vct_lpCardGfx.begin(); vi != _vct_lpCardGfx.end(); ++vi) {
         LPCardGfx pCard = *vi;
         delete pCard;

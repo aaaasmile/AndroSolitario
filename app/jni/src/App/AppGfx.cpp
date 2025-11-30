@@ -401,7 +401,10 @@ LPErrInApp AppGfx::EnterMenu(MenuItemEnum menuItem) {
     LPErrInApp err;
     switch (menuItem) {
         case MenuItemEnum::MENU_GAME:
-            // TODO start game
+            err = startGameLoop();
+            if (err != NULL)
+                return err;
+            break;
             break;
         case MenuItemEnum::MENU_HELP:
             err = showHelp();
@@ -442,8 +445,10 @@ LPErrInApp AppGfx::MainLoopEvent(SDL_Event* pEvent, SDL_AppResult& res) {
             break;
 
         case MenuItemEnum::MENU_GAME:
-            TRACE("TODO: menu game event \n");
-            LeaveMenu();  // TODO
+            err = _p_SolitarioGfx->HandleEvent(pEvent);
+            if (err != NULL)
+                return err;
+            //TRACE("TODO: menu game event \n");
             // err = startGameLoop();
             // if (err != NULL)
             //     return err;
@@ -510,7 +515,12 @@ LPErrInApp AppGfx::MainLoopIterate() {
             break;
 
         case MenuItemEnum::MENU_GAME:
-            // TODO
+            err = _p_SolitarioGfx->HandleIterate(done);
+            if (err != NULL)
+                return err;
+            if (done) {
+                backToMenuRootWithMusic();
+            }
             // err = startGameLoop();
             // if (err != NULL)
             //     goto error;
@@ -569,7 +579,7 @@ LPErrInApp AppGfx::MainLoopIterate() {
 }
 
 LPErrInApp AppGfx::startGameLoop() {
-    TRACE("Start Game Loop\n");
+    TRACE("Start Game Loop, the game is the solitario\n");
     if (_p_MusicManager->IsPlayingMusic()) {
         _p_MusicManager->StopMusic(600);
     }
@@ -585,7 +595,7 @@ LPErrInApp AppGfx::startGameLoop() {
     if (err != NULL)
         return err;
 
-    return _p_SolitarioGfx->StartGameLoop();
+    return _p_SolitarioGfx->Show();
 }
 
 LPErrInApp AppGfx::showHelp() {
