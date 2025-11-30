@@ -410,13 +410,6 @@ LPErrInApp SolitarioGfx::InitDrag(LPCardStackGfx pCargoStack, int x, int y,
     return NULL;
 }
 
-void SolitarioGfx::updateTextureAsFlipScreen() {
-    SDL_UpdateTexture(_p_ScreenTexture, NULL, _p_Screen->pixels,
-                      _p_Screen->pitch);
-    SDL_RenderTexture(_p_sdlRenderer, _p_ScreenTexture, NULL, NULL);
-    SDL_RenderPresent(_p_sdlRenderer);
-}
-
 void SolitarioGfx::DoDrag(int x, int y) {
     // TRACE_DEBUG(
     //     "DoDrag (x=%d, y=%d) => drag_x=%d, drag_y=%d. old_x=%d, old_y=%d\n",
@@ -507,7 +500,7 @@ LPCardRegionGfx SolitarioGfx::DoDrop(LPCardRegionGfx pDestRegion) {
     return pBestRegion;
 }
 
-void calcPt(int x0, int y0, int x1, int y1, float t, int& xf, int& yf) {
+static void calcPt(int x0, int y0, int x1, int y1, float t, int& xf, int& yf) {
     xf = int(x0 + t * (x1 - x0) + .5);
     yf = int(y0 + t * (y1 - y0) + .5);
 }
@@ -1888,6 +1881,13 @@ void SolitarioGfx::updateBadScoreRedial() {
 void SolitarioGfx::updateBadScoreAceToTableu() {
     _scoreChanged = true;
     _scoreGame -= 75;
+}
+
+void SolitarioGfx::updateTextureAsFlipScreen() {
+    SDL_UpdateTexture(_p_ScreenTexture, NULL, _p_Screen->pixels,
+                      _p_Screen->pitch);
+    SDL_RenderTexture(_p_sdlRenderer, _p_ScreenTexture, NULL, NULL);
+    SDL_RenderPresent(_p_sdlRenderer);
 }
 
 void SolitarioGfx::clearScore() {
