@@ -53,6 +53,9 @@ class SolitarioGfx {
         READY_TO_START,
         FIRST_SCENE,
         IN_GAME,
+        IN_SINGLE_TAPCLICK,
+        IN_DOUBLE_TAPCLICK,
+        ZOOMING,
         START_VICTORY,
         NEW_CARD_VICTORY,
         IN_CARD_VICTORY,
@@ -63,6 +66,7 @@ class SolitarioGfx {
         WAIT_FOR_FADING,
         TERMINATED
     };
+    enum eZoominState { ZS_INIT, ZS_IN_PROGRESS, ZS_TERMINATED };
 
    public:
     SolitarioGfx();
@@ -239,7 +243,9 @@ class SolitarioGfx {
     eState _stateAfter;
     eState _stateAfterYes;
     eState _stateAfterNo;
+    eZoominState _sunStateZooming;
     MesgBoxGfx* _p_MsgBox;
+    SDL_Point _ptLast;
 };
 
 #endif
