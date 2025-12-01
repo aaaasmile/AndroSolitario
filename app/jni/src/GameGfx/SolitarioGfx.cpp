@@ -875,7 +875,7 @@ LPErrInApp SolitarioGfx::VictoryAnimation() {
         return NULL;
     }
 
-    if (_state != SolitarioGfx::NEW_CARD_VICTORY) {
+    if (_state == SolitarioGfx::NEW_CARD_VICTORY) {
         g_pVict->rotation = rand() % 2;
         g_pVict->id = rand() % _deckType.GetNumCards();
         g_pVict->x = rand() % _p_Screen->w;
@@ -905,7 +905,7 @@ LPErrInApp SolitarioGfx::VictoryAnimation() {
         }
         updateTextureAsFlipScreen();
 
-        if ((g_pVict->x + g_CardWidth > 0) && (g_pVict->x < _p_Screen->w)) {
+        if ((g_pVict->x + g_CardWidth <= 0) || (g_pVict->x >= _p_Screen->w)) {
             _state = SolitarioGfx::NEW_CARD_VICTORY;
         }
     }
@@ -1345,7 +1345,9 @@ LPErrInApp SolitarioGfx::HandleEvent(SDL_Event* pEvent) {
                 _state = SolitarioGfx::DO_NEWGAME;
                 return NULL;
             case SDL_EVENT_KEY_DOWN:
-                if (pEvent->key.key == SDLK_ESCAPE) {
+                if (pEvent->key.key == SDLK_ESCAPE ||
+                    pEvent->key.key == SDLK_SPACE ||
+                    pEvent->key.key == SDLK_RETURN) {
                     _state = SolitarioGfx::DO_NEWGAME;
                     return NULL;
                 }
@@ -1477,8 +1479,8 @@ LPErrInApp SolitarioGfx::HandleIterate(bool& done) {
     }
     if (_state == SolitarioGfx::DO_NEWGAME) {
         TRACE_DEBUG("[SolitarioGfx - Iterate] state DO_NEWGAME \n");
-        DrawStaticScene();
         newGame();
+        DrawStaticScene();
         _state = SolitarioGfx::IN_GAME;
     }
 
