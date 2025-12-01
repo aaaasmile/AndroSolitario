@@ -21,7 +21,8 @@ class MesgBoxGfx {
     ~MesgBoxGfx(void);
 
     enum eMSGBOX_TYPE { TY_MBOK, TY_MB_YES_NO };
-    enum { RES_NO = 0, RES_YES = 1, ID_BT_YES = 2, ID_BT_NO = 3, ID_OK = 4 };
+    enum eMSGBOX_RES { RES_NO = 0, RES_YES = 1, RES_OK = 2 };
+    enum eMSGBOX_ID { ID_BT_YES = 0, ID_BT_NO = 1, ID_OK = 2 };
 
     LPErrInApp Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
                           TTF_Font* pFont, eMSGBOX_TYPE eval,
@@ -53,7 +54,7 @@ class MesgBoxGfx {
     eMSGBOX_TYPE _typeMsg;
     ButtonGfx* _p_BtButt1;
     ButtonGfx* _p_BtButt2;
-    int _result;
+    eMSGBOX_RES _result;
     VCT_STRING _dataStrings;
     Uint8 _alpha;
     bool _inProgress;

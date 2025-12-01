@@ -37,8 +37,7 @@ SolitarioGfx::SolitarioGfx() {
     _p_BtNewGame = NULL;
     _p_BtToggleSound = NULL;
     _p_AlphaDisplay = NULL;
-    _newgamerequest = false;
-    _terminated = true;
+    _p_MsgBox = NULL;
     _p_currentTime = new CurrentTime();
     _p_FadeAction = new FadeAction();
     _state = READY_TO_START;
@@ -62,6 +61,10 @@ SolitarioGfx::~SolitarioGfx() {
     }
     delete _p_currentTime;
     delete _p_FadeAction;
+    if (_p_MsgBox != NULL) {
+        delete _p_MsgBox;
+        _p_MsgBox = NULL;
+    }
 }
 
 void SolitarioGfx::clearSurface() {
@@ -1189,7 +1192,7 @@ LPErrInApp SolitarioGfx::doubleTapOrRightClick(SDL_Point& pt) {
 }
 
 LPErrInApp SolitarioGfx::singleTapOrLeftClick(SDL_Point& pt) {
-    TRACE_DEBUG("singleTapOrLeftClick \n");
+    TRACE_DEBUG("singleTapOrLeftClick in state %d\n", _state);
     LPErrInApp err;
     CardRegionGfx* srcReg;
     bool isInitDrag = false;
@@ -1362,6 +1365,19 @@ LPErrInApp SolitarioGfx::HandleEvent(SDL_Event* pEvent) {
         return NULL;
     }
 
+    if (_state == SolitarioGfx::IN_MSGBOX) {
+        _p_MsgBox->HandleEvent(pEvent);
+        return NULL;
+    }
+    if (_state == SolitarioGfx::FADING_OUT ||
+        _state == SolitarioGfx::WAIT_FOR_FADING) {
+        if (pEvent->key.key == SDLK_ESCAPE) {
+            TRACE_DEBUG("[SolitarioGfx - event] escape\n");
+            _state = SolitarioGfx::TERMINATED;
+            return NULL;
+        }
+        return NULL;
+    }
     switch (pEvent->type) {
         case SDL_EVENT_QUIT:
             TRACE_DEBUG("[SolitarioGfx - event] quit\n");
@@ -1485,6 +1501,10 @@ LPErrInApp SolitarioGfx::HandleIterate(bool& done) {
     }
 
     if (_state == SolitarioGfx::IN_GAME) {
+        if (_statePrev != _state) {
+            DrawStaticScene();
+            _statePrev = _state;
+        }
         updateBadScoreScoreOnTime();
         // write direct into the screen because it could be that a
         // is in action and the screen for a back buffer is dirty
@@ -1493,7 +1513,24 @@ LPErrInApp SolitarioGfx::HandleIterate(bool& done) {
             return err;
     }
 
-    // if (_newgamerequest) { // TODO
+    if (_state == SolitarioGfx::IN_MSGBOX) {
+        bool msgBoxDone = false;
+        _p_MsgBox->HandleIterate(msgBoxDone);
+        if (msgBoxDone) {
+            TRACE_DEBUG("User click result %d \n", _p_MsgBox->GetResult());
+            if (_p_MsgBox->GetResult() == MesgBoxGfx::eMSGBOX_RES::RES_YES) {
+                TRACE_DEBUG("User choose YES \n");
+                _state = _stateAfterYes;
+            } else {
+                _state = _stateAfterNo;
+                TRACE_DEBUG("User choose NO \n");
+            }
+            TRACE_DEBUG("Next state is %d \n", _state);
+            _statePrev = SolitarioGfx::IN_MSGBOX;
+        }
+    }
+
+    // if (_newgamerequest) {
     //     _newgamerequest = false;
     //     err = newGame();
     //     if (err != NULL) {
@@ -1693,10 +1730,13 @@ LPErrInApp SolitarioGfx::Show() {
     return NULL;
 }
 
-int SolitarioGfx::showYesNoMsgBox(LPCSTR strText) {
+void SolitarioGfx::showYesNoMsgBox(LPCSTR strText) {
     LPGameSettings pGameSettings = GameSettings::GetSettings();
     LPLanguages pLanguages = pGameSettings->GetLanguageMan();
-    MesgBoxGfx MsgBox;
+    if (_p_MsgBox != NULL) {
+        delete _p_MsgBox;
+    }
+    _p_MsgBox = new MesgBoxGfx();
     int offsetW = 100;
     int offsetH = 130;
     if (pGameSettings->NeedScreenMagnify()) {
@@ -1709,10 +1749,10 @@ int SolitarioGfx::showYesNoMsgBox(LPCSTR strText) {
     rctBox.y = (_p_Screen->h - rctBox.h) / 2;
     rctBox.x = (_p_Screen->w - rctBox.w) / 2;
 
-    MsgBox.ChangeAlpha(150);
-    MsgBox.Initialize(&rctBox, _p_Screen, _p_FontSmallText,
-                      MesgBoxGfx::TY_MB_YES_NO, _p_sdlRenderer);
-    DrawStaticScene();
+    _p_MsgBox->ChangeAlpha(150);
+    _p_MsgBox->Initialize(&rctBox, _p_Screen, _p_FontSmallText,
+                          MesgBoxGfx::TY_MB_YES_NO, _p_sdlRenderer);
+    // DrawStaticScene();
     SDL_Rect clipRect;
     SDL_GetSurfaceClipRect(_p_AlphaDisplay, &clipRect);
     SDL_FillSurfaceRect(
@@ -1724,10 +1764,10 @@ int SolitarioGfx::showYesNoMsgBox(LPCSTR strText) {
 
     STRING strTextYes = pLanguages->GetStringId(Languages::ID_YES);
     STRING strTextNo = pLanguages->GetStringId(Languages::ID_NO);
-    MsgBox.Show(_p_AlphaDisplay, strTextYes.c_str(), strTextNo.c_str(),
-                strText);
+    _p_MsgBox->Show(_p_AlphaDisplay, strTextYes.c_str(), strTextNo.c_str(),
+                    strText);
 
-    return MsgBox.GetResult();
+    // return _p_MsgBox->GetResult();
 }
 
 void SolitarioGfx::showOkMsgBox(LPCSTR strText) {
@@ -1746,9 +1786,9 @@ void SolitarioGfx::showOkMsgBox(LPCSTR strText) {
     rctBox.y = (_p_Screen->h - rctBox.h) / 2;
     rctBox.x = (_p_Screen->w - rctBox.w) / 2;
 
-    MsgBox.ChangeAlpha(150);
-    MsgBox.Initialize(&rctBox, _p_Screen, _p_FontSmallText, MesgBoxGfx::TY_MBOK,
-                      _p_sdlRenderer);
+    _p_MsgBox->ChangeAlpha(150);
+    _p_MsgBox->Initialize(&rctBox, _p_Screen, _p_FontSmallText,
+                          MesgBoxGfx::TY_MBOK, _p_sdlRenderer);
     DrawStaticScene();
     SDL_Rect clipRect;
     SDL_GetSurfaceClipRect(_p_AlphaDisplay, &clipRect);
@@ -1760,31 +1800,33 @@ void SolitarioGfx::showOkMsgBox(LPCSTR strText) {
     SDL_BlitSurface(_p_Screen, NULL, _p_AlphaDisplay, NULL);
 
     STRING strTextOk = pLanguages->GetStringId(Languages::ID_OK);
-    MsgBox.Show(_p_AlphaDisplay, strTextOk.c_str(), "", strText);
+    _p_MsgBox->Show(_p_AlphaDisplay, strTextOk.c_str(), "", strText);
 }
 
 void SolitarioGfx::BtQuitClick() {
     TRACE("Quit with user button\n");
     LPGameSettings pGameSettings = GameSettings::GetSettings();
     LPLanguages pLanguages = pGameSettings->GetLanguageMan();
-    if (showYesNoMsgBox(pLanguages->GetCStringId(Languages::ASK_QUIT)) ==
-        MesgBoxGfx::RES_YES) {
-        _terminated = true;
-    } else {
-        DrawStaticScene();
-    }
+    _stateAfterYes = SolitarioGfx::FADING_OUT;
+    _stateAfterNo = _state;
+    _state = SolitarioGfx::IN_MSGBOX;
+
+    showYesNoMsgBox(pLanguages->GetCStringId(Languages::ASK_QUIT));
 }
 
 void SolitarioGfx::BtNewGameClick() {
-    TRACE("New Game with user button\n");
+    TRACE("New Game click on button\n");
     LPGameSettings pGameSettings = GameSettings::GetSettings();
     LPLanguages pLanguages = pGameSettings->GetLanguageMan();
-    if (showYesNoMsgBox(pLanguages->GetCStringId(Languages::ASK_NEWGAME)) ==
-        MesgBoxGfx::RES_YES) {
-        _newgamerequest = true;
-    } else {
-        DrawStaticScene();
-    }
+    _stateAfterYes = SolitarioGfx::DO_NEWGAME;
+    _stateAfterNo = _state;
+    _state = SolitarioGfx::IN_MSGBOX;
+    showYesNoMsgBox(pLanguages->GetCStringId(Languages::ASK_NEWGAME));
+    //     MesgBoxGfx::RES_YES) {
+    //     _newgamerequest = true;
+    // } else {
+    //     DrawStaticScene();
+    // }
 }
 
 void SolitarioGfx::BtToggleSoundClick() {

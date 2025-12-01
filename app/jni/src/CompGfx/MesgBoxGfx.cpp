@@ -69,7 +69,7 @@ LPErrInApp MesgBoxGfx::Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
         rctBt1.y = _rctMsgBox.y + _rctMsgBox.h - btoffsetY - rctBt1.h;
         rctBt1.x =
             (_rctMsgBox.w - (2 * rctBt1.w + space2bt)) / 2 + _rctMsgBox.x;
-        _p_BtButt1->Initialize(&rctBt1, pScreen, pFont, ID_BT_YES, cbBt);
+        _p_BtButt1->Initialize(&rctBt1, pScreen, pFont, eMSGBOX_ID::ID_BT_YES, cbBt);
         _p_BtButt1->SetVisibleState(ButtonGfx::INVISIBLE);
 
         // button no
@@ -80,7 +80,7 @@ LPErrInApp MesgBoxGfx::Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
         rctBt1.h = bth;
         rctBt1.y = rctBt1.y;
         rctBt1.x = rctBt1.x + rctBt1.w + space2bt;
-        _p_BtButt2->Initialize(&rctBt1, pScreen, pFont, ID_BT_NO, cbBt);
+        _p_BtButt2->Initialize(&rctBt1, pScreen, pFont, eMSGBOX_ID::ID_BT_NO, cbBt);
         _p_BtButt2->SetVisibleState(ButtonGfx::INVISIBLE);
 
     } else if (_typeMsg == TY_MBOK) {
@@ -117,7 +117,7 @@ void MesgBoxGfx::ButCmdClicked(int butID) {
                 _result = RES_NO;
             }
         } else {
-            _result = butID;
+            _result = (eMSGBOX_RES)butID;
         }
     }
 }
@@ -249,9 +249,9 @@ LPErrInApp MesgBoxGfx::Show(SDL_Surface* pScene_background, LPCSTR lpsBut1Txt,
     _inProgress = true;
     _p_Scene_background = pScene_background;
     _result = RES_YES;
-    //Uint64 uiInitialTick = SDL_GetTicks();
-    //Uint64 uiLast_time = uiInitialTick;
-    //int FPS = 3;
+    // Uint64 uiInitialTick = SDL_GetTicks();
+    // Uint64 uiLast_time = uiInitialTick;
+    // int FPS = 3;
 
     _strMsgText = lpsMsgTxt;
     if (_p_BtButt1) {

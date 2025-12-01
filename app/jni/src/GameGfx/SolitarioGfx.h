@@ -16,6 +16,7 @@ class CurrentTime;
 class HighScore;
 class MusicManager;
 class FadeAction;
+class MesgBoxGfx;
 
 typedef std::vector<CardRegionGfx>::iterator regionVI;
 
@@ -49,16 +50,17 @@ class SolitarioGfx {
         Ace_Ix4 = 12
     };
     enum eState {
-        READY_TO_START,
-        FIRST_SCENE,
-        IN_GAME,
-        START_VICTORY,
-        NEW_CARD_VICTORY,
-        IN_CARD_VICTORY,
-        DO_NEWGAME,
-        FADING_OUT,
-        WAIT_FOR_FADING,
-        TERMINATED
+        READY_TO_START = 0,
+        FIRST_SCENE = 1,
+        IN_GAME = 2,
+        START_VICTORY = 3,
+        NEW_CARD_VICTORY = 4,
+        IN_CARD_VICTORY = 5,
+        DO_NEWGAME = 6,
+        IN_MSGBOX = 7,
+        FADING_OUT = 8,
+        WAIT_FOR_FADING = 9,
+        TERMINATED = 10
     };
 
    public:
@@ -191,7 +193,7 @@ class SolitarioGfx {
     void updateBadScoreAceToTableu();
     void clearScore();
     void bonusScore();
-    int showYesNoMsgBox(LPCSTR strText);
+    void showYesNoMsgBox(LPCSTR strText);
     void showOkMsgBox(LPCSTR strText);
 
    private:
@@ -222,8 +224,6 @@ class SolitarioGfx {
     bool _startdrag;
 
     std::vector<CardRegionGfx> _cardRegionList;
-    bool _terminated;
-    bool _newgamerequest;
     ButtonGfx* _p_BtQuit;
     ButtonGfx* _p_BtNewGame;
     ButtonGfx* _p_BtToggleSound;
@@ -234,7 +234,11 @@ class SolitarioGfx {
     Uint64 _lastUpTimestamp;
     FadeAction* _p_FadeAction;
     eState _state;
+    eState _statePrev;
     eState _stateAfter;
+    eState _stateAfterYes;
+    eState _stateAfterNo;
+    MesgBoxGfx* _p_MsgBox;
 };
 
 #endif
