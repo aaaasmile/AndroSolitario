@@ -1317,8 +1317,8 @@ LPErrInApp SolitarioGfx::endOfDragAndCheckForVictory() {
         if (err != NULL) {
             return err;
         }
+        _state = SolitarioGfx::START_VICTORY;
 
-        // TODO: do it with state
         // char buff[1024];
         // LPGameSettings pGameSettings = GameSettings::GetSettings();
         // LPLanguages pLanguages = pGameSettings->GetLanguageMan();
@@ -1345,21 +1345,21 @@ LPErrInApp SolitarioGfx::HandleEvent(SDL_Event* pEvent) {
     if (isInVictoryState()) {
         switch (pEvent->type) {
             case SDL_EVENT_QUIT:
-                _state = SolitarioGfx::DO_NEWGAME;
+                _state = SolitarioGfx::SHOW_SCORE;
                 return NULL;
             case SDL_EVENT_KEY_DOWN:
                 if (pEvent->key.key == SDLK_ESCAPE ||
                     pEvent->key.key == SDLK_SPACE ||
                     pEvent->key.key == SDLK_RETURN) {
-                    _state = SolitarioGfx::DO_NEWGAME;
+                    _state = SolitarioGfx::SHOW_SCORE;
                     return NULL;
                 }
                 break;
             case SDL_EVENT_MOUSE_BUTTON_DOWN:
-                _state = SolitarioGfx::DO_NEWGAME;
+                _state = SolitarioGfx::SHOW_SCORE;
                 return NULL;
             case SDL_EVENT_FINGER_DOWN:
-                _state = SolitarioGfx::DO_NEWGAME;
+                _state = SolitarioGfx::SHOW_SCORE;
                 return NULL;
         }
         return NULL;
@@ -1486,6 +1486,17 @@ LPErrInApp SolitarioGfx::HandleIterate(bool& done) {
     if (isInVictoryState()) {
         return VictoryAnimation();
     }
+    if (_state == SHOW_SCORE) {
+        TRACE_DEBUG("Show score state \n");
+        char buff[1024];
+        LPGameSettings pGameSettings = GameSettings::GetSettings();
+        LPLanguages pLanguages = pGameSettings->GetLanguageMan();
+        snprintf(buff, 1024, pLanguages->GetCStringId(Languages::FINAL_SCORE),
+                 _scoreGame);
+        _state = SolitarioGfx::IN_MSGBOX;
+        _stateAfter = SolitarioGfx::DO_NEWGAME;
+        showOkMsgBox(buff);
+    }
     if (_state == SolitarioGfx::TERMINATED) {
         TRACE_DEBUG("[SolitarioGfx - Iterate] state Terminated \n");
         if (_p_MusicManager->IsPlayingMusic()) {
@@ -1517,13 +1528,20 @@ LPErrInApp SolitarioGfx::HandleIterate(bool& done) {
         bool msgBoxDone = false;
         _p_MsgBox->HandleIterate(msgBoxDone);
         if (msgBoxDone) {
-            TRACE_DEBUG("User click result %d \n", _p_MsgBox->GetResult());
-            if (_p_MsgBox->GetResult() == MesgBoxGfx::eMSGBOX_RES::RES_YES) {
-                TRACE_DEBUG("User choose YES \n");
-                _state = _stateAfterYes;
-            } else {
-                _state = _stateAfterNo;
-                TRACE_DEBUG("User choose NO \n");
+            if (_p_MsgBox->GetType() ==
+                MesgBoxGfx::eMSGBOX_TYPE::TY_MB_YES_NO) {
+                TRACE_DEBUG("User click result %d \n", _p_MsgBox->GetResult());
+                if (_p_MsgBox->GetResult() ==
+                    MesgBoxGfx::eMSGBOX_RES::RES_YES) {
+                    TRACE_DEBUG("User choose YES \n");
+                    _state = _stateAfterYes;
+                } else {
+                    _state = _stateAfterNo;
+                    TRACE_DEBUG("User choose NO \n");
+                }
+            }else{
+                TRACE_DEBUG("Message box close \n");
+                _state = _stateAfter;
             }
             TRACE_DEBUG("Next state is %d \n", _state);
             _statePrev = SolitarioGfx::IN_MSGBOX;
@@ -1773,13 +1791,17 @@ void SolitarioGfx::showYesNoMsgBox(LPCSTR strText) {
 void SolitarioGfx::showOkMsgBox(LPCSTR strText) {
     LPGameSettings pGameSettings = GameSettings::GetSettings();
     LPLanguages pLanguages = pGameSettings->GetLanguageMan();
+    if (_p_MsgBox != NULL) {
+        delete _p_MsgBox;
+    }
+    _p_MsgBox = new MesgBoxGfx();
+
     int offsetW = 100;
     int offsetH = 130;
     if (pGameSettings->NeedScreenMagnify()) {
         offsetW = 150;
         offsetH = 260;
     }
-    MesgBoxGfx MsgBox;
     SDL_Rect rctBox;
     rctBox.w = _p_Screen->w - offsetW;
     rctBox.h = offsetH;
@@ -1789,7 +1811,7 @@ void SolitarioGfx::showOkMsgBox(LPCSTR strText) {
     _p_MsgBox->ChangeAlpha(150);
     _p_MsgBox->Initialize(&rctBox, _p_Screen, _p_FontSmallText,
                           MesgBoxGfx::TY_MBOK, _p_sdlRenderer);
-    DrawStaticScene();
+    // DrawStaticScene();
     SDL_Rect clipRect;
     SDL_GetSurfaceClipRect(_p_AlphaDisplay, &clipRect);
     SDL_FillSurfaceRect(

@@ -50,17 +50,18 @@ class SolitarioGfx {
         Ace_Ix4 = 12
     };
     enum eState {
-        READY_TO_START = 0,
-        FIRST_SCENE = 1,
-        IN_GAME = 2,
-        START_VICTORY = 3,
-        NEW_CARD_VICTORY = 4,
-        IN_CARD_VICTORY = 5,
-        DO_NEWGAME = 6,
-        IN_MSGBOX = 7,
-        FADING_OUT = 8,
-        WAIT_FOR_FADING = 9,
-        TERMINATED = 10
+        READY_TO_START,
+        FIRST_SCENE,
+        IN_GAME,
+        START_VICTORY,
+        NEW_CARD_VICTORY,
+        IN_CARD_VICTORY,
+        SHOW_SCORE,
+        DO_NEWGAME,
+        IN_MSGBOX,
+        FADING_OUT,
+        WAIT_FOR_FADING,
+        TERMINATED
     };
 
    public:

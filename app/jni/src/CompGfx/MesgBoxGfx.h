@@ -38,7 +38,8 @@ class MesgBoxGfx {
     void ChangeTextColor(SDL_Color newColor) { _colCurrent = newColor; }
     void ChangeAlpha(Uint8 newAlpha) { _alpha = newAlpha; }
 
-    int GetResult() { return _result; }
+    eMSGBOX_RES GetResult() { return _result; }
+    eMSGBOX_TYPE GetType() { return _typeMsg; }
 
    private:
     ClickCb prepClickBtCb();
