@@ -1451,59 +1451,14 @@ LPErrInApp SolitarioGfx::HandleIterate(bool& done) {
         DrawInitialScene();
         return NULL;
     }
+
     if (_state == SolitarioGfx::FIRST_SCENE) {
         TRACE_DEBUG("[SolitarioGfx - Iterate] first scene\n");
         DrawStaticScene();
         _state = SolitarioGfx::IN_GAME;
         return NULL;
     }
-    if (_state == SolitarioGfx::WAIT_FOR_FADING) {
-        if (_p_FadeAction->IsInProgress()) {
-            _p_FadeAction->Iterate();
-            return NULL;
-        }
-        TRACE(
-            "[SolitarioGfx - Iterate] - fade end, from %d to next state %d \n",
-            _state, _stateAfter);
-        if (_state == _stateAfter) {
-            return ERR_UTIL::ErrorCreate(
-                "Next state could not be WAIT_FOR_FADING\n");
-        }
-        _state = _stateAfter;
-    }
 
-    if (_state == SolitarioGfx::FADING_OUT) {
-        TRACE_DEBUG("[SolitarioGfx - Iterate] - enter in state FADING_OUT \n");
-        _p_FadeAction->Fade(_p_Screen, _p_Screen, 1, true, _p_sdlRenderer,
-                            NULL);
-        if (_p_MusicManager->IsPlayingMusic()) {
-            _p_MusicManager->StopMusic(300);
-        }
-        _state = SolitarioGfx::WAIT_FOR_FADING;
-        _stateAfter = SolitarioGfx::TERMINATED;
-        return NULL;
-    }
-    if (isInVictoryState()) {
-        return VictoryAnimation();
-    }
-    if (_state == SHOW_SCORE) {
-        TRACE_DEBUG("Show score state \n");
-        char buff[1024];
-        LPGameSettings pGameSettings = GameSettings::GetSettings();
-        LPLanguages pLanguages = pGameSettings->GetLanguageMan();
-        snprintf(buff, 1024, pLanguages->GetCStringId(Languages::FINAL_SCORE),
-                 _scoreGame);
-        _state = SolitarioGfx::IN_MSGBOX;
-        _stateAfter = SolitarioGfx::DO_NEWGAME;
-        showOkMsgBox(buff);
-    }
-    if (_state == SolitarioGfx::TERMINATED) {
-        TRACE_DEBUG("[SolitarioGfx - Iterate] state Terminated \n");
-        if (_p_MusicManager->IsPlayingMusic()) {
-            _p_MusicManager->StopMusic(0);
-        }
-        done = true;
-    }
     if (_state == SolitarioGfx::DO_NEWGAME) {
         TRACE_DEBUG("[SolitarioGfx - Iterate] state DO_NEWGAME \n");
         newGame();
@@ -1524,9 +1479,61 @@ LPErrInApp SolitarioGfx::HandleIterate(bool& done) {
             return err;
     }
 
+    if (_state == SolitarioGfx::WAIT_FOR_FADING) {
+        if (_p_FadeAction->IsInProgress()) {
+            _p_FadeAction->Iterate();
+            return NULL;
+        }
+        TRACE_DEBUG(
+            "[SolitarioGfx - Iterate] - fade end, from %d to next state %d \n",
+            _state, _stateAfter);
+        if (_state == _stateAfter) {
+            return ERR_UTIL::ErrorCreate(
+                "Next state could not be WAIT_FOR_FADING\n");
+        }
+        _state = _stateAfter;
+    }
+
+    if (_state == SolitarioGfx::FADING_OUT) {
+        TRACE_DEBUG("[SolitarioGfx - Iterate] - enter in state FADING_OUT \n");
+        _p_FadeAction->Fade(_p_Screen, _p_Screen, 1, true, _p_sdlRenderer,
+                            NULL);
+        if (_p_MusicManager->IsPlayingMusic()) {
+            _p_MusicManager->StopMusic(300);
+        }
+        _state = SolitarioGfx::WAIT_FOR_FADING;
+        _stateAfter = SolitarioGfx::TERMINATED;
+        return NULL;
+    }
+
+    if (isInVictoryState()) {
+        return VictoryAnimation();
+    }
+
+    if (_state == SHOW_SCORE) {
+        TRACE_DEBUG("Show score state \n");
+        char buff[1024];
+        LPGameSettings pGameSettings = GameSettings::GetSettings();
+        LPLanguages pLanguages = pGameSettings->GetLanguageMan();
+        snprintf(buff, 1024, pLanguages->GetCStringId(Languages::FINAL_SCORE),
+                 _scoreGame);
+        _state = SolitarioGfx::IN_MSGBOX;
+        _stateAfter = SolitarioGfx::DO_NEWGAME;
+        showOkMsgBox(buff);
+    }
+
+    if (_state == SolitarioGfx::TERMINATED) {
+        TRACE_DEBUG("[SolitarioGfx - Iterate] state Terminated \n");
+        if (_p_MusicManager->IsPlayingMusic()) {
+            _p_MusicManager->StopMusic(0);
+        }
+        done = true;
+    }
+
     if (_state == SolitarioGfx::IN_MSGBOX) {
         bool msgBoxDone = false;
         _p_MsgBox->HandleIterate(msgBoxDone);
+
         if (msgBoxDone) {
             if (_p_MsgBox->GetType() ==
                 MesgBoxGfx::eMSGBOX_TYPE::TY_MB_YES_NO) {
@@ -1539,7 +1546,7 @@ LPErrInApp SolitarioGfx::HandleIterate(bool& done) {
                     _state = _stateAfterNo;
                     TRACE_DEBUG("User choose NO \n");
                 }
-            }else{
+            } else {
                 TRACE_DEBUG("Message box close \n");
                 _state = _stateAfter;
             }
@@ -1547,7 +1554,7 @@ LPErrInApp SolitarioGfx::HandleIterate(bool& done) {
             _statePrev = SolitarioGfx::IN_MSGBOX;
         }
     }
-
+    
     // if (_newgamerequest) {
     //     _newgamerequest = false;
     //     err = newGame();
