@@ -915,7 +915,6 @@ LPErrInApp SolitarioGfx::VictoryAnimation() {
     }
     return NULL;
 
-    // TODO
     // LPErrInApp err;
     // int rotation;
     // int id;
