@@ -1180,6 +1180,13 @@ LPErrInApp SolitarioGfx::doubleTapOrRightClick(SDL_Point& pt) {
         if (pCardStack == NULL) {
             return NULL;
         }
+        // TODO
+        // _InitDragger = new InitDrag(pCardStack, -1, -1, srcReg);
+        // _InitDragger->Initialize(_cbTerminate);
+        // _InitDragger->Iterate();
+        // if (bTerminate){
+        //     _cbTerminate(pDropRegion, pCardStack);
+        // }
         err = InitDrag(pCardStack, -1, -1, isInitDrag, srcReg);
         if (err != NULL) {
             return err;
@@ -1235,21 +1242,21 @@ LPErrInApp SolitarioGfx::singleTapOrLeftClick(SDL_Point& pt) {
             if (err != NULL) {
                 return err;
             }
-            DoDrop(GetRegion(DeckPile_Ix));
-            Reverse(DeckPile_Ix);
-            InitCardCoords(DeckPile_Ix);
+            DoDrop(GetRegion(eRegionIx::DeckPile_Ix));
+            Reverse(eRegionIx::DeckPile_Ix);
+            InitCardCoords(eRegionIx::DeckPile_Ix);
             delete pCardStack;
             updateBadScoreRedial();
         } else if (!srcReg->IsEmpty()) {
             // the next card goes to the deck face up region: drag and drop
             // to deck face up
-            LPCardStackGfx pCardStack = PopStackFromRegion(DeckPile_Ix, 1);
+            LPCardStackGfx pCardStack = PopStackFromRegion(eRegionIx::DeckPile_Ix, 1);
             pCardStack->SetCardsFaceUp(true);
             err = InitDrag(pCardStack, -1, -1, isInitDrag, srcReg);
             if (err != NULL) {
                 return err;
             }
-            DoDrop(GetRegion(DeckFaceUp));
+            DoDrop(GetRegion(eRegionIx::DeckFaceUp));
             delete pCardStack;
         } else {
             TRACE("No more card on the pile deck\n");
