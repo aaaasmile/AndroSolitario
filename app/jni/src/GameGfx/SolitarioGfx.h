@@ -55,6 +55,9 @@ class SolitarioGfx {
         IN_GAME,
         IN_SINGLE_TAPCLICK,
         IN_DOUBLE_TAPCLICK,
+        INITDRAG_STEP1,
+        INITDRAG_STEP2,
+        INITDRAG_AFTER,
         ZOOMING,
         START_VICTORY,
         NEW_CARD_VICTORY,
@@ -94,6 +97,11 @@ class SolitarioGfx {
                         LPCardRegionGfx pSrcRegion);
     LPErrInApp InitDrag(LPCardStackGfx CargoStack, int x, int y,
                         bool& isInitDrag, LPCardRegionGfx pSrcRegion);
+    LPErrInApp InitDragContinue();
+    void InitDragAfterFromDoubleTap();
+    void InitDragAfterFromSingleTapA();
+    void InitDragAfterFromSingleTapB();
+    void InitDragAfterFromSingleTapC();
 
     void DoDrag(int x, int y);
 
@@ -176,7 +184,6 @@ class SolitarioGfx {
     void setDeckType(DeckType& dt) { _deckType.CopyFrom(dt); }
     void clearSurface();
     LPErrInApp newGame();
-    LPErrInApp handleGameLoopKeyDownEvent(SDL_Event* pEvent);
     LPErrInApp handleGameLoopMouseDownEvent(SDL_Event* pEvent);
     LPErrInApp handleGameLoopFingerDownEvent(SDL_Event* pEvent);
     LPErrInApp handleGameLoopFingerUpEvent(SDL_Event* pEvent);
@@ -246,6 +253,11 @@ class SolitarioGfx {
     eZoominState _sunStateZooming;
     MesgBoxGfx* _p_MsgBox;
     SDL_Point _ptLast;
+
+    void (SolitarioGfx::*_continueFnCb)();
+    LPCardRegionGfx _p_DropRegionForDrag;
+    LPCardStackGfx _p_CardStackForDrag;
+    bool _isInitDrag;
 };
 
 #endif
