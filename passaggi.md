@@ -249,6 +249,18 @@ Però per settare anche le atre opzioni, meglio usare:
     set_target_properties(${PROJECT_NAME} PROPERTIES
 In quanto con target_link_options non mi ha funzionato ALLOW_MEMORY_GROWTH
 
+### Debug di  Emscripten su Android
+Mi è capitato una serie di problemi sul target wasm che gira nel browser in Android (eventi Tap e Mouse contemporanei).
+Su Android il browser non ha la console per vedere i traces. Per questo ci si collega al
+telefono con il cavo usb e si apre Chrome all'indirizzo chrome://inspect.
+Poi si apre l'app sul browser dello smartphone e sul pc si esegue l'inspect del tab del browser remoto.
+In questa nuova finestra sul PC è possibile vedere i logs sulla console.
+
+### Emscripten Touch e mouse
+Il zarget wasm funziona nel browser e quidi gira su device che hanno il touch, il mouse oppure entrambi.
+Se abilito mouse e touch ho gli stessi eventi ripetuti e questo l'app non li supporta (pensa al toggle della musica). 
+Quindi il target Emscripten viene compilato solo con il mouse che funziona decentementre anche su Android.
+
 ## Directory Scratch di questo progetto
 Voglio creare dei piccoli progetti per testare delle funzionalità singole.
 Per esempio cd scratch/test_font vorrei compilare il programma hello.c.

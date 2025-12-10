@@ -229,7 +229,6 @@ class SolitarioGfx {
     SDL_Renderer* _p_sdlRenderer;
     SDL_Window* _p_Window;
     TTF_Font* _p_FontBigText;
-    TTF_Font* _p_FontSmallText;
     HighScore* _p_HighScore;
     MusicManager* _p_MusicManager;
 

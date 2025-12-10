@@ -54,6 +54,7 @@ class GameSettings {
     }
     TTF_Font* GetFontAriblk() { return _p_fontAriblk; }
     TTF_Font* GetFontVera() { return _p_fontVera; }
+    TTF_Font* GetFontMedium() { return _p_fontMedium; }
     TTF_Font* GetFontSymb() { return _p_fontSymb; }
 
     Languages* GetLanguageMan();
@@ -70,9 +71,11 @@ class GameSettings {
    private:
     SDL_Rect _screenRect = {0};
     int _fontSmallSize = 11;
+    int _fontMediumSize = 18;
     int _fontBigSize = 22;
     int _fontSymSize = 24;
     TTF_Font* _p_fontVera;
+    TTF_Font* _p_fontMedium;
     TTF_Font* _p_fontAriblk;
     TTF_Font* _p_fontSymb;
     Languages* _p_Languages;

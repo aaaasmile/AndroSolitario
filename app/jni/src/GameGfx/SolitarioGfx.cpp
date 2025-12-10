@@ -133,7 +133,6 @@ LPErrInApp SolitarioGfx::Initialize(SDL_Surface* s, SDL_Renderer* r,
     _sceneBackgroundIsBlack =
         pGameSettings->BackgroundType == BackgroundTypeEnum::Black;
     _p_FontBigText = pGameSettings->GetFontAriblk();
-    _p_FontSmallText = pGameSettings->GetFontVera();
     LPErrInApp err;
     _p_Screen = s;
     _p_sdlRenderer = r;
@@ -2006,7 +2005,7 @@ void SolitarioGfx::showYesNoMsgBox(LPCSTR strText) {
     rctBox.x = (_p_Screen->w - rctBox.w) / 2;
 
     _p_MsgBox->ChangeAlpha(150);
-    _p_MsgBox->Initialize(&rctBox, _p_Screen, _p_FontSmallText,
+    _p_MsgBox->Initialize(&rctBox, _p_Screen, pGameSettings->GetFontMedium(),
                           MesgBoxGfx::TY_MB_YES_NO, _p_sdlRenderer);
     // DrawStaticScene();
     SDL_Rect clipRect;
@@ -2047,7 +2046,7 @@ void SolitarioGfx::showOkMsgBox(LPCSTR strText) {
     rctBox.x = (_p_Screen->w - rctBox.w) / 2;
 
     _p_MsgBox->ChangeAlpha(150);
-    _p_MsgBox->Initialize(&rctBox, _p_Screen, _p_FontSmallText,
+    _p_MsgBox->Initialize(&rctBox, _p_Screen, pGameSettings->GetFontMedium(),
                           MesgBoxGfx::TY_MBOK, _p_sdlRenderer);
     // DrawStaticScene();
     SDL_Rect clipRect;

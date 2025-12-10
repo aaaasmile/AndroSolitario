@@ -217,6 +217,11 @@ LPErrInApp GameSettings::LoadFonts() {
         return ERR_UTIL::ErrorCreate("Unable to load font %s, error: %s\n",
                                      g_lpszIniFontVeraFname, SDL_GetError());
     }
+    _p_fontMedium = TTF_OpenFont(g_lpszIniFontVeraFname, _fontMediumSize);
+    if (_p_fontMedium == NULL) {
+        return ERR_UTIL::ErrorCreate("Unable to load medium font %s, error: %s\n",
+                                     g_lpszIniFontVeraFname, SDL_GetError());
+    }
     _p_fontSymb = TTF_OpenFont(g_lpszFontSymbFname, _fontSymSize);
     if (_p_fontSymb == NULL) {
         return ERR_UTIL::ErrorCreate("Unable to load font %s, error: %s\n",
