@@ -2,6 +2,7 @@
 #define SOLIATRIO_GFX__H
 
 #include <vector>
+#include <functional>
 
 #include "CardRegionGfx.h"
 #include "ErrorInfo.h"
@@ -65,6 +66,8 @@ class SolitarioGfx {
         SHOW_SCORE,
         DO_NEWGAME,
         IN_MSGBOX,
+        IN_ZOOM,
+        IN_ZOOM_TERMINATED,
         FADING_OUT,
         WAIT_FOR_FADING,
         TERMINATED
@@ -98,10 +101,10 @@ class SolitarioGfx {
     LPErrInApp InitDrag(LPCardStackGfx CargoStack, int x, int y,
                         bool& isInitDrag, LPCardRegionGfx pSrcRegion);
     LPErrInApp InitDragContinue();
-    void InitDragAfterFromDoubleTap();
-    void InitDragAfterFromSingleTapA();
-    void InitDragAfterFromSingleTapB();
-    void InitDragAfterFromSingleTapC();
+    LPErrInApp InitDragAfterFromDoubleTap();
+    LPErrInApp InitDragAfterFromSingleTapA();
+    LPErrInApp InitDragAfterFromSingleTapB();
+    LPErrInApp InitDragAfterFromSingleTapC();
 
     void DoDrag(int x, int y);
 
@@ -180,7 +183,9 @@ class SolitarioGfx {
 
    private:
     void updateTextureAsFlipScreen();
-    void zoomDropCard(int& sx, int& sy, LPCardGfx pCard, int width, int height);
+    void zoomDropCardStart(int* pSx, int* pSy, LPCardGfx pCard, int width,
+                           int height);
+    LPErrInApp zoomDropCardIterate();
     void setDeckType(DeckType& dt) { _deckType.CopyFrom(dt); }
     void clearSurface();
     LPErrInApp newGame();
@@ -191,6 +196,8 @@ class SolitarioGfx {
     LPErrInApp singleTapOrLeftClick(SDL_Point& pt);
     LPErrInApp doubleTapOrRightClick(SDL_Point& pt);
     LPErrInApp endOfDragAndCheckForVictory();
+    LPErrInApp checkForVictory();
+    //void dropAfterZoom();
     void handleGameLoopMouseMoveEvent(SDL_Event* pEvent);
     LPErrInApp handleGameLoopMouseUpEvent(SDL_Event* pEvent);
     ClickCb prepClickQuitCb();
@@ -254,7 +261,8 @@ class SolitarioGfx {
     MesgBoxGfx* _p_MsgBox;
     SDL_Point _ptLast;
 
-    void (SolitarioGfx::*_continueFnCb)();
+    LPErrInApp (SolitarioGfx::*_continueFnCb)();
+    std::function<LPErrInApp()> _continueLamdaCb;
     LPCardRegionGfx _p_DropRegionForDrag;
     LPCardStackGfx _p_CardStackForDrag;
     bool _isInitDrag;
