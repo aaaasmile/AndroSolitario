@@ -226,7 +226,12 @@ Però se guardi bene la repository di SDL_ttf c'è già incluso in external la l
 che viene usata per il target di Android. Quindi basta abilitarla con:
 
     -DSDLTTF_VENDORED=ON
-al momento della configurazione del progetto.
+al momento della configurazione del progetto. Se non funziona e per caso hai fatto un cambio di brach
+sul sdl2, per esempio, la directory SDL_ttf/external non va più bene. Quindi tutte le directory scaricate
+vanno cancellate e rifatto il ./download.sh.
+La ragione è che in SDL2 ho messo in source control anche le librerie esterne, mentre in SDL3 le ho tolte
+dal source control. Così però il cambio di branch successivo su SDL3 mi rende inutilizzabile la directory SDL_ttf/external.
+Ho risolto cancellando tutte le directory e lanciato di nuovo ./download.sh. 
 
 Il Linker di wasm mi manda il seguente warning:
 
