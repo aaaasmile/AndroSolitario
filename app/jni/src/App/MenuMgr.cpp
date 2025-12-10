@@ -591,7 +591,9 @@ LPErrInApp MenuMgr::HandleRootMenuEvent(SDL_Event* pEvent) {
 LPErrInApp MenuMgr::HandleRootMenuIterate() {
     LPErrInApp err;
     // show the link url label
+#if HASGOTLINK
     _p_homeUrl->SetState(LabelLinkGfx::VISIBLE);
+#endif
     _p_LabelVersion->SetState(LabelGfx::VISIBLE);
 
     err = drawStaticScene();

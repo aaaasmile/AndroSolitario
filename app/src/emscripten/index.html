@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="en-us">
+<html lang="it-it">
 
 <head>
   <meta charset="utf-8">
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <title>Solitarion SDL</title>
+  <title>Solitario SDL</title>
   <style>
     body {
       font-family: arial;
@@ -33,9 +33,19 @@
       background-color: black;
     }
 
-    #emscripten_logo {
-      display: inline-block;
-      margin: 0;
+    footer {
+      padding-left: 3em;
+      padding-right: 3em;
+
+      nav {
+        padding-top: 1rem;
+        font-weight: lighter;
+        font-size: small;
+        display: flex;
+        flex-direction: column;
+        row-gap: 1em;
+        border-top: 2px solid rgb(51, 51, 51);
+      }
     }
 
     .spinner {
@@ -116,7 +126,7 @@
     }
 
     #controls {
-      display: inline-block;
+      /* display: inline-block; */
       float: right;
       vertical-align: top;
       margin-top: 30px;
@@ -228,5 +238,15 @@
   </script>
   <script async type="text/javascript" src="solitario.js"></script>
 </body>
+<footer>
+  <p>
+    Aggiornato:
+    <time datetime="2025-05-03 00:00">11 Dicembre 2025 - 02:42</time>
+  </p>
+  <nav>
+    <a href="https://invido.it/" >Invido</a>
+  </nav>
+  <p class="copyright">© 2025 - Igor Run for <em>invido.it</em>. All rights reserved.</p>
+</footer>
 
 </html>
