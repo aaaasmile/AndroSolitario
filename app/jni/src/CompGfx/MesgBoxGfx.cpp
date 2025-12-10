@@ -3,6 +3,7 @@
 #include "ButtonGfx.h"
 #include "GameSettings.h"
 #include "GfxUtil.h"
+#include "Config.h"
 
 MesgBoxGfx::MesgBoxGfx(void) {
     _p_Screen = 0;
@@ -132,6 +133,7 @@ LPErrInApp MesgBoxGfx::HandleEvent(SDL_Event* pEvent) {
             }
         }
     }
+#if HASTOUCH
     if (pEvent->type == SDL_EVENT_FINGER_DOWN) {
         if (_p_BtButt1) {
             _p_BtButt1->FingerDown(pEvent);
@@ -140,6 +142,8 @@ LPErrInApp MesgBoxGfx::HandleEvent(SDL_Event* pEvent) {
             _p_BtButt2->FingerDown(pEvent);
         }
     }
+#endif
+#if HASMOUSE
     if (pEvent->type == SDL_EVENT_MOUSE_MOTION) {
         // Not needed because mouse recognition is done on draw button
     }
@@ -151,6 +155,7 @@ LPErrInApp MesgBoxGfx::HandleEvent(SDL_Event* pEvent) {
             _p_BtButt2->MouseUp(pEvent);
         }
     }
+#endif
     return NULL;
 }
 

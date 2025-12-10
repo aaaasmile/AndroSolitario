@@ -4,7 +4,9 @@
 
 #include "GameSettings.h"
 #include "GfxUtil.h"
+#include "Config.h"
 
+#if HASTOUCH
 static bool IsPointInsideCtrl(const SDL_Rect& rct, const SDL_Point& pt) {
     if (pt.x >= rct.x && pt.x <= rct.x + rct.w && pt.y >= rct.y &&
         pt.y <= rct.y + rct.h) {
@@ -12,6 +14,7 @@ static bool IsPointInsideCtrl(const SDL_Rect& rct, const SDL_Point& pt) {
     }
     return false;
 }
+#endif
 
 TextInputGfx::TextInputGfx() {
     _visibleState = INVISIBLE;
@@ -46,8 +49,8 @@ void TextInputGfx::Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
 }
 
 void TextInputGfx::HandleEvent(SDL_Event* pEvent) {
+#if HASMOUSE
     LPGameSettings pGameSettings = GameSettings::GetSettings();
-
     if (pEvent->type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
         if (pGameSettings->InputType == InputTypeEnum::TouchWithoutMouse) {
             return;
@@ -64,7 +67,9 @@ void TextInputGfx::HandleEvent(SDL_Event* pEvent) {
         } else {
             SDL_StopTextInput(_p_Window);
         }
-    } else if (_hasFocus && pEvent->type == SDL_EVENT_KEY_DOWN) {
+    } 
+#endif
+    if (_hasFocus && pEvent->type == SDL_EVENT_KEY_DOWN) {
         if (pEvent->key.key == SDLK_BACKSPACE && !_text.empty()) {
             _text.pop_back();
         } else if (pEvent->key.key == SDLK_RETURN ||
@@ -72,7 +77,8 @@ void TextInputGfx::HandleEvent(SDL_Event* pEvent) {
             _hasFocus = false;
             SDL_StopTextInput(_p_Window);
         }
-    } else if (_hasFocus && pEvent->type == SDL_EVENT_TEXT_INPUT) {
+    }
+    if (_hasFocus && pEvent->type == SDL_EVENT_TEXT_INPUT) {
         if (_text.length() < 20) {
             std::string newText = pEvent->text.text;
             if (std::all_of(newText.begin(), newText.end(), [](char c) {
@@ -81,7 +87,9 @@ void TextInputGfx::HandleEvent(SDL_Event* pEvent) {
                 _text += newText;
             }
         }
-    } else if (pEvent->type == SDL_EVENT_FINGER_DOWN) {
+    }
+#if HASTOUCH
+    if (pEvent->type == SDL_EVENT_FINGER_DOWN) {
         SDL_Point pt;
         pGameSettings->GetTouchPoint(pEvent->tfinger, &pt);
         _hasFocus = IsPointInsideCtrl(_rctCtrl, pt);
@@ -91,6 +99,7 @@ void TextInputGfx::HandleEvent(SDL_Event* pEvent) {
             SDL_StopTextInput(_p_Window);
         }
     }
+#endif
 }
 
 void TextInputGfx::DrawCtrl(SDL_Surface* pScreen) {

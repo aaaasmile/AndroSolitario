@@ -9,6 +9,7 @@
 #include "CompGfx/TextInputGfx.h"
 #include "GfxUtil.h"
 #include "MusicManager.h"
+#include "Config.h"
 
 OptionsGfx::OptionsGfx() {
     _p_screen = NULL;
@@ -314,6 +315,7 @@ LPErrInApp OptionsGfx::HandleEvent(SDL_Event* pEvent) {
                 return err;
         }
     }
+#if HASTOUCH
     if (pEvent->type == SDL_EVENT_FINGER_DOWN) {
         _p_buttonOK->FingerDown(pEvent);
         _p_checkMusic->FingerDown(pEvent);
@@ -321,6 +323,8 @@ LPErrInApp OptionsGfx::HandleEvent(SDL_Event* pEvent) {
         _p_comboBackground->FingerDown(pEvent);
         _p_comboDeck->FingerDown(pEvent);
     }
+#endif
+#if HASMOUSE
     if (pEvent->type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
         _mouseDownRec = true;
     }
@@ -334,6 +338,7 @@ LPErrInApp OptionsGfx::HandleEvent(SDL_Event* pEvent) {
             _mouseDownRec = false;
         }
     }
+#endif
     _p_textInput->HandleEvent(pEvent);
     return NULL;
 }
