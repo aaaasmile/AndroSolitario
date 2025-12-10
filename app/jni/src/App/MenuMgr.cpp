@@ -175,7 +175,7 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
     _p_sdlRenderer = pRenderer;
     _p_Window = pWindow;
 
-    SDL_Rect clipRect; 
+    SDL_Rect clipRect;
     SDL_GetSurfaceClipRect(_p_Screen, &clipRect);
     _screenW = clipRect.w;
     _box_X = _screenW / 6;
@@ -485,14 +485,14 @@ LPErrInApp MenuMgr::drawMenuTextList() {
 }
 
 LPErrInApp MenuMgr::HandleRootMenuEvent(SDL_Event* pEvent) {
-    SDL_Point touchLocation;
     LPErrInApp err;
     // TRACE_DEBUG("Ignore mouse events: %b", ignoreMouseEvent);
     if (pEvent->type == SDL_EVENT_QUIT) {
         (_menuDlgt.tc)->LeaveMenu(_menuDlgt.self);
         return NULL;
     }
-
+#if HASTOUCH
+    SDL_Point touchLocation;
     if (pEvent->type == SDL_EVENT_FINGER_DOWN) {
         _p_GameSettings->GetTouchPoint(pEvent->tfinger, &touchLocation);
         TRACE_DEBUG("Tap in x=%d, y=%d\n", touchLocation.x, touchLocation.y);
@@ -502,7 +502,7 @@ LPErrInApp MenuMgr::HandleRootMenuEvent(SDL_Event* pEvent) {
             TRACE_DEBUG("Select menu %s from Tap down\n",
                         MenuItemEnumToString(_focusedMenuItem));
             err = rootMenuNext();
-            if(err != NULL){
+            if (err != NULL) {
                 return err;
             }
         } else {
@@ -510,6 +510,7 @@ LPErrInApp MenuMgr::HandleRootMenuEvent(SDL_Event* pEvent) {
             _focusedMenuItem = MenuItemEnum::NOTHING;
         }
     }
+#endif
 
     if (pEvent->type == SDL_EVENT_KEY_DOWN) {
         if (pEvent->key.key == SDLK_UP) {
@@ -527,7 +528,7 @@ LPErrInApp MenuMgr::HandleRootMenuEvent(SDL_Event* pEvent) {
         if (pEvent->key.key == SDLK_RETURN) {
             TRACE_DEBUG("Select menu from return\n");
             err = rootMenuNext();
-            if(err != NULL){
+            if (err != NULL) {
                 return err;
             }
         }
@@ -570,7 +571,7 @@ LPErrInApp MenuMgr::HandleRootMenuEvent(SDL_Event* pEvent) {
             TRACE_DEBUG("Select menu %s from mouse down\n",
                         MenuItemEnumToString(_focusedMenuItem));
             err = rootMenuNext();
-            if(err != NULL){
+            if (err != NULL) {
                 return err;
             }
         } else {
@@ -652,7 +653,7 @@ MenuItemEnum previousMenu(MenuItemEnum currMenu) {
         case MenuItemEnum::MENU_HIGHSCORE:
             return MenuItemEnum::MENU_HELP;
 #else
-           case MenuItemEnum::MENU_HIGHSCORE:
+        case MenuItemEnum::MENU_HIGHSCORE:
             return MenuItemEnum::MENU_CREDITS;
 #endif
         case MenuItemEnum::QUIT:

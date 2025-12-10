@@ -23,6 +23,7 @@
     #define HASWINICON 0
     #define HASQUITMENU 0 
     #define HASHELPMENU 0
+    #define HASTOUCH 0  // Remember that Emscripten run also on android with touch screen, but also mouse event are raised. Touch will be an event repetition.
 #endif
 
 #ifndef HASWINICON

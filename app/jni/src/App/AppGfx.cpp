@@ -318,11 +318,11 @@ void AppGfx::terminate() {
         _p_MenuMgr = NULL;
     }
 
-    if (_p_SolitarioGfx != NULL){
+    if (_p_SolitarioGfx != NULL) {
         delete _p_SolitarioGfx;
         _p_SolitarioGfx = NULL;
     }
-    
+
     delete _p_HighScore;
     _p_GameSettings->TerminateMusicManager();
 
@@ -448,12 +448,12 @@ LPErrInApp AppGfx::MainLoopEvent(SDL_Event* pEvent, SDL_AppResult& res) {
             err = _p_SolitarioGfx->HandleEvent(pEvent);
             if (err != NULL)
                 return err;
-            //TRACE("TODO: menu game event \n");
-            // err = startGameLoop();
-            // if (err != NULL)
-            //     return err;
-            // TRACE("Exit from game loop \n");
-            // LeaveMenu();
+            // TRACE("TODO: menu game event \n");
+            //  err = startGameLoop();
+            //  if (err != NULL)
+            //      return err;
+            //  TRACE("Exit from game loop \n");
+            //  LeaveMenu();
             break;
 
         case MenuItemEnum::MENU_HELP:
@@ -491,8 +491,11 @@ LPErrInApp AppGfx::MainLoopEvent(SDL_Event* pEvent, SDL_AppResult& res) {
             break;
 
         case MenuItemEnum::QUIT:
-        default:
             TRACE("Quit Menu \n");
+            res = SDL_APP_SUCCESS;
+            break;
+        default:
+            TRACE("Exit application because outside of menu\n");
             res = SDL_APP_SUCCESS;
             break;
     }

@@ -1176,7 +1176,7 @@ LPErrInApp SolitarioGfx::newGame() {
 
 // Remember Finger events are parallel with mouse events
 LPErrInApp SolitarioGfx::handleGameLoopFingerDownEvent(SDL_Event* pEvent) {
-    TRACE_DEBUG("handleGameLoopFingerDownEvent \n");
+    TRACE_DEBUG("handleGameLoopFingerDownEvent (TAP only) \n");
     Uint64 now_time = SDL_GetTicks();
     _p_BtQuit->FingerDown(pEvent);
     _p_BtNewGame->FingerDown(pEvent);
@@ -1203,7 +1203,7 @@ LPErrInApp SolitarioGfx::handleGameLoopFingerDownEvent(SDL_Event* pEvent) {
 
 LPErrInApp SolitarioGfx::handleGameLoopFingerUpEvent(SDL_Event* pEvent) {
     TRACE_DEBUG("handleGameLoopFingerUpEvent\n");
-
+    _isInitDrag = false;
     LPErrInApp err = endOfDragAndCheckForVictory();
     if (err != NULL) {
         return NULL;
@@ -1296,11 +1296,15 @@ LPErrInApp SolitarioGfx::InitDragAfterFromSingleTapA() {
     TRACE_DEBUG("InitDragAfterFromSingleTapA \n");
 
     if (_isInitDrag) {
-        TRACE_DEBUG("Init dragging \n");
+        TRACE_DEBUG("dragging intialize ok - now start drag \n");
         _startdrag = true;
         SDL_HideCursor();
         SDL_SetWindowMouseGrab(_p_Window, true);
         _isInitDrag = false;
+    } else {
+        TRACE_DEBUG(
+            "!![InitDragAfterFromSingleTapA]!! dragging is over, force drop\n");
+        DoDrop();
     }
     return NULL;
 }
@@ -1315,7 +1319,7 @@ LPErrInApp SolitarioGfx::InitDragAfterFromSingleTapB() {
         delete _p_CardStackForDrag;
         updateBadScoreRedial();
         TRACE_DEBUG("InitDragAfterFromSingleTapB - drop end \n");
-        return NULL;    
+        return NULL;
     };
 
     return NULL;
@@ -1386,7 +1390,7 @@ LPErrInApp SolitarioGfx::singleTapOrLeftClick(SDL_Point& pt) {
             }
             _continueFnCb = &SolitarioGfx::InitDragAfterFromSingleTapB;
             // DoDrop(GetRegion(eRegionIx::DeckPile_Ix)); // In
-            // InitDragAfterFromSingleTapB Reverse(eRegionIx::DeckPile_Ix);
+            // Reverse(eRegionIx::DeckPile_Ix);
             // InitCardCoords(eRegionIx::DeckPile_Ix);
             // delete pCardStack;
             // updateBadScoreRedial();
@@ -1425,6 +1429,7 @@ void SolitarioGfx::handleGameLoopMouseMoveEvent(SDL_Event* pEvent) {
 
 LPErrInApp SolitarioGfx::handleGameLoopMouseUpEvent(SDL_Event* pEvent) {
     TRACE_DEBUG("handleGameLoopMouseUpEvent \n");
+    _isInitDrag = false;
     _p_BtQuit->MouseUp(pEvent);
     _p_BtNewGame->MouseUp(pEvent);
     _p_BtToggleSound->MouseUp(pEvent);
@@ -1452,8 +1457,8 @@ LPErrInApp SolitarioGfx::endOfDragAndCheckForVictory() {
                        pDestReg->RegionTypeId() == RegionType::RT_TABLEAU) {
                 updateBadScoreAceToTableu();
             }
-            LPErrInApp err =  checkForVictory();
-            if (err != NULL){
+            LPErrInApp err = checkForVictory();
+            if (err != NULL) {
                 return err;
             }
             TRACE_DEBUG("endOfDragAndCheckForVictory - drop end \n");
@@ -1585,13 +1590,13 @@ LPErrInApp SolitarioGfx::HandleEvent(SDL_Event* pEvent) {
             break;
 #if HASTOUCH
         case SDL_EVENT_FINGER_DOWN:
-            // TRACE_DEBUG("Event SDL_EVENT_FINGER_DOWN \n");
+            TRACE_DEBUG("Event SDL_EVENT_FINGER_DOWN \n");
             err = handleGameLoopFingerDownEvent(pEvent);
             if (err != NULL)
                 return err;
             break;
         case SDL_EVENT_FINGER_UP:
-            // TRACE_DEBUG("Event SDL_EVENT_FINGER_UP \n");
+            TRACE_DEBUG("Event SDL_EVENT_FINGER_UP \n");
             err = handleGameLoopFingerUpEvent(pEvent);
             if (err != NULL)
                 return err;
@@ -1604,9 +1609,7 @@ LPErrInApp SolitarioGfx::HandleEvent(SDL_Event* pEvent) {
 #endif
 #if HASMOUSE
         case SDL_EVENT_MOUSE_BUTTON_DOWN:
-            // TRACE_DEBUG("Event SDL_EVENT_MOUSE_BUTTON_DOWN -
-            // start
-            // \n");
+            TRACE_DEBUG("Event SDL_EVENT_MOUSE_BUTTON_DOWN - start\n");
             err = handleGameLoopMouseDownEvent(pEvent);
             // TRACE_DEBUG("Event SDL_EVENT_MOUSE_BUTTON_DOWN - end
             // \n");
@@ -1619,7 +1622,7 @@ LPErrInApp SolitarioGfx::HandleEvent(SDL_Event* pEvent) {
             break;
 
         case SDL_EVENT_MOUSE_BUTTON_UP:
-            // TRACE_DEBUG("Event SDL_EVENT_MOUSE_BUTTON_UP \n");
+            TRACE_DEBUG("Event SDL_EVENT_MOUSE_BUTTON_UP \n");
             err = handleGameLoopMouseUpEvent(pEvent);
             if (err != NULL)
                 return err;
@@ -1666,7 +1669,9 @@ LPErrInApp SolitarioGfx::HandleIterate(bool& done) {
         _state = _statePrev;
         if (_continueLamdaCb != NULL) {
             TRACE_DEBUG(
-                "[SolitarioGfx - Iterate] run the callback after drop zoom (next state %d) \n", _state);
+                "[SolitarioGfx - Iterate] run the callback after drop zoom "
+                "(next state %d) \n",
+                _state);
             LPErrInApp err = _continueLamdaCb();
             _continueLamdaCb = NULL;
             if (err != NULL) {
@@ -1674,7 +1679,9 @@ LPErrInApp SolitarioGfx::HandleIterate(bool& done) {
             }
         } else {
             TRACE_DEBUG(
-                "[SolitarioGfx - Iterate] nothing to do after the zoom (next state %d) \n", _state);
+                "[SolitarioGfx - Iterate] nothing to do after the zoom (next "
+                "state %d) \n",
+                _state);
         }
         return NULL;
     }
