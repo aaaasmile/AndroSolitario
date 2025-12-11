@@ -539,7 +539,6 @@ LPCardRegionGfx SolitarioGfx::DoDrop(LPCardRegionGfx pDestRegion) {
     zoomDropCardStart(&_dragPileInfo.x, &_dragPileInfo.y, pCard,
                       _dragPileInfo.width, _dragPileInfo.height);
 
-    
     // TRACE_DEBUG("DoDrop -  end \n");
     return pBestRegion;
 }
@@ -614,7 +613,7 @@ LPErrInApp SolitarioGfx::zoomDropCardIterate() {
     SDL_BlitSurface(_p_ScreenBackbufferDrag, &rcs, _p_Screen, &rcd);
     SDL_BlitSurface(_p_Dragface, NULL, _p_Screen, &dest);
     updateTextureAsFlipScreen();
-    
+
     zoomInfo_Inc(g_zoomInfo);
     if (g_zoomInfo->i > 1.0) {
         TRACE_DEBUG("[zoomDropCardIterate] Zoom card - end - x=%d, y=%d \n",
@@ -1063,9 +1062,15 @@ LPErrInApp SolitarioGfx::handleGameLoopFingerMotion(SDL_Event* pEvent) {
 
 LPErrInApp SolitarioGfx::handleGameLoopMouseDownEvent(SDL_Event* pEvent) {
     if (pEvent->button.button == SDL_BUTTON_LEFT) {
+        Uint64 now_time = SDL_GetTicks();
         _ptLast.x = pEvent->button.x;
         _ptLast.y = pEvent->button.y;
-        _state = SolitarioGfx::IN_SINGLE_TAPCLICK;
+        if (_lastUpTimestamp + 500 > now_time) {
+            _state = SolitarioGfx::IN_DOUBLE_TAPCLICK;
+        } else {
+            _state = SolitarioGfx::IN_SINGLE_TAPCLICK;
+        }
+        _lastUpTimestamp = SDL_GetTicks();
     } else if (pEvent->button.button == SDL_BUTTON_RIGHT) {
         _ptLast.x = pEvent->button.x;
         _ptLast.y = pEvent->button.y;
@@ -1591,9 +1596,9 @@ LPErrInApp SolitarioGfx::Show() {
     // button Toggle Sound
     if (_p_MusicManager->IsMusicEnabled()) {
         if (_p_MusicManager->IsPlayingMusic()) {
-            strTextBt = "🔊"; 
+            strTextBt = "🔊";
         } else {
-            strTextBt = "🔇"; 
+            strTextBt = "🔇";
         }
         _p_BtToggleSound->SetButtonText(strTextBt.c_str());
         _p_BtToggleSound->SetVisibleState(ButtonGfx::VISIBLE);
@@ -1734,7 +1739,7 @@ void SolitarioGfx::showOkMsgBox(LPCSTR strText) {
     _p_MsgBox->ChangeAlpha(150);
     _p_MsgBox->Initialize(&rctBox, _p_Screen, pGameSettings->GetFontMedium(),
                           MesgBoxGfx::TY_MBOK, _p_sdlRenderer);
-    
+
     SDL_Rect clipRect;
     SDL_GetSurfaceClipRect(_p_AlphaDisplay, &clipRect);
     SDL_FillSurfaceRect(
@@ -1776,10 +1781,10 @@ void SolitarioGfx::BtToggleSoundClick() {
         // playing music or paused
         if (_p_MusicManager->IsMusicPaused()) {
             _p_MusicManager->ResumeMusic();
-            strTextBt = "🔊"; 
+            strTextBt = "🔊";
         } else {
             _p_MusicManager->PauseMusic();
-            strTextBt = "🔇"; 
+            strTextBt = "🔇";
         }
     } else {
         // no music
