@@ -713,6 +713,17 @@ void AppGfx::ParseCmdLine(int argc, char* argv[], SDL_AppResult& res) {
         if (strcmp(argv[i], "--version") == 0 || strcmp(argv[i], "-v") == 0) {
             printf("Solitario version %s (c) 2004-2025 Invido.it\n", VERSION);
             res = SDL_APP_SUCCESS;
+        } else if (std::string(argv[i]) == "--language" && i + 1 < argc) {
+            std::string language = argv[i + 1];
+            TRACE_DEBUG("[ParseCmdLine] Startup language regognized %s \n",
+                        language.c_str());
+            i++;  // Skip the value in the next loop iteration
+            LPGameSettings pGameSettings = GameSettings::GetSettings();
+            if (language == "italian") {
+                TRACE_DEBUG("[ParseCmdLine] change the language to italian");
+                pGameSettings->CurrentLanguage = Languages::eLangId::LANG_ITA;
+                pGameSettings->SetCurrentLang();
+            }
         } else {
             printf("unknown option: %s\n", argv[i]);
             printf("\nUsage: %s --version \n", argv[0]);
