@@ -3,15 +3,24 @@
 #include <memory.h>
 #include <stdlib.h>
 
+#include "Config.h"
 #include "Fading.h"
 #include "GameSettings.h"
 #include "GfxUtil.h"
 #include "MusicManager.h"
 #include "WinTypeGlobal.h"
 
-using namespace std;
+#if PLATFORM_EMS
+#include <emscripten.h>
 
+#include <iostream>
+#include <sstream>
+#include <vector>
+#else
 static char g_filepath[1024];
+#endif
+
+using namespace std;
 
 HighScore::HighScore() {
     _p_FadeAction = new FadeAction();
@@ -45,7 +54,46 @@ HighScore::~HighScore() {
     }
 }
 
+#if PLATFORM_EMS
+static std::string loadGameHighScore(const char* key,
+                                     const char* defaultValue) {
+    char js_command[256];
+    snprintf(js_command, sizeof(js_command),
+             "localStorage.getItem('high_%s') || '%s'", key, defaultValue);
+    const char* result = emscripten_run_script_string(js_command);
+    return result != NULL ? std::string(result) : std::string(defaultValue);
+}
+
+static void saveGameHighScore(const char* key, const char* value) {
+    char js_cmd[256];
+    snprintf(js_cmd, sizeof(js_cmd), "localStorage.setItem('high_%s', '%s')",
+             key, value);
+    emscripten_run_script(js_cmd);
+}
+
+std::vector<std::string> splitString(const std::string& str, char delimiter) {
+    std::vector<std::string> tokens;
+    std::istringstream iss(str);
+    std::string token;
+
+    while (std::getline(iss, token, delimiter)) {
+        tokens.push_back(token);
+    }
+
+    return tokens;
+}
+#endif
+
 LPErrInApp HighScore::Save() {
+#if PLATFORM_EMS
+    for (int k = 0; k < NUMOFSCORE; k++) {
+        std::string kstr = std::to_string(k);
+        std::string val = _scoreInfo[k].Name + ":" +
+                          std::to_string(_scoreInfo[k].Score) + ":" +
+                          std::to_string(_scoreInfo[k].NumCard);
+        saveGameHighScore(kstr.c_str(), val.c_str());
+    }
+#else
     LPGameSettings pGameSettings = GameSettings::GetSettings();
     if (pGameSettings->SettingsDir == "" || pGameSettings->GameName == "") {
         return ERR_UTIL::ErrorCreate("User dir for high score is not defined");
@@ -82,6 +130,7 @@ LPErrInApp HighScore::Save() {
         }
     }
     SDL_CloseIO(dst);
+#endif
     return NULL;
 }
 
@@ -115,6 +164,30 @@ LPErrInApp HighScore::SaveScore(int score, int numCard) {
 }
 
 LPErrInApp HighScore::Load() {
+#if PLATFORM_EMS
+    for (int k = 0; k < NUMOFSCORE; k++) {
+        std::string kstr = std::to_string(k);
+        std::string result = loadGameHighScore(kstr.c_str(), "");
+        if (result == "") {
+            TRACE_DEBUG("No high score in storage found, use defaults \n");
+            return NULL;
+        }
+        int numCard = 40;
+        std::string name = "";
+        int score = 0;
+        std::vector<std::string> parts = splitString(result, ':');
+        if (parts.size() >= 2) {
+            name = parts[0];
+            score = std::stoi(parts[1]);
+            if (parts.size() >= 3) {
+                numCard = std::stoi(parts[2]);
+            }
+        }
+        _scoreInfo[k].Name = name;
+        _scoreInfo[k].Score = score;
+        _scoreInfo[k].NumCard = numCard;
+    }
+#else
     LPGameSettings pGameSettings = GameSettings::GetSettings();
 
     snprintf(g_filepath, sizeof(g_filepath), "%s/%s-score.bin",
@@ -148,6 +221,7 @@ LPErrInApp HighScore::Load() {
         _scoreInfo[k].NumCard = numCard;
     }
     SDL_CloseIO(src);
+#endif
     return NULL;
 }
 
