@@ -97,7 +97,6 @@ LPErrInApp FadeAction::Fade(SDL_Surface* pSurfScreen, SDL_Surface* pSurfImg,
     //   based on the elapsed time since the previous loop-iteration.
     // 3. Draw p_surf_black onto p_surf_screen in the current alpha value.
     _ui_old_time = SDL_GetTicks();
-    // ui_curr_time = ui_old_time;
     //  Convert the given time in seconds into miliseconds.
     _ui_time_ms = uiSeconds * 1000;
     TRACE_DEBUG("[Fade] Ticks initial %" PRIu64 ", end of fading %" PRIu64 ", fading out %d\n",

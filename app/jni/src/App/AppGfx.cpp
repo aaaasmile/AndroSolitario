@@ -448,43 +448,24 @@ LPErrInApp AppGfx::MainLoopEvent(SDL_Event* pEvent, SDL_AppResult& res) {
             err = _p_SolitarioGfx->HandleEvent(pEvent);
             if (err != NULL)
                 return err;
-            // TRACE("TODO: menu game event \n");
-            //  err = startGameLoop();
-            //  if (err != NULL)
-            //      return err;
-            //  TRACE("Exit from game loop \n");
-            //  LeaveMenu();
             break;
 
         case MenuItemEnum::MENU_HELP:
-            // Nothing to loop
-            // err = showHelp();
-            // if (err != NULL)
-            //     return err;
             break;
 
         case MenuItemEnum::MENU_CREDITS:
-            // err = showCredits();
-            // if (err != NULL)
-            //     return err;
             err = _p_CreditsView->HandleEvent(pEvent);
             if (err != NULL)
                 return err;
             break;
 
         case MenuItemEnum::MENU_HIGHSCORE:
-            // err = showHighScore();
-            // if (err != NULL)
-            //     return err;
             err = _p_HighScore->HandleEvent(pEvent);
             if (err != NULL)
                 return err;
             break;
 
         case MenuItemEnum::MENU_OPTIONS:
-            // err = showGeneralOptions();
-            // if (err != NULL)
-            //     return err;
             err = _p_OptGfx->HandleEvent(pEvent);
             if (err != NULL)
                 return err;
@@ -524,15 +505,9 @@ LPErrInApp AppGfx::MainLoopIterate() {
             if (done) {
                 backToMenuRootWithMusic();
             }
-            // err = startGameLoop();
-            // if (err != NULL)
-            //     goto error;
-            // TRACE("Exit from game loop \n");
-            // LeaveMenu();
             break;
 
         case MenuItemEnum::MENU_HELP:
-            // Nothing to render
             break;
 
         case MenuItemEnum::MENU_CREDITS:
@@ -559,14 +534,6 @@ LPErrInApp AppGfx::MainLoopIterate() {
                 return err;
             if (done) {
                 backToMenuRootSameMusic();
-                // if (_backGroundChanged) {
-
-                //     err = loadSceneBackground();
-                //     if (err != NULL)
-                //         return err;
-                //     _p_MenuMgr->SetBackground(_p_SceneBackground);
-                //     _backGroundChanged = false;
-                // }
             }
             break;
         case MenuItemEnum::NOTHING:

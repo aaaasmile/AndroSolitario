@@ -223,13 +223,6 @@ LPErrInApp MesgBoxGfx::HandleIterate(bool& done) {
     SDL_RenderTexture(_p_sdlRenderer, _p_ScreenTexture, NULL, NULL);
     SDL_RenderPresent(_p_sdlRenderer);
 
-    // synch to frame rate
-    // Uint32 uiNowTime = SDL_GetTicks();
-    // if (uiNowTime < uiLast_time + FPS) {
-    //     SDL_Delay(uiLast_time + FPS - uiNowTime);
-    //     uiLast_time = SDL_GetTicks();
-    // }
-
     if (!_inProgress) {
         if (_p_ShadowSrf != NULL) {
             SDL_DestroySurface(_p_ShadowSrf);
@@ -254,10 +247,7 @@ LPErrInApp MesgBoxGfx::Show(SDL_Surface* pScene_background, LPCSTR lpsBut1Txt,
     _inProgress = true;
     _p_Scene_background = pScene_background;
     _result = RES_YES;
-    // Uint64 uiInitialTick = SDL_GetTicks();
-    // Uint64 uiLast_time = uiInitialTick;
-    // int FPS = 3;
-
+    
     _strMsgText = lpsMsgTxt;
     if (_p_BtButt1) {
         _p_BtButt1->SetButtonText(lpsBut1Txt);
@@ -279,121 +269,5 @@ LPErrInApp MesgBoxGfx::Show(SDL_Surface* pScene_background, LPCSTR lpsBut1Txt,
     _p_ScreenTexture =
         SDL_CreateTextureFromSurface(_p_sdlRenderer, _p_ShadowSrf);
 
-    // while (!_terminated) {
-    //  SDL_BlitSurface(pScene_background, NULL, pShadowSrf, NULL);
-
-    // SDL_Event event;
-    // while (SDL_PollEvent(&event)) {
-    //     if (pEvent->type == SDL_EVENT_KEY_DOWN) {
-    //         if (pEvent->key.key == SDLK_RETURN) {
-    //             if (_typeMsg == TY_MB_YES_NO) {
-    //                 ButCmdClicked(ID_BT_YES);
-    //             } else {
-    //                 ButCmdClicked(0);
-    //             }
-    //             break;
-    //         }
-    //     }
-    //     if (pEvent->type == SDL_EVENT_FINGER_DOWN) {
-    //         if (_p_BtButt1) {
-    //             _p_BtButt1->FingerDown(event);
-    //         }
-    //         if (_p_BtButt2) {
-    //             _p_BtButt2->FingerDown(event);
-    //         }
-    //     }
-    //     if (pEvent->type == SDL_EVENT_MOUSE_MOTION) {
-    //         // Not needed because mouse recognition is done on draw
-    //         button
-    //     }
-    //     if (pEvent->type == SDL_EVENT_MOUSE_BUTTON_UP) {
-    //         if (_p_BtButt1) {
-    //             _p_BtButt1->MouseUp(event);
-    //         }
-    //         if (_p_BtButt2) {
-    //             _p_BtButt2->MouseUp(event);
-    //         }
-    //     }
-    // }
-    // the msg box
-    //     GFX_UTIL::DrawStaticSpriteEx(pShadowSrf, 0, 0, _rctMsgBox.w,
-    //                                  _rctMsgBox.h, _rctMsgBox.x,
-    //                                  _rctMsgBox.y, _p_Surf_Bar);
-
-    //     // draw the text
-    //     int tx, ty;
-    //     int iXOffSet;
-    //     int iYOffset;
-    //     if (_dataStrings.size() > 0) {
-    //         int iYinitial = 10;
-    //         int iEmptySpaceOn_Y = 4;
-    //         // draw text lines
-    //         for (int i = 0; i < _dataStrings.size(); i++) {
-    //             STRING strText = _dataStrings[i];
-    //             TTF_GetStringSize(_p_FontText, strText.c_str(), 0, &tx,
-    //             &ty);
-
-    //             iXOffSet = (_rctMsgBox.w - tx) / 2;
-    //             iYOffset = i * ty + iEmptySpaceOn_Y + iYinitial;
-
-    //             GFX_UTIL::DrawString(
-    //                 pShadowSrf, strText.c_str(), _rctMsgBox.x + iXOffSet,
-    //                 _rctMsgBox.y + iYOffset, _colCurrent, _p_FontText);
-    //         }
-    //     } else {
-    //         // draw only a line in the middle
-    //         TTF_GetStringSize(_p_FontText, _strMsgText.c_str(), 0, &tx,
-    //         &ty);
-
-    //         iXOffSet = (_rctMsgBox.w - tx) / 2;
-    //         if (iXOffSet < 0) {
-    //             iXOffSet = 1;
-    //         }
-    //         iYOffset = (_rctMsgBox.h - ty) / 2;
-    //         GFX_UTIL::DrawString(
-    //             pShadowSrf, _strMsgText.c_str(), _rctMsgBox.x + iXOffSet,
-    //             _rctMsgBox.y + iYOffset, _colCurrent, _p_FontText);
-    //     }
-
-    //     // draw border
-    //     GFX_UTIL::DrawRect(pShadowSrf, _rctMsgBox.x - 1, _rctMsgBox.y -
-    //     1,
-    //                        _rctMsgBox.x + _rctMsgBox.w + 1,
-    //                        _rctMsgBox.y + _rctMsgBox.h + 1,
-    //                        GFX_UTIL_COLOR::Gray);
-    //     GFX_UTIL::DrawRect(pShadowSrf, _rctMsgBox.x - 2, _rctMsgBox.y -
-    //     2,
-    //                        _rctMsgBox.x + _rctMsgBox.w + 2,
-    //                        _rctMsgBox.y + _rctMsgBox.h + 2,
-    //                        GFX_UTIL_COLOR::Black);
-    //     GFX_UTIL::DrawRect(pShadowSrf, _rctMsgBox.x, _rctMsgBox.y,
-    //                        _rctMsgBox.x + _rctMsgBox.w,
-    //                        _rctMsgBox.y + _rctMsgBox.h, _colCurrent);
-
-    //     // draw buttons
-    //     if (_p_BtButt1) {
-    //         _p_BtButt1->DrawButton(pShadowSrf);
-    //     }
-    //     if (_typeMsg == TY_MB_YES_NO) {
-    //         _p_BtButt2->DrawButton(pShadowSrf);
-    //     }
-
-    //     SDL_BlitSurface(pShadowSrf, NULL, _p_Screen, NULL);
-    //     SDL_UpdateTexture(pScreenTexture, NULL, _p_Screen->pixels,
-    //                       _p_Screen->pitch);
-    //     SDL_RenderTexture(_p_sdlRenderer, pScreenTexture, NULL, NULL);
-    //     SDL_RenderPresent(_p_sdlRenderer);
-
-    //     // synch to frame rate
-    //     Uint32 uiNowTime = SDL_GetTicks();
-    //     if (uiNowTime < uiLast_time + FPS) {
-    //         SDL_Delay(uiLast_time + FPS - uiNowTime);
-    //         uiLast_time = SDL_GetTicks();
-    //     }
-    // }
-    // SDL_DestroySurface(pShadowSrf);
-    // SDL_DestroyTexture(pScreenTexture);
-
-    // return _result;
     return NULL;
 }

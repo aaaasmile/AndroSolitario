@@ -226,7 +226,6 @@ LPErrInApp SolitarioGfx::Initialize(SDL_Surface* s, SDL_Renderer* r,
     _p_BtToggleSound->SetVisibleState(ButtonGfx::INVISIBLE);
 
     TRACE_DEBUG("Solitario initialized \n");
-    // return DrawInitialScene();
     return NULL;
 }
 
