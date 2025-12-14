@@ -18,9 +18,9 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-#include "SDL_config.h"
+#include <SDL3/SDL_platform.h>
 
-#ifdef __HAIKU__
+#ifdef SDL_PLATFORM_HAIKU
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -47,7 +47,7 @@ class MidiEventsStore : public BMidi
     fPlaying = false;
     fLoops = 0;
   }
-  virtual status_t Import(SDL_RWops *src)
+  virtual status_t Import(SDL_IOStream *src)
   {
     fEvs = CreateMIDIEventList(src, &fDivision);
     if (!fEvs) {
@@ -206,7 +206,7 @@ struct _NativeMidiSong {
 
 char lasterr[1024];
 
-int native_midi_detect(void)
+bool native_midi_detect(void)
 {
   status_t res = synth.EnableInput(true, false);
   return res == B_OK;
@@ -219,7 +219,7 @@ void native_midi_setvolume(int volume)
   synth.SetVolume(volume / 128.0);
 }
 
-NativeMidiSong *native_midi_loadsong_RW(SDL_RWops *src, int freesrc)
+NativeMidiSong *native_midi_loadsong_IO(SDL_IOStream *src, bool closeio)
 {
   NativeMidiSong *song = new NativeMidiSong;
   song->store = new MidiEventsStore;
@@ -234,8 +234,8 @@ NativeMidiSong *native_midi_loadsong_RW(SDL_RWops *src, int freesrc)
   }
   else
   {
-    if (freesrc) {
-      SDL_RWclose(src);
+    if (closeio) {
+      SDL_CloseIO(src);
     }
   }
   return song;
@@ -281,9 +281,9 @@ void native_midi_stop(void)
   currentSong = NULL;
 }
 
-int native_midi_active(void)
+bool native_midi_active(void)
 {
-  if (currentSong == NULL) return 0;
+  if (currentSong == NULL) return false;
   return currentSong->store->IsPlaying();
 }
 
@@ -292,4 +292,4 @@ const char* native_midi_error(void)
   return lasterr;
 }
 
-#endif /* __HAIKU__ */
+#endif /* SDL_PLATFORM_HAIKU */

@@ -11,7 +11,7 @@ LabelGfx::LabelGfx() {
 
 LabelGfx::~LabelGfx() {
     if (_p_Surf_Bar) {
-        SDL_FreeSurface(_p_Surf_Bar);
+        SDL_DestroySurface(_p_Surf_Bar);
         _p_Surf_Bar = NULL;
     }
 }
@@ -19,11 +19,13 @@ LabelGfx::~LabelGfx() {
 void LabelGfx::Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
                           TTF_Font* pFont) {
     _rctCtrl = *pRect;
+    _p_Surf_Bar =
+        GFX_UTIL::SDL_CreateRGBSurface(_rctCtrl.w, _rctCtrl.h, 32, 0, 0, 0, 0);
 
-    // black bar surface
-    _p_Surf_Bar = SDL_CreateRGBSurface(SDL_SWSURFACE, _rctCtrl.w, _rctCtrl.h,
-                                       32, 0, 0, 0, 0);
-    SDL_FillRect(_p_Surf_Bar, NULL, SDL_MapRGBA(pScreen->format, 255, 0, 0, 0));
+    SDL_FillSurfaceRect(_p_Surf_Bar, NULL,
+                        SDL_MapRGB(SDL_GetPixelFormatDetails(pScreen->format),
+                                   NULL, 255, 0, 0));
+
     SDL_SetSurfaceBlendMode(_p_Surf_Bar, SDL_BLENDMODE_BLEND);
     SDL_SetSurfaceAlphaMod(_p_Surf_Bar, 127);
     _p_FontText = pFont;
@@ -43,7 +45,7 @@ void LabelGfx::Draw(SDL_Surface* pScreen) {
     if (_StateGfx != INVISIBLE) {
         if (_isEnabled) {
             int tx, ty;
-            TTF_SizeText(_p_FontText, _CtrlText.c_str(), &tx, &ty);
+            TTF_GetStringSize(_p_FontText, _CtrlText.c_str(), 0, &tx, &ty);
             int iXOffSet = (_rctCtrl.w - tx) / 2;
             if (iXOffSet < 0) {
                 iXOffSet = 1;

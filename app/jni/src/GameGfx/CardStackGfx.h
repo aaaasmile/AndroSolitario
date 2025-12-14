@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <vector>
+#include <random>
 
 #include "CardGfx.h"
 #include "DeckType.h"

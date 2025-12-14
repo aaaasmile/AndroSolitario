@@ -1,6 +1,6 @@
 #include "TraceService.h"
 
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
 #include <fstream>
 #include <iostream>
@@ -39,8 +39,8 @@ STRING EntryTraceDetail::ToString() {
                 alpszDetTypeName[m_eTrType], strOnlyFileName.c_str(),
                 m_iLineNumber, m_strComment.c_str());
     } else {
-        sprintf(buff, "[%d][%s]%s", (int)m_ulTimeStamp, alpszDetTypeName[m_eTrType],
-                m_strComment.c_str());
+        sprintf(buff, "[%d][%s]%s", (int)m_ulTimeStamp,
+                alpszDetTypeName[m_eTrType], m_strComment.c_str());
     }
 
     strRes = buff;
@@ -87,7 +87,7 @@ bool TraceService::AddNewEntry(int iChannel, int iId,
     if (m_abChannelMask[iChannel]) {
         int iIndexNew = m_aiChannelCursor[iChannel];
 
-        Uint64 ticks = SDL_GetTicks64();
+        Uint64 ticks = SDL_GetTicks();
 
         m_mtxEntryTraceDetails[iChannel][iIndexNew].m_eTrType = eValType;
         m_mtxEntryTraceDetails[iChannel][iIndexNew].m_iID = iId;
@@ -134,7 +134,7 @@ void TraceService::AddTrace(EntryTraceDetail::eType traceDet, LPCSTR lpszForm,
         if (m_abChannelMask[iChannel]) {
             int iIndexNew = m_aiChannelCursor[iChannel];
 
-            Uint64 ticks = SDL_GetTicks64();
+            Uint64 ticks = SDL_GetTicks();
 
             // update info trace
             m_mtxEntryTraceDetails[iChannel][iIndexNew].m_eTrType = traceDet;
@@ -209,6 +209,8 @@ void TraceService::flashTheEntry() {
             ::OutputDebugString(strEntry.c_str());
             break;
 #endif
+        default:
+            break;
     }
 }
 
@@ -219,7 +221,7 @@ void TraceService::SetOutputChannel(int iChannel, eOutType eVal,
     }
     if (iChannel >= 0 && iChannel < NUM_OF_CHANN) {
         m_aeChannelOut[iChannel] = eVal;
-        if (eVal == OT_FILE && lpszFileName != "") {
+        if (eVal == OT_FILE && strcmp(lpszFileName, "") != 0) {
             if (!m_abChannelMask[iChannel]) {
                 m_aChannelFiles[iChannel].open(lpszFileName);
                 m_abChannelMask[iChannel] = true;

@@ -1,21 +1,38 @@
-#ifndef FADING_H
-#define FADING_H
+#ifndef FADING_H___
+#define FADING_H___
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
+#include <SDL3/SDL.h>
 #include <stdio.h>
 
-#include "SDL.h"
+#include "ErrorInfo.h"
 
-void Fade(SDL_Surface* p_surf_screen, SDL_Surface* p_surf_img,
-          Uint32 ui_seconds, int i_fade_out, SDL_Renderer* psdlRenderer,
-          SDL_Rect* prctTarget);
+class FadeAction {
+   public:
+    ~FadeAction();
+    LPErrInApp Fade(SDL_Surface* pSurfScreen, SDL_Surface* pSurfImg,
+                    Uint32 uiSeconds, bool fadeOut, SDL_Renderer* p_sdlRenderer,
+                    SDL_Rect* p_rctTarget);
 
-void InstantFade(SDL_Surface* p_surf_screen);
+    void InstantFade(SDL_Surface* p_surf_screen);
+    bool IsInProgress() { return _inProgress; }
+    void Iterate();
 
-#ifdef __cplusplus
-}
-#endif
+   private:
+    void cleanUp();
+
+   private:
+    bool _inProgress;
+    bool _fade_out;
+    float _f_alpha;
+    Uint64 _ui_old_time;
+    Uint64 _ui_time_ms;
+    SDL_Surface* _p_surf_screen;
+    SDL_Surface* _p_surf_img;
+    SDL_Surface* _p_surf_black;
+    SDL_Texture* _p_ScreenTexture;
+    SDL_Renderer* _p_sdlRenderer;
+    SDL_Surface* _p_surf_screen_copy;
+    SDL_Rect* _p_rctTarget;
+};
+
 #endif

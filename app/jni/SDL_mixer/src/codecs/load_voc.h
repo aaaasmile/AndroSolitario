@@ -1,6 +1,6 @@
 /*
   SDL_mixer:  An audio mixer library based on the SDL library
-  Copyright (C) 1997-2023 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2024 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -20,8 +20,8 @@
 
   This is the source needed to decode a Creative Labs VOC file into a
   waveform. It's pretty straightforward once you get going. The only
-  externally-callable function is Mix_LoadVOC_RW(), which is meant to
-  act as identically to SDL_LoadWAV_RW() as possible.
+  externally-callable function is Mix_LoadVOC_IO(), which is meant to
+  act as identically to SDL_LoadWAV_IO() as possible.
 
   This file by Ryan C. Gordon (icculus@icculus.org).
 
@@ -29,8 +29,8 @@
         (http://www.freshmeat.net/projects/sox/)
 */
 
-/* Don't call this directly; use Mix_LoadWAV_RW() for now. */
-SDL_AudioSpec *Mix_LoadVOC_RW (SDL_RWops *src, int freesrc,
-        SDL_AudioSpec *spec, Uint8 **audio_buf, Uint32 *audio_len);
+/* Don't call this directly; use Mix_LoadWAV_IO() for now. */
+SDL_AudioSpec *Mix_LoadVOC_IO (SDL_IOStream *src, bool closeio,
+			       SDL_AudioSpec *spec, Uint8 **audio_buf, Uint32 *audio_len);
 
 /* vi: set ts=4 sw=4 expandtab: */

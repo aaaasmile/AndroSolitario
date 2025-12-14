@@ -1,6 +1,6 @@
 /*
   SDL_mixer:  An audio mixer library based on the SDL library
-  Copyright (C) 1997-2023 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2024 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -24,8 +24,7 @@
 
 #ifdef MUSIC_MID_FLUIDSYNTH
 
-#include "SDL_loadso.h"
-#include "SDL_rwops.h"
+#include <SDL3/SDL.h>
 
 #include "music_fluidsynth.h"
 
@@ -39,6 +38,7 @@ typedef struct {
 #if (FLUIDSYNTH_VERSION_MAJOR >= 2)
     void (*delete_fluid_player)(fluid_player_t*);
     void (*delete_fluid_synth)(fluid_synth_t*);
+    int (*fluid_player_seek)(fluid_player_t *, int);
 #else
     int (*delete_fluid_player)(fluid_player_t*);
     int (*delete_fluid_synth)(fluid_synth_t*);
@@ -85,6 +85,7 @@ static int FLUIDSYNTH_Load()
 #if (FLUIDSYNTH_VERSION_MAJOR >= 2)
         FUNCTION_LOADER(delete_fluid_player, void (*)(fluid_player_t*))
         FUNCTION_LOADER(delete_fluid_synth, void (*)(fluid_synth_t*))
+        FUNCTION_LOADER(fluid_player_seek, int (*)(fluid_player_t *, int))
 #else
         FUNCTION_LOADER(delete_fluid_player, int (*)(fluid_player_t*))
         FUNCTION_LOADER(delete_fluid_synth, int (*)(fluid_synth_t*))
@@ -135,29 +136,30 @@ typedef struct {
     void *buffer;
     int buffer_size;
     int volume;
+    bool is_paused;
 } FLUIDSYNTH_Music;
 
 static void FLUIDSYNTH_Delete(void *context);
 
-static int SDLCALL fluidsynth_check_soundfont(const char *path, void *data)
+static bool SDLCALL fluidsynth_check_soundfont(const char *path, void *data)
 {
-    SDL_RWops *rw = SDL_RWFromFile(path, "rb");
+    SDL_IOStream *io = SDL_IOFromFile(path, "rb");
 
     (void)data;
-    if (rw) {
-        SDL_RWclose(rw);
-        return 1;
+    if (io) {
+        SDL_CloseIO(io);
+        return true;
     } else {
-        Mix_SetError("Failed to access the SoundFont %s", path);
-        return 0;
+        SDL_SetError("Failed to access the SoundFont %s", path);
+        return false;
     }
 }
 
-static int SDLCALL fluidsynth_load_soundfont(const char *path, void *data)
+static bool SDLCALL fluidsynth_load_soundfont(const char *path, void *data)
 {
     /* If this fails, it's too late to try Timidity so pray that at least one works. */
     fluidsynth.fluid_synth_sfload((fluid_synth_t*) data, path, 1);
-    return 1;
+    return true;
 }
 
 static int FLUIDSYNTH_Open(const SDL_AudioSpec *spec)
@@ -171,36 +173,35 @@ static int FLUIDSYNTH_Open(const SDL_AudioSpec *spec)
 
 static FLUIDSYNTH_Music *FLUIDSYNTH_LoadMusic(void *data)
 {
-    SDL_RWops *src = (SDL_RWops *)data;
+    SDL_AudioSpec srcspec;
+    SDL_IOStream *src = (SDL_IOStream *)data;
     FLUIDSYNTH_Music *music;
     double samplerate; /* as set by the lib. */
     const Uint8 channels = 2;
-    int src_format = AUDIO_S16SYS;
-    void *rw_mem;
-    size_t rw_size;
+    int src_format = SDL_AUDIO_S16;
+    void *io_mem;
+    size_t io_size;
     int ret;
 
     if (!(music = SDL_calloc(1, sizeof(FLUIDSYNTH_Music)))) {
-        SDL_OutOfMemory();
         return NULL;
     }
 
     music->volume = MIX_MAX_VOLUME;
-    music->buffer_size = music_spec.samples * sizeof(Sint16) * channels;
+    music->buffer_size = 4096/*music_spec.samples*/ * sizeof(Sint16) * channels;
     music->synth_write = fluidsynth.fluid_synth_write_s16;
     if (music_spec.format & 0x0020) { /* 32 bit. */
-        src_format = AUDIO_F32SYS;
+        src_format = SDL_AUDIO_F32;
         music->buffer_size <<= 1;
         music->synth_write = fluidsynth.fluid_synth_write_float;
     }
 
     if (!(music->buffer = SDL_malloc((size_t)music->buffer_size))) {
-        SDL_OutOfMemory();
         goto fail;
     }
 
     if (!(music->settings = fluidsynth.new_fluid_settings())) {
-        Mix_SetError("Failed to create FluidSynth settings");
+        SDL_SetError("Failed to create FluidSynth settings");
         goto fail;
     }
 
@@ -208,7 +209,7 @@ static FLUIDSYNTH_Music *FLUIDSYNTH_LoadMusic(void *data)
     fluidsynth.fluid_settings_getnum(music->settings, "synth.sample-rate", &samplerate);
 
     if (!(music->synth = fluidsynth.new_fluid_synth(music->settings))) {
-        Mix_SetError("Failed to create FluidSynth synthesizer");
+        SDL_SetError("Failed to create FluidSynth synthesizer");
         goto fail;
     }
 
@@ -217,25 +218,27 @@ static FLUIDSYNTH_Music *FLUIDSYNTH_LoadMusic(void *data)
     }
 
     if (!(music->player = fluidsynth.new_fluid_player(music->synth))) {
-        Mix_SetError("Failed to create FluidSynth player");
+        SDL_SetError("Failed to create FluidSynth player");
         goto fail;
     }
 
-    rw_mem = SDL_LoadFile_RW(src, &rw_size, SDL_FALSE);
-    if (!rw_mem) {
-        SDL_OutOfMemory();
+    io_mem = SDL_LoadFile_IO(src, &io_size, false);
+    if (!io_mem) {
         goto fail;
     }
 
-    ret = fluidsynth.fluid_player_add_mem(music->player, rw_mem, rw_size);
-    SDL_free(rw_mem);
+    ret = fluidsynth.fluid_player_add_mem(music->player, io_mem, io_size);
+    SDL_free(io_mem);
     if (ret != FLUID_OK) {
-        Mix_SetError("FluidSynth failed to load in-memory song");
+        SDL_SetError("FluidSynth failed to load in-memory song");
         goto fail;
     }
 
-    if (!(music->stream = SDL_NewAudioStream(src_format, channels, (int) samplerate,
-                          music_spec.format, music_spec.channels, music_spec.freq))) {
+    SDL_zero(srcspec);
+    srcspec.format = src_format;
+    srcspec.channels = channels;
+    srcspec.freq = (int) samplerate;
+    if (!(music->stream = SDL_CreateAudioStream(&srcspec, &music_spec))) {
         goto fail;
     }
 
@@ -245,13 +248,13 @@ fail:
     return NULL;
 }
 
-static void *FLUIDSYNTH_CreateFromRW(SDL_RWops *src, int freesrc)
+static void *FLUIDSYNTH_CreateFromIO(SDL_IOStream *src, bool closeio)
 {
     FLUIDSYNTH_Music *music;
 
     music = FLUIDSYNTH_LoadMusic(src);
-    if (music && freesrc) {
-        SDL_RWclose(src);
+    if (music && closeio) {
+        SDL_CloseIO(src);
     }
     return music;
 }
@@ -259,9 +262,9 @@ static void *FLUIDSYNTH_CreateFromRW(SDL_RWops *src, int freesrc)
 static void FLUIDSYNTH_SetVolume(void *context, int volume)
 {
     FLUIDSYNTH_Music *music = (FLUIDSYNTH_Music *)context;
-    /* FluidSynth's default is 0.2. Make 1.2 the maximum. */
+    /* FluidSynth's default gain is 0.2. Make 1.0 the maximum gain value to avoid sound overload. */
     music->volume = volume;
-    fluidsynth.fluid_synth_set_gain(music->synth, (float) (volume * 1.2 / MIX_MAX_VOLUME));
+    fluidsynth.fluid_synth_set_gain(music->synth, volume * 1.0f / MIX_MAX_VOLUME);
 }
 
 static int FLUIDSYNTH_GetVolume(void *context)
@@ -274,33 +277,44 @@ static int FLUIDSYNTH_Play(void *context, int play_count)
 {
     FLUIDSYNTH_Music *music = (FLUIDSYNTH_Music *)context;
     fluidsynth.fluid_player_set_loop(music->player, play_count);
+#if (FLUIDSYNTH_VERSION_MAJOR >= 2)
+    fluidsynth.fluid_player_seek(music->player, 0);
+#endif
     fluidsynth.fluid_player_play(music->player);
+    music->is_paused = false;
     return 0;
 }
 
-static SDL_bool FLUIDSYNTH_IsPlaying(void *context)
+static void FLUIDSYNTH_Resume(void *context)
 {
     FLUIDSYNTH_Music *music = (FLUIDSYNTH_Music *)context;
-    return fluidsynth.fluid_player_get_status(music->player) == FLUID_PLAYER_PLAYING ? SDL_TRUE : SDL_FALSE;
+    fluidsynth.fluid_player_play(music->player);
+    music->is_paused = false;
 }
 
-static int FLUIDSYNTH_GetSome(void *context, void *data, int bytes, SDL_bool *done)
+static bool FLUIDSYNTH_IsPlaying(void *context)
+{
+    FLUIDSYNTH_Music *music = (FLUIDSYNTH_Music *)context;
+    return music->is_paused || fluidsynth.fluid_player_get_status(music->player) == FLUID_PLAYER_PLAYING ? true : false;
+}
+
+static int FLUIDSYNTH_GetSome(void *context, void *data, int bytes, bool *done)
 {
     FLUIDSYNTH_Music *music = (FLUIDSYNTH_Music *)context;
     int filled;
 
     (void)done;
 
-    filled = SDL_AudioStreamGet(music->stream, data, bytes);
+    filled = SDL_GetAudioStreamData(music->stream, data, bytes);
     if (filled != 0) {
         return filled;
     }
 
-    if (music->synth_write(music->synth, music_spec.samples, music->buffer, 0, 2, music->buffer, 1, 2) != FLUID_OK) {
-        Mix_SetError("Error generating FluidSynth audio");
+    if (music->synth_write(music->synth, 4096/*music_spec.samples*/, music->buffer, 0, 2, music->buffer, 1, 2) != FLUID_OK) {
+        SDL_SetError("Error generating FluidSynth audio");
         return -1;
     }
-    if (SDL_AudioStreamPut(music->stream, music->buffer, music->buffer_size) < 0) {
+    if (!SDL_PutAudioStreamData(music->stream, music->buffer, music->buffer_size)) {
         return -1;
     }
     return 0;
@@ -314,6 +328,17 @@ static void FLUIDSYNTH_Stop(void *context)
 {
     FLUIDSYNTH_Music *music = (FLUIDSYNTH_Music *)context;
     fluidsynth.fluid_player_stop(music->player);
+#if (FLUIDSYNTH_VERSION_MAJOR >= 2)
+    fluidsynth.fluid_player_seek(music->player, 0);
+#endif
+    music->is_paused = false;
+}
+
+static void FLUIDSYNTH_Pause(void *context)
+{
+    FLUIDSYNTH_Music *music = (FLUIDSYNTH_Music *)context;
+    fluidsynth.fluid_player_stop(music->player);
+    music->is_paused = true;
 }
 
 static void FLUIDSYNTH_Delete(void *context)
@@ -330,7 +355,7 @@ static void FLUIDSYNTH_Delete(void *context)
         fluidsynth.delete_fluid_settings(music->settings);
     }
     if (music->stream) {
-        SDL_FreeAudioStream(music->stream);
+        SDL_DestroyAudioStream(music->stream);
     }
     if (music->buffer) {
         SDL_free(music->buffer);
@@ -343,12 +368,12 @@ Mix_MusicInterface Mix_MusicInterface_FLUIDSYNTH =
     "FLUIDSYNTH",
     MIX_MUSIC_FLUIDSYNTH,
     MUS_MID,
-    SDL_FALSE,
-    SDL_FALSE,
+    false,
+    false,
 
     FLUIDSYNTH_Load,
     FLUIDSYNTH_Open,
-    FLUIDSYNTH_CreateFromRW,
+    FLUIDSYNTH_CreateFromIO,
     NULL,   /* CreateFromFile */
     FLUIDSYNTH_SetVolume,
     FLUIDSYNTH_GetVolume,
@@ -363,8 +388,10 @@ Mix_MusicInterface Mix_MusicInterface_FLUIDSYNTH =
     NULL,   /* LoopEnd */
     NULL,   /* LoopLength */
     NULL,   /* GetMetaTag */
-    NULL,   /* Pause */
-    NULL,   /* Resume */
+    NULL,   /* GetNumTracks */
+    NULL,   /* StartTrack */
+    FLUIDSYNTH_Pause,
+    FLUIDSYNTH_Resume,
     FLUIDSYNTH_Stop,
     FLUIDSYNTH_Delete,
     NULL,   /* Close */

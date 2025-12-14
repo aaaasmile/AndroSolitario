@@ -19,20 +19,20 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "SDL_config.h"
+#include <SDL3/SDL_platform.h>
 
-#if __MACOSX__
+#ifdef SDL_PLATFORM_MACOS
 
 /* Mac OS X 10.6+, using Core MIDI. */
 
-#include "SDL_stdinc.h"
+#include <SDL3/SDL_stdinc.h>
 
 #include <AudioUnit/AudioUnit.h>
 #include <AudioToolbox/AudioToolbox.h>
 #include <AvailabilityMacros.h>
 
-#include "SDL_endian.h"
-#include "SDL_mixer.h"
+#include <SDL3/SDL_endian.h>
+#include <SDL3_mixer/SDL_mixer.h>
 #include "../../mixer.h"
 #include "native_midi.h"
 
@@ -125,24 +125,24 @@ GetSequenceAudioUnitMatching(MusicSequence sequence, AudioUnit *aunit,
 
 typedef struct {
     AudioUnit aunit;
-    SDL_bool soundfont_set;
+    bool soundfont_set;
     CFURLRef default_url;
 } macosx_load_soundfont_ctx;
 
-static int SDLCALL
+static bool SDLCALL
 macosx_load_soundfont(const char *path, void *data)
 {
     CFURLRef url;
     OSStatus err;
     macosx_load_soundfont_ctx *ctx = data;
     if (ctx->soundfont_set)
-        return SDL_FALSE;
+        return false;
 
     url = CFURLCreateFromFileSystemRepresentation(kCFAllocatorDefault,
                                                   (const UInt8*)path,
                                                   strlen(path), false);
     if (!url)
-        return SDL_FALSE;
+        return false;
 
     err = AudioUnitSetProperty(ctx->aunit, kMusicDeviceProperty_SoundBankURL,
                                kAudioUnitScope_Global, 0, &url, sizeof(url));
@@ -157,11 +157,11 @@ macosx_load_soundfont(const char *path, void *data)
             /* uh-oh, this might leave the audio unit in an unusable state
                (e.g. if the soundfont was an incompatible file type) */
         }
-        return SDL_FALSE;
+        return false;
     }
 
-    ctx->soundfont_set = SDL_TRUE;
-    return SDL_TRUE;
+    ctx->soundfont_set = true;
+    return true;
 }
 
 static void
@@ -169,7 +169,7 @@ SetSequenceSoundFont(MusicSequence sequence)
 {
     OSStatus err;
     macosx_load_soundfont_ctx ctx;
-    ctx.soundfont_set = SDL_FALSE;
+    ctx.soundfont_set = false;
     ctx.default_url = NULL;
 
     CFBundleRef bundle = CFBundleGetBundleWithIdentifier(
@@ -191,31 +191,20 @@ SetSequenceSoundFont(MusicSequence sequence)
     return;
 }
 
-int native_midi_detect(void)
+bool native_midi_detect(void)
 {
-    return 1;  /* always available. */
+    return true;  /* always available. */
 }
 
-NativeMidiSong *native_midi_loadsong_RW(SDL_RWops *src, int freesrc)
+NativeMidiSong *native_midi_loadsong_IO(SDL_IOStream *src, bool closeio)
 {
     NativeMidiSong *retval = NULL;
     void *buf = NULL;
-    Sint64 len = 0;
+    size_t len = 0;
     CFDataRef data = NULL;
 
-    if (SDL_RWseek(src, 0, RW_SEEK_END) < 0)
-        goto fail;
-    len = SDL_RWtell(src);
-    if (len < 0)
-        goto fail;
-    if (SDL_RWseek(src, 0, RW_SEEK_SET) < 0)
-        goto fail;
-
-    buf = SDL_malloc(len);
+    buf = SDL_LoadFile_IO(src, &len, false);
     if (buf == NULL)
-        goto fail;
-
-    if (SDL_RWread(src, buf, len, 1) != 1)
         goto fail;
 
     retval = SDL_malloc(sizeof(NativeMidiSong));
@@ -248,8 +237,8 @@ NativeMidiSong *native_midi_loadsong_RW(SDL_RWops *src, int freesrc)
     if (MusicPlayerSetSequence(retval->player, retval->sequence) != noErr)
         goto fail;
 
-    if (freesrc)
-        SDL_RWclose(src);
+    if (closeio)
+        SDL_CloseIO(src);
 
     return retval;
 
@@ -330,22 +319,22 @@ void native_midi_stop(void)
     }
 }
 
-int native_midi_active(void)
+bool native_midi_active(void)
 {
     MusicTimeStamp currentTime = 0;
     if (currentsong == NULL)
-        return 0;
+        return false;
 
     MusicPlayerGetTime(currentsong->player, &currentTime);
     if ((currentTime < currentsong->endTime) ||
         (currentTime >= kMusicTimeStamp_EndOfTrack)) {
-        return 1;
+        return true;
     } else if (currentsong->loops) {
         --currentsong->loops;
         MusicPlayerSetTime(currentsong->player, 0);
-        return 1;
+        return true;
     }
-    return 0;
+    return false;
 }
 
 void native_midi_setvolume(int volume)
@@ -364,6 +353,57 @@ void native_midi_setvolume(int volume)
 const char *native_midi_error(void)
 {
     return "";  /* !!! FIXME */
+}
+
+#else
+
+#include "native_midi.h"
+
+bool native_midi_detect(void)
+{
+    return false;
+}
+
+NativeMidiSong *native_midi_loadsong_IO(SDL_IOStream *src, bool closeio)
+{
+    if (closeio) {
+        SDL_CloseIO(src);
+    }
+    SDL_Unsupported();
+    return NULL;
+}
+
+void native_midi_freesong(NativeMidiSong *song)
+{
+}
+
+void native_midi_start(NativeMidiSong *song, int loops)
+{
+}
+
+void native_midi_pause(void)
+{
+}
+
+void native_midi_resume(void)
+{
+}
+
+void native_midi_stop(void)
+{
+}
+
+bool native_midi_active(void)
+{
+}
+
+void native_midi_setvolume(int volume)
+{
+}
+
+const char *native_midi_error(void)
+{
+    return "";
 }
 
 #endif /* Mac OS X native MIDI support */

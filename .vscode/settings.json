@@ -87,6 +87,7 @@
         "thread": "cpp",
         "cinttypes": "cpp",
         "filesystem": "cpp",
-        "sdl_internal.h": "c"
+        "sdl_internal.h": "c",
+        "cfenv": "cpp"
     }
 }

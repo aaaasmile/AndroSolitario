@@ -1,6 +1,6 @@
 #include "AppGfx.h"
 
-#include <SDL_image.h>
+#include <SDL3_image/SDL_image.h>
 #include <fcntl.h>
 #include <limits.h>
 #include <stdlib.h>
@@ -25,15 +25,14 @@
 #include "OptionsGfx.h"
 #include "WinTypeGlobal.h"
 
-static const char *g_lpszHelpFileName = DATA_PREFIX "solitario.pdf";
+static const char* g_lpszHelpFileName = DATA_PREFIX "solitario.pdf";
 
-static const char *g_lpszIconProgFile = DATA_PREFIX "images/icona_asso.bmp";
-static const char *g_lpszTitleFile = DATA_PREFIX "images/title.png";
-static const char *g_lpszIniFontAriblk = DATA_PREFIX "font/ariblk.ttf";
-static const char *g_lpszIniFontVera = DATA_PREFIX "font/vera.ttf";
-static const char *g_lpszImageSplashComm =
+static const char* g_lpszIconProgFile = DATA_PREFIX "images/icona_asso.bmp";
+static const char* g_lpszTitleFile = DATA_PREFIX "images/title.png";
+
+static const char* g_lpszImageSplashComm =
     DATA_PREFIX "images/commessaggio.jpg";
-static const char *g_lpszImageSplashMantova = DATA_PREFIX "images/mantova.jpg";
+static const char* g_lpszImageSplashMantova = DATA_PREFIX "images/mantova.jpg";
 
 AppGfx::AppGfx() {
     _p_Window = NULL;
@@ -41,24 +40,32 @@ AppGfx::AppGfx() {
     _p_SolitarioGfx = NULL;
     _p_SceneBackground = NULL;
     _p_Screen = NULL;
-    _screenW = 1024;
-    _screenH = 768;
+#ifdef ANDROID
+    // this is portrait
+    _screenW = 1080;
+    _screenH = 1920;
+#else
+    _screenH = 768;   // 960; //768;
+    _screenW = 1024;  // 540;//1024;
+#endif
     _Bpp = 0;
-    _p_MusicManager = 0;
-    _p_HighScore = 0;
-    _p_CreditTitle = 0;
+    _p_MusicManager = NULL;
+    _p_CreditTitle = NULL;
     _fullScreen = false;
-    _p_GameSettings = GAMESET::GetSettings();
+    _p_GameSettings = GameSettings::GetSettings();
+    _p_CreditsView = new CreditsView();
+    _p_OptGfx = new OptionsGfx();
+    _p_HighScore = new HighScore();
 }
 
 AppGfx::~AppGfx() { terminate(); }
 
 LPErrInApp AppGfx::Init() {
     TRACE("Init App\n");
-    LPCSTR exeDirPath = GAMESET::GetExeAppFolder();
-    TRACE("Exe directory is %s\n", exeDirPath);
     _p_GameSettings->GameName = "Solitario";
 #ifdef WIN32
+    LPCSTR exeDirPath = GAMESET::GetExeAppFolder();
+    TRACE("Exe directory is %s\n", exeDirPath);
     if (chdir(exeDirPath) < 0) {
         return ERR_UTIL::ErrorCreate("Unable to change to the exe directory");
     } else {
@@ -75,7 +82,7 @@ LPErrInApp AppGfx::Init() {
     }
 
     if (!SDL_WasInit(SDL_INIT_VIDEO)) {
-        if (SDL_Init(0) < 0) {
+        if (!SDL_Init(0)) {
             return ERR_UTIL::ErrorCreate("Couldn't initialize SDL: %s\n",
                                          SDL_GetError());
         }
@@ -84,64 +91,105 @@ LPErrInApp AppGfx::Init() {
     if (err != NULL) {
         return err;
     }
-
-    _p_MusicManager = new MusicManager();
-    _p_MusicManager->Initialize(_p_GameSettings->MusicEnabled);
-
-    _p_HighScore = new HighScore();
     _p_HighScore->Load();
 
-    _Languages.SetLang(_p_GameSettings->CurrentLanguage);
+    _p_GameSettings->SetCurrentLang();
+    Languages* pLanguages = _p_GameSettings->GetLanguageMan();
 
-    if (TTF_Init() == -1) {
+    if (!TTF_Init()) {
         return ERR_UTIL::ErrorCreate("Font init error");
     }
     if (_p_GameSettings->NeedScreenMagnify()) {
         _p_GameSettings->UseBigFontSize();
     }
-    int sizeFontBig = _p_GameSettings->GetSizeFontBig();
-    int sizeFontSmall = _p_GameSettings->GetSizeFontSmall();
-    std::string strFileFontStatus = g_lpszIniFontAriblk;
-    _p_fontAriblk = TTF_OpenFont(strFileFontStatus.c_str(), sizeFontBig);
-    if (_p_fontAriblk == 0) {
-        return ERR_UTIL::ErrorCreate("Unable to load font %s, error: %s\n",
-                                     strFileFontStatus.c_str(), SDL_GetError());
-    }
-    strFileFontStatus = g_lpszIniFontVera;
-    _p_fontVera = TTF_OpenFont(strFileFontStatus.c_str(), sizeFontSmall);
-    if (_p_fontVera == 0) {
-        return ERR_UTIL::ErrorCreate("Unable to load font %s, error: %s\n",
-                                     strFileFontStatus.c_str(), SDL_GetError());
-    }
+    TRACE_DEBUG("Font initialized OK\n");
 
-    const char *title = _Languages.GetCStringId(Languages::ID_SOLITARIO);
+    const char* title = pLanguages->GetCStringId(Languages::ID_SOLITARIO);
     SDL_SetWindowTitle(_p_Window, title);
 
-    SDL_Surface *psIcon = SDL_LoadBMP(g_lpszIconProgFile);
+    SDL_Surface* psIcon = SDL_LoadBMP(g_lpszIconProgFile);
     if (psIcon == 0) {
         return ERR_UTIL::ErrorCreate("Icon not found");
     }
-    SDL_SetColorKey(psIcon, true, SDL_MapRGB(psIcon->format, 0, 128, 0));
-    SDL_SetWindowIcon(_p_Window, psIcon);
-
+    TRACE_DEBUG("Icon loaded OK\n");
+    SDL_SetSurfaceColorKey(
+        psIcon, true,
+        SDL_MapRGB(SDL_GetPixelFormatDetails(psIcon->format), NULL, 0, 128, 0));
+#if HASWINICON
+    if (!SDL_SetWindowIcon(_p_Window, psIcon)) {
+        return ERR_UTIL::ErrorCreate("Couldn't set icon on window: %s\n",
+                                     SDL_GetError());
+    }
+#endif
     _p_CreditTitle = IMG_Load(g_lpszTitleFile);
     if (_p_CreditTitle == 0) {
         return ERR_UTIL::ErrorCreate("Title image not found");
     }
+    TRACE_DEBUG("Credit loaded OK\n");
+
     err = loadSceneBackground();
     if (err != NULL) {
         return err;
     }
+    TRACE_DEBUG("SceneBackground OK\n");
+    err = _p_GameSettings->LoadFonts();
+    if (err != NULL) {
+        TRACE_DEBUG("Error on Load fonts\n");
+        return err;
+    }
+    TRACE_DEBUG("Fonts and background loaded OK\n");
 
     clearBackground();
 
+    err = _p_GameSettings->InitMusicManager();
+    if (err != NULL) {
+        return err;
+    }
+    _p_MusicManager = _p_GameSettings->GetMusicManager();
     err = _p_MusicManager->LoadMusicRes();
-    return err;
+    if (err != NULL) {
+        return err;
+    }
+
+    MenuDelegator menuDelegator = prepMenuDelegator();
+    _p_MenuMgr = new MenuMgr();
+    err = _p_MenuMgr->Initialize(_p_Screen, _p_sdlRenderer, _p_Window,
+                                 menuDelegator);
+    if (err != NULL) {
+        return err;
+    }
+    _histMenu.push(MenuItemEnum::QUIT);
+    _histMenu.push(MenuItemEnum::MENU_ROOT);
+
+    _p_MenuMgr->SetBackground(_p_SceneBackground);
+    if (err != NULL) {
+        return err;
+    }
+    OptionDelegator optionDelegator = prepOptionDelegator();
+
+    err = _p_OptGfx->Initialize(_p_Screen, _p_sdlRenderer, optionDelegator,
+                                _p_Window);
+    if (err) {
+        return err;
+    }
+    return NULL;
+}
+
+LPErrInApp AppGfx::ChangeSceneBackground(SDL_Surface** ppSceneBackground) {
+    LPErrInApp err;
+    err = loadSceneBackground();
+    if (err != NULL) {
+        return err;
+    }
+    _p_MenuMgr->SetBackground(_p_SceneBackground);
+
+    *ppSceneBackground = _p_SceneBackground;
+    return NULL;
 }
 
 LPErrInApp AppGfx::loadSceneBackground() {
     if (_p_SceneBackground != NULL) {
-        SDL_FreeSurface(_p_SceneBackground);
+        SDL_DestroySurface(_p_SceneBackground);
         _p_SceneBackground = NULL;
     }
     if (_p_GameSettings->BackgroundType != BackgroundTypeEnum::Black) {
@@ -156,20 +204,27 @@ LPErrInApp AppGfx::loadSceneBackground() {
             return ERR_UTIL::ErrorCreate("Backgound Type %d not supported\n",
                                          _p_GameSettings->BackgroundType);
         }
-        SDL_RWops *srcBack = SDL_RWFromFile(strFileName.c_str(), "rb");
+        SDL_IOStream* srcBack = SDL_IOFromFile(strFileName.c_str(), "rb");
+
         if (srcBack == 0) {
             return ERR_UTIL::ErrorCreate("Unable to load %s background image\n",
                                          strFileName.c_str());
         }
-        _p_SceneBackground = IMG_LoadJPG_RW(srcBack);
+        _p_SceneBackground = IMG_LoadTyped_IO(srcBack, false, "JPG");
         if (_p_SceneBackground == 0) {
             return ERR_UTIL::ErrorCreate("Unable to create splash");
         }
+        SDL_CloseIO(srcBack);
     } else {
-        _p_SceneBackground = SDL_CreateRGBSurface(SDL_SWSURFACE, _p_Screen->w,
-                                                  _p_Screen->h, 32, 0, 0, 0, 0);
-        SDL_FillRect(_p_SceneBackground, &_p_SceneBackground->clip_rect,
-                     SDL_MapRGBA(_p_SceneBackground->format, 0, 0, 0, 0));
+        _p_SceneBackground = GFX_UTIL::SDL_CreateRGBSurface(
+            _p_Screen->w, _p_Screen->h, 32, 0, 0, 0, 0);
+
+        SDL_Rect clipRect;
+        SDL_GetSurfaceClipRect(_p_SceneBackground, &clipRect);
+        SDL_FillSurfaceRect(
+            _p_SceneBackground, &clipRect,
+            SDL_MapRGB(SDL_GetPixelFormatDetails(_p_SceneBackground->format),
+                       NULL, 0, 0, 0));
     }
 
     return NULL;
@@ -177,51 +232,48 @@ LPErrInApp AppGfx::loadSceneBackground() {
 
 LPErrInApp AppGfx::createWindow() {
     TRACE_DEBUG("createWindow\n");
-    int flagwin = 0;
+    SDL_WindowFlags flagwin;
     if (_p_Window != NULL) {
         _p_Window = NULL;
         SDL_DestroyWindow(_p_Window);
     }
     if (_p_Screen != NULL) {
-        SDL_FreeSurface(_p_Screen);
+        SDL_DestroySurface(_p_Screen);
         _p_Screen = NULL;
     }
     if (_fullScreen) {
-        flagwin = SDL_WINDOW_FULLSCREEN_DESKTOP;
+        flagwin = SDL_WINDOW_FULLSCREEN;
     } else {
-        flagwin = SDL_WINDOW_SHOWN;
+        flagwin = SDL_WINDOW_RESIZABLE;
     }
 #ifdef ANDROID
     flagwin = SDL_WINDOW_FULLSCREEN;
 #endif
 
-    _p_Window = SDL_CreateWindow(
-        _p_GameSettings->GameName.c_str(), SDL_WINDOWPOS_UNDEFINED,
-        SDL_WINDOWPOS_UNDEFINED, _screenW, _screenH, flagwin);
+    _p_Window = SDL_CreateWindow(_p_GameSettings->GameName.c_str(), _screenW,
+                                 _screenH, flagwin);
+
     if (_p_Window == NULL) {
         return ERR_UTIL::ErrorCreate("Error SDL_CreateWindow: %s\n",
                                      SDL_GetError());
     }
-    _p_GameSettings->CalcDisplaySize();
+    LPErrInApp err = _p_GameSettings->CalcDisplaySize(_screenW, _screenH);
+    if (err != NULL) {
+        return err;
+    }
     _screenH = _p_GameSettings->GetScreenHeight();
     _screenW = _p_GameSettings->GetScreenWidth();
 
-    _p_sdlRenderer =
-        SDL_CreateRenderer(_p_Window, -1, SDL_RENDERER_ACCELERATED);
+    _p_sdlRenderer = SDL_CreateRenderer(_p_Window, NULL);
 
     if (_p_sdlRenderer == NULL) {
         return ERR_UTIL::ErrorCreate("Cannot create renderer: %s\n",
                                      SDL_GetError());
     }
-    // this is not magnify, but only changing the scale
-    // if (SDL_RenderSetLogicalSize(_p_sdlRenderer, 400, 900) < 0) {
-    //     return ERR_UTIL::ErrorCreate("RenderSetScale error: %s\n",
-    //                                  SDL_GetError());
-    // }
-    //TRACE_DEBUG("Render transformed \n");
 
-    _p_Screen = SDL_CreateRGBSurface(0, _screenW, _screenH, 32, 0x00FF0000,
-                                     0x0000FF00, 0x000000FF, 0xFF000000);
+    _p_Screen = GFX_UTIL::SDL_CreateRGBSurface(
+        _screenW, _screenH, 32, 0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
+
     if (_p_Screen == NULL) {
         return ERR_UTIL::ErrorCreate("Error SDL_CreateRGBSurface: %s\n",
                                      SDL_GetError());
@@ -240,54 +292,39 @@ LPErrInApp AppGfx::createWindow() {
     return NULL;
 }
 
-LPErrInApp AppGfx::startGameLoop() {
-    TRACE("Start Game Loop\n");
-    _p_MusicManager->StopMusic(700);
-
-    LPErrInApp err;
-    if (_p_SolitarioGfx != NULL) {
-        delete _p_SolitarioGfx;
-    }
-    _p_SolitarioGfx = new SolitarioGfx();
-
-    err = _p_SolitarioGfx->Initialize(
-        _p_Screen, _p_sdlRenderer, _p_Window, _p_GameSettings->DeckTypeVal,
-        &_Languages, _p_fontVera, _p_fontAriblk, _p_SceneBackground,
-        _p_MusicManager,
-        _p_GameSettings->BackgroundType == BackgroundTypeEnum::Black,
-        _p_HighScore);
-    if (err != NULL)
-        return err;
-
-    return _p_SolitarioGfx->StartGameLoop();
-}
-
 void AppGfx::terminate() {
-    writeProfile();
-    SDL_ShowCursor(SDL_ENABLE);
+    delete _p_CreditsView;
+    delete _p_OptGfx;
+
+    SDL_ShowCursor();
 
     if (_p_Screen != NULL) {
-        SDL_FreeSurface(_p_Screen);
+        SDL_DestroySurface(_p_Screen);
         _p_Screen = NULL;
     }
     if (_p_SceneBackground) {
-        SDL_FreeSurface(_p_SceneBackground);
+        SDL_DestroySurface(_p_SceneBackground);
         _p_SceneBackground = NULL;
     }
     if (_p_CreditTitle) {
-        SDL_FreeSurface(_p_CreditTitle);
+        SDL_DestroySurface(_p_CreditTitle);
         _p_CreditTitle = NULL;
     }
     if (_p_ScreenTexture != NULL) {
         SDL_DestroyTexture(_p_ScreenTexture);
     }
+    if (_p_MenuMgr != NULL) {
+        delete _p_MenuMgr;
+        _p_MenuMgr = NULL;
+    }
 
-    delete _p_MusicManager;
-    delete _p_SolitarioGfx;
+    if (_p_SolitarioGfx != NULL) {
+        delete _p_SolitarioGfx;
+        _p_SolitarioGfx = NULL;
+    }
+
     delete _p_HighScore;
-    _p_SolitarioGfx = NULL;
-    _p_MusicManager = NULL;
-    _p_HighScore = NULL;
+    _p_GameSettings->TerminateMusicManager();
 
     SDL_DestroyWindow(_p_Window);
     SDL_Quit();
@@ -307,168 +344,238 @@ LPErrInApp AppGfx::loadProfile() {
     _p_GameSettings->SettingsDir = dirpath;
 
     TRACE("Load profile\n");
-    return _p_GameSettings->LoadSettings();
+    err = _p_GameSettings->LoadSettings();
+    if (err != NULL) {
+        TRACE("Ignore settings because error: %s\n", err->ErrorText.c_str());
+    }
+    return NULL;
 }
 
-LPErrInApp AppGfx::writeProfile() {
-    TRACE("Save profile \n");
-    return _p_GameSettings->SaveSettings();
+LPErrInApp fncBind_LeaveMenu(void* self) {
+    AppGfx* pApp = (AppGfx*)self;
+    return pApp->LeaveMenu();
 }
 
-TTF_Font *fncBind_GetFontVera(void *self) {
-    AppGfx *pApp = (AppGfx *)self;
-    return pApp->GetFontVera();
+LPErrInApp fncBind_EnterMenu(void* self, MenuItemEnum menuItem) {
+    AppGfx* pApp = (AppGfx*)self;
+    return pApp->EnterMenu(menuItem);
 }
 
-TTF_Font *fncBind_GetFontAriblk(void *self) {
-    AppGfx *pApp = (AppGfx *)self;
-    return pApp->GetFontAriblk();
-}
-
-Languages *fncBind_GetLanguageMan(void *self) {
-    AppGfx *pApp = (AppGfx *)self;
-    return pApp->GetLanguageMan();
-}
-
-void fncBind_LeaveMenu(void *self) {
-    AppGfx *pApp = (AppGfx *)self;
-    pApp->LeaveMenu();
-}
-
-void fncBind_SetNextMenu(void *self, MenuItemEnum menuItem) {
-    AppGfx *pApp = (AppGfx *)self;
-    pApp->SetNextMenu(menuItem);
-}
-
-LPErrInApp fncBind_SettingsChanged(void *self, bool backGroundChanged,
+LPErrInApp fncBind_SettingsChanged(void* self, bool backGroundChanged,
                                    bool languageChanged) {
-    AppGfx *pApp = (AppGfx *)self;
+    AppGfx* pApp = (AppGfx*)self;
     return pApp->SettingsChanged(backGroundChanged, languageChanged);
+}
+
+LPErrInApp fncBind_ChangeSceneBackground(void* self,
+                                         SDL_Surface** ppSceneBackground) {
+    AppGfx* pApp = (AppGfx*)self;
+    return pApp->ChangeSceneBackground(ppSceneBackground);
 }
 
 MenuDelegator AppGfx::prepMenuDelegator() {
     // Use only static otherwise you loose it
-    static VMenuDelegator const tc = {
-        .GetFontVera = (&fncBind_GetFontVera),
-        .GetFontAriblk = (&fncBind_GetFontAriblk),
-        .GetLanguageMan = (&fncBind_GetLanguageMan),
-        .LeaveMenu = (&fncBind_LeaveMenu),
-        .SetNextMenu = (&fncBind_SetNextMenu),
-        .SettingsChanged = (&fncBind_SettingsChanged)};
+    static VMenuDelegator const tc = {.LeaveMenu = (&fncBind_LeaveMenu),
+                                      .EnterMenu = (&fncBind_EnterMenu)};
 
     return (MenuDelegator){.tc = &tc, .self = this};
 }
 
-void AppGfx::LeaveMenu() {
+OptionDelegator AppGfx::prepOptionDelegator() {
+    // Use only static otherwise you loose it
+    static VOptionDelegator const tc = {
+        .SettingsChanged = (&fncBind_SettingsChanged),
+        .ChangeSceneBackground = (&fncBind_ChangeSceneBackground)};
+
+    return (OptionDelegator){.tc = &tc, .self = this};
+}
+
+LPErrInApp AppGfx::LeaveMenu() {
     clearBackground();
     _histMenu.pop();
-}
-
-LPErrInApp AppGfx::SettingsChanged(bool backGroundChanged,
-                                   bool languageChanged) {
-    TRACE("Persist settings\n");
-    if (backGroundChanged) {
-        _backGroundChanged = true;
-    }
-    return writeProfile();
-}
-
-void AppGfx::clearBackground() {
-    TRACE_DEBUG("Clear background\n");
-    SDL_FillRect(_p_Screen, &_p_Screen->clip_rect,
-                 SDL_MapRGBA(_p_Screen->format, 0, 0, 0, 0));
-    updateScreenTexture();
-}
-
-LPErrInApp AppGfx::MainLoop() {
-    LPErrInApp err;
-    bool quit = false;
-
-    MenuMgr *pMenuMgr = new MenuMgr();
-    MenuDelegator delegator = prepMenuDelegator();
-    err = pMenuMgr->Initialize(_p_Screen, _p_sdlRenderer, _p_Window, delegator);
-    if (err != NULL)
-        goto error;
-
-    // set main menu
-    _histMenu.push(MenuItemEnum::QUIT);
-    _histMenu.push(MenuItemEnum::MENU_ROOT);
-
-    pMenuMgr->SetBackground(_p_SceneBackground);
-
-    while (!quit && !_histMenu.empty()) {
-        switch (_histMenu.top()) {
-            case MenuItemEnum::MENU_ROOT:
-                if (!_p_MusicManager->IsPlayingMusic()) {
-                    _p_MusicManager->PlayMusic(MusicManager::MUSIC_INIT_SND,
-                                               MusicManager::LOOP_ON);
-                }
-                err = pMenuMgr->HandleRootMenu();
-                if (err != NULL)
-                    goto error;
-                break;
-
-            case MenuItemEnum::MENU_GAME:
-                err = startGameLoop();
-                if (err != NULL)
-                    goto error;
-                LeaveMenu();
-                break;
-
-            case MenuItemEnum::MENU_HELP:
-                err = showHelp();
-                if (err != NULL)
-                    goto error;
-                break;
-
-            case MenuItemEnum::MENU_CREDITS:
-                err = showCredits();
-                if (err != NULL)
-                    goto error;
-                break;
-
-            case MenuItemEnum::MENU_HIGHSCORE:
-                err = showHighScore();
-                if (err != NULL)
-                    goto error;
-                break;
-
-            case MenuItemEnum::MENU_OPTIONS:
-                _backGroundChanged = false;
-                err = showOptionGeneral();
-                if (err != NULL)
-                    goto error;
-                if (_backGroundChanged) {
-                    err = loadSceneBackground();
-                    if (err)
-                        goto error;
-                    pMenuMgr->SetBackground(_p_SceneBackground);
-                }
-                break;
-
-            case MenuItemEnum::QUIT:
-            default:
-                quit = true;
-                break;
-        }
-
-        updateScreenTexture();
-    }
-    delete pMenuMgr;
     return NULL;
-error:
-    delete pMenuMgr;
-    return err;
+}
+
+LPErrInApp AppGfx::EnterMenu(MenuItemEnum menuItem) {
+    _histMenu.push(menuItem);
+    LPErrInApp err;
+    switch (menuItem) {
+        case MenuItemEnum::MENU_GAME:
+            err = startGameLoop();
+            if (err != NULL)
+                return err;
+            break;
+            break;
+        case MenuItemEnum::MENU_HELP:
+            err = showHelp();
+            if (err != NULL)
+                return err;
+            break;
+        case MenuItemEnum::MENU_CREDITS:
+            err = showCredits();
+            if (err != NULL)
+                return err;
+            break;
+        case MenuItemEnum::MENU_HIGHSCORE:
+            err = showHighScore();
+            if (err != NULL)
+                return err;
+            break;
+        case MenuItemEnum::MENU_OPTIONS:
+            err = showGeneralOptions();
+            if (err != NULL)
+                return err;
+            break;
+        default:
+            // Nothing to do
+            break;
+    }
+    return NULL;
+}
+
+LPErrInApp AppGfx::MainLoopEvent(SDL_Event* pEvent, SDL_AppResult& res) {
+    LPErrInApp err;
+    res = SDL_APP_CONTINUE;
+
+    switch (_histMenu.top()) {
+        case MenuItemEnum::MENU_ROOT:
+            err = _p_MenuMgr->HandleRootMenuEvent(pEvent);
+            if (err != NULL)
+                return err;
+            break;
+
+        case MenuItemEnum::MENU_GAME:
+            err = _p_SolitarioGfx->HandleEvent(pEvent);
+            if (err != NULL)
+                return err;
+            break;
+
+        case MenuItemEnum::MENU_HELP:
+            break;
+
+        case MenuItemEnum::MENU_CREDITS:
+            err = _p_CreditsView->HandleEvent(pEvent);
+            if (err != NULL)
+                return err;
+            break;
+
+        case MenuItemEnum::MENU_HIGHSCORE:
+            err = _p_HighScore->HandleEvent(pEvent);
+            if (err != NULL)
+                return err;
+            break;
+
+        case MenuItemEnum::MENU_OPTIONS:
+            err = _p_OptGfx->HandleEvent(pEvent);
+            if (err != NULL)
+                return err;
+            break;
+
+        case MenuItemEnum::QUIT:
+            TRACE("Quit Menu \n");
+            res = SDL_APP_SUCCESS;
+            break;
+        default:
+            TRACE("Exit application because outside of menu\n");
+            res = SDL_APP_SUCCESS;
+            break;
+    }
+    return NULL;
+}
+
+LPErrInApp AppGfx::MainLoopIterate() {
+    LPErrInApp err;
+    bool done = false;
+
+    switch (_histMenu.top()) {
+        case MenuItemEnum::MENU_ROOT:
+            if (!_p_MusicManager->IsPlayingMusic()) {
+                _p_MusicManager->PlayMusic(MusicManager::MUSIC_INIT_SND,
+                                           MusicManager::LOOP_ON);
+            }
+            err = _p_MenuMgr->HandleRootMenuIterate();
+            if (err != NULL)
+                return err;
+            break;
+
+        case MenuItemEnum::MENU_GAME:
+            err = _p_SolitarioGfx->HandleIterate(done);
+            if (err != NULL)
+                return err;
+            if (done) {
+                backToMenuRootWithMusic();
+            }
+            break;
+
+        case MenuItemEnum::MENU_HELP:
+            break;
+
+        case MenuItemEnum::MENU_CREDITS:
+            err = _p_CreditsView->HandleIterate(done);
+            if (err != NULL)
+                return err;
+            if (done) {
+                backToMenuRootWithMusic();
+            }
+            break;
+
+        case MenuItemEnum::MENU_HIGHSCORE:
+            err = _p_HighScore->HandleIterate(done);
+            if (err != NULL)
+                return err;
+            if (done) {
+                backToMenuRootWithMusic();
+            }
+            break;
+
+        case MenuItemEnum::MENU_OPTIONS:
+            err = _p_OptGfx->HandleIterate(done);
+            if (err != NULL)
+                return err;
+            if (done) {
+                backToMenuRootSameMusic();
+            }
+            break;
+        case MenuItemEnum::NOTHING:
+            // Nothing to render
+            break;
+        case MenuItemEnum::QUIT:
+            // Nothing to render
+            break;
+        default:
+            break;
+    }
+    return NULL;
+}
+
+LPErrInApp AppGfx::startGameLoop() {
+    TRACE("Start Game Loop, the game is the solitario\n");
+    if (_p_MusicManager->IsPlayingMusic()) {
+        _p_MusicManager->StopMusic(600);
+    }
+
+    LPErrInApp err;
+    if (_p_SolitarioGfx != NULL) {
+        delete _p_SolitarioGfx;
+    }
+    _p_SolitarioGfx = new SolitarioGfx();
+
+    err = _p_SolitarioGfx->Initialize(_p_Screen, _p_sdlRenderer, _p_Window,
+                                      _p_SceneBackground, _p_HighScore);
+    if (err != NULL)
+        return err;
+
+    return _p_SolitarioGfx->Show();
 }
 
 LPErrInApp AppGfx::showHelp() {
-    const char *cmd = NULL;
+    TRACE("Show Help\n");
+    const char* cmd = NULL;
     char cmdpath[PATH_MAX];
-#ifdef WIN32
+#if PLATFORM_WINDOWS
     cmd = "start";
     snprintf(cmdpath, sizeof(cmdpath), "%s .\\%s", cmd, g_lpszHelpFileName);
-#endif
-#ifdef ANDROID
+#elif PLATFORM_ANDROID
     // TODO open the pdf file
     TRACE_DEBUG("Wanna open file %s\n", g_lpszHelpFileName);
 #else
@@ -483,171 +590,111 @@ LPErrInApp AppGfx::showHelp() {
 }
 
 LPErrInApp AppGfx::showHighScore() {
-    MusicManager *pMusicManager = NULL;
+    TRACE("Show HighScore\n");
+    if (_p_HighScore->IsOngoing()) {
+        return ERR_UTIL::ErrorCreate("Credit already started");
+    }
+    if (_p_HighScore->IsOngoing()) {
+        return NULL;
+    }
     if (_p_MusicManager->IsPlayingMusic()) {
         _p_MusicManager->StopMusic(600);
     }
-    _p_HighScore->Show(_p_Screen, _p_CreditTitle, _p_sdlRenderer,
-                       _p_MusicManager, _p_fontAriblk, _p_fontVera,
-                       &_Languages);
-
-    LeaveMenu();
-
-    if (_p_MusicManager->IsPlayingMusic()) {
-        _p_MusicManager->StopMusic(300);
-        _p_MusicManager->PlayMusic(MusicManager::MUSIC_INIT_SND,
-                                   MusicManager::LOOP_ON);
-    }
+    _p_HighScore->Show(_p_Screen, _p_CreditTitle, _p_sdlRenderer);
 
     return NULL;
 }
 
 LPErrInApp AppGfx::showCredits() {
+    TRACE("Show Credits\n");
+    if (_p_CreditsView->IsOngoing()) {
+        return ERR_UTIL::ErrorCreate("Credit already started");
+    }
     if (_p_MusicManager->IsPlayingMusic()) {
         _p_MusicManager->StopMusic(600);
     }
-    credits(_p_Screen, _p_CreditTitle, _p_sdlRenderer, _p_MusicManager);
-    LeaveMenu();
-    _p_MusicManager->PlayMusic(MusicManager::MUSIC_INIT_SND,
-                               MusicManager::LOOP_ON);
+    _p_CreditsView->Show(_p_Screen, _p_CreditTitle, _p_sdlRenderer);
+
     return NULL;
 }
 
-LPErrInApp AppGfx::showOptionGeneral() {
-    TRACE("Show option general\n");
-    OptionsGfx optGfx;
+LPErrInApp AppGfx::showGeneralOptions() {
+    TRACE("Show general Options\n");
+    if (_p_OptGfx->IsOngoing()) {
+        return ERR_UTIL::ErrorCreate("General Options already started");
+    }
 
-    MenuDelegator delegator = prepMenuDelegator();
-    STRING caption = _Languages.GetStringId(Languages::ID_MEN_OPTIONS);
-    LPErrInApp err = optGfx.Initialize(_p_Screen, _p_sdlRenderer,
-                                       _p_MusicManager, delegator);
+    LPLanguages pLanguages = _p_GameSettings->GetLanguageMan();
+    STRING caption = pLanguages->GetStringId(Languages::ID_MEN_OPTIONS);
+    LPErrInApp err = _p_OptGfx->Show(_p_SceneBackground, caption);
     if (err) {
         return err;
     }
-    err = optGfx.Show(_p_SceneBackground, caption);
-    if (err) {
-        return err;
-    }
-
-    LeaveMenu();
     return NULL;
+}
+
+void AppGfx::backToMenuRootWithMusic() {
+    TRACE("Back to root menu\n");
+    LeaveMenu();
+    _p_MusicManager->PlayMusic(MusicManager::MUSIC_INIT_SND,
+                               MusicManager::LOOP_ON);
+    _p_HighScore->Reset();
+    _p_CreditsView->Reset();
+}
+
+void AppGfx::backToMenuRootSameMusic() {
+    TRACE("Back to root menu same music\n");
+    LeaveMenu();
+    _p_OptGfx->Reset();
+}
+
+LPErrInApp AppGfx::SettingsChanged(bool backGroundChanged,
+                                   bool languageChanged) {
+    TRACE_DEBUG("Settings changed, background: %s, language: %s\n",
+                backGroundChanged ? "true" : "false",
+                languageChanged ? "true" : "false");
+    return NULL;
+}
+
+void AppGfx::clearBackground() {
+    TRACE_DEBUG("Clear background\n");
+    SDL_Rect clipRect;
+    SDL_GetSurfaceClipRect(_p_Screen, &clipRect);
+    SDL_FillSurfaceRect(_p_Screen, &clipRect,
+                        SDL_MapRGB(SDL_GetPixelFormatDetails(_p_Screen->format),
+                                   NULL, 0, 0, 0));
+    updateScreenTexture();
 }
 
 void AppGfx::updateScreenTexture() {
     SDL_UpdateTexture(_p_ScreenTexture, NULL, _p_Screen->pixels,
                       _p_Screen->pitch);
     SDL_RenderClear(_p_sdlRenderer);
-    SDL_RenderCopy(_p_sdlRenderer, _p_ScreenTexture, NULL, NULL);
+    SDL_RenderTexture(_p_sdlRenderer, _p_ScreenTexture, NULL, NULL);
     SDL_RenderPresent(_p_sdlRenderer);
 }
 
-void AppGfx::ParseCmdLine(int argc, char *argv[]) {
+void AppGfx::ParseCmdLine(int argc, char* argv[], SDL_AppResult& res) {
+    res = SDL_APP_CONTINUE;
     for (int i = 1; i < argc; i++) {
-        if (strcmp(argv[i], "--help") == 0 || strcmp(argv[i], "-h") == 0) {
-            printf(
-                "Solitario version %s (c) 2004-2023 Invido.it\nOptions "
-                "available: \n"
-                "--fullscreen   - to run in fullscreen, if possible "
-                "(vs. "
-                "windowed)\n"
-                "--size x,y starts the Solitario at given resolution "
-                "x,y \n",
-                VERSION);
-
-            exit(0);
-        } else if (strcmp(argv[i], "--copyright") == 0 ||
-                   strcmp(argv[i], "-c") == 0) {
-            printf(
-                "\n\"Solitario\" version %s, Copyright (C) 2004-2024 "
-                "Invido.it\n"
-                "This program is free software; you can redistribute "
-                "it "
-                "and/or\n"
-                "modify it under the terms of the GNU General Public "
-                "License\n"
-                "as published by the Free Software Foundation.  See "
-                "COPYING.txt\n"
-                "\n"
-                "This program is distributed in the hope that it will "
-                "be "
-                "useful,\n"
-                "but WITHOUT ANY WARRANTY; without even the implied "
-                "warranty "
-                "of\n"
-                "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n"
-                "\n",
-                VERSION);
-
-            exit(0);
-        } else if (strcmp(argv[i], "--usage") == 0 ||
-                   strcmp(argv[i], "-u") == 0) {
-            usage(0, argv[0]);
-        } else if (strcmp(argv[i], "--fullscreen") == 0 ||
-                   strcmp(argv[i], "-f") == 0) {
-            _fullScreen = true;
-        } else if (strcmp(argv[i], "--version") == 0 ||
-                   strcmp(argv[i], "-v") == 0) {
-            printf("Solitario versione %s\n", VERSION);
-            exit(0);
-        } else if (strcmp(argv[i], "--size") == 0 ||
-                   strcmp(argv[i], "-s") == 0) {
-            if (i >= argc - 1) {
-                fprintf(stderr, "%s two arguments needed\n", argv[i]);
-                usage(1, argv[0]);
-            } else {
-                if (parseScreenSize(argv[i + 1])) {
-                } else {
-                    fprintf(stderr, "parameter incorrect: %s\n", argv[i + 1]);
-                    usage(1, argv[0]);
-                }
-                i++;
+        if (strcmp(argv[i], "--version") == 0 || strcmp(argv[i], "-v") == 0) {
+            printf("Solitario version %s (c) 2004-2025 Invido.it\n", VERSION);
+            res = SDL_APP_SUCCESS;
+        } else if (std::string(argv[i]) == "--language" && i + 1 < argc) {
+            std::string language = argv[i + 1];
+            TRACE_DEBUG("[ParseCmdLine] Startup language regognized %s \n",
+                        language.c_str());
+            i++;  // Skip the value in the next loop iteration
+            LPGameSettings pGameSettings = GameSettings::GetSettings();
+            if (language == "italian") {
+                TRACE_DEBUG("[ParseCmdLine] change the language to italian");
+                pGameSettings->CurrentLanguage = Languages::eLangId::LANG_ITA;
+                pGameSettings->SetCurrentLang();
             }
         } else {
-            fprintf(stderr, "unknown option: %s\n", argv[i]);
-            usage(1, argv[0]);
+            printf("unknown option: %s\n", argv[i]);
+            printf("\nUsage: %s --version \n", argv[0]);
+            res = SDL_APP_SUCCESS;
         }
     }
-}
-
-bool AppGfx::parseScreenSize(LPCSTR strInput) {
-    char strBuffer[2048];
-    memset(strBuffer, 0, 2048);
-    char seps[] = " ,\t\n";
-    char *token;
-    VCT_STRING vct_String;
-    bool bRet = false;
-
-    int iNumChar = strlen(strInput);
-    strncpy(strBuffer, strInput, iNumChar);
-    token = strtok(strBuffer, seps);
-    while (token != NULL) {
-        vct_String.push_back(token);
-        token = strtok(NULL, seps);
-    }
-
-    int iNumElemntArr = vct_String.size();
-
-    if (iNumElemntArr == 2) {
-        sscanf((LPCSTR)vct_String[0].c_str(), "%d", &_screenW);
-        sscanf((LPCSTR)vct_String[1].c_str(), "%d", &_screenH);
-        bRet = true;
-    }
-    return bRet;
-}
-
-void AppGfx::usage(int errOut, char *cmd) {
-    FILE *f;
-
-    if (errOut == 0)
-        f = stdout;
-    else
-        f = stderr;
-
-    fprintf(f,
-            "\nUsage: %s {--help | --usage | --copyright}\n"
-            "       %s [--fullscreen] [--size x,y] "
-            "\n",
-            cmd, cmd);
-
-    exit(errOut);
 }

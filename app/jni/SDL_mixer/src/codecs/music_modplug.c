@@ -1,6 +1,6 @@
 /*
   SDL_mixer:  An audio mixer library based on the SDL library
-  Copyright (C) 1997-2023 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2024 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -21,7 +21,7 @@
 
 #ifdef MUSIC_MOD_MODPLUG
 
-#include "SDL_loadso.h"
+#include <SDL3/SDL_loadso.h>
 
 #include "music_modplug.h"
 
@@ -59,9 +59,13 @@ static ModPlug_Settings settings;
 #else
 #define FUNCTION_LOADER(FUNC, SIG) \
     modplug.FUNC = FUNC; \
-    if (modplug.FUNC == NULL) { Mix_SetError("Missing libmodplug.framework"); return -1; }
+    if (modplug.FUNC == NULL) { SDL_SetError("Missing libmodplug.framework"); return -1; }
 #endif
 
+#ifdef __APPLE__
+    /* Need to turn off optimizations so weak framework load check works */
+    __attribute__ ((optnone))
+#endif
 static int MODPLUG_Load(void)
 {
     if (modplug.loaded == 0) {
@@ -83,6 +87,9 @@ static int MODPLUG_Load(void)
         FUNCTION_LOADER(ModPlug_GetName, const char* (*)(ModPlugFile* file))
 #ifdef MODPLUG_DYNAMIC
         modplug.ModPlug_Tell = (int (*)(ModPlugFile* file)) SDL_LoadFunction(modplug.handle, "ModPlug_Tell");
+        if (modplug.ModPlug_Tell == NULL) {
+            SDL_ClearError();   /* ModPlug_Tell is optional. */
+        }
 #elif defined(MODPLUG_HAS_TELL)
         modplug.ModPlug_Tell = ModPlug_Tell;
 #else
@@ -157,40 +164,43 @@ static int MODPLUG_Open(const SDL_AudioSpec *spec)
     return 0;
 }
 
-/* Load a modplug stream from an SDL_RWops object */
-void *MODPLUG_CreateFromRW(SDL_RWops *src, int freesrc)
+/* Load a modplug stream from an SDL_IOStream object */
+void *MODPLUG_CreateFromIO(SDL_IOStream *src, bool closeio)
 {
+    SDL_AudioSpec srcspec;
     MODPLUG_Music *music;
     void *buffer;
     size_t size;
 
     music = (MODPLUG_Music *)SDL_calloc(1, sizeof(*music));
     if (!music) {
-        SDL_OutOfMemory();
         return NULL;
     }
 
     music->volume = MIX_MAX_VOLUME;
 
-    music->stream = SDL_NewAudioStream((settings.mBits == 8) ? AUDIO_U8 : AUDIO_S16SYS, (Uint8)settings.mChannels, settings.mFrequency,
-                                       music_spec.format, music_spec.channels, music_spec.freq);
+    SDL_zero(srcspec);
+    srcspec.format = (settings.mBits == 8) ? SDL_AUDIO_U8 : SDL_AUDIO_S16;
+    srcspec.channels = settings.mChannels;
+    srcspec.freq = settings.mFrequency;
+    music->stream = SDL_CreateAudioStream(&srcspec, &music_spec);
     if (!music->stream) {
         MODPLUG_Delete(music);
         return NULL;
     }
 
-    music->buffer_size = music_spec.samples * (settings.mBits / 8) * settings.mChannels;
+    music->buffer_size = 4096/*music_spec.samples*/ * (settings.mBits / 8) * settings.mChannels;
     music->buffer = SDL_malloc((size_t)music->buffer_size);
     if (!music->buffer) {
         MODPLUG_Delete(music);
         return NULL;
     }
 
-    buffer = SDL_LoadFile_RW(src, &size, SDL_FALSE);
+    buffer = SDL_LoadFile_IO(src, &size, false);
     if (buffer) {
         music->file = modplug.ModPlug_Load(buffer, (int)size);
         if (!music->file) {
-            Mix_SetError("ModPlug_Load failed");
+            SDL_SetError("ModPlug_Load failed");
         }
         SDL_free(buffer);
     }
@@ -203,8 +213,8 @@ void *MODPLUG_CreateFromRW(SDL_RWops *src, int freesrc)
     meta_tags_init(&music->tags);
     meta_tags_set(&music->tags, MIX_META_TITLE, modplug.ModPlug_GetName(music->file));
 
-    if (freesrc) {
-        SDL_RWclose(src);
+    if (closeio) {
+        SDL_CloseIO(src);
     }
     return music;
 }
@@ -235,35 +245,35 @@ static int MODPLUG_Play(void *context, int play_count)
 static void MODPLUG_Stop(void *context)
 {
     MODPLUG_Music *music = (MODPLUG_Music *)context;
-    SDL_AudioStreamClear(music->stream);
+    SDL_ClearAudioStream(music->stream);
 }
 
 /* Play some of a stream previously started with modplug_play() */
-static int MODPLUG_GetSome(void *context, void *data, int bytes, SDL_bool *done)
+static int MODPLUG_GetSome(void *context, void *data, int bytes, bool *done)
 {
     MODPLUG_Music *music = (MODPLUG_Music *)context;
     int filled, amount;
 
-    filled = SDL_AudioStreamGet(music->stream, data, bytes);
+    filled = SDL_GetAudioStreamData(music->stream, data, bytes);
     if (filled != 0) {
         return filled;
     }
 
     if (!music->play_count) {
         /* All done */
-        *done = SDL_TRUE;
+        *done = true;
         return 0;
     }
 
     amount = modplug.ModPlug_Read(music->file, music->buffer, music->buffer_size);
     if (amount > 0) {
-        if (SDL_AudioStreamPut(music->stream, music->buffer, amount) < 0) {
+        if (!SDL_PutAudioStreamData(music->stream, music->buffer, amount)) {
             return -1;
         }
     } else {
         if (music->play_count == 1) {
             music->play_count = 0;
-            SDL_AudioStreamFlush(music->stream);
+            SDL_FlushAudioStream(music->stream);
         } else {
             int play_count = -1;
             if (music->play_count > 0) {
@@ -330,7 +340,7 @@ static void MODPLUG_Delete(void *context)
         modplug.ModPlug_Unload(music->file);
     }
     if (music->stream) {
-        SDL_FreeAudioStream(music->stream);
+        SDL_DestroyAudioStream(music->stream);
     }
     if (music->buffer) {
         SDL_free(music->buffer);
@@ -343,12 +353,12 @@ Mix_MusicInterface Mix_MusicInterface_MODPLUG =
     "MODPLUG",
     MIX_MUSIC_MODPLUG,
     MUS_MOD,
-    SDL_FALSE,
-    SDL_FALSE,
+    false,
+    false,
 
     MODPLUG_Load,
     MODPLUG_Open,
-    MODPLUG_CreateFromRW,
+    MODPLUG_CreateFromIO,
     NULL,   /* CreateFromFile */
     MODPLUG_SetVolume,
     MODPLUG_GetVolume,
@@ -363,6 +373,8 @@ Mix_MusicInterface Mix_MusicInterface_MODPLUG =
     NULL,   /* LoopEnd */
     NULL,   /* LoopLength */
     MODPLUG_GetMetaTag,
+    NULL,   /* GetNumTracks */
+    NULL,   /* StartTrack */
     NULL,   /* Pause */
     NULL,   /* Resume */
     MODPLUG_Stop,

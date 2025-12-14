@@ -1,6 +1,6 @@
 /*
   SDL_mixer:  An audio mixer library based on the SDL library
-  Copyright (C) 1997-2023 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2024 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -26,7 +26,7 @@
 #error You should not include this file or use these functions.
 #endif
 
-#include "SDL_mixer.h"
+#include <SDL3_mixer/SDL_mixer.h>
 
 extern int _Mix_effects_max_speed;
 extern void *_Eff_volume_table;
@@ -37,10 +37,9 @@ void _Mix_InitEffects(void);
 void _Mix_DeinitEffects(void);
 void _Eff_PositionDeinit(void);
 
-int _Mix_RegisterEffect_locked(int channel, Mix_EffectFunc_t f,
-                               Mix_EffectDone_t d, void *arg);
-int _Mix_UnregisterEffect_locked(int channel, Mix_EffectFunc_t f);
-int _Mix_UnregisterAllEffects_locked(int channel);
+bool _Mix_RegisterEffect_locked(int channel, Mix_EffectFunc_t f, Mix_EffectDone_t d, void *arg);
+bool _Mix_UnregisterEffect_locked(int channel, Mix_EffectFunc_t f);
+bool _Mix_UnregisterAllEffects_locked(int channel);
 
 #endif /* _INCLUDE_EFFECTS_INTERNAL_H_ */
 

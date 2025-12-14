@@ -1,16 +1,17 @@
-#define SDL_MAIN_HANDLED
-#include "SDL.h"
-#include "SDL_ttf.h"
-#include <stdio.h>
+#include <SDL3/SDL.h>
+#include <SDL3/SDL_main.h>
+#include <SDL3_ttf/SDL_ttf.h>
 
-int main(int argc, char *argv[]) {
-    SDL_SetMainReady();
-    if (SDL_Init(0) < 0) {
-        fprintf(stderr, "could not initialize sdl2: %s\n", SDL_GetError());
+int main(int argc, char *argv[])
+{
+    (void)argc;
+    (void)argv;
+    if (!SDL_Init(0)) {
+        SDL_Log("SDL_Init: could not initialize SDL: %s", SDL_GetError());
         return 1;
     }
-    if (TTF_Init() == -1) {
-        fprintf(stderr, "TTF_Init: %s\n", TTF_GetError());
+    if (!TTF_Init()) {
+        SDL_Log("TTF_Init: %s", SDL_GetError());
     }
     TTF_Quit();
     SDL_Quit();

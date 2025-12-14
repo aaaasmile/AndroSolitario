@@ -37,8 +37,8 @@ public:
         ID_CMD_CHATWELCOME,
         ID_CMD_CHATLIST,
         ID_SOLITARIO,
-        ID_MAZZONAME,
-        ID_CHOOSEMAZZO,
+        ID_DECKNAME,
+        ID_CHOOSEDECK,
         ID_PIACENTINA,
         ID_BERGAMO,
         ID_BOLOGNA,
@@ -78,6 +78,7 @@ public:
         CARDDECK,
         ON,
         OFF,
+        PLEASE_ENTER_NAME,
         TOT_STRINGS  // it must be always on the last place
     };
 

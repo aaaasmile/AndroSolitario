@@ -1,7 +1,11 @@
 build
-gradle
+build-web
 .gradle
 app/src/main/assets
 *.o
 asset_data_forwsl
 app/jni/SDL_2_26_5
+*.Zone.Identifier
+*.Identifier
+app/jni/SDL_ttf/external
+synch_web_with_invido.sh

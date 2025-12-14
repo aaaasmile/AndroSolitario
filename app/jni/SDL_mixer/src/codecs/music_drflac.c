@@ -1,6 +1,6 @@
 /*
   SDL_mixer:  An audio mixer library based on the SDL library
-  Copyright (C) 1997-2023 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2024 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -25,7 +25,7 @@
 #include "mp3utils.h"
 #include "../utils.h"
 
-#include "SDL.h"
+#include <SDL3/SDL.h>
 
 #define DR_FLAC_IMPLEMENTATION
 #if defined(__GNUC__) && (__GNUC__ >= 4) && \
@@ -51,7 +51,7 @@ typedef struct {
     struct mp3file_t file;
     drflac *dec;
     int play_count;
-    int freesrc;
+    bool closeio;
     int volume;
     int status;
     int sample_rate;
@@ -60,7 +60,7 @@ typedef struct {
     drflac_int16 *buffer;
     int buffer_size;
     int loop;
-    SDL_bool loop_flag;
+    bool loop_flag;
     Sint64 loop_start;
     Sint64 loop_end;
     Sint64 loop_len;
@@ -71,14 +71,14 @@ typedef struct {
 static size_t DRFLAC_ReadCB(void *context, void *buf, size_t size)
 {
     DRFLAC_Music *music = (DRFLAC_Music *)context;
-    return MP3_RWread(&music->file, buf, 1, size);
+    return MP3_IOread(&music->file, buf, 1, size);
 }
 
 static drflac_bool32 DRFLAC_SeekCB(void *context, int offset, drflac_seek_origin origin)
 {
     DRFLAC_Music *music = (DRFLAC_Music *)context;
-    int whence = (origin == drflac_seek_origin_start) ? RW_SEEK_SET : RW_SEEK_CUR;
-    if (MP3_RWseek(&music->file, offset, whence) < 0) {
+    int whence = (origin == drflac_seek_origin_start) ? SDL_IO_SEEK_SET : SDL_IO_SEEK_CUR;
+    if (MP3_IOseek(&music->file, offset, whence) < 0) {
         return DRFLAC_FALSE;
     }
     return DRFLAC_TRUE;
@@ -94,7 +94,7 @@ static void DRFLAC_MetaCB(void *context, drflac_metadata *metadata)
     } else if (metadata->type == DRFLAC_METADATA_BLOCK_TYPE_VORBIS_COMMENT) {
         drflac_uint32 i;
         char *param, *argument, *value;
-        SDL_bool is_loop_length = SDL_FALSE;
+        bool is_loop_length = false;
         const char *pRunningData = (const char *)metadata->data.vorbis_comment.pComments;
 
         for (i = 0; i < metadata->data.vorbis_comment.commentCount; ++i) {
@@ -123,10 +123,10 @@ static void DRFLAC_MetaCB(void *context, drflac_metadata *metadata)
                     music->loop_start = _Mix_ParseTime(value, music->sample_rate);
                 else if (SDL_strcasecmp(argument, "LOOPLENGTH") == 0) {
                     music->loop_len = SDL_strtoll(value, NULL, 10);
-                    is_loop_length = SDL_TRUE;
+                    is_loop_length = true;
                 } else if (SDL_strcasecmp(argument, "LOOPEND") == 0) {
                     music->loop_end = _Mix_ParseTime(value, music->sample_rate);
-                    is_loop_length = SDL_FALSE;
+                    is_loop_length = false;
                 } else if (SDL_strcasecmp(argument, "TITLE") == 0) {
                     meta_tags_set(&music->tags, MIX_META_TITLE, value);
                 } else if (SDL_strcasecmp(argument, "ARTIST") == 0) {
@@ -158,18 +158,18 @@ static void DRFLAC_MetaCB(void *context, drflac_metadata *metadata)
 
 static int DRFLAC_Seek(void *context, double position);
 
-static void *DRFLAC_CreateFromRW(SDL_RWops *src, int freesrc)
+static void *DRFLAC_CreateFromIO(SDL_IOStream *src, bool closeio)
 {
     DRFLAC_Music *music;
+    SDL_AudioSpec srcspec;
 
     music = (DRFLAC_Music *)SDL_calloc(1, sizeof(DRFLAC_Music));
     if (!music) {
-        SDL_OutOfMemory();
         return NULL;
     }
     music->volume = MIX_MAX_VOLUME;
 
-    if (MP3_RWinit(&music->file, src) < 0) {
+    if (MP3_IOinit(&music->file, src) < 0) {
         SDL_free(music);
         return NULL;
     }
@@ -179,29 +179,26 @@ static void *DRFLAC_CreateFromRW(SDL_RWops *src, int freesrc)
     music->dec = drflac_open_with_metadata(DRFLAC_ReadCB, DRFLAC_SeekCB, DRFLAC_MetaCB, music, NULL);
     if (!music->dec) {
         SDL_free(music);
-        Mix_SetError("music_drflac: corrupt flac file (bad stream).");
+        SDL_SetError("music_drflac: corrupt flac file (bad stream).");
         return NULL;
     }
 
     /* We should have channels and sample rate set up here */
-    music->stream = SDL_NewAudioStream(AUDIO_S16SYS,
-                                       (Uint8)music->channels,
-                                       music->sample_rate,
-                                       music_spec.format,
-                                       music_spec.channels,
-                                       music_spec.freq);
+    SDL_zero(srcspec);
+    srcspec.format = SDL_AUDIO_S16;
+    srcspec.channels = music->channels;
+    srcspec.freq = music->sample_rate;
+    music->stream = SDL_CreateAudioStream(&srcspec, &music_spec);
     if (!music->stream) {
-        SDL_OutOfMemory();
         drflac_close(music->dec);
         SDL_free(music);
         return NULL;
     }
 
-    music->buffer_size = music_spec.samples * sizeof(drflac_int16) * music->channels;
+    music->buffer_size = 4096/*music_spec.samples*/ * sizeof(drflac_int16) * music->channels;
     music->buffer = (drflac_int16*)SDL_calloc(1, music->buffer_size);
     if (!music->buffer) {
         drflac_close(music->dec);
-        SDL_OutOfMemory();
         SDL_free(music);
         return NULL;
     }
@@ -214,7 +211,7 @@ static void *DRFLAC_CreateFromRW(SDL_RWops *src, int freesrc)
         music->loop = 1;
     }
 
-    music->freesrc = freesrc;
+    music->closeio = closeio;
     return music;
 }
 
@@ -241,17 +238,17 @@ static int DRFLAC_Play(void *context, int play_count)
 static void DRFLAC_Stop(void *context)
 {
     DRFLAC_Music *music = (DRFLAC_Music *)context;
-    SDL_AudioStreamClear(music->stream);
+    SDL_ClearAudioStream(music->stream);
 }
 
-static int DRFLAC_GetSome(void *context, void *data, int bytes, SDL_bool *done)
+static int DRFLAC_GetSome(void *context, void *data, int bytes, bool *done)
 {
     DRFLAC_Music *music = (DRFLAC_Music *)context;
     int filled;
     drflac_uint64 amount;
 
     if (music->stream) {
-        filled = SDL_AudioStreamGet(music->stream, data, bytes);
+        filled = SDL_GetAudioStreamData(music->stream, data, bytes);
         if (filled != 0) {
             return filled;
         }
@@ -259,7 +256,7 @@ static int DRFLAC_GetSome(void *context, void *data, int bytes, SDL_bool *done)
 
     if (!music->play_count) {
         /* All done */
-        *done = SDL_TRUE;
+        *done = true;
         return 0;
     }
 
@@ -273,24 +270,24 @@ static int DRFLAC_GetSome(void *context, void *data, int bytes, SDL_bool *done)
                 play_count = (music->play_count - 1);
             }
             music->play_count = play_count;
-            music->loop_flag = SDL_FALSE;
+            music->loop_flag = false;
         }
     }
 
-    amount = drflac_read_pcm_frames_s16(music->dec, music_spec.samples, music->buffer);
+    amount = drflac_read_pcm_frames_s16(music->dec, 4096/*music_spec.samples*/, music->buffer);
     if (amount > 0) {
         if (music->loop && (music->play_count != 1) &&
             ((Sint64)music->dec->currentPCMFrame >= music->loop_end)) {
-            amount -= (music->dec->currentPCMFrame - music->loop_end) * sizeof(drflac_int16) * music->channels;
-            music->loop_flag = SDL_TRUE;
+            amount -= (music->dec->currentPCMFrame - music->loop_end);
+            music->loop_flag = true;
         }
-        if (SDL_AudioStreamPut(music->stream, music->buffer, (int)amount * sizeof(drflac_int16) * music->channels) < 0) {
+        if (!SDL_PutAudioStreamData(music->stream, music->buffer, (int)amount * sizeof(drflac_int16) * music->channels)) {
             return -1;
         }
     } else {
         if (music->play_count == 1) {
             music->play_count = 0;
-            SDL_AudioStreamFlush(music->stream);
+            SDL_FlushAudioStream(music->stream);
         } else {
             int play_count = -1;
             if (music->play_count > 0) {
@@ -373,13 +370,13 @@ static void DRFLAC_Delete(void *context)
     meta_tags_clear(&music->tags);
 
     if (music->stream) {
-        SDL_FreeAudioStream(music->stream);
+        SDL_DestroyAudioStream(music->stream);
     }
     if (music->buffer) {
         SDL_free(music->buffer);
     }
-    if (music->freesrc) {
-        SDL_RWclose(music->file.src);
+    if (music->closeio) {
+        SDL_CloseIO(music->file.src);
     }
     SDL_free(music);
 }
@@ -389,12 +386,12 @@ Mix_MusicInterface Mix_MusicInterface_DRFLAC =
     "DRFLAC",
     MIX_MUSIC_DRFLAC,
     MUS_FLAC,
-    SDL_FALSE,
-    SDL_FALSE,
+    false,
+    false,
 
     NULL,   /* Load */
     NULL,   /* Open */
-    DRFLAC_CreateFromRW,
+    DRFLAC_CreateFromIO,
     NULL,   /* CreateFromFile */
     DRFLAC_SetVolume,
     DRFLAC_GetVolume,
@@ -409,6 +406,8 @@ Mix_MusicInterface Mix_MusicInterface_DRFLAC =
     DRFLAC_LoopEnd,
     DRFLAC_LoopLength,
     DRFLAC_GetMetaTag,
+    NULL,   /* GetNumTracks */
+    NULL,   /* StartTrack */
     NULL,   /* Pause */
     NULL,   /* Resume */
     DRFLAC_Stop,

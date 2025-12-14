@@ -1,7 +1,7 @@
 #ifndef CARDGFX__H
 #define CARDGFX__H
 
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
 #include <vector>
 
@@ -12,7 +12,7 @@
 enum eSUIT { BASTONI = 0, COPPE = 1, DENARI = 2, SPADE = 3 };
 
 class CardGfx {
-public:
+   public:
     CardGfx();
     eSUIT Suit() const { return _eSuit; }
     const char* SuitStr();
@@ -51,8 +51,9 @@ public:
         else
             return false;
     }
+    void SetScaleFactor(float factor) { _scaleFactor = factor; }
 
-private:
+   private:
     bool _faceUp;
     eSUIT _eSuit;
     int _rank;
@@ -67,6 +68,7 @@ private:
     DeckType _deckType;
     STRING _name;
     STRING _nameFull;
+    float _scaleFactor;
 };
 
 typedef CardGfx* LPCardGfx;

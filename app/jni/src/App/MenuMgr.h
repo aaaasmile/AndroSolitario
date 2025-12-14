@@ -5,8 +5,8 @@
 #pragma once
 #endif
 
-#include <SDL.h>
-#include <SDL_ttf.h>
+#include <SDL3/SDL.h>
+#include <SDL3_ttf/SDL_ttf.h>
 
 #include "ErrorInfo.h"
 #include "Traits.h"
@@ -14,6 +14,8 @@
 class Languages;
 class LabelLinkGfx;
 class LabelGfx;
+class GameSettings;
+class MusicManager;
 
 using namespace traits;
 
@@ -25,7 +27,8 @@ class MenuMgr {
     virtual ~MenuMgr();
     LPErrInApp Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
                           SDL_Window* pWindow, MenuDelegator& menuDelegator);
-    LPErrInApp HandleRootMenu();
+    LPErrInApp HandleRootMenuEvent(SDL_Event* pEvent);
+    LPErrInApp HandleRootMenuIterate();
     void SetBackground(SDL_Surface* pVal) { _p_SceneBackground = pVal; }
 
    private:
@@ -33,12 +36,11 @@ class MenuMgr {
                             SDL_Color& color, TTF_Font* customfont);
     LPErrInApp drawStaticScene();
     LPErrInApp drawMenuTextList();
-    void rootMenuNext();
+    LPErrInApp rootMenuNext();
     void updateTextureAsFlipScreen();
 
    private:
     MenuDelegator _menuDlgt;
-    Languages* _p_Languages;
     TTF_Font* _p_fontAriblk;
     TTF_Font* _p_fontVera;
     TTF_Font* _p_fontVeraUnderscore;
@@ -50,13 +52,18 @@ class MenuMgr {
     SDL_Texture* _p_ScreenTexture;
     SDL_Renderer* _p_sdlRenderer;
     MenuItemEnum _focusedMenuItem;
+    MenuItemEnum _prevFocusedMenuItem;
     int _box_Y;
     int _box_X;
+    int _hBar;
     int _screenW;
     int _screenH;
     SDL_Rect _rctPanelRedBox;
     LabelGfx* _p_LabelVersion;
     LabelLinkGfx* _p_homeUrl;
+    GameSettings* _p_GameSettings;
+    MusicManager* _p_MusicManager;
+    bool _ignoreMouseEvent;
 };
 
 #endif

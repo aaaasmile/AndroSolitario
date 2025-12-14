@@ -6,8 +6,7 @@
     it under the terms of the Perl Artistic License, available in COPYING.
 */
 
-#include "SDL.h"
-#include "../../utils.h" /* for SDL_strtokr() */
+#include <SDL3/SDL.h>
 
 #include "timidity.h"
 
@@ -29,7 +28,7 @@ static char def_instr_name[256] = "";
 
 /* Quick-and-dirty fgets() replacement. */
 
-static char *RWgets(SDL_RWops *rw, char *s, int size)
+static char *IOgets(SDL_IOStream *io, char *s, int size)
 {
     int num_read = 0;
     char *p = s;
@@ -38,7 +37,7 @@ static char *RWgets(SDL_RWops *rw, char *s, int size)
 
     for (; num_read < size; ++p)
     {
-	if (SDL_RWread(rw, p, 1, 1) != 1)
+	if (SDL_ReadIO(io, p, 1) != 1)
 	    break;
 
 	num_read++;
@@ -61,36 +60,43 @@ static char *RWgets(SDL_RWops *rw, char *s, int size)
 
 static int read_config_file(const char *name, int rcf_count)
 {
-  SDL_RWops *rw;
+  SDL_IOStream *io;
   char tmp[1024];
   char *w[MAXWORDS], *cp;
   char *endp;
   ToneBank *bank;
-  int i, j, k, line, r, words;
+  int i, j, k, r, words;
+#ifdef DEBUG_CHATTER
+  int line;
+#endif
 
   if (rcf_count >= MAX_RCFCOUNT) {
     SNDDBG(("Probable source loop in configuration files\n"));
     return -1;
   }
 
-  if (!(rw=timi_openfile(name)))
+  if (!(io=timi_openfile(name)))
    return -1;
 
   bank = NULL;
+#ifdef DEBUG_CHATTER
   line = 0;
+#endif
   r = -1; /* start by assuming failure, */
 
-  while (RWgets(rw, tmp, sizeof(tmp)))
+  while (IOgets(io, tmp, sizeof(tmp)))
   {
+#ifdef DEBUG_CHATTER
     line++;
+#endif
     words=0;
-    w[0]=SDL_strtokr(tmp, " \t\240", &endp);
+    w[0]=SDL_strtok_r(tmp, " \t\240", &endp);
     if (!w[0]) continue;
 
         /* Originally the TiMidity++ extensions were prefixed like this */
     if (SDL_strcmp(w[0], "#extension") == 0)
     {
-        w[0]=SDL_strtokr(0, " \t\240", &endp);
+        w[0]=SDL_strtok_r(0, " \t\240", &endp);
         if (!w[0]) continue;
     }
 
@@ -101,52 +107,43 @@ static int read_config_file(const char *name, int rcf_count)
     {
       while (*endp == ' ' || *endp == '\t' || *endp == '\240')
         endp++;
+
       if (*endp == '\0' || *endp == '#')
         break;
-      if (*endp == '"' || *endp == '\'') /* quoted string */
-      {
-        char *terminator;
-        if ((terminator = SDL_strchr(endp + 1, *endp)) != NULL) /* terminated */
-        {
-          if (terminator[1] == ' ' || terminator[1] == '\t' || terminator[1] == '\240' || terminator[1] == '\0')
-          {
-            char *extraQuote;
-            if ((extraQuote = SDL_strchr(endp + 1, *endp == '"' ? '\'' : '"')) != NULL && extraQuote < terminator)
-            {
+
+      if (*endp == '"' || *endp == '\'') { /* quoted string */
+        char *terminator = SDL_strchr(endp + 1, *endp);
+        if (terminator != NULL) { /* terminated */
+          if (terminator[1] == ' ' || terminator[1] == '\t' || terminator[1] == '\240' || terminator[1] == '\0') {
+            char *extraQuote = SDL_strchr(endp + 1, *endp == '"' ? '\'' : '"');
+            if (extraQuote != NULL && extraQuote < terminator) {
                 SNDDBG(("%s: line %d: Quote characters are not allowed inside a quoted string", name, line));
                 goto fail;
             }
-
             w[++words] = endp + 1;
             endp = terminator + 1;
             *terminator = '\0';
           }
-          else /* no space after quoted string */
-          {
+          else { /* no space after quoted string */
             SNDDBG(("%s: line %d: There must be at least one whitespace between string terminator (%c) and the next parameter", name, line, *endp));
             goto fail;
           }
         }
-        else /* not terminated */
-        {
+        else { /* not terminated */
           SNDDBG(("%s: line %d: The quoted string is not terminated", name, line));
           goto fail;
         }
       }
-      else /* not quoted string */
-      {
+      else { /* not quoted string */
         w[++words] = endp;
-        while (!(*endp == ' ' || *endp == '\t' || *endp == '\240' || *endp == '\0'))
-        {
-          if (*endp == '"' || *endp == '\'') /* no space before quoted string */
-          {
+        while (!(*endp == ' ' || *endp == '\t' || *endp == '\240' || *endp == '\0')) {
+          if (*endp == '"' || *endp == '\'') { /* no space before quoted string */
               SNDDBG(("%s: line %d: There must be at least one whitespace between previous parameter and a beginning of the quoted string (%c)", name, line, *endp));
               goto fail;
           }
           endp++;
         }
-        if (*endp != '\0') /* unless at the end-of-string (i.e. EOF) */
-        {
+        if (*endp != '\0') { /* unless at the end-of-string (i.e. EOF) */
           *endp = '\0';    /* terminate the token */
           endp++;
         }
@@ -432,11 +429,11 @@ static int read_config_file(const char *name, int rcf_count)
 
   r = 0; /* we're good. */
 fail:
-  SDL_RWclose(rw);
+  SDL_CloseIO(io);
   return r;
 }
 
-#if defined(_WIN32)||defined(__CYGWIN__)||defined(__OS2__)
+#if defined(_WIN32) || defined(__CYGWIN__)
 /* FIXME: What about C:FOO ? */
 static SDL_INLINE char *get_last_dirsep (const char *p) {
   char *p1 = SDL_strrchr(p, '/');
@@ -512,13 +509,13 @@ int Timidity_Init(const char *config_file)
   return init_with_config(config_file);
 }
 
-static void do_song_load(SDL_RWops *rw, SDL_AudioSpec *audio, MidiSong **out)
+static void do_song_load(SDL_IOStream *io, SDL_AudioSpec *audio, MidiSong **out)
 {
   MidiSong *song;
   int i;
 
   *out = NULL;
-  if (rw == NULL)
+  if (io == NULL)
       return;
 
   /* Allocate memory for the song */
@@ -544,7 +541,7 @@ static void do_song_load(SDL_RWops *rw, SDL_AudioSpec *audio, MidiSong **out)
   song->voices = DEFAULT_VOICES;
   song->drumchannels = DEFAULT_DRUMCHANNELS;
 
-  song->rw = rw;
+  song->io = io;
 
   song->rate = audio->freq;
   song->encoding = 0;
@@ -561,31 +558,25 @@ static void do_song_load(SDL_RWops *rw, SDL_AudioSpec *audio, MidiSong **out)
       goto fail;
   }
   switch (audio->format) {
-  case AUDIO_S8:
+  case SDL_AUDIO_S8:
     song->write = timi_s32tos8;
     break;
-  case AUDIO_U8:
+  case SDL_AUDIO_U8:
     song->write = timi_s32tou8;
     break;
-  case AUDIO_S16LSB:
+  case SDL_AUDIO_S16LE:
     song->write = timi_s32tos16l;
     break;
-  case AUDIO_S16MSB:
+  case SDL_AUDIO_S16BE:
     song->write = timi_s32tos16b;
     break;
-  case AUDIO_U16LSB:
-    song->write = timi_s32tou16l;
-    break;
-  case AUDIO_U16MSB:
-    song->write = timi_s32tou16b;
-    break;
-  case AUDIO_S32LSB:
+  case SDL_AUDIO_S32LE:
     song->write = timi_s32tos32l;
     break;
-  case AUDIO_S32MSB:
+  case SDL_AUDIO_S32BE:
     song->write = timi_s32tos32b;
     break;
-  case AUDIO_F32SYS:
+  case SDL_AUDIO_F32:
     song->write = timi_s32tof32;
     break;
   default:
@@ -593,10 +584,10 @@ static void do_song_load(SDL_RWops *rw, SDL_AudioSpec *audio, MidiSong **out)
     goto fail;
   }
 
-  song->buffer_size = audio->samples;
-  song->resample_buffer = SDL_malloc(audio->samples * sizeof(sample_t));
+  song->buffer_size = 4096/*audio->samples*/;
+  song->resample_buffer = SDL_malloc(4096/*audio->samples*/ * sizeof(sample_t));
   if (!song->resample_buffer) goto fail;
-  song->common_buffer = SDL_malloc(audio->samples * 2 * sizeof(Sint32));
+  song->common_buffer = SDL_malloc(4096/*audio->samples*/ * 2 * sizeof(Sint32));
   if (!song->common_buffer) goto fail;
 
   song->control_ratio = audio->freq / CONTROLS_PER_SECOND;
@@ -630,10 +621,10 @@ fail: Timidity_FreeSong(song);
   }
 }
 
-MidiSong *Timidity_LoadSong(SDL_RWops *rw, SDL_AudioSpec *audio)
+MidiSong *Timidity_LoadSong(SDL_IOStream *io, SDL_AudioSpec *audio)
 {
   MidiSong *song;
-  do_song_load(rw, audio, &song);
+  do_song_load(io, audio, &song);
   return song;
 }
 

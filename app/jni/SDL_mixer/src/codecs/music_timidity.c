@@ -1,6 +1,6 @@
 /*
   SDL_mixer:  An audio mixer library based on the SDL library
-  Copyright (C) 1997-2023 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2024 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -45,11 +45,8 @@ static void TIMIDITY_Delete(void *context);
 /* Config file should contain any other directory that needs
  * to be added to the search path. The library adds the path
  * of the config file to its search path, too. */
-#if defined(__WIN32__)
+#if defined(SDL_PLATFORM_WIN32)
 # define TIMIDITY_CFG           "C:\\TIMIDITY\\TIMIDITY.CFG"
-#elif defined(__OS2__)
-# define TIMIDITY_CFG           "C:\\TIMIDITY\\TIMIDITY.CFG"
-# define TIMIDITY_CFG_ETC       "/@unixroot/etc/timidity/timidity.cfg"
 #else  /* unix: */
 # define TIMIDITY_CFG_ETC       "/etc/timidity.cfg"
 # define TIMIDITY_CFG_FREEPATS  "/etc/timidity/freepats.cfg"
@@ -86,15 +83,14 @@ static void TIMIDITY_Close(void)
     Timidity_Exit();
 }
 
-void *TIMIDITY_CreateFromRW(SDL_RWops *src, int freesrc)
+void *TIMIDITY_CreateFromIO(SDL_IOStream *src, bool closeio)
 {
     TIMIDITY_Music *music;
     SDL_AudioSpec spec;
-    SDL_bool need_stream = SDL_FALSE;
+    bool need_stream = false;
 
     music = (TIMIDITY_Music *)SDL_calloc(1, sizeof(*music));
     if (!music) {
-        SDL_OutOfMemory();
         return NULL;
     }
 
@@ -102,7 +98,7 @@ void *TIMIDITY_CreateFromRW(SDL_RWops *src, int freesrc)
 
     SDL_memcpy(&spec, &music_spec, sizeof(spec));
     if (spec.channels > 2) {
-        need_stream = SDL_TRUE;
+        need_stream = true;
         spec.channels = 2;
     }
     music->song = Timidity_LoadSong(src, &spec);
@@ -112,24 +108,22 @@ void *TIMIDITY_CreateFromRW(SDL_RWops *src, int freesrc)
     }
 
     if (need_stream) {
-        music->stream = SDL_NewAudioStream(spec.format, spec.channels, spec.freq,
-                                           music_spec.format, music_spec.channels, music_spec.freq);
+        music->stream = SDL_CreateAudioStream(&spec, &music_spec);
         if (!music->stream) {
             TIMIDITY_Delete(music);
             return NULL;
         }
 
-        music->buffer_size = spec.samples * (SDL_AUDIO_BITSIZE(spec.format) / 8) * spec.channels;
+        music->buffer_size = 4096/*spec.samples*/ * (SDL_AUDIO_BITSIZE(spec.format) / 8) * spec.channels;
         music->buffer = SDL_malloc((size_t)music->buffer_size);
         if (!music->buffer) {
-            SDL_OutOfMemory();
             TIMIDITY_Delete(music);
             return NULL;
         }
     }
 
-    if (freesrc) {
-        SDL_RWclose(src);
+    if (closeio) {
+        SDL_CloseIO(src);
     }
     return music;
 }
@@ -155,19 +149,19 @@ static int TIMIDITY_Play(void *context, int play_count)
     return TIMIDITY_Seek(music, 0.0);
 }
 
-static SDL_bool TIMIDITY_IsPlaying(void *context)
+static bool TIMIDITY_IsPlaying(void *context)
 {
     TIMIDITY_Music *music = (TIMIDITY_Music *)context;
     return Timidity_IsActive(music->song);
 }
 
-static int TIMIDITY_GetSome(void *context, void *data, int bytes, SDL_bool *done)
+static int TIMIDITY_GetSome(void *context, void *data, int bytes, bool *done)
 {
     TIMIDITY_Music *music = (TIMIDITY_Music *)context;
     int filled, amount, expected;
 
     if (music->stream) {
-        filled = SDL_AudioStreamGet(music->stream, data, bytes);
+        filled = SDL_GetAudioStreamData(music->stream, data, bytes);
         if (filled != 0) {
             return filled;
         }
@@ -175,14 +169,14 @@ static int TIMIDITY_GetSome(void *context, void *data, int bytes, SDL_bool *done
 
     if (!music->play_count) {
         /* All done */
-        *done = SDL_TRUE;
+        *done = true;
         return 0;
     }
 
     if (music->stream) {
         expected = music->buffer_size;
         amount = Timidity_PlaySome(music->song, music->buffer, music->buffer_size);
-        if (SDL_AudioStreamPut(music->stream, music->buffer, amount) < 0) {
+        if (!SDL_PutAudioStreamData(music->stream, music->buffer, amount)) {
             return -1;
         }
     } else {
@@ -245,7 +239,7 @@ static void TIMIDITY_Delete(void *context)
         Timidity_FreeSong(music->song);
     }
     if (music->stream) {
-        SDL_FreeAudioStream(music->stream);
+        SDL_DestroyAudioStream(music->stream);
     }
     if (music->buffer) {
         SDL_free(music->buffer);
@@ -264,12 +258,12 @@ Mix_MusicInterface Mix_MusicInterface_TIMIDITY =
     "TIMIDITY",
     MIX_MUSIC_TIMIDITY,
     MUS_MID,
-    SDL_FALSE,
-    SDL_FALSE,
+    false,
+    false,
 
     NULL,   /* Load */
     TIMIDITY_Open,
-    TIMIDITY_CreateFromRW,
+    TIMIDITY_CreateFromIO,
     NULL,   /* CreateFromFile */
     TIMIDITY_SetVolume,
     TIMIDITY_GetVolume,
@@ -284,6 +278,8 @@ Mix_MusicInterface Mix_MusicInterface_TIMIDITY =
     NULL,   /* LoopEnd */
     NULL,   /* LoopLength */
     NULL,   /* GetMetaTag */
+    NULL,   /* GetNumTracks */
+    NULL,   /* StartTrack */
     NULL,   /* Pause */
     NULL,   /* Resume */
     TIMIDITY_Stop,

@@ -1,8 +1,8 @@
 #ifndef _CCHECKBOXGFX__H_
 #define _CCHECKBOXGFX__H_
 
-#include <SDL.h>
-#include <SDL_ttf.h>
+#include <SDL3/SDL.h>
+#include <SDL3_ttf/SDL_ttf.h>
 
 #include "Traits.h"
 #include "WinTypeGlobal.h"
@@ -24,10 +24,10 @@ class CheckBoxGfx {
     void Initialize(SDL_Rect* pRect, SDL_Surface* pScreen, TTF_Font* pFont,
                     int iButID, CheckboxClickCb& fncbClickEvent);
     void SetWindowText(LPCSTR strCaption) { _buttonText = strCaption; }
-    void MouseMove(SDL_Event& event, SDL_Surface* pScreen,
+    void MouseMove(SDL_Event* pEvent, SDL_Surface* pScreen,
                    SDL_Surface* pScene_background);
-    void FingerDown(SDL_Event& event);
-    void MouseUp(SDL_Event& event);
+    void FingerDown(SDL_Event* pEvent);
+    void MouseUp(SDL_Event* pEvent);
     void DrawButton(SDL_Surface* pScreen);
     void EnableWindow(bool bVal) { _enabled = bVal; }
     void SetVisibleState(VisbleState eVal);

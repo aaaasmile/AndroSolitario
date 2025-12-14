@@ -5,8 +5,7 @@
 #pragma warning(disable : 4786)
 #endif
 
-#include <SDL.h>
-#include <SDL_ttf.h>
+#include <SDL3/SDL.h>
 
 #include <stack>
 #include <string>
@@ -19,70 +18,67 @@
 
 class MusicManager;
 class HighScore;
+class MenuMgr;
+class CreditsView;
+class OptionsGfx;
 
 using namespace traits;
 
 class AppGfx {
-public:
+   public:
     AppGfx();
     ~AppGfx();
 
     LPErrInApp Init();
-    LPErrInApp MainLoop();
+    LPErrInApp MainLoopEvent(SDL_Event* pEvent, SDL_AppResult& res);
+    LPErrInApp MainLoopIterate();
     std::string GetPlayerName() { return _p_GameSettings->PlayerName; }
     void SetPlayerName(std::string strVal) {
         _p_GameSettings->PlayerName = strVal;
     }
-    Languages* GetLanguageMan() { return &_Languages; }
-    void ParseCmdLine(int argc, char* argv[]);
-    TTF_Font* GetFontVera() { return _p_fontVera; }  // text small
-    TTF_Font* GetFontAriblk() {
-        return _p_fontAriblk;
-    }  // text for big command on menu
-    void LeaveMenu();
-    void SetNextMenu(MenuItemEnum menuItem) { _histMenu.push(menuItem); }
+    void ParseCmdLine(int argc, char* argv[], SDL_AppResult& res);
+    LPErrInApp LeaveMenu();
+    LPErrInApp EnterMenu(MenuItemEnum menuItem); 
     LPErrInApp SettingsChanged(bool backGroundChanged, bool languageChanged);
+    LPErrInApp ChangeSceneBackground(SDL_Surface** ppSceneBackground);
 
-private:
+   private:
     LPErrInApp startGameLoop();
     LPErrInApp createWindow();
     void terminate();
     LPErrInApp loadProfile();
-    LPErrInApp writeProfile();
-    void usage(int errOut, char* cmd);
-    bool parseScreenSize(LPCSTR strOpz);
     void updateScreenTexture();
     LPErrInApp showHelp();
     LPErrInApp showCredits();
     LPErrInApp showHighScore();
-    LPErrInApp showOptionGeneral();
+    LPErrInApp showGeneralOptions();
+    void backToMenuRootWithMusic();
+    void backToMenuRootSameMusic();
 
     MenuDelegator prepMenuDelegator();
+    OptionDelegator prepOptionDelegator();
     void clearBackground();
     LPErrInApp loadSceneBackground();
 
-private:
+   private:
     SDL_Surface* _p_Screen;
     SDL_Surface* _p_SceneBackground;
     SDL_Surface* _p_CreditTitle;
     SDL_Texture* _p_ScreenTexture;
     SDL_Window* _p_Window;
     SDL_Renderer* _p_sdlRenderer;
-    TTF_Font* _p_fontVera;
-    TTF_Font* _p_fontAriblk;
     GameSettings* _p_GameSettings;
     SolitarioGfx* _p_SolitarioGfx;
     MusicManager* _p_MusicManager;
     HighScore* _p_HighScore;
-    Languages _Languages;
+    MenuMgr* _p_MenuMgr;
+    CreditsView* _p_CreditsView;
+    OptionsGfx* _p_OptGfx;
 
     int _screenW;
     int _screenH;
     int _Bpp;
-
     bool _fullScreen;
-    bool _backGroundChanged;
-
     std::stack<MenuItemEnum> _histMenu;
 };
 

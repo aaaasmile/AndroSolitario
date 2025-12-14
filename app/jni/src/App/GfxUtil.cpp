@@ -1,10 +1,13 @@
 #include "GfxUtil.h"
 
-#include <SDL_image.h>
+#include <SDL3_image/SDL_image.h>
+#include <SDL3_ttf/SDL_ttf.h>
+
+#include <cmath>
 
 #include "WinTypeGlobal.h"
 
-const char *g_lpszDeckDir = DATA_PREFIX "mazzi/";
+const char* g_lpszDeckDir = DATA_PREFIX "mazzi/";
 
 SDL_Color GFX_UTIL_COLOR::White = {255, 255, 255, 0};
 SDL_Color GFX_UTIL_COLOR::Gray = {128, 128, 128, 0};
@@ -14,7 +17,7 @@ SDL_Color GFX_UTIL_COLOR::Black = {0, 0, 0, 0};
 SDL_Color GFX_UTIL_COLOR::Orange = {255, 200, 0, 0};
 SDL_Color GFX_UTIL_COLOR::Blue = {0, 0, 255, 0};
 
-void GFX_UTIL::ScreenShade(SDL_Surface *surface, SDL_Rect *rect, float opacity,
+void GFX_UTIL::ScreenShade(SDL_Surface* surface, SDL_Rect* rect, float opacity,
                            unsigned char r1, unsigned char g1,
                            unsigned char b1) {
     Uint32 pixel;
@@ -28,11 +31,14 @@ void GFX_UTIL::ScreenShade(SDL_Surface *surface, SDL_Rect *rect, float opacity,
     for (int y = rect->y; y < rect->y + rect->h; y++)
         for (int x = rect->x; x < rect->x + rect->w; x++) {
             pixel = GetPixel(surface, x, y);
-            SDL_GetRGB(pixel, surface->format, &r, &g, &b);
+            SDL_GetRGB(pixel, SDL_GetPixelFormatDetails(surface->format), NULL,
+                       &r, &g, &b);
             r = (Uint8)((float)r * opacity);
             g = (Uint8)((float)g * opacity);
             b = (Uint8)((float)b * opacity);
-            SetPixel(surface, x, y, SDL_MapRGBA(surface->format, r, g, b, 255));
+            Uint32 color = SDL_MapRGBA(
+                SDL_GetPixelFormatDetails(surface->format), NULL, r, g, b, 255);
+            SetPixel(surface, x, y, color);
         }
     if (bunlock == true)
         SDL_UnlockSurface(surface);
@@ -42,7 +48,7 @@ void GFX_UTIL::ScreenShade(SDL_Surface *surface, SDL_Rect *rect, float opacity,
                   rect->y + rect->h - 2, r1, g1, b1, 255);
 }
 
-void GFX_UTIL::rectangleRGBA(SDL_Surface *screen, int x1, int y1, int x2,
+void GFX_UTIL::rectangleRGBA(SDL_Surface* screen, int x1, int y1, int x2,
                              int y2, unsigned char r, unsigned char g,
                              unsigned char b, unsigned char a) {
     int x, y;
@@ -53,7 +59,8 @@ void GFX_UTIL::rectangleRGBA(SDL_Surface *screen, int x1, int y1, int x2,
     if (SDL_LockSurface(screen) == 0)
         bneedunlock = true;
 
-    color = SDL_MapRGBA(screen->format, r, g, b, a);
+    color = SDL_MapRGBA(SDL_GetPixelFormatDetails(screen->format), NULL, r, g,
+                        b, a);
 
     for (x = x1; x < x2; x++) {
         SetPixel(screen, x, y1, color);
@@ -68,7 +75,7 @@ void GFX_UTIL::rectangleRGBA(SDL_Surface *screen, int x1, int y1, int x2,
         SDL_UnlockSurface(screen);
 }
 
-void GFX_UTIL::boxRGBA(SDL_Surface *screen, int x1, int y1, int x2, int y2,
+void GFX_UTIL::boxRGBA(SDL_Surface* screen, int x1, int y1, int x2, int y2,
                        unsigned char r, unsigned char g, unsigned char b,
                        unsigned char a) {
     int x, y;
@@ -80,7 +87,8 @@ void GFX_UTIL::boxRGBA(SDL_Surface *screen, int x1, int y1, int x2, int y2,
     if (SDL_LockSurface(screen) == 0)
         bneedunlock = true;
 
-    color = SDL_MapRGBA(screen->format, r, g, b, a);
+    color = SDL_MapRGBA(SDL_GetPixelFormatDetails(screen->format), NULL, r, g,
+                        b, a);
 
     for (y = y1; y < y2; y++) {
         for (x = x1; x < x2; x++) {
@@ -91,17 +99,17 @@ void GFX_UTIL::boxRGBA(SDL_Surface *screen, int x1, int y1, int x2, int y2,
         SDL_UnlockSurface(screen);
 }
 
-Uint32 inline GFX_UTIL::GetPixel(SDL_Surface *surface, int x, int y) {
-    int bpp = surface->format->BytesPerPixel;
-    /* Here p is the address to the pixel we want to retrieve */
-    Uint8 *p = (Uint8 *)surface->pixels + y * surface->pitch + x * bpp;
+Uint32 inline GFX_UTIL::GetPixel(SDL_Surface* surface, int x, int y) {
+    int bpp = SDL_GetPixelFormatDetails(surface->format)->bytes_per_pixel;
+    // Here p is the address to the pixel we want to retrieve
+    Uint8* p = (Uint8*)surface->pixels + y * surface->pitch + x * bpp;
 
     switch (bpp) {
         case 1:
             return *p;
 
         case 2:
-            return *(Uint16 *)p;
+            return *(Uint16*)p;
 
         case 3:
             if (SDL_BYTEORDER == SDL_BIG_ENDIAN)
@@ -110,17 +118,17 @@ Uint32 inline GFX_UTIL::GetPixel(SDL_Surface *surface, int x, int y) {
                 return p[0] | p[1] << 8 | p[2] << 16;
 
         case 4:
-            return *(Uint32 *)p;
+            return *(Uint32*)p;
 
         default:
-            return 0; /* shouldn't happen, but avoids warnings */
+            return 0;  // shouldn't happen, but avoids warnings
     }
 }
-void inline GFX_UTIL::SetPixel(SDL_Surface *surface, int x, int y,
+void inline GFX_UTIL::SetPixel(SDL_Surface* surface, int x, int y,
                                Uint32 pixel) {
-    int bpp = surface->format->BytesPerPixel;
-    /* Here p is the address to the pixel we want to set */
-    Uint8 *p = (Uint8 *)surface->pixels + y * surface->pitch + x * bpp;
+    int bpp = SDL_GetPixelFormatDetails(surface->format)->bytes_per_pixel;
+    // Here p is the address to the pixel we want to set
+    Uint8* p = (Uint8*)surface->pixels + y * surface->pitch + x * bpp;
 
     switch (bpp) {
         case 1:
@@ -128,7 +136,7 @@ void inline GFX_UTIL::SetPixel(SDL_Surface *surface, int x, int y,
             break;
 
         case 2:
-            *(Uint16 *)p = pixel;
+            *(Uint16*)p = pixel;
             break;
 
         case 3:
@@ -144,35 +152,35 @@ void inline GFX_UTIL::SetPixel(SDL_Surface *surface, int x, int y,
             break;
 
         case 4:
-            *(Uint32 *)p = pixel;
+            *(Uint32*)p = pixel;
             break;
     }
 }
 
-LPErrInApp GFX_UTIL::DrawString(SDL_Surface *screen, const char *strText, int x,
-                                int y, SDL_Color color, TTF_Font *customfont) {
+LPErrInApp GFX_UTIL::DrawString(SDL_Surface* screen, const char* strText, int x,
+                                int y, SDL_Color color, TTF_Font* customfont) {
     int width, height;
-    TTF_SizeText(customfont, strText, &width, &height);
-    SDL_Surface *surFont;
-    surFont = TTF_RenderUTF8_Blended(customfont, strText, color);
+    TTF_GetStringSize(customfont, strText, 0, &width, &height);
+    SDL_Surface* surFont;
+    surFont = TTF_RenderText_Blended(customfont, strText, 0, color);
     if (surFont == NULL) {
         return ERR_UTIL::ErrorCreate("Error TTF_RenderUTF8_Blended: %s\n",
                                      SDL_GetError());
     }
     GFX_UTIL::DrawStaticSpriteEx(screen, 0, 0, width, height, x, y, surFont);
-    SDL_FreeSurface(surFont);
+    SDL_DestroySurface(surFont);
     return NULL;
 }
 
-void GFX_UTIL::DrawStaticSpriteEx(SDL_Surface *screen, int src_x, int src_y,
+void GFX_UTIL::DrawStaticSpriteEx(SDL_Surface* screen, int src_x, int src_y,
                                   int src_dx, int src_dy, int dst_x, int dst_y,
-                                  SDL_Surface *sprite) {
+                                  SDL_Surface* sprite) {
     SDL_Rect src_rec = {src_x, src_y, src_dx, src_dy};
     SDL_Rect dst_rec = {dst_x, dst_y, 0, 0};
     SDL_BlitSurface(sprite, &src_rec, screen, &dst_rec);
 }
 
-void GFX_UTIL::DrawStaticLine(SDL_Surface *screen, int x0, int y0, int x1,
+void GFX_UTIL::DrawStaticLine(SDL_Surface* screen, int x0, int y0, int x1,
                               int y1, SDL_Color color) {
     int d =
         (int)sqrtf(pow((float)(x1 - x0), 2.0f) + pow((float)(y1 - y0), 2.0f));
@@ -185,59 +193,62 @@ void GFX_UTIL::DrawStaticLine(SDL_Surface *screen, int x0, int y0, int x1,
         if ((x >= 0) && (y >= 0) && (x < w) && (y < h)) {
             GFX_UTIL::SetPixel(
                 screen, x, y,
-                SDL_MapRGBA(screen->format, color.r, color.g, color.b, 255));
+                SDL_MapRGB(SDL_GetPixelFormatDetails(screen->format), NULL,
+                           color.r, color.g, color.b));
         }
     }
 }
 
-void GFX_UTIL::DrawRect(SDL_Surface *screen, int x, int y, int dx, int dy,
+void GFX_UTIL::DrawRect(SDL_Surface* screen, int xi, int yi, int xf, int yf,
                         SDL_Color color) {
-    DrawStaticLine(screen, x, y, dx, y, color);
-    DrawStaticLine(screen, x, y, x, dy, color);
-    DrawStaticLine(screen, dx, y, dx, dy, color);
-    DrawStaticLine(screen, x, dy, dx, dy, color);
+    DrawStaticLine(screen, xi, yi, xf, yi, color);
+    DrawStaticLine(screen, xi, yi, xi, yf, color);
+    DrawStaticLine(screen, xf, yi, xf, yf, color);
+    DrawStaticLine(screen, xi, yf, xf, yf, color);
 }
 
-void GFX_UTIL::FillRect(SDL_Surface *screen, int x0, int y0, int width,
+void GFX_UTIL::FillRect(SDL_Surface* screen, int x0, int y0, int width,
                         int height, Uint32 color) {
     SDL_Rect rect = {x0, y0, width, height};
-    SDL_FillRect(screen, &rect, color);
+    SDL_FillSurfaceRect(screen, &rect, color);
 }
 
-LPErrInApp GFX_UTIL::LoadCardPac(SDL_Surface **pp_Deck, DeckType &deckType,
-                                 Uint16 *pac_w, Uint16 *pac_h) {
+LPErrInApp GFX_UTIL::LoadCardPac(SDL_Surface** pp_Deck, DeckType& deckType,
+                                 Uint16* pac_w, Uint16* pac_h) {
     TRACE("Load card Pac %s\n", deckType.GetDeckName().c_str());
     Uint32 timetag;
     char description[100];
     Uint8 num_anims;
     Uint16 w, h;
     Uint16 frames;
+    Uint16 ignore;
 
     std::string strFileName = g_lpszDeckDir;
     strFileName += deckType.GetResFileName();
 
-    SDL_RWops *src = SDL_RWFromFile(strFileName.c_str(), "rb");
+    SDL_IOStream* src = SDL_IOFromFile(strFileName.c_str(), "rb");
     if (src == 0) {
         return ERR_UTIL::ErrorCreate(
             "SDL_RWFromFile on pac file error (file %s): %s\n",
             strFileName.c_str(), SDL_GetError());
     }
-    SDL_RWread(src, description, 100, 1);
-    timetag = SDL_ReadLE32(src);
+    SDL_ReadIO(src, description, 100);
+    SDL_ReadU32LE(src, &timetag);
     TRACE("Timetag is %d\n", timetag);
-    SDL_RWread(src, &num_anims, 1, 1);
-    // witdh of the picture (pac of 4 cards)
-    w = SDL_ReadLE16(src);
+    SDL_ReadIO(src, &num_anims, 1);
+    // width of the picture (pac of 4 cards)
+    SDL_ReadU16LE(src, &w);
     // height of the picture (pac of 10 rows of cards)
-    h = SDL_ReadLE16(src);
-    frames = SDL_ReadLE16(src);
+    SDL_ReadU16LE(src, &h);
+    SDL_ReadU16LE(src, &frames);
 
     for (int i = 0; i < frames; i++) {
-        SDL_ReadLE16(src);
+        SDL_ReadU16LE(src, &ignore);
     }
 
-    *pp_Deck = IMG_LoadPNG_RW(src);
+    *pp_Deck = IMG_LoadTyped_IO(src, false, "PNG");
     if (!*pp_Deck) {
+        SDL_CloseIO(src);
         return ERR_UTIL::ErrorCreate(
             "IMG_LoadPNG_RW on pac file error (file %s): %s\n",
             strFileName.c_str(), SDL_GetError());
@@ -248,17 +259,21 @@ LPErrInApp GFX_UTIL::LoadCardPac(SDL_Surface **pp_Deck, DeckType &deckType,
         green_trasp = 0;
         blue_trasp = 241;
     }
-    SDL_SetColorKey(
+    SDL_SetSurfaceColorKey(
         *pp_Deck, true,
-        SDL_MapRGB((*pp_Deck)->format, red_trasp, green_trasp, blue_trasp));
+        SDL_MapRGB(SDL_GetPixelFormatDetails((*pp_Deck)->format),
+                   SDL_GetSurfacePalette(*pp_Deck), red_trasp, green_trasp,
+                   blue_trasp));
     *pac_h = h;
     *pac_w = w;
+
+    SDL_CloseIO(src);
     return NULL;
 }
 
-void GFX_UTIL::DrawStaticBrokenLine(SDL_Surface *screen, int x0, int y0, int x1,
-                                    int y1, const SDL_Color *color1,
-                                    const SDL_Color *color2, int break_size) {}
+void GFX_UTIL::DrawStaticBrokenLine(SDL_Surface* screen, int x0, int y0, int x1,
+                                    int y1, const SDL_Color* color1,
+                                    const SDL_Color* color2, int break_size) {}
 
 std::string STR_UTIL::intToString(int iNumber) {
     std::string temp;
@@ -266,4 +281,12 @@ std::string STR_UTIL::intToString(int iNumber) {
     sprintf(buffer, "%d", iNumber);
     temp = buffer;
     return temp;
+}
+
+SDL_Surface* GFX_UTIL::SDL_CreateRGBSurface(int width, int height, int depth,
+                                            Uint32 Rmask, Uint32 Gmask,
+                                            Uint32 Bmask, Uint32 Amask) {
+    return SDL_CreateSurface(
+        width, height,
+        SDL_GetPixelFormatForMasks(depth, Rmask, Gmask, Bmask, Amask));
 }

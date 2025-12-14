@@ -1,6 +1,6 @@
 /*
   SDL_mixer:  An audio mixer library based on the SDL library
-  Copyright (C) 1997-2023 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2024 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -24,21 +24,13 @@
 
 /* misc helper routines */
 
-#include "SDL_stdinc.h"
-#include "SDL_version.h"
-
-#if SDL_VERSION_ATLEAST(2,0,12)
-#define HAVE_SDL_STRTOKR
-#else
-#define SDL_strtokr _MIX_strtokr
-extern char *SDL_strtokr(char *s1, const char *s2, char **saveptr);
-#endif
+#include <SDL3/SDL_stdinc.h>
 
 /* Parse time string of the form HH:MM:SS.mmm and return equivalent sample
  * position */
 extern Sint64 _Mix_ParseTime(char *time, long samplerate_hz);
 
-extern SDL_bool _Mix_IsLoopTag(const char *tag);
+extern bool _Mix_IsLoopTag(const char *tag);
 
 #endif /* UTILS_H_ */
 

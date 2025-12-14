@@ -1,6 +1,6 @@
 /*
   SDL_mixer:  An audio mixer library based on the SDL library
-  Copyright (C) 1997-2023 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2024 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -27,11 +27,11 @@
 #include "native_midi/native_midi.h"
 
 
-static void *NATIVEMIDI_CreateFromRW(SDL_RWops *src, int freesrc)
+static void *NATIVEMIDI_CreateFromIO(SDL_IOStream *src, bool closeio)
 {
-    NativeMidiSong *music = native_midi_loadsong_RW(src, freesrc);
+    NativeMidiSong *music = native_midi_loadsong_IO(src, closeio);
     if (!music) {
-        Mix_SetError("%s", native_midi_error());
+        SDL_SetError("%s", native_midi_error());
     }
     return music;
 }
@@ -53,10 +53,10 @@ static void NATIVEMIDI_SetVolume(void *context, int volume)
     native_midi_setvolume(volume);
 }
 
-static SDL_bool NATIVEMIDI_IsPlaying(void *context)
+static bool NATIVEMIDI_IsPlaying(void *context)
 {
     (void)context;
-    return native_midi_active() ? SDL_TRUE : SDL_FALSE;
+    return native_midi_active();
 }
 
 static void NATIVEMIDI_Pause(void *context)
@@ -88,12 +88,12 @@ Mix_MusicInterface Mix_MusicInterface_NATIVEMIDI =
     "NATIVEMIDI",
     MIX_MUSIC_NATIVEMIDI,
     MUS_MID,
-    SDL_FALSE,
-    SDL_FALSE,
+    false,
+    false,
 
     NULL,   /* Load */
     NULL,   /* Open */
-    NATIVEMIDI_CreateFromRW,
+    NATIVEMIDI_CreateFromIO,
     NULL,   /* CreateFromFile */
     NATIVEMIDI_SetVolume,
     NULL,   /* GetVolume */
@@ -108,6 +108,8 @@ Mix_MusicInterface Mix_MusicInterface_NATIVEMIDI =
     NULL,   /* LoopEnd */
     NULL,   /* LoopLength */
     NULL,   /* GetMetaTag */
+    NULL,   /* GetNumTracks */
+    NULL,   /* StartTrack */
     NATIVEMIDI_Pause,
     NATIVEMIDI_Resume,
     NATIVEMIDI_Stop,

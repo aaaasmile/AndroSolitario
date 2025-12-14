@@ -24,6 +24,7 @@ CardGfx::CardGfx() {
     _eSuit = eSUIT::BASTONI;
     _x = _y = _width = _height = 0;
     _pPacDeck = 0;
+    _scaleFactor = 0.0;
 }
 
 LPCSTR CardGfx::String() {
@@ -113,12 +114,12 @@ LPErrInApp CardGfx::DrawCardPac(SDL_Surface* s) {
             "CardGfx - DrawCardPac size is not defined");
     }
 
-    int iSegnoIx = index / num_cards_insuit;
-    int iCartaIx = index % num_cards_insuit;
+    int suitIx = index / num_cards_insuit;
+    int cardIx = index % num_cards_insuit;
     SDL_Rect srcCard;
 
-    srcCard.x = iSegnoIx * _width;
-    srcCard.y = iCartaIx * _height;
+    srcCard.x = suitIx * _width;
+    srcCard.y = cardIx * _height;
     srcCard.w = _width;
     srcCard.h = _height;
 
@@ -126,10 +127,23 @@ LPErrInApp CardGfx::DrawCardPac(SDL_Surface* s) {
     dest.x = X();
     dest.y = Y();
 
-    if (SDL_BlitSurface(_pPacDeck, &srcCard, s, &dest) == -1) {
+    if (_scaleFactor != 0.0) {
+        dest.h = (int)srcCard.h * _scaleFactor;
+        dest.w = (int)srcCard.w * _scaleFactor;
+        // TRACE_DEBUG(
+        //     "[DrawCardPac] scaling tarock height from %d to %d and width %d to "
+        //     "%d \n",
+        //     srcCard.h, dest.h, srcCard.w, dest.w);
+        // NOte: I can't get SDL_SCALEMODE_LINEAR working
+        if (!SDL_BlitSurfaceScaled(_pPacDeck, &srcCard, s, &dest,
+                                   SDL_SCALEMODE_NEAREST)) {
+            return ERR_UTIL::ErrorCreate(
+                "SDL_BlitSurfaceScaled in DrawCardPac error: %s\n",
+                SDL_GetError());
+        }
+    } else if (!SDL_BlitSurface(_pPacDeck, &srcCard, s, &dest)) {
         return ERR_UTIL::ErrorCreate(
-            "SDL_BlitSurface in DrawCardPac with Iterator error: %s\n",
-            SDL_GetError());
+            "SDL_BlitSurface in DrawCardPac error: %s\n", SDL_GetError());
     }
     return NULL;
 }

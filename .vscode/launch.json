@@ -30,16 +30,46 @@
             ]
         },
         {
-            "name": "Debug Linux",
+            "name": "WSL2 Debug",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/src/solitario",
+            "program": "${workspaceFolder}/build/solitario",
             "args": [],
             "stopAtEntry": false,
-            "cwd": "${workspaceFolder}/build/src/",
+            "cwd": "${workspaceFolder}/build/",
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "Windows Debug MySys2",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/solitario.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/build/",
+            "environment": [
+                {
+                    "name": "PATH",
+                    "value": "C:\\msys64\\ucrt64\\bin"
+                }
+            ],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "miDebuggerPath": "C:\\msys64\\ucrt64\\bin\\gdb.exe",
             "setupCommands": [
                 {
                     "description": "Enable pretty-printing for gdb",
