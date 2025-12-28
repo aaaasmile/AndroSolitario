@@ -175,7 +175,7 @@ LPErrInApp SolitarioGfx::Initialize(SDL_Surface* s, SDL_Renderer* r,
     SDL_Rect rctBt1;
     int btw = 120;
     int btwSymb = 60;
-    int bth = 28;
+    int bth = 34;
     int btoffsetY = 70;
     int btposx = 150;
     int btintraX = 30;
@@ -214,8 +214,11 @@ LPErrInApp SolitarioGfx::Initialize(SDL_Surface* s, SDL_Renderer* r,
     if (pGameSettings->NeedScreenMagnify()) {
         tx = btposx;
         offsetY = 250;
+        rctBt1.y = _p_Screen->h - offsetY;
+    }else{
+        tx = tx - btw - 30;
     }
-    rctBt1.y = _p_Screen->h - offsetY;
+    
     rctBt1.x = tx;
     rctBt1.w = btwSymb;
     ClickCb cbBtToggleSound = prepClickToggleSoundCb();
