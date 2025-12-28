@@ -250,6 +250,7 @@ class SolitarioGfx {
     bool _scoreChanged;
     CurrentTime* _p_currentTime;
     Uint64 _lastUpTimestamp;
+    Uint64 _lastIterateTimestamp;
     FadeAction* _p_FadeAction;
     eState _state;
     eState _statePrev;
