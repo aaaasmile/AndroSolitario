@@ -41,7 +41,7 @@ void ComboGfx::Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
     _p_sdlRenderer = psdlRenderer;
     LPGameSettings pGameSettings = GameSettings::GetSettings();
 
-    int boxIncW = 20;
+    int boxIncW = 34;
     int boxIncH = _rctCtrl.h;
     if (pGameSettings->NeedScreenMagnify()) {
         boxIncW = 50;

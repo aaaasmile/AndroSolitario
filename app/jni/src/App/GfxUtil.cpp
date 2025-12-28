@@ -16,6 +16,7 @@ SDL_Color GFX_UTIL_COLOR::Green = {0, 255, 0, 0};
 SDL_Color GFX_UTIL_COLOR::Black = {0, 0, 0, 0};
 SDL_Color GFX_UTIL_COLOR::Orange = {255, 200, 0, 0};
 SDL_Color GFX_UTIL_COLOR::Blue = {0, 0, 255, 0};
+SDL_Color GFX_UTIL_COLOR::CustomLbl = {245, 200, 10, 0};//rgba(255, 204, 19, 1)
 
 void GFX_UTIL::ScreenShade(SDL_Surface* surface, SDL_Rect* rect, float opacity,
                            unsigned char r1, unsigned char g1,

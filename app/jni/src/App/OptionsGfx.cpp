@@ -107,8 +107,8 @@ LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
     if (pScreen == NULL) {
         return ERR_UTIL::ErrorCreate("pScreen is null");
     }
-    _rctOptBox.w = 500;
-    _rctOptBox.h = 560;
+    _rctOptBox.w = 600;
+    _rctOptBox.h = 580;
     if (_p_GameSettings->NeedScreenMagnify()) {
         _rctOptBox.w = 800;
         _rctOptBox.h = 1024;
@@ -122,7 +122,7 @@ LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
     _optDlgt = optDlg;
     _p_MusicManager = _p_GameSettings->GetMusicManager();
     _p_fontCtrl = _p_GameSettings->GetFontAriblk();
-    _p_fontText = _p_GameSettings->GetFontVera();
+    _p_fontText = _p_GameSettings->GetFontMedium();
     _p_sdlRenderer = pRenderer;
 
     _p_surfBar = GFX_UTIL::SDL_CreateRGBSurface(_rctOptBox.w, _rctOptBox.h, 32,
@@ -146,7 +146,7 @@ LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
     // button OK
     _p_buttonOK = new ButtonGfx();
     rctBt1.w = 120;
-    rctBt1.h = 28;
+    rctBt1.h = 34;
     int offsetBtY = 30;
     if (_p_GameSettings->NeedScreenMagnify()) {
         rctBt1.w = 180;
@@ -159,11 +159,11 @@ LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
     _p_buttonOK->Initialize(&rctBt1, pScreen, _p_fontText, MYIDOK, cbBtOK);
     _p_buttonOK->SetVisibleState(ButtonGfx::INVISIBLE);
     // Combo
-    int comboW = 180;
-    int comboH = 26;
+    int comboW = 220;
+    int comboH = 36;
     int comboOffsetY = 80;
     int combo2OffsetY = 20;
-    int combo3OffsetY = 30;
+    int combo3OffsetY = 40;
     int comboOffsetX = 50;
     if (_p_GameSettings->NeedScreenMagnify()) {
         comboW = 300;
@@ -421,7 +421,7 @@ LPErrInApp OptionsGfx::HandleIterate(bool& done) {
     GFX_UTIL::DrawString(_p_ShadowSrf, strSelectLanguage.c_str(),
                          _p_comboLang->PosX(),
                          _p_comboLang->PosY() - _labelOffsetY,
-                         GFX_UTIL_COLOR::Orange, _p_fontText);
+                         GFX_UTIL_COLOR::CustomLbl, _p_fontText);
 
     _p_comboLang->DrawButton(_p_ShadowSrf);
 
@@ -434,7 +434,7 @@ LPErrInApp OptionsGfx::HandleIterate(bool& done) {
     GFX_UTIL::DrawString(_p_ShadowSrf, strSelectBackGround.c_str(),
                          _p_comboBackground->PosX(),
                          _p_comboBackground->PosY() - _labelOffsetY,
-                         GFX_UTIL_COLOR::Orange, _p_fontText);
+                         GFX_UTIL_COLOR::CustomLbl, _p_fontText);
     _p_comboBackground->DrawButton(_p_ShadowSrf);
 
     // player name
@@ -446,7 +446,7 @@ LPErrInApp OptionsGfx::HandleIterate(bool& done) {
     GFX_UTIL::DrawString(_p_ShadowSrf, strDeckSelectTitle.c_str(),
                          _p_comboDeck->PosX(),
                          _p_comboDeck->PosY() - _labelOffsetY,
-                         GFX_UTIL_COLOR::Orange, _p_fontText);
+                         GFX_UTIL_COLOR::CustomLbl, _p_fontText);
 
     _p_comboDeck->DrawButton(_p_ShadowSrf);
 
@@ -534,7 +534,7 @@ LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
 
     _hbar = 30;
     _captionOffsetX = 10;
-    _labelOffsetY = 20;
+    _labelOffsetY = 25;
     if (_p_GameSettings->NeedScreenMagnify()) {
         _hbar = 65;
         _captionOffsetX = 20;

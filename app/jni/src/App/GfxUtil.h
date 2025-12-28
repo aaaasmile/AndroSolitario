@@ -51,6 +51,7 @@ class GFX_UTIL_COLOR {
     static SDL_Color Black;
     static SDL_Color Orange;
     static SDL_Color Blue;
+    static SDL_Color CustomLbl;
 };
 
 namespace STR_UTIL {
