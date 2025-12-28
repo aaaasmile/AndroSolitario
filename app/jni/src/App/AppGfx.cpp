@@ -112,9 +112,11 @@ LPErrInApp AppGfx::Init() {
         return ERR_UTIL::ErrorCreate("Icon not found");
     }
     TRACE_DEBUG("Icon loaded OK\n");
+    Uint8 r, g, b, a;
+    SDL_ReadSurfacePixel(psIcon, 0, 0, &r, &g, &b, &a);
     SDL_SetSurfaceColorKey(
         psIcon, true,
-        SDL_MapRGB(SDL_GetPixelFormatDetails(psIcon->format), NULL, 0, 128, 0));
+        SDL_MapRGBA(SDL_GetPixelFormatDetails(psIcon->format), NULL, r, g, b, a));
 #if HASWINICON
     if (!SDL_SetWindowIcon(_p_Window, psIcon)) {
         return ERR_UTIL::ErrorCreate("Couldn't set icon on window: %s\n",
