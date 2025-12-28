@@ -23,16 +23,9 @@ void LabelLinkGfx::Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
                               ClickCb& fncbClickEvent) {
     _fncbClickEvent = fncbClickEvent;
     _rctCtrl = *pRect;
-
-    // black bar surface
-    // _p_SurfBar = SDL_CreateRGBSurface(SDL_SWSURFACE, _rctCtrl.w, _rctCtrl.h,
-    // 32,
-    //                                   0, 0, 0, 0); SDL 2
     _p_SurfBar =
         GFX_UTIL::SDL_CreateRGBSurface(_rctCtrl.w, _rctCtrl.h, 32, 0, 0, 0, 0);
 
-    // SDL_FillRect(_p_SurfBar, NULL, SDL_MapRGBA(pScreen->format, 255, 0, 0,
-    // 0)); SDL 2
     SDL_FillSurfaceRect(_p_SurfBar, NULL,
                         SDL_MapRGB(SDL_GetPixelFormatDetails(pScreen->format),
                                    NULL, 255, 0, 0));
@@ -55,12 +48,12 @@ void LabelLinkGfx::SetState(eSate eVal) {
     _isDirty = true;
 }
 
-void LabelLinkGfx::MouseMove(SDL_Event& event) {
+void LabelLinkGfx::MouseMove(SDL_Event* pEvent) {
     if (_stateGfx == VISIBLE && _isEnabled) {
-        if (event.motion.x >= _rctCtrl.x &&
-            event.motion.x <= _rctCtrl.x + _rctCtrl.w &&
-            event.motion.y >= _rctCtrl.y &&
-            event.motion.y <= _rctCtrl.y + _rctCtrl.h) {
+        if (pEvent->motion.x >= _rctCtrl.x &&
+            pEvent->motion.x <= _rctCtrl.x + _rctCtrl.w &&
+            pEvent->motion.y >= _rctCtrl.y &&
+            pEvent->motion.y <= _rctCtrl.y + _rctCtrl.h) {
             // mouse inner button
             if (_mouseOuside) {
                 _isDirty = true;
@@ -76,12 +69,12 @@ void LabelLinkGfx::MouseMove(SDL_Event& event) {
     }
 }
 
-void LabelLinkGfx::MouseUp(SDL_Event& event) {
+void LabelLinkGfx::MouseUp(SDL_Event* pEvent) {
     if (_stateGfx == VISIBLE && _isEnabled) {
-        if (event.motion.x >= _rctCtrl.x &&
-            event.motion.x <= _rctCtrl.x + _rctCtrl.w &&
-            event.motion.y >= _rctCtrl.y &&
-            event.motion.y <= _rctCtrl.y + _rctCtrl.h) {
+        if (pEvent->motion.x >= _rctCtrl.x &&
+            pEvent->motion.x <= _rctCtrl.x + _rctCtrl.w &&
+            pEvent->motion.y >= _rctCtrl.y &&
+            pEvent->motion.y <= _rctCtrl.y + _rctCtrl.h) {
             // mouse go up inner the button
             // send a click event
             if ((_fncbClickEvent.tc) != NULL)
@@ -122,7 +115,6 @@ void LabelLinkGfx::Draw(SDL_Surface* pScreen) {
             // end stuff mouse
 
             int tx, ty;
-            // TTF_SizeText(_p_FontText, _ctrlText.c_str(), &tx, &ty); SDL2
             TTF_GetStringSize(_p_FontText, _ctrlText.c_str(), 0, &tx, &ty);
             int iXOffSet = (_rctCtrl.w - tx) / 2;
             if (iXOffSet < 0) {

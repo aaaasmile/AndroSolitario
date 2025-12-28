@@ -18,26 +18,31 @@
 
 class MusicManager;
 class HighScore;
+class MenuMgr;
+class CreditsView;
+class OptionsGfx;
 
 using namespace traits;
 
 class AppGfx {
-public:
+   public:
     AppGfx();
     ~AppGfx();
 
     LPErrInApp Init();
-    LPErrInApp MainLoop();
+    LPErrInApp MainLoopEvent(SDL_Event* pEvent, SDL_AppResult& res);
+    LPErrInApp MainLoopIterate();
     std::string GetPlayerName() { return _p_GameSettings->PlayerName; }
     void SetPlayerName(std::string strVal) {
         _p_GameSettings->PlayerName = strVal;
     }
-    void ParseCmdLine(int argc, char* argv[]);
-    void LeaveMenu();
-    void SetNextMenu(MenuItemEnum menuItem) { _histMenu.push(menuItem); }
+    void ParseCmdLine(int argc, char* argv[], SDL_AppResult& res);
+    LPErrInApp LeaveMenu();
+    LPErrInApp EnterMenu(MenuItemEnum menuItem); 
     LPErrInApp SettingsChanged(bool backGroundChanged, bool languageChanged);
+    LPErrInApp ChangeSceneBackground(SDL_Surface** ppSceneBackground);
 
-private:
+   private:
     LPErrInApp startGameLoop();
     LPErrInApp createWindow();
     void terminate();
@@ -47,12 +52,15 @@ private:
     LPErrInApp showCredits();
     LPErrInApp showHighScore();
     LPErrInApp showGeneralOptions();
+    void backToMenuRootWithMusic();
+    void backToMenuRootSameMusic();
 
     MenuDelegator prepMenuDelegator();
+    OptionDelegator prepOptionDelegator();
     void clearBackground();
     LPErrInApp loadSceneBackground();
 
-private:
+   private:
     SDL_Surface* _p_Screen;
     SDL_Surface* _p_SceneBackground;
     SDL_Surface* _p_CreditTitle;
@@ -63,15 +71,14 @@ private:
     SolitarioGfx* _p_SolitarioGfx;
     MusicManager* _p_MusicManager;
     HighScore* _p_HighScore;
-    
+    MenuMgr* _p_MenuMgr;
+    CreditsView* _p_CreditsView;
+    OptionsGfx* _p_OptGfx;
 
     int _screenW;
     int _screenH;
     int _Bpp;
-
     bool _fullScreen;
-    bool _backGroundChanged;
-
     std::stack<MenuItemEnum> _histMenu;
 };
 

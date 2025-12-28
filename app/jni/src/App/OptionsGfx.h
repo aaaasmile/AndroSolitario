@@ -36,18 +36,22 @@ class OptionsGfx {
     ~OptionsGfx();
 
     LPErrInApp Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
-                          MenuDelegator& menuDlg);
-    LPErrInApp Show(SDL_Surface* pScene_background, STRING& strCaption,
-                    SDL_Window* pWindow);
+                          OptionDelegator& optDlg, SDL_Window* pWindow);
+    LPErrInApp Show(SDL_Surface* pScene_background, STRING& strCaption);
+    LPErrInApp HandleEvent(SDL_Event* pEvent);
+    LPErrInApp HandleIterate(bool& done);
     void SetCaption(STRING& strCaption) { _headerText = strCaption; }
-    LPErrInApp ButEndOPtClicked(int iButID);
+    LPErrInApp OptionsEnd();
     void CheckboxMusicClicked(bool state);
+    void Reset() { _inProgress = false; }
+    bool IsOngoing() { return _inProgress; }
 
    private:
     ClickCb prepClickCb();
-    ClickCb prepClickComboCb();
     CheckboxClickCb prepCheckBoxClickMusic();
-    ClickCb prepSelectionDeckCb();
+    void setBackgoundTypeInGameSettings();
+    void setLanguageInGameSettings();
+    void setControlLocalCaptions();
 
    private:
     SDL_Renderer* _p_sdlRenderer;
@@ -58,7 +62,6 @@ class OptionsGfx {
     TTF_Font* _p_fontCtrl;
     SDL_Color _color;
     ButtonGfx* _p_buttonOK;
-    bool _terminated;
     STRING _headerText;
     CheckBoxGfx* _p_checkMusic;
     ComboGfx* _p_comboLang;
@@ -67,9 +70,24 @@ class OptionsGfx {
     TextInputGfx* _p_textInput;
     SDL_Surface* _p_deckAll[eDeckType::NUM_OF_DECK];
     CardGfx _cardOnEachDeck[3][eDeckType::NUM_OF_DECK];
-    MenuDelegator _menuDlgt;
+    OptionDelegator _optDlgt;
     GameSettings* _p_GameSettings;
     MusicManager* _p_MusicManager;
+    SDL_Surface* _p_Scene_background;
+    bool _inProgress;
+    bool _mouseDownRec;
+    SDL_Texture* _p_ScreenTexture;
+    SDL_Surface* _p_ShadowSrf;
+    int _hbar;
+    int _labelOffsetY;
+    int _captionOffsetX;
+    bool _initilized;
+    // previous settings    
+    Languages::eLangId _prevLangId;
+    eDeckType _prevDeckType;
+    bool _prevMusicEnabled;
+    BackgroundTypeEnum _prevBackgroundType;
+    std::string _prevName;
 };
 
 #endif

@@ -1,10 +1,10 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#define VERSION "Ver 3.0.2 20251111"
+#define VERSION "Ver 3.0.4 20251228"
 #define PACKAGE_URL "https://invido.it"
 #define AUTHOR "igorrun"
-#define VERSION_HOME "030002"
+#define VERSION_HOME "030004"
 
 // Platform detection
 #if defined(__ANDROID__) || defined(ANDROID)
@@ -19,12 +19,16 @@
     #define PLATFORM_APPLE 1
 #endif
 
+#if PLATFORM_EMS
+    #define HASWINICON 0
+    #define HASQUITMENU 0 
+    #define HASHELPMENU 0
+    #define HASTOUCH 0  // Remember that Emscripten run also on android with touch screen, but also mouse event are raised. Touch will be an event repetition.
+    #define HASGOTLINK 0
+#endif
+
 #ifndef HASWINICON
-    #ifdef PLATFORM_EMS
-        #define HASWINICON 0  // no icon in emscripten
-    #else
-        #define HASWINICON 1  
-    #endif
+    #define HASWINICON 1  
 #endif
 
 #ifndef HASQUITMENU
@@ -65,6 +69,10 @@
     #else
         #define HASMOUSE 1
     #endif
+#endif
+
+#ifndef HASGOTLINK
+    #define HASGOTLINK 1
 #endif
 
 

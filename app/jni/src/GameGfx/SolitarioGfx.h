@@ -2,6 +2,7 @@
 #define SOLIATRIO_GFX__H
 
 #include <vector>
+#include <functional>
 
 #include "CardRegionGfx.h"
 #include "ErrorInfo.h"
@@ -15,6 +16,8 @@ class ButtonGfx;
 class CurrentTime;
 class HighScore;
 class MusicManager;
+class FadeAction;
+class MesgBoxGfx;
 
 typedef std::vector<CardRegionGfx>::iterator regionVI;
 
@@ -47,15 +50,39 @@ class SolitarioGfx {
         Ace_Ix3 = 11,
         Ace_Ix4 = 12
     };
+    enum eState {
+        READY_TO_START,
+        FIRST_SCENE,
+        IN_GAME,
+        IN_SINGLE_TAPCLICK,
+        IN_DOUBLE_TAPCLICK,
+        INITDRAG_STEP1,
+        INITDRAG_STEP2,
+        INITDRAG_AFTER,
+        ZOOMING,
+        START_VICTORY,
+        NEW_CARD_VICTORY,
+        IN_CARD_VICTORY,
+        SHOW_SCORE,
+        DO_NEWGAME,
+        IN_MSGBOX,
+        IN_ZOOM,
+        IN_ZOOM_TERMINATED,
+        FADING_OUT,
+        WAIT_FOR_FADING,
+        TERMINATED
+    };
+    
 
    public:
     SolitarioGfx();
     ~SolitarioGfx();
 
-    LPErrInApp Initialize(SDL_Surface *s, SDL_Renderer *r, SDL_Window *w,
-                          SDL_Surface *pSceneBackground,
-                          HighScore *pHighScore);
-    LPErrInApp StartGameLoop();
+    LPErrInApp Initialize(SDL_Surface* s, SDL_Renderer* r, SDL_Window* w,
+                          SDL_Surface* pSceneBackground, HighScore* pHighScore);
+    LPErrInApp HandleEvent(SDL_Event* pEvent);
+    LPErrInApp HandleIterate(bool& done);
+    LPErrInApp Show();
 
     int RegionSize(int regionNo) { return _cardRegionList[regionNo].Size(); }
     void CleanUpRegion();
@@ -69,10 +96,15 @@ class SolitarioGfx {
 
     LPCardRegionGfx SelectRegionOnPoint(int x, int y);
 
-    LPErrInApp InitDrag(int x, int y, bool &isInitDrag,
+    LPErrInApp InitDrag(int x, int y, bool& isInitDrag,
                         LPCardRegionGfx pSrcRegion);
     LPErrInApp InitDrag(LPCardStackGfx CargoStack, int x, int y,
-                        bool &isInitDrag, LPCardRegionGfx pSrcRegion);
+                        bool& isInitDrag, LPCardRegionGfx pSrcRegion);
+    LPErrInApp InitDragContinue();
+    LPErrInApp InitDragAfterFromDoubleTap();
+    LPErrInApp InitDragAfterFromSingleTapA();
+    LPErrInApp InitDragAfterFromSingleTapB();
+    LPErrInApp InitDragAfterFromSingleTapC();
 
     void DoDrag(int x, int y);
 
@@ -88,23 +120,23 @@ class SolitarioGfx {
     LPCardRegionGfx GetBestStack(int x, int y, int width, int height,
                                  LPCardStackGfx stack);
 
-    LPErrInApp DrawCardStack(SDL_Surface *s, LPCardRegionGfx pcardRegion);
+    LPErrInApp DrawCardStack(SDL_Surface* s, LPCardRegionGfx pcardRegion);
     LPErrInApp DrawCardStack(LPCardRegionGfx pcardRegion);
 
     LPErrInApp DrawCard(int x, int y, int nCdIndex);
-    LPErrInApp DrawCard(int x, int y, int nCdIndex, SDL_Surface *s);
-    LPErrInApp DrawCard(LPCardGfx pCard, SDL_Surface *s);
+    LPErrInApp DrawCard(int x, int y, int nCdIndex, SDL_Surface* s);
+    LPErrInApp DrawCard(LPCardGfx pCard, SDL_Surface* s);
 
-    LPErrInApp DrawCardPac(int x, int y, int nCdIndex, SDL_Surface *s);
-    LPErrInApp DrawCardPac(LPCardGfx pCard, SDL_Surface *s);
+    LPErrInApp DrawCardPac(int x, int y, int nCdIndex, SDL_Surface* s);
+    LPErrInApp DrawCardPac(LPCardGfx pCard, SDL_Surface* s);
 
     LPErrInApp DrawCardBack(int x, int y);
-    LPErrInApp DrawCardBack(int x, int y, SDL_Surface *s);
-    LPErrInApp DrawCardBackPac(int x, int y, SDL_Surface *s);
+    LPErrInApp DrawCardBack(int x, int y, SDL_Surface* s);
+    LPErrInApp DrawCardBackPac(int x, int y, SDL_Surface* s);
 
     LPErrInApp DrawSymbol(int x, int y, int nSymbol);
-    LPErrInApp DrawSymbol(int x, int y, int nSymbol, SDL_Surface *s);
-    LPErrInApp DrawSymbolPac(int x, int y, int nSymbol, SDL_Surface *s);
+    LPErrInApp DrawSymbol(int x, int y, int nSymbol, SDL_Surface* s);
+    LPErrInApp DrawSymbolPac(int x, int y, int nSymbol, SDL_Surface* s);
 
     LPErrInApp VictoryAnimation();
 
@@ -146,27 +178,32 @@ class SolitarioGfx {
     void BtQuitClick();
     void BtNewGameClick();
     void BtToggleSoundClick();
+    bool isInVictoryState();
+    void clearAnimation();
 
    private:
     void updateTextureAsFlipScreen();
-    void zoomDropCard(int &sx, int &sy, LPCardGfx pCard, int width, int height);
-    void setDeckType(DeckType &dt) { _deckType.CopyFrom(dt); }
+    void zoomDropCardStart(int* pSx, int* pSy, LPCardGfx pCard, int width,
+                           int height);
+    LPErrInApp zoomDropCardIterate();
+    void setDeckType(DeckType& dt) { _deckType.CopyFrom(dt); }
     void clearSurface();
     LPErrInApp newGame();
-    LPErrInApp handleGameLoopKeyDownEvent(SDL_Event &event);
-    LPErrInApp handleGameLoopMouseDownEvent(SDL_Event &event);
-    LPErrInApp handleGameLoopFingerDownEvent(SDL_Event &event);
-    LPErrInApp handleGameLoopFingerUpEvent(SDL_Event &event);
-    LPErrInApp handleGameLoopFingerMotion(SDL_Event &event);
+    LPErrInApp handleGameLoopMouseDownEvent(SDL_Event* pEvent);
+    LPErrInApp handleGameLoopFingerDownEvent(SDL_Event* pEvent);
+    LPErrInApp handleGameLoopFingerUpEvent(SDL_Event* pEvent);
+    LPErrInApp handleGameLoopFingerMotion(SDL_Event* pEvent);
     LPErrInApp singleTapOrLeftClick(SDL_Point& pt);
-    LPErrInApp doubleTapOrRightClick(SDL_Point& pt);
+    LPErrInApp doubleTapOrRightClick(SDL_Point& pt, bool& isDoubleClick);
     LPErrInApp endOfDragAndCheckForVictory();
-    void handleGameLoopMouseMoveEvent(SDL_Event &event);
-    LPErrInApp handleGameLoopMouseUpEvent(SDL_Event &event);
+    LPErrInApp checkForVictory();
+    //void dropAfterZoom();
+    void handleGameLoopMouseMoveEvent(SDL_Event* pEvent);
+    LPErrInApp handleGameLoopMouseUpEvent(SDL_Event* pEvent);
     ClickCb prepClickQuitCb();
     ClickCb prepClickNewGameCb();
     ClickCb prepClickToggleSoundCb();
-    LPErrInApp drawScore(SDL_Surface *pScreen);
+    LPErrInApp drawScore(SDL_Surface* pScreen);
     void updateScoreOnAce(int sizeAce, int oldSizeAce);
     void updateScoreOnTurnOverFaceDown();
     void updateScoreMoveDeckToTableau();
@@ -175,7 +212,7 @@ class SolitarioGfx {
     void updateBadScoreAceToTableu();
     void clearScore();
     void bonusScore();
-    int showYesNoMsgBox(LPCSTR strText);
+    void showYesNoMsgBox(LPCSTR strText);
     void showOkMsgBox(LPCSTR strText);
 
    private:
@@ -183,39 +220,50 @@ class SolitarioGfx {
     DragPileInfo _dragPileInfo;
     LPCardRegionGfx _p_selectedCardRegion;
 
-    SDL_Surface *_p_Screen;
-    SDL_Surface *_p_AlphaDisplay;
-    SDL_Surface *_p_ScreenBackbufferDrag;
-    SDL_Texture *_p_ScreenTexture;
-    SDL_Surface *_p_Dragface;
-    SDL_Surface *_p_SceneBackground;
-    SDL_Renderer *_p_sdlRenderer;
-    SDL_Window *_p_Window;
-    TTF_Font *_p_FontBigText;
-    TTF_Font *_p_FontSmallText;
-    HighScore *_p_HighScore;
-    MusicManager *_p_MusicManager;
+    SDL_Surface* _p_Screen;
+    SDL_Surface* _p_AlphaDisplay;
+    SDL_Surface* _p_ScreenBackbufferDrag;
+    SDL_Texture* _p_ScreenTexture;
+    SDL_Surface* _p_Dragface;
+    SDL_Surface* _p_SceneBackground;
+    SDL_Renderer* _p_sdlRenderer;
+    SDL_Window* _p_Window;
+    TTF_Font* _p_FontBigText;
+    HighScore* _p_HighScore;
+    MusicManager* _p_MusicManager;
 
     int _oldx;
     int _oldy;
 
-    SDL_Surface *_p_Deck;
-    SDL_Surface *_p_Symbols;
+    SDL_Surface* _p_Deck;
+    SDL_Surface* _p_Symbols;
     DeckType _deckType;
 
     bool _startdrag;
 
     std::vector<CardRegionGfx> _cardRegionList;
-    bool _terminated;
-    bool _newgamerequest;
-    ButtonGfx *_p_BtQuit;
-    ButtonGfx *_p_BtNewGame;
-    ButtonGfx *_p_BtToggleSound;
+    ButtonGfx* _p_BtQuit;
+    ButtonGfx* _p_BtNewGame;
+    ButtonGfx* _p_BtToggleSound;
     bool _sceneBackgroundIsBlack;
     int _scoreGame;
     bool _scoreChanged;
-    CurrentTime *_p_currentTime;
+    CurrentTime* _p_currentTime;
     Uint64 _lastUpTimestamp;
+    FadeAction* _p_FadeAction;
+    eState _state;
+    eState _statePrev;
+    eState _stateAfter;
+    eState _stateAfterYes;
+    eState _stateAfterNo;
+    MesgBoxGfx* _p_MsgBox;
+    SDL_Point _ptLast;
+
+    LPErrInApp (SolitarioGfx::*_continueFnCb)();
+    std::function<LPErrInApp()> _continueLamdaCb;
+    LPCardRegionGfx _p_DropRegionForDrag;
+    LPCardStackGfx _p_CardStackForDrag;
+    bool _isInitDrag;
 };
 
 #endif

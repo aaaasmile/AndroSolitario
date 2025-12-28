@@ -85,7 +85,8 @@ o alternativo, molto meglio, senza cambiare la directory (-S è la source dir, -
 Una volta compilato:
 
     cd build
-    ./solitario
+    make  (eventuale, se si cambia il codice)
+    ./solitario 
 
 Problemi con la funzione random di std. Se uso
 
@@ -115,11 +116,25 @@ Nota che il programma va a finire di dafult nella directory ./build/src.
 Cambio la destinazione con set_target_properties in CMakeFiles.
 Gli asset li ho copiati con un post build command.
 
+### Main e uso di callbacks
+L'uso dei callbacks anzichè della funzione main, ha un senso per quanto riguarda
+l'implementazione in wasm, che utilizza un meccanismo di polling. Queste sono le callback
+che bisogna implementare:
+SDL_AppInit, SDL_AppEvent, SDL_AppIterate, and SDL_AppQuit
+Nel file main.cpp uso anche (nota l'utilizzo di SDL_MAIN_USE_CALLBACKS):
+
+    #define SDL_MAIN_USE_CALLBACKS 1
+    #include <SDL3/SDL_main.h>
+
+
 ## Compilazione con target Windows (MySys2)
 
     rm -r build
     cmake -S app/jni/ -B build  -DSDL_WAYLAND=OFF
     cmake --build build
+    cd build 
+    .\solitario.exe
+    ninja
 
 Per far partire il Solitario occorre un device attaccato, altrimenti non parte.
 Siccome ho un'altra versione installata, quella col setup 2_0_1, ho bisogno di salvare
@@ -211,7 +226,12 @@ Però se guardi bene la repository di SDL_ttf c'è già incluso in external la l
 che viene usata per il target di Android. Quindi basta abilitarla con:
 
     -DSDLTTF_VENDORED=ON
-al momento della configurazione del progetto.
+al momento della configurazione del progetto. Se non funziona e per caso hai fatto un cambio di brach
+sul sdl2, per esempio, la directory SDL_ttf/external non va più bene. Quindi tutte le directory scaricate
+vanno cancellate e rifatto il ./download.sh.
+La ragione è che in SDL2 ho messo in source control anche le librerie esterne, mentre in SDL3 le ho tolte
+dal source control. Così però il cambio di branch successivo su SDL3 mi rende inutilizzabile la directory SDL_ttf/external.
+Ho risolto cancellando tutte le directory e lanciato di nuovo ./download.sh. 
 
 Il Linker di wasm mi manda il seguente warning:
 
@@ -224,6 +244,22 @@ la app riesce ora a caricare i fonts.
 
 Gli assets devono essere integrati nel wasm. Per questo si setta in target_link_options
 l'opzione preload-file, che mi genera il file solitario.data con tutti gli assets.
+Però per settare anche le atre opzioni, meglio usare:
+
+    set_target_properties(${PROJECT_NAME} PROPERTIES
+In quanto con target_link_options non mi ha funzionato ALLOW_MEMORY_GROWTH
+
+### Debug di  Emscripten su Android
+Mi è capitato una serie di problemi sul target wasm che gira nel browser in Android (eventi Tap e Mouse contemporanei).
+Su Android il browser non ha la console per vedere i traces. Per questo ci si collega al
+telefono con il cavo usb e si apre Chrome all'indirizzo chrome://inspect.
+Poi si apre l'app sul browser dello smartphone e sul pc si esegue l'inspect del tab del browser remoto.
+In questa nuova finestra sul PC è possibile vedere i logs sulla console.
+
+### Emscripten Touch e mouse
+Il zarget wasm funziona nel browser e quidi gira su device che hanno il touch, il mouse oppure entrambi.
+Se abilito mouse e touch ho gli stessi eventi ripetuti e questo l'app non li supporta (pensa al toggle della musica). 
+Quindi il target Emscripten viene compilato solo con il mouse che funziona decentementre anche su Android.
 
 ## Directory Scratch di questo progetto
 Voglio creare dei piccoli progetti per testare delle funzionalità singole.

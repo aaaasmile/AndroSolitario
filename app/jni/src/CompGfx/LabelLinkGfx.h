@@ -23,8 +23,8 @@ public:
     void Initialize(SDL_Rect* pRect, SDL_Surface* pScreen, TTF_Font* pFont,
                     int iButID, ClickCb& fncbClickEvent);
     void SetWindowText(LPCSTR strCaption) { _ctrlText = strCaption; }
-    void MouseMove(SDL_Event& event);
-    void MouseUp(SDL_Event& event);
+    void MouseMove(SDL_Event* pEvent);
+    void MouseUp(SDL_Event* pEvent);
     virtual void Draw(SDL_Surface* pScreen);
     void EnableWindow(bool bVal) { _isEnabled = bVal; }
     void SetState(eSate eVal);

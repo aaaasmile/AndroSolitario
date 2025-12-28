@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="en-us">
+<html lang="it-it">
 
 <head>
   <meta charset="utf-8">
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <title>Solitarion SDL</title>
+  <title>Solitario SDL</title>
   <style>
     body {
       font-family: arial;
@@ -33,9 +33,19 @@
       background-color: black;
     }
 
-    #emscripten_logo {
-      display: inline-block;
-      margin: 0;
+    footer {
+      padding-left: 3em;
+      padding-right: 3em;
+
+      nav {
+        padding-top: 1rem;
+        font-weight: lighter;
+        font-size: small;
+        display: flex;
+        flex-direction: column;
+        row-gap: 1em;
+        border-top: 2px solid rgb(51, 51, 51);
+      }
     }
 
     .spinner {
@@ -116,7 +126,7 @@
     }
 
     #controls {
-      display: inline-block;
+      /* display: inline-block; */
       float: right;
       vertical-align: top;
       margin-top: 30px;
@@ -145,15 +155,6 @@
   <div class="spinner" id='spinner'></div>
   <div class="emscripten" id="status">Downloading...</div>
 
-  <span id='controls'>
-    <span><input type="checkbox" id="resize">Resize canvas</span>
-    <span><input type="checkbox" id="pointerLock" checked>Lock/hide mouse pointer &nbsp;&nbsp;&nbsp;</span>
-    <span><input type="button" value="Fullscreen"
-        onclick="Module.requestFullscreen(document.getElementById('pointerLock').checked, 
-                                                                            document.getElementById('resize').checked)">
-    </span>
-  </span>
-
   <div class="emscripten">
     <progress value="0" max="100" id="progress" hidden=1></progress>
   </div>
@@ -161,7 +162,6 @@
   <div class="emscripten_border">
     <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" tabindex=-1></canvas>
   </div>
-  <textarea id="output" rows="8"></textarea>
 
   <script type='text/javascript'>
     var statusElement = document.getElementById('status');
@@ -171,6 +171,7 @@
     var Module = {
       preRun: [],
       postRun: [],
+      arguments: ['--language', 'italian'],
       print: (function () {
         var element = document.getElementById('output');
         if (element) element.value = ''; // clear browser cache
@@ -236,7 +237,17 @@
       };
     };
   </script>
-  <script async type="text/javascript" src="solitario.js"></script>
+  <script async type="text/javascript" src="solitario.js?v3.0.4"></script>
 </body>
+<footer>
+  <p>
+    Aggiornato:
+    <time datetime="2025-12-28 15:44">28 Dicembre 2025 - 15:44</time>
+  </p>
+  <nav>
+    <a href="https://invido.it/" >Invido</a>
+  </nav>
+  <p class="copyright">© 2026 - Igor Run for <em>invido.it</em>. All rights reserved.</p>
+</footer>
 
 </html>

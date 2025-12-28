@@ -17,7 +17,7 @@ set(SOURCES App/MusicManager.cpp
             App/GfxUtil.cpp
             App/Languages.cpp
             App/Main.cpp
-            App/Fading.c
+            App/Fading.cpp
             App/Credits.cpp
             App/ErrorInfo.cpp
             App/MenuMgr.cpp
@@ -136,8 +136,8 @@ else()
           SDL3_mixer::SDL3_mixer  
           SDL3_ttf::SDL3_ttf
       )
-      target_link_options(${PROJECT_NAME} PRIVATE
-        "--preload-file=${CMAKE_CURRENT_SOURCE_DIR}/../../src/main/assets@/data"
+      set_target_properties(${PROJECT_NAME} PROPERTIES
+        LINK_FLAGS "--preload-file=${CMAKE_CURRENT_SOURCE_DIR}/../../src/main/assets@/data -s ALLOW_MEMORY_GROWTH=1"
       )
       # Add any WSL2-specific configurations here
         # Set a new output name and different postfixes for Debug/Release builds

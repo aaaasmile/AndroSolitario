@@ -16,33 +16,35 @@ using namespace traits;
 class ButtonGfx;
 
 class MesgBoxGfx {
-public:
+   public:
     MesgBoxGfx(void);
     ~MesgBoxGfx(void);
 
     enum eMSGBOX_TYPE { TY_MBOK, TY_MB_YES_NO };
-    enum {
-        RES_NO = 0,
-        RES_YES = 1,
-        ID_BT_YES = 2,
-        ID_BT_NO = 3,
-        ID_OK = 4
-    };
+    enum eMSGBOX_RES { RES_NO = 0, RES_YES = 1, RES_OK = 2 };
+    enum eMSGBOX_ID { ID_BT_YES = 0, ID_BT_NO = 1, ID_OK = 2 };
 
     LPErrInApp Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
                           TTF_Font* pFont, eMSGBOX_TYPE eval,
                           SDL_Renderer* pRenderer);
-    int Show(SDL_Surface* pScene_background, LPCSTR lpsBut1_txt,
-             LPCSTR lpsBut2_txt, LPCSTR lpsMsg_txt);
+    LPErrInApp Show(SDL_Surface* pScene_background, LPCSTR lpsBut1_txt,
+                    LPCSTR lpsBut2_txt, LPCSTR lpsMsg_txt);
+    LPErrInApp HandleEvent(SDL_Event* pEvent);
+    LPErrInApp HandleIterate(bool& done);
+    bool IsInProgress() { return _inProgress; }
+
     void ButCmdClicked(int iButID);
     void AddLineText(LPCSTR strLine) { _dataStrings.push_back(strLine); }
     void ChangeTextColor(SDL_Color newColor) { _colCurrent = newColor; }
     void ChangeAlpha(Uint8 newAlpha) { _alpha = newAlpha; }
 
-private:
+    eMSGBOX_RES GetResult() { return _result; }
+    eMSGBOX_TYPE GetType() { return _typeMsg; }
+
+   private:
     ClickCb prepClickBtCb();
 
-private:
+   private:
     SDL_Renderer* _p_sdlRenderer;
     SDL_Rect _rctMsgBox;
     STRING _strMsgText;
@@ -53,10 +55,13 @@ private:
     eMSGBOX_TYPE _typeMsg;
     ButtonGfx* _p_BtButt1;
     ButtonGfx* _p_BtButt2;
-    bool _terminated;
-    int _result;
+    eMSGBOX_RES _result;
     VCT_STRING _dataStrings;
     Uint8 _alpha;
+    bool _inProgress;
+    SDL_Texture* _p_ScreenTexture;
+    SDL_Surface* _p_ShadowSrf;
+    SDL_Surface* _p_Scene_background;
 };
 
 #endif

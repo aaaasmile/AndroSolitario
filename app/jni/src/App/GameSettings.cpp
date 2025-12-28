@@ -17,6 +17,10 @@
 #include "MusicManager.h"
 #include "WinTypeGlobal.h"
 
+#if PLATFORM_EMS
+#include <emscripten.h>
+#endif
+
 static LPGameSettings _p_GameSettings = NULL;
 static char _settingsRootDir[1024] = "";
 static char _exeRootDir[1024] = "";
@@ -85,14 +89,55 @@ void GameSettings::TerminateMusicManager() {
     }
 }
 
+#if PLATFORM_EMS
+static std::string loadGameSetting(const char* key, const char* defaultValue) {
+    char js_command[256];
+    snprintf(js_command, sizeof(js_command),
+             "localStorage.getItem('game_%s') || '%s'", key, defaultValue);
+    const char* result = emscripten_run_script_string(js_command);
+    return result != NULL ? std::string(result) : std::string(defaultValue);
+}
+
+static void saveGameSetting(const char* key, const char* value) {
+    char js_cmd[256];
+    snprintf(js_cmd, sizeof(js_cmd), "localStorage.setItem('game_%s', '%s')",
+             key, value);
+    emscripten_run_script(js_cmd);
+}
+#endif
+
 LPErrInApp GameSettings::LoadSettings() {
+#if PLATFORM_EMS
+    std::string defval = MusicEnabled ? "true" : "false";
+    std::string result = loadGameSetting("MusicEnabled", defval.c_str());
+    //TRACE_DEBUG("Read setting result '%s'\n", result.c_str());
+    MusicEnabled = result == "true" ? true : false;
+
+    defval = std::to_string(CurrentLanguage);
+    result = loadGameSetting("CurrentLanguage", defval.c_str());
+    int langId = std::stoi(result);    
+    CurrentLanguage = (Languages::eLangId)langId;
+
+    defval = std::to_string(DeckTypeVal.GetTypeIndex());
+    result = loadGameSetting("DeckTypeVal", defval.c_str());
+    int deckId = std::stoi(result);
+    DeckTypeVal.SetTypeIndex(deckId);
+
+    defval = std::to_string(BackgroundType);
+    result = loadGameSetting("BackgroundType", defval.c_str());
+    int bt = std::stoi(result);
+    BackgroundType = (BackgroundTypeEnum)bt;
+
+    defval = PlayerName;
+    PlayerName = loadGameSetting("PlayerName", defval.c_str());
+    
+#else
     LPErrInApp err = setSettingFileName();
     if (err != NULL) {
         return err;
     }
 
     TRACE("Load setting file %s\n", g_filepath);
-    // SDL_RWops* src = SDL_RWFromFile(g_filepath, "rb"); SDL 2
     SDL_IOStream* src = SDL_IOFromFile(g_filepath, "rb");
     if (src == 0) {
         TRACE("No setting file found, no problem ignore it and use default\n");
@@ -105,25 +150,21 @@ LPErrInApp GameSettings::LoadSettings() {
     uint8_t backgroudType;
     uint8_t nameSize;
 
-    // if (SDL_RWread(src, &deckId, 1, 1) == 0) { SDL 2
     if (SDL_ReadIO(src, &deckId, 1) == 0) {
         return ERR_UTIL::ErrorCreate(
             "SDL_RWread on setting file error (file %s): %s\n", g_filepath,
             SDL_GetError());
     }
-    // if (SDL_RWread(src, &langId, 1, 1) == 0) { SDL 2
     if (SDL_ReadIO(src, &langId, 1) == 0) {
         return ERR_UTIL::ErrorCreate(
             "SDL_RWread on setting file error (file %s): %s\n", g_filepath,
             SDL_GetError());
     }
-    // if (SDL_RWread(src, &musEnabled, 1, 1) == 0) { SDL 2
     if (SDL_ReadIO(src, &musEnabled, 1) == 0) {
         return ERR_UTIL::ErrorCreate(
             "SDL_RWread on setting file error (file %s): %s\n", g_filepath,
             SDL_GetError());
     }
-    // if (SDL_RWread(src, &backgroudType, 1, 1) == 0) { SDL 2
     if (SDL_ReadIO(src, &backgroudType, 1) == 0) {
         return ERR_UTIL::ErrorCreate(
             "SDL_RWread on setting file error (file %s): %s\n", g_filepath,
@@ -145,7 +186,6 @@ LPErrInApp GameSettings::LoadSettings() {
         }
     }
 
-    // SDL_RWclose(src); SDL 2
     SDL_CloseIO(src);
 
     DeckTypeVal.SetTypeIndex(deckId);
@@ -153,10 +193,22 @@ LPErrInApp GameSettings::LoadSettings() {
     MusicEnabled = musEnabled;
     BackgroundType = (BackgroundTypeEnum)backgroudType;
     PlayerName = playername;
+#endif
     return NULL;
 }
 
 LPErrInApp GameSettings::SaveSettings() {
+#if PLATFORM_EMS
+    std::string val = MusicEnabled ? "true" : "false";
+    saveGameSetting("MusicEnabled", val.c_str());
+    val = std::to_string(CurrentLanguage);
+    saveGameSetting("CurrentLanguage", val.c_str());
+    val = std::to_string(DeckTypeVal.GetTypeIndex());
+    saveGameSetting("DeckTypeVal", val.c_str());
+    val = std::to_string(BackgroundType);
+    saveGameSetting("BackgroundType", val.c_str());
+    saveGameSetting("PlayerName", PlayerName.c_str());
+#else
     LPErrInApp err = setSettingFileName();
     if (err != NULL) {
         return err;
@@ -173,28 +225,23 @@ LPErrInApp GameSettings::SaveSettings() {
     musEnabled = (uint8_t)MusicEnabled;
     backgroudType = (uint8_t)BackgroundType;
 
-    // SDL_RWops* dst = SDL_RWFromFile(g_filepath, "wb"); SDL 2
     SDL_IOStream* dst = SDL_IOFromFile(g_filepath, "wb");
     if (dst == 0) {
         return ERR_UTIL::ErrorCreate("Unable to save setting file %s",
                                      g_filepath);
     }
-    // int numWritten = SDL_RWwrite(dst, &deckId, 1, 1); SDL 2
     int numWritten = SDL_WriteIO(dst, &deckId, 1);
     if (numWritten < 1) {
         return ERR_UTIL::ErrorCreate("SDL_WriteIO error %s\n", SDL_GetError());
     }
-    // numWritten = SDL_RWwrite(dst, &langId, 1, 1); SDL 2
     numWritten = SDL_WriteIO(dst, &langId, 1);
     if (numWritten < 1) {
         return ERR_UTIL::ErrorCreate("SDL_WriteIO error %s\n", SDL_GetError());
     }
-    // numWritten = SDL_RWwrite(dst, &musEnabled, 1, 1); SDL 2
     numWritten = SDL_WriteIO(dst, &musEnabled, 1);
     if (numWritten < 1) {
         return ERR_UTIL::ErrorCreate("SDL_WriteIO error %s\n", SDL_GetError());
     }
-    // numWritten = SDL_RWwrite(dst, &backgroudType, 1, 1); SDL 2
     numWritten = SDL_WriteIO(dst, &backgroudType, 1);
     if (numWritten < 1) {
         return ERR_UTIL::ErrorCreate("SDL_WriteIO error %s\n", SDL_GetError());
@@ -211,8 +258,8 @@ LPErrInApp GameSettings::SaveSettings() {
     if (numWritten < 1) {
         return ERR_UTIL::ErrorCreate("SDL_WriteIO error %s\n", SDL_GetError());
     }
-    // SDL_RWclose(dst); SDL 2
     SDL_CloseIO(dst);
+#endif
     return NULL;
 }
 
@@ -228,6 +275,12 @@ LPErrInApp GameSettings::LoadFonts() {
     if (_p_fontVera == NULL) {
         return ERR_UTIL::ErrorCreate("Unable to load font %s, error: %s\n",
                                      g_lpszIniFontVeraFname, SDL_GetError());
+    }
+    _p_fontMedium = TTF_OpenFont(g_lpszIniFontVeraFname, _fontMediumSize);
+    if (_p_fontMedium == NULL) {
+        return ERR_UTIL::ErrorCreate(
+            "Unable to load medium font %s, error: %s\n",
+            g_lpszIniFontVeraFname, SDL_GetError());
     }
     _p_fontSymb = TTF_OpenFont(g_lpszFontSymbFname, _fontSymSize);
     if (_p_fontSymb == NULL) {

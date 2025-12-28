@@ -45,9 +45,9 @@ static bool IsPointInsideCtrl(const SDL_Rect& rct, const SDL_Point& pt) {
     return false;
 }
 
-void CheckBoxGfx::FingerDown(SDL_Event& event) {
+void CheckBoxGfx::FingerDown(SDL_Event* pEvent) {
     SDL_Point pt;
-    _p_GameSettings->GetTouchPoint(event.tfinger, &pt);
+    _p_GameSettings->GetTouchPoint(pEvent->tfinger, &pt);
     if (IsPointInsideCtrl(_rctCtrl, pt)) {
         if (_clicked) {
             _clicked = false;
@@ -59,18 +59,18 @@ void CheckBoxGfx::FingerDown(SDL_Event& event) {
     }
 }
 
-void CheckBoxGfx::MouseMove(SDL_Event& event, SDL_Surface* pScreen,
+void CheckBoxGfx::MouseMove(SDL_Event* pEvent, SDL_Surface* pScreen,
                             SDL_Surface* pScene_background) {}
 
-void CheckBoxGfx::MouseUp(SDL_Event& event) {
+void CheckBoxGfx::MouseUp(SDL_Event* pEvent) {
     if (_p_GameSettings->InputType == InputTypeEnum::TouchWithoutMouse) {
         return;
     }
     if (_visibleState == VISIBLE && _enabled) {
-        if (event.motion.x >= _rctCtrl.x &&
-            event.motion.x <= _rctCtrl.x + _rctCtrl.w &&
-            event.motion.y >= _rctCtrl.y &&
-            event.motion.y <= _rctCtrl.y + _rctCtrl.h) {
+        if (pEvent->motion.x >= _rctCtrl.x &&
+            pEvent->motion.x <= _rctCtrl.x + _rctCtrl.w &&
+            pEvent->motion.y >= _rctCtrl.y &&
+            pEvent->motion.y <= _rctCtrl.y + _rctCtrl.h) {
             if (_clicked) {
                 _clicked = false;
             } else {
@@ -137,7 +137,6 @@ void CheckBoxGfx::DrawButton(SDL_Surface* pScreen) {
     yOffset = rctCheck.h;
 
     int tx, ty;
-    //TTF_SizeText(_p_FontText, _buttonText.c_str(), &tx, &ty);
     TTF_GetStringSize(_p_FontText, _buttonText.c_str(), 0, &tx, &ty);
 
     if (xOffset < 0) {

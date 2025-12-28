@@ -61,14 +61,9 @@ void ComboGfx::Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
     _rctBoxDown.w = boxIncW;
     _rctBoxDown.h = boxIncH;
 
-    //_p_surfBar = SDL_CreateRGBSurface(SDL_SWSURFACE, _rctCtrl.w, _rctCtrl.h,
-    // 32,
-    //                                  0, 0, 0, 0); SDL 2
     _p_surfBar =
         GFX_UTIL::SDL_CreateRGBSurface(_rctCtrl.w, _rctCtrl.h, 32, 0, 0, 0, 0);
 
-    // SDL_FillRect(_p_surfBar, NULL,
-    //              SDL_MapRGBA(pScreen->format, 255, 128, 30, 0));
     SDL_FillSurfaceRect(_p_surfBar, NULL,
                         SDL_MapRGB(SDL_GetPixelFormatDetails(pScreen->format),
                                    NULL, 255, 128, 30));
@@ -76,13 +71,9 @@ void ComboGfx::Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
     SDL_SetSurfaceBlendMode(_p_surfBar, SDL_BLENDMODE_BLEND);
     SDL_SetSurfaceAlphaMod(_p_surfBar, 127);
 
-    // _p_surfBoxSel = SDL_CreateRGBSurface(SDL_SWSURFACE, _rctBoxUp.w,
-    //                                      _rctBoxUp.h, 32, 0, 0, 0, 0); SDL 2
     _p_surfBoxSel = GFX_UTIL::SDL_CreateRGBSurface(_rctBoxUp.w, _rctBoxUp.h, 32,
                                                    0, 0, 0, 0);
 
-    // SDL_FillRect(_p_surfBoxSel, NULL,
-    //              SDL_MapRGBA(pScreen->format, 200, 200, 130, 0)); SDL 2
     SDL_FillSurfaceRect(_p_surfBoxSel, NULL,
                         SDL_MapRGB(SDL_GetPixelFormatDetails(pScreen->format),
                                    NULL, 200, 200, 130));
@@ -90,13 +81,9 @@ void ComboGfx::Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
     SDL_SetSurfaceBlendMode(_p_surfBoxSel, SDL_BLENDMODE_BLEND);
     SDL_SetSurfaceAlphaMod(_p_surfBoxSel, 127);
 
-    // _p_surfBoxUNSel = SDL_CreateRGBSurface(SDL_SWSURFACE, _rctBoxUp.w,
-    //                                        _rctBoxUp.h, 32, 0, 0, 0, 0);
     _p_surfBoxUNSel = GFX_UTIL::SDL_CreateRGBSurface(_rctBoxUp.w, _rctBoxUp.h,
                                                      32, 0, 0, 0, 0);
 
-    // SDL_FillRect(_p_surfBoxUNSel, NULL,
-    //              SDL_MapRGBA(pScreen->format, 255, 128, 30, 0));
     SDL_FillSurfaceRect(_p_surfBoxUNSel, NULL,
                         SDL_MapRGB(SDL_GetPixelFormatDetails(pScreen->format),
                                    NULL, 255, 128, 30));
@@ -130,14 +117,14 @@ void ComboGfx::SetVisibleState(VisbleState eVal) {
     }
 }
 
-void ComboGfx::MouseMove(SDL_Event& event, SDL_Surface* pScreen,
+void ComboGfx::MouseMove(SDL_Event* pEvent, SDL_Surface* pScreen,
                          SDL_Texture* pScene_background,
                          SDL_Texture* pScreenTexture) {
     if (_visibleState == VISIBLE && _enabled) {
-        if (event.motion.x >= _rctCtrl.x &&
-            event.motion.x <= _rctCtrl.x + _rctCtrl.w &&
-            event.motion.y >= _rctCtrl.y &&
-            event.motion.y <= _rctCtrl.y + _rctCtrl.h) {
+        if (pEvent->motion.x >= _rctCtrl.x &&
+            pEvent->motion.x <= _rctCtrl.x + _rctCtrl.w &&
+            pEvent->motion.y >= _rctCtrl.y &&
+            pEvent->motion.y <= _rctCtrl.y + _rctCtrl.h) {
             // mouse inner button
             _color = GFX_UTIL_COLOR::Orange;
             RedrawButton(pScreen, pScene_background, pScreenTexture);
@@ -162,9 +149,9 @@ static bool IsPointInsideBox(const SDL_Rect& rct, const SDL_Point& pt) {
     return false;
 }
 
-void ComboGfx::FingerDown(SDL_Event& event) {
+void ComboGfx::FingerDown(SDL_Event* pEvent) {
     SDL_Point pt;
-    _p_GameSettings->GetTouchPoint(event.tfinger, &pt);
+    _p_GameSettings->GetTouchPoint(pEvent->tfinger, &pt);
     if (IsPointInsideBox(_rctBoxUp, pt)) {
         // mouse on up box
         _currDataIndex++;
@@ -187,13 +174,13 @@ void ComboGfx::FingerDown(SDL_Event& event) {
     }
 }
 
-void ComboGfx::MouseUp(SDL_Event& event) {
+void ComboGfx::MouseUp(SDL_Event* pEvent) {
     if (_p_GameSettings->InputType == InputTypeEnum::TouchWithoutMouse) {
         return;
     }
     if (_visibleState == VISIBLE && _enabled) {
-        int mx = event.motion.x;
-        int my = event.motion.y;
+        int mx = pEvent->motion.x;
+        int my = pEvent->motion.y;
         if (mx >= _rctBoxUp.x && mx <= _rctBoxUp.x + _rctBoxUp.w &&
             my >= _rctBoxUp.y && my <= _rctBoxUp.y + _rctBoxUp.h) {
             // mouse on up box
@@ -220,6 +207,8 @@ void ComboGfx::MouseUp(SDL_Event& event) {
                     ->Click(_fncbClickEvent.self, _currDataIndex);
         }
     }
+    // TRACE_DEBUG("[combo] Index %d, size %d \n", _currDataIndex,
+    //             _vctDataStrings.size());
 }
 
 void ComboGfx::DrawButton(SDL_Surface* pScreen) {
@@ -265,7 +254,6 @@ void ComboGfx::DrawButton(SDL_Surface* pScreen) {
 
         // draw current selected text
         int tx, ty;
-        // TTF_SizeText(_p_fontText, _buttonText.c_str(), &tx, &ty); SDL 2
         TTF_GetStringSize(_p_fontText, _buttonText.c_str(), 0, &tx, &ty);
         int xOffset = (_rctText.w - tx) / 2;
         if (xOffset < 0) {
@@ -278,7 +266,6 @@ void ComboGfx::DrawButton(SDL_Surface* pScreen) {
                              _p_fontText);
 
         // draw text upper box
-        // TTF_SizeText(_p_fontText, LP_PLUS, &tx, &ty);
         TTF_GetStringSize(_p_fontText, LP_PLUS, 0, &tx, &ty);
 
         xOffset = (_rctBoxUp.w - tx) / 2;
@@ -298,7 +285,6 @@ void ComboGfx::DrawButton(SDL_Surface* pScreen) {
                              _rctBoxUp.y + yOffset, _color, _p_fontText);
 
         // draw text down box
-        // TTF_SizeText(_p_fontText, LP_MINUS, &tx, &ty);
         TTF_GetStringSize(_p_fontText, LP_MINUS, 0, &tx, &ty);
 
         xOffset = (_rctBoxDown.w - tx) / 2;

@@ -175,12 +175,10 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
     _p_sdlRenderer = pRenderer;
     _p_Window = pWindow;
 
-    SDL_Rect clipRect;  // SDL 3
+    SDL_Rect clipRect;
     SDL_GetSurfaceClipRect(_p_Screen, &clipRect);
-    //_screenW = _p_Screen->clip_rect.w; SDL 2
     _screenW = clipRect.w;
     _box_X = _screenW / 6;
-    //_screenH = _p_Screen->clip_rect.h; // SDL 2
     _screenH = clipRect.h;
     _box_Y = _screenH / 5;
 
@@ -208,9 +206,6 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
           _rctPanelRedBox.w, _rctPanelRedBox.h);
     g_MenuItemBoxes.SetBox(_rctPanelRedBox);
 
-    // _p_ScreenBackbuffer = SDL_CreateRGBSurface(SDL_SWSURFACE, _p_Screen->w,
-    //                                            _p_Screen->h, 32, 0, 0, 0, 0);
-    //                                            SDL 2
     _p_ScreenBackbuffer = GFX_UTIL::SDL_CreateRGBSurface(
         _p_Screen->w, _p_Screen->h, 32, 0, 0, 0, 0);
 
@@ -225,18 +220,13 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
     _p_fontAriblk = pGameSettings->GetFontAriblk();
     _p_fontVera = pGameSettings->GetFontVera();
 
-    // _p_MenuBox = SDL_CreateRGBSurface(SDL_SWSURFACE, _rctPanelRedBox.w,
-    //                                   _rctPanelRedBox.h, 32, 0, 0, 0, 0);
     _p_MenuBox = GFX_UTIL::SDL_CreateRGBSurface(
         _rctPanelRedBox.w, _rctPanelRedBox.h, 32, 0, 0, 0, 0);
-    // SDL_FillRect(_p_MenuBox, NULL,
-    //              SDL_MapRGBA(_p_Screen->format, 136, 60, 60, 0)); SDL 2
     SDL_FillSurfaceRect(_p_MenuBox, NULL,
                         SDL_MapRGB(SDL_GetPixelFormatDetails(_p_Screen->format),
                                    NULL, 0, 0, 0));
 
     SDL_SetSurfaceBlendMode(_p_MenuBox, SDL_BLENDMODE_BLEND);
-    // SDL_SetSurfaceAlphaMod(_p_MenuBox, 127);
     SDL_SetSurfaceAlphaMod(_p_MenuBox, 120);
 
     // link to invido.it
@@ -285,9 +275,6 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
     _p_LabelVersion->SetState(LabelGfx::INVISIBLE);
     _p_LabelVersion->SetWindowText(g_lpszVersion);
 
-    // SDL_FillRect(_p_ScreenBackbuffer, &_p_ScreenBackbuffer->clip_rect,
-    //              SDL_MapRGBA(_p_ScreenBackbuffer->format, 60, 60, 60, 0));
-    //              SDL 2
     SDL_GetSurfaceClipRect(_p_ScreenBackbuffer, &clipRect);
     SDL_FillSurfaceRect(
         _p_ScreenBackbuffer, &clipRect,
@@ -296,13 +283,16 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
 
     SDL_BlitSurface(_p_Screen, NULL, _p_ScreenBackbuffer, NULL);
 
+    _p_GameSettings = GameSettings::GetSettings();
+    _p_MusicManager = _p_GameSettings->GetMusicManager();
+    _ignoreMouseEvent =
+        pGameSettings->InputType == InputTypeEnum::TouchWithoutMouse;
+
     return NULL;
 }
 
 LPErrInApp MenuMgr::drawStaticScene() {
-    LPGameSettings pGameSettings = GameSettings::GetSettings();
-    LPLanguages pLanguages = pGameSettings->GetLanguageMan();
-    // function called in loop
+    LPLanguages pLanguages = _p_GameSettings->GetLanguageMan();
     SDL_Rect rctTarget;
     LPErrInApp err = NULL;
     rctTarget.x = (_p_ScreenBackbuffer->w - _p_SceneBackground->w) / 2;
@@ -314,7 +304,6 @@ LPErrInApp MenuMgr::drawStaticScene() {
     SDL_BlitSurface(_p_SceneBackground, NULL, _p_ScreenBackbuffer, &rctTarget);
 
     Uint32 colorBarTitle =
-        // SDL_MapRGB(_p_ScreenBackbuffer->format, 153, 202, 51); SDL 2
         SDL_MapRGB(SDL_GetPixelFormatDetails(_p_ScreenBackbuffer->format), NULL,
                    153, 202, 51);
 
@@ -326,7 +315,7 @@ LPErrInApp MenuMgr::drawStaticScene() {
     // header bar
     int hbarOffset = 0;
     int hbar = 46;
-    if (pGameSettings->NeedScreenMagnify()) {
+    if (_p_GameSettings->NeedScreenMagnify()) {
         hbar = 65;
     }
     GFX_UTIL::FillRect(_p_ScreenBackbuffer, _box_X, _box_Y - (2 + hbarOffset),
@@ -369,9 +358,8 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     int intraOffset = (_rctPanelRedBox.h - 80) / NumOfMenuItems;
     int minIntraOffsetY = 80;
     intraOffset = std::min(minIntraOffsetY, intraOffset);
-    LPGameSettings pGameSettings = GameSettings::GetSettings();
-    LPLanguages pLanguages = pGameSettings->GetLanguageMan();
-    if (pGameSettings->NeedScreenMagnify()) {
+    LPLanguages pLanguages = _p_GameSettings->GetLanguageMan();
+    if (_p_GameSettings->NeedScreenMagnify()) {
         intraOffset += 50;
     }
     if (_rctPanelRedBox.h <= 600) {
@@ -496,10 +484,116 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     return NULL;
 }
 
-LPErrInApp MenuMgr::HandleRootMenu() {
+LPErrInApp MenuMgr::HandleRootMenuEvent(SDL_Event* pEvent) {
+    LPErrInApp err;
+    // TRACE_DEBUG("Ignore mouse events: %b", ignoreMouseEvent);
+    if (pEvent->type == SDL_EVENT_QUIT) {
+        (_menuDlgt.tc)->LeaveMenu(_menuDlgt.self);
+        return NULL;
+    }
+#if HASTOUCH
+    SDL_Point touchLocation;
+    if (pEvent->type == SDL_EVENT_FINGER_DOWN) {
+        _p_GameSettings->GetTouchPoint(pEvent->tfinger, &touchLocation);
+        TRACE_DEBUG("Tap in x=%d, y=%d\n", touchLocation.x, touchLocation.y);
+        MenuItemBox tapInfoBox;
+        if (g_MenuItemBoxes.IsPointInside(touchLocation, tapInfoBox)) {
+            _focusedMenuItem = tapInfoBox.MenuItem;
+            TRACE_DEBUG("Select menu %s from Tap down\n",
+                        MenuItemEnumToString(_focusedMenuItem));
+            err = rootMenuNext();
+            if (err != NULL) {
+                return err;
+            }
+        } else {
+            TRACE_DEBUG("Tap outside the menu list\n");
+            _focusedMenuItem = MenuItemEnum::NOTHING;
+        }
+    }
+#endif
+
+    if (pEvent->type == SDL_EVENT_KEY_DOWN) {
+        if (pEvent->key.key == SDLK_UP) {
+            _focusedMenuItem = previousMenu(_focusedMenuItem);
+            if (_focusedMenuItem != MenuItemEnum::NOTHING) {
+                _p_MusicManager->PlayEffect(MusicManager::EFFECT_OVER);
+            }
+        }
+        if (pEvent->key.key == SDLK_DOWN) {
+            _focusedMenuItem = nextMenu(_focusedMenuItem);
+            if (_focusedMenuItem != MenuItemEnum::NOTHING) {
+                _p_MusicManager->PlayEffect(MusicManager::EFFECT_OVER);
+            }
+        }
+        if (pEvent->key.key == SDLK_RETURN) {
+            TRACE_DEBUG("Select menu from return\n");
+            err = rootMenuNext();
+            if (err != NULL) {
+                return err;
+            }
+        }
+        if (pEvent->key.key == SDLK_ESCAPE) {
+            (_menuDlgt.tc)->LeaveMenu(_menuDlgt.self);
+        }
+    }
+    if (pEvent->type == SDL_EVENT_MOUSE_MOTION) {
+        if (_ignoreMouseEvent) {
+            return NULL;
+        }
+        SDL_Point motionLocation;
+        motionLocation.x = (int)pEvent->motion.x;
+        motionLocation.y = (int)pEvent->motion.y;
+
+        MenuItemBox mouseInfoBox;
+        if (g_MenuItemBoxes.IsPointInside(motionLocation, mouseInfoBox)) {
+            _focusedMenuItem = mouseInfoBox.MenuItem;
+            if (_focusedMenuItem != MenuItemEnum::NOTHING &&
+                _focusedMenuItem != _prevFocusedMenuItem) {
+                _p_MusicManager->PlayEffect(MusicManager::EFFECT_OVER);
+                _prevFocusedMenuItem = _focusedMenuItem;
+            }
+        } else {
+            _focusedMenuItem = MenuItemEnum::NOTHING;
+        }
+        _p_homeUrl->MouseMove(pEvent);
+    }
+    if (pEvent->type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
+        if (_ignoreMouseEvent) {
+            return NULL;
+        }
+        MenuItemBox mouseInfoBox;
+        SDL_Point clickLocation;
+        clickLocation.x = (int)pEvent->button.x;
+        clickLocation.y = (int)pEvent->button.y;
+
+        if (g_MenuItemBoxes.IsPointInside(clickLocation, mouseInfoBox)) {
+            _focusedMenuItem = mouseInfoBox.MenuItem;
+            TRACE_DEBUG("Select menu %s from mouse down\n",
+                        MenuItemEnumToString(_focusedMenuItem));
+            err = rootMenuNext();
+            if (err != NULL) {
+                return err;
+            }
+        } else {
+            TRACE_DEBUG("Mouse outside the menu list\n");
+            _focusedMenuItem = MenuItemEnum::NOTHING;
+        }
+    } else if (pEvent->type == SDL_EVENT_MOUSE_BUTTON_UP) {
+        if (_ignoreMouseEvent) {
+            return NULL;
+        }
+        _p_homeUrl->MouseUp(pEvent);
+    }
+
+    return NULL;
+}
+
+LPErrInApp MenuMgr::HandleRootMenuIterate() {
     LPErrInApp err;
     // show the link url label
+#if HASGOTLINK
     _p_homeUrl->SetState(LabelLinkGfx::VISIBLE);
+#endif
     _p_LabelVersion->SetState(LabelGfx::VISIBLE);
 
     err = drawStaticScene();
@@ -509,105 +603,6 @@ LPErrInApp MenuMgr::HandleRootMenu() {
     err = drawMenuTextList();
     if (err != NULL) {
         return err;
-    }
-
-    SDL_Point touchLocation;
-    SDL_Event event;
-    LPGameSettings pGameSettings = GameSettings::GetSettings();
-    MusicManager* pMusicManager = pGameSettings->GetMusicManager();
-    bool ignoreMouseEvent =
-        pGameSettings->InputType == InputTypeEnum::TouchWithoutMouse;
-    // TRACE_DEBUG("Ignore mouse events: %b", ignoreMouseEvent);
-    while (SDL_PollEvent(&event)) {
-        if (event.type == SDL_EVENT_QUIT) {
-            (_menuDlgt.tc)->LeaveMenu(_menuDlgt.self);
-            break;
-        }
-
-        if (event.type == SDL_EVENT_FINGER_DOWN) {
-            pGameSettings->GetTouchPoint(event.tfinger, &touchLocation);
-            TRACE_DEBUG("Tap in x=%d, y=%d\n", touchLocation.x,
-                        touchLocation.y);
-            MenuItemBox tapInfoBox;
-            if (g_MenuItemBoxes.IsPointInside(touchLocation, tapInfoBox)) {
-                _focusedMenuItem = tapInfoBox.MenuItem;
-                TRACE_DEBUG("Select menu %s from Tap down\n",
-                            MenuItemEnumToString(_focusedMenuItem));
-                rootMenuNext();
-            } else {
-                TRACE_DEBUG("Tap outside the menu list\n");
-                _focusedMenuItem = MenuItemEnum::NOTHING;
-            }
-        }
-
-        if (event.type == SDL_EVENT_KEY_DOWN) {
-            if (event.key.key == SDLK_UP) {
-                _focusedMenuItem = previousMenu(_focusedMenuItem);
-                if (_focusedMenuItem != MenuItemEnum::NOTHING) {
-                    pMusicManager->PlayEffect(MusicManager::EFFECT_OVER);
-                }
-            }
-            if (event.key.key == SDLK_DOWN) {
-                _focusedMenuItem = nextMenu(_focusedMenuItem);
-                if (_focusedMenuItem != MenuItemEnum::NOTHING) {
-                    pMusicManager->PlayEffect(MusicManager::EFFECT_OVER);
-                }
-            }
-            if (event.key.key == SDLK_RETURN) {
-                TRACE_DEBUG("Select menu from return\n");
-                rootMenuNext();
-            }
-            if (event.key.key == SDLK_ESCAPE) {
-                (_menuDlgt.tc)->LeaveMenu(_menuDlgt.self);
-            }
-        }
-        if (event.type == SDL_EVENT_MOUSE_MOTION) {
-            if (ignoreMouseEvent) {
-                break;
-            }
-            // SDL_Point motionLocation = {event.motion.x, event.motion.y}; SDL
-            // 2
-            SDL_Point motionLocation;
-            motionLocation.x = (int)event.motion.x;
-            motionLocation.y = (int)event.motion.y;
-
-            MenuItemBox mouseInfoBox;
-            if (g_MenuItemBoxes.IsPointInside(motionLocation, mouseInfoBox)) {
-                _focusedMenuItem = mouseInfoBox.MenuItem;
-                if (_focusedMenuItem != MenuItemEnum::NOTHING && 
-                    _focusedMenuItem != _prevFocusedMenuItem) {
-                    pMusicManager->PlayEffect(MusicManager::EFFECT_OVER);
-                    _prevFocusedMenuItem = _focusedMenuItem;
-                }    
-            } else {
-                _focusedMenuItem = MenuItemEnum::NOTHING;
-            }
-            _p_homeUrl->MouseMove(event);
-        }
-        if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
-            if (ignoreMouseEvent) {
-                break;
-            }
-            MenuItemBox mouseInfoBox;
-            SDL_Point clickLocation;
-            clickLocation.x = (int)event.button.x;
-            clickLocation.y = (int)event.button.y;
-
-            if (g_MenuItemBoxes.IsPointInside(clickLocation, mouseInfoBox)) {
-                _focusedMenuItem = mouseInfoBox.MenuItem;
-                TRACE_DEBUG("Select menu %s from mouse down\n",
-                            MenuItemEnumToString(_focusedMenuItem));
-                rootMenuNext();
-            } else {
-                TRACE_DEBUG("Mouse outside the menu list\n");
-                _focusedMenuItem = MenuItemEnum::NOTHING;
-            }
-        } else if (event.type == SDL_EVENT_MOUSE_BUTTON_UP) {
-            if (ignoreMouseEvent) {
-                break;
-            }
-            _p_homeUrl->MouseUp(event);
-        }
     }
     _p_homeUrl->Draw(_p_ScreenBackbuffer);
     _p_LabelVersion->Draw(_p_ScreenBackbuffer);
@@ -635,13 +630,15 @@ void MenuMgr::updateTextureAsFlipScreen() {
     SDL_RenderPresent(_p_sdlRenderer);
 }
 
-void MenuMgr::rootMenuNext() {
+LPErrInApp MenuMgr::rootMenuNext() {
+    LPErrInApp err;
     TRACE_DEBUG("Menu selected %s\n", MenuItemEnumToString(_focusedMenuItem));
     if (_focusedMenuItem == MenuItemEnum::QUIT) {
-        (_menuDlgt.tc)->LeaveMenu(_menuDlgt.self);
+        err = (_menuDlgt.tc)->LeaveMenu(_menuDlgt.self);
     } else {
-        (_menuDlgt.tc)->SetNextMenu(_menuDlgt.self, _focusedMenuItem);
+        err = (_menuDlgt.tc)->EnterMenu(_menuDlgt.self, _focusedMenuItem);
     }
+    return err;
 }
 
 MenuItemEnum previousMenu(MenuItemEnum currMenu) {
@@ -654,12 +651,22 @@ MenuItemEnum previousMenu(MenuItemEnum currMenu) {
             return MenuItemEnum::MENU_OPTIONS;
         case MenuItemEnum::MENU_HELP:
             return MenuItemEnum::MENU_CREDITS;
+#if HASHELPMENU
         case MenuItemEnum::MENU_HIGHSCORE:
             return MenuItemEnum::MENU_HELP;
+#else
+        case MenuItemEnum::MENU_HIGHSCORE:
+            return MenuItemEnum::MENU_CREDITS;
+#endif
         case MenuItemEnum::QUIT:
             return MenuItemEnum::MENU_HIGHSCORE;
+#if HASQUITMENU
         case MenuItemEnum::NOTHING:
             return MenuItemEnum::QUIT;
+#else
+        case MenuItemEnum::NOTHING:
+            return MenuItemEnum::MENU_HIGHSCORE;
+#endif
         default:
             return currMenu;
     }
@@ -672,12 +679,22 @@ MenuItemEnum nextMenu(MenuItemEnum currMenu) {
             return MenuItemEnum::MENU_OPTIONS;
         case MenuItemEnum::MENU_OPTIONS:
             return MenuItemEnum::MENU_CREDITS;
+#if HASHELPMENU
         case MenuItemEnum::MENU_CREDITS:
             return MenuItemEnum::MENU_HELP;
+#else
+        case MenuItemEnum::MENU_CREDITS:
+            return MenuItemEnum::MENU_HIGHSCORE;
+#endif
         case MenuItemEnum::MENU_HELP:
             return MenuItemEnum::MENU_HIGHSCORE;
+#if HASQUITMENU
         case MenuItemEnum::MENU_HIGHSCORE:
             return MenuItemEnum::QUIT;
+#else
+        case MenuItemEnum::MENU_HIGHSCORE:
+            return MenuItemEnum::NOTHING;
+#endif
         case MenuItemEnum::QUIT:
             return MenuItemEnum::QUIT;
         case MenuItemEnum::NOTHING:

@@ -35,7 +35,8 @@
             "name": "Emscripten",
             "includePath": [
                 "${workspaceFolder}/**",
-                "/usr/include"
+                "/usr/include",
+                "~/emsdk/upstream/emscripten/system/include"
             ],
             "defines": [
                 "TRACEINSERVICE",
