@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(solitario)
+project(solitario VERSION 3.0.5 LANGUAGES C CXX)
 
 # Don't mistake osx for unix
 if(UNIX AND NOT ANDROID AND NOT APPLE AND NOT RISCOS)
@@ -139,22 +139,23 @@ else()
       set_target_properties(${PROJECT_NAME} PROPERTIES
         LINK_FLAGS "--preload-file=${CMAKE_CURRENT_SOURCE_DIR}/../../src/main/assets@/data -s ALLOW_MEMORY_GROWTH=1"
       )
-      # Add any WSL2-specific configurations here
-        # Set a new output name and different postfixes for Debug/Release builds
-        set_target_properties(solitario PROPERTIES
-            OUTPUT_NAME "solitario"
-            DEBUG_POSTFIX ".debug"
-            RELEASE_POSTFIX ""
-            RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
-        )
-        # copy asset in build/bin
-        message(STATUS "Current source dir: ${CMAKE_CURRENT_SOURCE_DIR}")
-        add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-          COMMAND ${CMAKE_COMMAND} -E copy_directory
-              ${CMAKE_CURRENT_SOURCE_DIR}/../../src/emscripten/
-              $<TARGET_FILE_DIR:${PROJECT_NAME}>
-          COMMENT "Copying stuff for web"
-        )
+      # Add any Emscripten-specific configurations here
+      # Set a new output name and different postfixes for Debug/Release builds
+      set_target_properties(solitario PROPERTIES
+          OUTPUT_NAME "${PROJECT_NAME}_${PROJECT_VERSION}"
+          DEBUG_POSTFIX ".debug"
+          RELEASE_POSTFIX ""
+          RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
+      )
+      add_compile_options(-s BUILD_AS=PROJECT_${PROJECT_VERSION})
+      # copy asset in build/bin
+      message(STATUS "Current source dir: ${CMAKE_CURRENT_SOURCE_DIR}")
+      add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+            ${CMAKE_CURRENT_SOURCE_DIR}/../../src/emscripten/
+            $<TARGET_FILE_DIR:${PROJECT_NAME}>
+        COMMENT "Copying stuff for web"
+      )
     else()
       # Note on Android: it is built using gradle and mk files, so no cmake section here
       message(STATUS "=> TODO add cmake support please this Target: " ${CMAKE_SYSTEM})

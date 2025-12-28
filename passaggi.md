@@ -196,7 +196,25 @@ Ora non rimane altro che compilare:
     emmake make -j$(nproc)
 
 Rimanendo invece in root, come in wsl2 o windows, non mi funziona poi il build, che va fatto con emmake.
-    
+
+### Nuova versione
+Quando è pronta una nuova versione, c'è bisogno di nuovi file solitario_xxx.data/js/wasm + index.html.
+In tutto sono 4 files. I files solitario_xxx vengono generati dal file cmakelist.txt col target emscripten.
+Il placeholder xxx è cambiato con la linea 
+
+    OUTPUT_NAME "${PROJECT_NAME}_${PROJECT_VERSION}"
+Nota che PROJECT_VERSION viene definito in testa al file CMakeLIst.txt, qui:
+
+    project(solitario VERSION 3.0.5 LANGUAGES C CXX)
+Purtroppo il file index.html non viene generato automaticamente, quindi il file index.html
+
+    <script async type="text/javascript" src="solitario_3.0.5.js?v=305"></script>
+
+va cambiato manualmente (quello che si trova in app/src/emscripten).
+La versione che compare sulla pagina principale, invece, è nel file src/App/Config.h
+- Incrementa la versione in CMakeList.txt
+- Incrementa la versione in Config.h
+- Adatta il file index.html usando la nuova versione (versione e timestamp)
 
 ### Problemi col target Emscripten-1
 Ho avuto dei problemi con SDL_ttf. Il primo errore è quello che non trova SDL_3 dir. Siccome SDL_mixer e sdl_image
@@ -256,6 +274,10 @@ Su Android il browser non ha la console per vedere i traces. Per questo ci si co
 telefono con il cavo usb e si apre Chrome all'indirizzo chrome://inspect.
 Poi si apre l'app sul browser dello smartphone e sul pc si esegue l'inspect del tab del browser remoto.
 In questa nuova finestra sul PC è possibile vedere i logs sulla console.
+Non riesco a capire perché sul mio Nothing Phone ricevo sempre:
+
+    Pending authentication: please accept debugging session on the device. 
+In questo modo non riesco a vedere la console del browser.
 
 ### Emscripten Touch e mouse
 Il zarget wasm funziona nel browser e quidi gira su device che hanno il touch, il mouse oppure entrambi.

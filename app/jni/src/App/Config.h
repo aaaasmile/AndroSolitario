@@ -1,10 +1,10 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#define VERSION "Ver 3.0.4 20251228"
+#define VERSION "Ver 3.0.5 20251228"
 #define PACKAGE_URL "https://invido.it"
 #define AUTHOR "igorrun"
-#define VERSION_HOME "030004"
+#define VERSION_HOME "030005"
 
 // Platform detection
 #if defined(__ANDROID__) || defined(ANDROID)
