@@ -52,6 +52,7 @@ void TextInputGfx::HandleEvent(SDL_Event* pEvent) {
 #if HASMOUSE
     LPGameSettings pGameSettings = GameSettings::GetSettings();
     if (pEvent->type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
+        TRACE_DEBUG("[TextInput - event] SDL_EVENT_MOUSE_BUTTON_DOWN \n");
         if (pGameSettings->InputType == InputTypeEnum::TouchWithoutMouse) {
             return;
         }
@@ -63,6 +64,7 @@ void TextInputGfx::HandleEvent(SDL_Event* pEvent) {
              mouseY >= _rctCtrl.y && mouseY <= _rctCtrl.y + _rctCtrl.h);
 
         if (_hasFocus) {
+            TRACE_DEBUG("[TextInput - event] calling SDL_StartTextInput \n");
             SDL_StartTextInput(_p_Window);
         } else {
             SDL_StopTextInput(_p_Window);
