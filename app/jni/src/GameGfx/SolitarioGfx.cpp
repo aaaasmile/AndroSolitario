@@ -215,10 +215,10 @@ LPErrInApp SolitarioGfx::Initialize(SDL_Surface* s, SDL_Renderer* r,
         tx = btposx;
         offsetY = 250;
         rctBt1.y = _p_Screen->h - offsetY;
-    }else{
+    } else {
         tx = tx - btw - 30;
     }
-    
+
     rctBt1.x = tx;
     rctBt1.w = btwSymb;
     ClickCb cbBtToggleSound = prepClickToggleSoundCb();
@@ -944,7 +944,7 @@ LPErrInApp SolitarioGfx::LoadCardPac() {
 
 LPErrInApp SolitarioGfx::LoadSymbolsForPac() {
     std::string strFileSymbName = g_lpszSymbDir;
-    Uint8 r, g, b;
+    Uint8 r, g, b, a;
     strFileSymbName += _deckType.GetSymbolFileName();
     if (_deckType.GetType() == eDeckType::TAROCK_PIEMONT) {
         SDL_IOStream* srcSymb = SDL_IOFromFile(strFileSymbName.c_str(), "rb");
@@ -964,25 +964,18 @@ LPErrInApp SolitarioGfx::LoadSymbolsForPac() {
         b = 241;
         SDL_CloseIO(srcSymb);
     } else {
+        a = 255;
         _p_Symbols = SDL_LoadBMP(strFileSymbName.c_str());
         if (_p_Symbols == 0) {
             return ERR_UTIL::ErrorCreate("Load bitmap failed: %s\n",
                                          SDL_GetError());
         }
-        if (_deckType.GetSymbolFileName() == "symb_336.bmp") {
-            r = 242;
-            g = 30;
-            b = 206;
-        } else {
-            r = 0;
-            g = 128;
-            b = 0;
-        }
+        SDL_ReadSurfacePixel(_p_Symbols, 0, 0, &r, &g, &b, &a);
     }
     SDL_SetSurfaceColorKey(
         _p_Symbols, true,
-        SDL_MapRGB(SDL_GetPixelFormatDetails(_p_Symbols->format), NULL, r, g,
-                   b));
+        SDL_MapRGBA(SDL_GetPixelFormatDetails(_p_Symbols->format), NULL, r, g,
+                    b, a));
 
     g_SymbolWidth = _p_Symbols->w / 4;
     g_SymbolHeight = _p_Symbols->h;
@@ -1822,7 +1815,7 @@ LPErrInApp SolitarioGfx::drawScore(SDL_Surface* pScreen) {
         tx = 100;
         offsetY = 400;
     }
-    if (_scoreGame < -2000){
+    if (_scoreGame < -2000) {
         _scoreGame = -2000;
     }
     int ty = pScreen->h - offsetY;
@@ -1905,7 +1898,8 @@ void SolitarioGfx::clearScore() {
 }
 
 void SolitarioGfx::bonusScore() {
-    uint64_t bonus = (2 * _scoreGame) - (_p_currentTime->GetNumOfSeconds() * 10);
+    uint64_t bonus =
+        (2 * _scoreGame) - (_p_currentTime->GetNumOfSeconds() * 10);
     if (bonus > 0) {
         _scoreGame += bonus;
         _scoreChanged = true;
