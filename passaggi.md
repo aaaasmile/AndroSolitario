@@ -77,7 +77,8 @@ riguarda il target Android.
     cd build
     cmake ../app/jni/ -DSDL_WAYLAND=OFF
     cmake --build .
-o alternativo, molto meglio, senza cambiare la directory (-S è la source dir, -B è la build dir):
+o alternativo, senza cambiare la directory (-S è la source dir, -B è la build dir)
+anche se dopo devo entrare nella dir quando cambio il codice:
 
     rm -r -R build
     cmake -S app/jni/ -B build  -DSDL_WAYLAND=OFF
