@@ -1822,10 +1822,13 @@ LPErrInApp SolitarioGfx::drawScore(SDL_Surface* pScreen) {
         tx = 100;
         offsetY = 400;
     }
+    if (_scoreGame < -2000){
+        _scoreGame = -2000;
+    }
     int ty = pScreen->h - offsetY;
     char buff[256];
     snprintf(buff, sizeof(buff), "%s : %d",
-             pLanguages->GetCStringId(Languages::ID_SCORE), _scoreGame);
+             pLanguages->GetCStringId(Languages::ID_SCORE), (int)_scoreGame);
 
     SDL_Color colorText = GFX_UTIL_COLOR::White;
     if (_scoreGame < 0) {
@@ -1855,7 +1858,7 @@ LPErrInApp SolitarioGfx::drawScore(SDL_Surface* pScreen) {
 
 void SolitarioGfx::updateBadScoreScoreOnTime() {
     if (_p_currentTime->IsMoreThenOneSecElapsed()) {
-        int deltaSec = _p_currentTime->GetDeltaFromLastUpdate();
+        uint64_t deltaSec = _p_currentTime->GetDeltaFromLastUpdate();
         _scoreGame = _scoreGame - deltaSec;
         _scoreChanged = true;
     }
@@ -1896,13 +1899,13 @@ void SolitarioGfx::updateTextureAsFlipScreen() {
 }
 
 void SolitarioGfx::clearScore() {
-    int oldScore = _scoreGame;
+    uint64_t oldScore = _scoreGame;
     _scoreGame = 0;
     _scoreChanged = (oldScore != _scoreGame);
 }
 
 void SolitarioGfx::bonusScore() {
-    int bonus = (2 * _scoreGame) - (_p_currentTime->GetNumOfSeconds() * 10);
+    uint64_t bonus = (2 * _scoreGame) - (_p_currentTime->GetNumOfSeconds() * 10);
     if (bonus > 0) {
         _scoreGame += bonus;
         _scoreChanged = true;

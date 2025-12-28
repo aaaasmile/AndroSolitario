@@ -36,7 +36,7 @@ class HighScore {
     ~HighScore();
     LPErrInApp Load();
     LPErrInApp Save();
-    LPErrInApp SaveScore(int score, int numCard);
+    LPErrInApp SaveScore(int64_t score, int numCard);
     LPErrInApp Show(SDL_Surface* screen, SDL_Surface* pSurfTitle,
                     SDL_Renderer* psdlRenderer);
     LPErrInApp HandleEvent(SDL_Event* pEvent);

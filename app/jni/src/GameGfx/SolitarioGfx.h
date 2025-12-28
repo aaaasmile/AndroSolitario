@@ -246,7 +246,7 @@ class SolitarioGfx {
     ButtonGfx* _p_BtNewGame;
     ButtonGfx* _p_BtToggleSound;
     bool _sceneBackgroundIsBlack;
-    int _scoreGame;
+    int64_t _scoreGame;
     bool _scoreChanged;
     CurrentTime* _p_currentTime;
     Uint64 _lastUpTimestamp;

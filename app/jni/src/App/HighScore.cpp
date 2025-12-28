@@ -134,7 +134,10 @@ LPErrInApp HighScore::Save() {
     return NULL;
 }
 
-LPErrInApp HighScore::SaveScore(int score, int numCard) {
+LPErrInApp HighScore::SaveScore(int64_t score, int numCard) {
+    if (score < 0 || score > 1000000) {
+        return NULL;
+    }
     int j = -1;
     for (int i = 0; i < NUMOFSCORE; i++) {
         if (score > _scoreInfo[i].Score) {
