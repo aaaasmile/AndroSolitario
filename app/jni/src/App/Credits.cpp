@@ -33,7 +33,7 @@ char const* credit_text[] = {
     "",
     "",
     "-LEAD PROGRAMMER",
-    "IGORRUN ON INVIDO DOT IT",
+    "IGORRUN ON INVIDO IT",
     "",
     "",
     "",
