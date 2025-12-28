@@ -226,7 +226,8 @@ LPErrInApp HighScore::Load() {
 }
 
 LPErrInApp HighScore::HandleEvent(SDL_Event* pEvent) {
-    if (_state != HighScore::IN_PROGRESS) {
+    if (_state != HighScore::IN_PROGRESS &&
+        _state != HighScore::IN_PROGRESS_WAIT) {
         return NULL;
     }
     if (pEvent->type == SDL_EVENT_KEY_DOWN) {
@@ -363,7 +364,9 @@ LPErrInApp HighScore::HandleIterate(bool& done) {
                           _p_surfScreen->pitch);
         SDL_RenderTexture(_p_sdlRenderer, _p_ScreenTexture, NULL, NULL);
         SDL_RenderPresent(_p_sdlRenderer);
-
+        _state = HighScore::IN_PROGRESS_WAIT;
+    }
+    if (_state == HighScore::IN_PROGRESS_WAIT) {
         Uint64 now_time = SDL_GetTicks();
         uint32_t elapsed_sec = (now_time / 1000) - (_start_time / 1000);
         if (elapsed_sec > 30) {

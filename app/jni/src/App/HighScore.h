@@ -21,7 +21,15 @@ typedef struct {
 
 class HighScore {
     enum { NUMOFSCORE = 10 };
-    enum eState { READY_TO_START, WAIT_FOR_FADING, INIT, IN_PROGRESS, DONE, TERMINATED };
+    enum eState {
+        READY_TO_START,
+        WAIT_FOR_FADING,
+        INIT,
+        IN_PROGRESS,
+        IN_PROGRESS_WAIT,
+        DONE,
+        TERMINATED
+    };
 
    public:
     HighScore();
