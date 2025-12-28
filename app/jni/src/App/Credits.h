@@ -39,5 +39,7 @@ class CreditsView {
     eState _stateAfter;
     uint32_t _scroll;
     uint32_t _line;
+    Uint64 _start_time;
+    Uint64 _lastUpTimestamp;
 };
 #endif

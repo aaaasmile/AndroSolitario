@@ -180,13 +180,14 @@ LPErrInApp CreditsView::HandleIterate(bool& done) {
         return NULL;
     }
 
-    if (_state == CreditsView::WAIT_FOR_FADING){
-        if (_p_FadeAction->IsInProgress()){
+    if (_state == CreditsView::WAIT_FOR_FADING) {
+        if (_p_FadeAction->IsInProgress()) {
             _p_FadeAction->Iterate();
             return NULL;
         }
-        if(_state == _stateAfter){
-            return ERR_UTIL::ErrorCreate("Next state could not be WAIT_FOR_FADING\n");
+        if (_state == _stateAfter) {
+            return ERR_UTIL::ErrorCreate(
+                "Next state could not be WAIT_FOR_FADING\n");
         }
         _state = _stateAfter;
     }
@@ -210,12 +211,18 @@ LPErrInApp CreditsView::HandleIterate(bool& done) {
         }
         _p_MusicManager->PlayMusic(MusicManager::MUSIC_CREDITS_SND,
                                    MusicManager::LOOP_ON);
-        
+
         return NULL;
     }
 
     if (_state == CreditsView::IN_PROGRESS) {
-        
+        Uint64 now_time = SDL_GetTicks();
+        if (_lastUpTimestamp + 30 > now_time){
+            //TRACE_DEBUG("Ignore iteration because too fast \n");
+            return NULL;
+        }
+        _lastUpTimestamp = now_time;
+
         dest.x = (_p_surfScreen->w - _p_SurfTitle->w) / 2;
         dest.y = 0;
         dest.w = _p_SurfTitle->w;
@@ -251,9 +258,14 @@ LPErrInApp CreditsView::HandleIterate(bool& done) {
         if (_scroll >= 9) {
             _scroll = 0;
             _line++;
-
-            if (credit_text[_line] == NULL)
-                _state = CreditsView::DONE;
+            if (credit_text[_line] == NULL) {
+                _line--;
+                uint32_t elapsed_sec = (now_time / 1000) - (_start_time / 1000);
+                if (elapsed_sec > 30) {
+                    TRACE_DEBUG("after 30 sec, time to exit from high score\n");
+                    _state = CreditsView::DONE;
+                }
+            }
         }
         SDL_UpdateTexture(_p_ScreenTexture, NULL, _p_surfScreen->pixels,
                           _p_surfScreen->pitch);
@@ -263,8 +275,8 @@ LPErrInApp CreditsView::HandleIterate(bool& done) {
 
     if (_state == CreditsView::DONE) {
         TRACE("CreditsView done \n");
-        _p_FadeAction->Fade(_p_surfScreen, _p_surfScreen, 1, true, _p_sdlRenderer,
-                            NULL);
+        _p_FadeAction->Fade(_p_surfScreen, _p_surfScreen, 1, true,
+                            _p_sdlRenderer, NULL);
         _state = CreditsView::WAIT_FOR_FADING;
         _stateAfter = CreditsView::TERMINATED;
     }
@@ -292,6 +304,7 @@ void CreditsView::Show(SDL_Surface* p_surf_screen, SDL_Surface* pSurfTitle,
     _ignoreMouseEvent =
         _p_GameSettings->InputType == InputTypeEnum::TouchWithoutMouse;
     _state = CreditsView::INIT;
+    _start_time = SDL_GetTicks();
 }
 
 void CreditsView::draw_text(char const* str) {
