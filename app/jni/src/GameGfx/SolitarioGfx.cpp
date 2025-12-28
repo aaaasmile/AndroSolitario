@@ -1024,12 +1024,14 @@ LPErrInApp SolitarioGfx::handleGameLoopFingerDownEvent(SDL_Event* pEvent) {
     LPGameSettings pGameSettings = GameSettings::GetSettings();
     pGameSettings->GetTouchPoint(pEvent->tfinger, &pt);
     LPErrInApp err;
+    bool isDoubleClick;
     if (_lastUpTimestamp + 500 > now_time) {
-        err = doubleTapOrRightClick(pt);
+        err = doubleTapOrRightClick(pt, isDoubleClick);
         if (err != NULL) {
             return NULL;
         }
-    } else {
+    };
+    if (!isDoubleClick) {
         err = singleTapOrLeftClick(pt);
         if (err != NULL) {
             return NULL;
@@ -1078,11 +1080,13 @@ LPErrInApp SolitarioGfx::handleGameLoopMouseDownEvent(SDL_Event* pEvent) {
     return NULL;
 }
 
-LPErrInApp SolitarioGfx::doubleTapOrRightClick(SDL_Point& pt) {
+LPErrInApp SolitarioGfx::doubleTapOrRightClick(SDL_Point& pt,
+                                               bool& isDoubleClick) {
     TRACE_DEBUG("doubleTapOrRightClick recognized\n");
     LPErrInApp err;
     CardRegionGfx* srcReg;
     bool isInitDrag = false;
+    isDoubleClick = false;
 
     srcReg = SelectRegionOnPoint(pt.x, pt.y);
     if (srcReg == NULL)
@@ -1109,6 +1113,7 @@ LPErrInApp SolitarioGfx::doubleTapOrRightClick(SDL_Point& pt) {
             return err;
         }
         _continueFnCb = &SolitarioGfx::InitDragAfterFromDoubleTap;
+        isDoubleClick = true;
     }
 
     return NULL;
@@ -1491,8 +1496,12 @@ LPErrInApp SolitarioGfx::HandleIterate(bool& done) {
     }
 
     if (_state == SolitarioGfx::IN_DOUBLE_TAPCLICK) {
+        bool isDoubleClick = false;
         _state = SolitarioGfx::IN_GAME;
-        doubleTapOrRightClick(_ptLast);
+        doubleTapOrRightClick(_ptLast, isDoubleClick);
+        if (!isDoubleClick){
+            singleTapOrLeftClick(_ptLast);
+        }
     }
 
     if (_state == SolitarioGfx::WAIT_FOR_FADING) {

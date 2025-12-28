@@ -194,7 +194,7 @@ class SolitarioGfx {
     LPErrInApp handleGameLoopFingerUpEvent(SDL_Event* pEvent);
     LPErrInApp handleGameLoopFingerMotion(SDL_Event* pEvent);
     LPErrInApp singleTapOrLeftClick(SDL_Point& pt);
-    LPErrInApp doubleTapOrRightClick(SDL_Point& pt);
+    LPErrInApp doubleTapOrRightClick(SDL_Point& pt, bool& isDoubleClick);
     LPErrInApp endOfDragAndCheckForVictory();
     LPErrInApp checkForVictory();
     //void dropAfterZoom();
