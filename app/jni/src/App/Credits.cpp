@@ -134,6 +134,7 @@ char const chars[38][5][6] = {{".###.", "#..##", "#.#.#", "##..#", ".###."},
 CreditsView::CreditsView() {
     _scroll = 0;
     _line = 0;
+    _lastUpTimestamp = 0;
     _state = CreditsView::READY_TO_START;
     _p_sdlRenderer = NULL;
     _p_surfScreen = NULL;
@@ -190,9 +191,11 @@ LPErrInApp CreditsView::HandleIterate(bool& done) {
                 "Next state could not be WAIT_FOR_FADING\n");
         }
         _state = _stateAfter;
+        TRACE_DEBUG("[CreditsView] Continue with state %d\n", _state);
     }
 
     if (_state == CreditsView::INIT) {
+        TRACE_DEBUG("[CreditsView] State init\n");
         _line = 0;
         _scroll = 0;
         if (_p_ScreenTexture != NULL) {
@@ -261,7 +264,7 @@ LPErrInApp CreditsView::HandleIterate(bool& done) {
             if (credit_text[_line] == NULL) {
                 _line--;
                 uint32_t elapsed_sec = (now_time / 1000) - (_start_time / 1000);
-                if (elapsed_sec > 30) {
+                if (elapsed_sec > 20) {
                     TRACE_DEBUG("after 30 sec, time to exit from high score\n");
                     _state = CreditsView::DONE;
                 }
@@ -305,6 +308,7 @@ void CreditsView::Show(SDL_Surface* p_surf_screen, SDL_Surface* pSurfTitle,
         _p_GameSettings->InputType == InputTypeEnum::TouchWithoutMouse;
     _state = CreditsView::INIT;
     _start_time = SDL_GetTicks();
+    _lastUpTimestamp = 0;
 }
 
 void CreditsView::draw_text(char const* str) {

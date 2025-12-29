@@ -152,11 +152,12 @@ I vari files, compresi i logs, vanno a finire in C:\Users\igor\.solitario030002
 Nota che in Windows le librerie die SDL sono tutte Dll.
 
 ### Problemi in Windows
-- L'icona dell'asso di bastoni non è trasparaente
+- L'icona dell'asso di bastoni non è trasparaente [DONE]
 - Il debugger in Visual Code e MySys2 non funziona
 - Quando scopre una carta sulla pila impiega troppo tempo per scoprirla. (ho dovuto mettere dei delay 
  tra le varie update dello screen, per esempio nel drag e drop) [DONE]
 - L'animazione finale della vittoria è troppo veloce [DONE]
+- Highscore non funziona
 
 ## Target web (Emscripten-1)
 Come riferimento per SDL3, vedi app/jni/SDL/docs/README-emscripten.md
