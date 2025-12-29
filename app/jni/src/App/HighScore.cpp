@@ -30,6 +30,7 @@ HighScore::HighScore() {
     _p_ScreenTexture = NULL;
     _p_GameSettings = NULL;
     _p_MusicManager = NULL;
+    _lastUpTimestamp = 0;
     _state = HighScore::READY_TO_START;
 
     for (int k = 0; k < 10; k++) {
@@ -251,7 +252,7 @@ LPErrInApp HighScore::HandleEvent(SDL_Event* pEvent) {
 }
 
 LPErrInApp HighScore::HandleIterate(bool& done) {
-    SDL_Rect dest;
+    SDL_Rect src, dest;
     if (_state == HighScore::READY_TO_START) {
         return NULL;
     }
@@ -260,12 +261,13 @@ LPErrInApp HighScore::HandleIterate(bool& done) {
             _p_FadeAction->Iterate();
             return NULL;
         }
-        TRACE("HighScore - fade end \n");
+        TRACE("HighScore - fade end, next state is %d \n", _stateAfter);
         if (_state == _stateAfter) {
             return ERR_UTIL::ErrorCreate(
                 "Next state could not be WAIT_FOR_FADING\n");
         }
         _state = _stateAfter;
+        return NULL;
     }
 
     if (_state == HighScore::INIT) {
@@ -297,6 +299,29 @@ LPErrInApp HighScore::HandleIterate(bool& done) {
         dest.h = _p_SurfTitle->h;
 
         SDL_BlitSurface(_p_SurfTitle, NULL, _p_surfScreen, &dest);
+
+        src.x = 0;
+        src.y = (_p_SurfTitle->h) + 2;
+        src.w = _p_surfScreen->w;
+        src.h = _p_surfScreen->h - (_p_SurfTitle->h);
+
+        dest.x = 0;
+        dest.y = (_p_SurfTitle->h);
+        dest.w = src.w;
+        dest.h = src.h;
+
+        SDL_BlitSurface(_p_surfScreen, &src, _p_surfScreen, &dest);
+
+        dest.x = 0;
+        dest.y = (_p_surfScreen->h) - 2;
+        dest.w = _p_surfScreen->w;
+        dest.h = 2;
+
+        SDL_FillSurfaceRect(
+            _p_surfScreen, &dest,
+            SDL_MapRGB(SDL_GetPixelFormatDetails(_p_surfScreen->format), NULL,
+                       0, 0, 0));
+
         int ax = 70;
         int bx = 300;
         int cx = 100;
@@ -363,18 +388,27 @@ LPErrInApp HighScore::HandleIterate(bool& done) {
             xOff = 0;
         }
 
+        _state = HighScore::IN_PROGRESS_WAIT;
+        // TRACE_DEBUG("[HandleIterate] next state is IN_PROGRESS_WAIT \n");
+    }
+    if (_state == HighScore::IN_PROGRESS_WAIT) {
+        Uint64 now_time = SDL_GetTicks();
+        if (_lastUpTimestamp + 30 > now_time) {
+            // TRACE_DEBUG("Ignore iteration because too fast \n");
+            return NULL;
+        }
+        _lastUpTimestamp = now_time;
+
         SDL_UpdateTexture(_p_ScreenTexture, NULL, _p_surfScreen->pixels,
                           _p_surfScreen->pitch);
         SDL_RenderTexture(_p_sdlRenderer, _p_ScreenTexture, NULL, NULL);
         SDL_RenderPresent(_p_sdlRenderer);
-        _state = HighScore::IN_PROGRESS_WAIT;
-    }
-    if (_state == HighScore::IN_PROGRESS_WAIT) {
-        Uint64 now_time = SDL_GetTicks();
+
         uint32_t elapsed_sec = (now_time / 1000) - (_start_time / 1000);
-        if (elapsed_sec > 30) {
-            TRACE_DEBUG("after 30 sec, time to exit from high score\n");
+        if (elapsed_sec > 20) {
+            TRACE_DEBUG("after 20 sec, time to exit from high score\n");
             _state = HighScore::DONE;
+            return NULL;
         }
 
         return NULL;
@@ -406,6 +440,7 @@ LPErrInApp HighScore::Show(SDL_Surface* p_surf_screen, SDL_Surface* pSurfTitle,
     _p_surfScreen = p_surf_screen;
     _p_SurfTitle = pSurfTitle;
     _start_time = SDL_GetTicks();
+    _lastUpTimestamp = _start_time;
 
     _p_GameSettings = GameSettings::GetSettings();
     _p_MusicManager = _p_GameSettings->GetMusicManager();

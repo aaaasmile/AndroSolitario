@@ -57,6 +57,7 @@ class HighScore {
     bool _ignoreMouseEvent;
     Uint64 _start_time;
     eState _stateAfter;
+    Uint64 _lastUpTimestamp;
 };
 
 #endif
