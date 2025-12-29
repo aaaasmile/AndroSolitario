@@ -613,7 +613,7 @@ LPErrInApp SolitarioGfx::zoomDropCardIterate() {
     *g_zoomInfo->pSy = dest.y = py;
 
     Uint64 now_time = SDL_GetTicks();
-    if (_lastIterateTimestamp + 30 <= now_time) {
+    if (_lastIterateTimestamp + 8 <= now_time) {
         // TRACE_DEBUG("Iteration slow enought to update the display\n");
         SDL_BlitSurface(_p_ScreenBackbufferDrag, &rcs, _p_Screen, &rcd);
         SDL_BlitSurface(_p_Dragface, NULL, _p_Screen, &dest);
