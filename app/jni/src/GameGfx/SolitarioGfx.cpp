@@ -45,6 +45,7 @@ SolitarioGfx::SolitarioGfx() {
     _p_DropRegionForDrag = NULL;
     _p_CardStackForDrag = NULL;
     _isInitDrag = false;
+    _lastIterateTimestamp = 0;
 }
 
 SolitarioGfx::~SolitarioGfx() {
@@ -383,6 +384,7 @@ LPErrInApp SolitarioGfx::InitDragContinue() {
         TRACE_DEBUG("[INITDRAG_STEP1]  DrawStaticScene \n");
         DrawStaticScene();
         _state = SolitarioGfx::INITDRAG_STEP2;
+        _lastIterateTimestamp = SDL_GetTicks();
         return NULL;
     }
 
@@ -434,9 +436,17 @@ LPErrInApp SolitarioGfx::InitDragContinue() {
         updateTextureAsFlipScreen();
         _state = SolitarioGfx::INITDRAG_AFTER;
         TRACE_DEBUG("[STEP 2]InitDrag - end \n");
+        _lastIterateTimestamp = SDL_GetTicks();
         return NULL;
     }
     if (_state == SolitarioGfx::INITDRAG_AFTER) {
+        Uint64 now_time = SDL_GetTicks();
+        if (_lastIterateTimestamp + 8 > now_time) {
+            //TRACE_DEBUG("Ignore iteration because too fast. State is %d \n", _state);
+            return NULL;
+        }
+        updateTextureAsFlipScreen();
+        _lastIterateTimestamp = now_time;
         _state = SolitarioGfx::IN_GAME;  // ahead set beacause the callback can
                                          // change the state
         if (_continueFnCb != NULL) {
@@ -1096,7 +1106,7 @@ LPErrInApp SolitarioGfx::doubleTapOrRightClick(SDL_Point& pt,
     if (pCard == NULL) {
         return NULL;
     }
-    if(_p_DropRegionForDrag != NULL){
+    if (_p_DropRegionForDrag != NULL) {
         TRACE_DEBUG("Drag/Drop already ongoing \n");
         return NULL;
     }
@@ -1432,6 +1442,7 @@ LPErrInApp SolitarioGfx::HandleEvent(SDL_Event* pEvent) {
 LPErrInApp SolitarioGfx::HandleIterate(bool& done) {
     LPErrInApp err = NULL;
     if (_state == SolitarioGfx::READY_TO_START) {
+        _lastIterateTimestamp = SDL_GetTicks();
         TRACE_DEBUG("[SolitarioGfx - Iterate] ready to start\n");
         DrawInitialScene();
         return NULL;
@@ -1454,7 +1465,7 @@ LPErrInApp SolitarioGfx::HandleIterate(bool& done) {
     if (_state == SolitarioGfx::INITDRAG_STEP1 ||
         _state == SolitarioGfx::INITDRAG_STEP2 ||
         _state == SolitarioGfx::INITDRAG_AFTER) {
-        TRACE_DEBUG("[SolitarioGfx - Iterate] INITDRAG_%d \n", _state);
+        //TRACE_DEBUG("[SolitarioGfx - Iterate] INITDRAG_%d \n", _state);
         InitDragContinue();
         return NULL;
     }
@@ -1485,6 +1496,12 @@ LPErrInApp SolitarioGfx::HandleIterate(bool& done) {
     }
 
     if (_state == SolitarioGfx::IN_GAME) {
+        Uint64 now_time = SDL_GetTicks();
+        if (_lastIterateTimestamp + 8 > now_time) {
+            //TRACE_DEBUG("Ignore iteration because too fast. State is %d \n", _state);
+            return NULL;
+        }
+        _lastIterateTimestamp = now_time;
         if (_statePrev != _state) {
             DrawStaticScene();
             _statePrev = _state;
