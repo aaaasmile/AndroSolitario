@@ -442,7 +442,8 @@ LPErrInApp SolitarioGfx::InitDragContinue() {
     if (_state == SolitarioGfx::INITDRAG_AFTER) {
         Uint64 now_time = SDL_GetTicks();
         if (_lastIterateTimestamp + 8 > now_time) {
-            //TRACE_DEBUG("Ignore iteration because too fast. State is %d \n", _state);
+            // TRACE_DEBUG("Ignore iteration because too fast. State is %d \n",
+            // _state);
             return NULL;
         }
         updateTextureAsFlipScreen();
@@ -890,6 +891,13 @@ LPErrInApp SolitarioGfx::VictoryAnimation() {
         return ERR_UTIL::ErrorCreate(
             "[VictoryAnimation] called in worng state");
     }
+    Uint64 now_time = SDL_GetTicks();
+    if (_lastIterateTimestamp + 9 > now_time) {
+        // TRACE_DEBUG("Ignore iteration because too fast. State is %d \n",
+        // _state);
+        return NULL;
+    }
+    _lastIterateTimestamp = now_time;
 
     if (_state == SolitarioGfx::START_VICTORY) {
         TRACE("Victory animation - Start \n");
@@ -1465,7 +1473,7 @@ LPErrInApp SolitarioGfx::HandleIterate(bool& done) {
     if (_state == SolitarioGfx::INITDRAG_STEP1 ||
         _state == SolitarioGfx::INITDRAG_STEP2 ||
         _state == SolitarioGfx::INITDRAG_AFTER) {
-        //TRACE_DEBUG("[SolitarioGfx - Iterate] INITDRAG_%d \n", _state);
+        // TRACE_DEBUG("[SolitarioGfx - Iterate] INITDRAG_%d \n", _state);
         InitDragContinue();
         return NULL;
     }
@@ -1498,7 +1506,8 @@ LPErrInApp SolitarioGfx::HandleIterate(bool& done) {
     if (_state == SolitarioGfx::IN_GAME) {
         Uint64 now_time = SDL_GetTicks();
         if (_lastIterateTimestamp + 8 > now_time) {
-            //TRACE_DEBUG("Ignore iteration because too fast. State is %d \n", _state);
+            // TRACE_DEBUG("Ignore iteration because too fast. State is %d \n",
+            // _state);
             return NULL;
         }
         _lastIterateTimestamp = now_time;
