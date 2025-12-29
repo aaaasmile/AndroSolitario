@@ -1096,6 +1096,10 @@ LPErrInApp SolitarioGfx::doubleTapOrRightClick(SDL_Point& pt,
     if (pCard == NULL) {
         return NULL;
     }
+    if(_p_DropRegionForDrag != NULL){
+        TRACE_DEBUG("Drag/Drop already ongoing \n");
+        return NULL;
+    }
 
     if (((srcReg->RegionTypeId() == RegionType::RT_TABLEAU) ||
          (srcReg->RegionTypeId() == RegionType::RT_DECKSTOCK_FACEUP)) &&
@@ -1131,6 +1135,7 @@ LPErrInApp SolitarioGfx::InitDragAfterFromDoubleTap() {
             delete _p_CardStackForDrag;
             _p_CardStackForDrag = NULL;
         }
+        _p_DropRegionForDrag = NULL;
         TRACE_DEBUG("InitDragAfterFromDoubleTap - drop end \n");
         return NULL;
     };
@@ -1469,6 +1474,7 @@ LPErrInApp SolitarioGfx::HandleIterate(bool& done) {
             if (err != NULL) {
                 return err;
             }
+            _p_DropRegionForDrag = NULL;
         } else {
             TRACE_DEBUG(
                 "[SolitarioGfx - Iterate] nothing to do after the zoom (next "
