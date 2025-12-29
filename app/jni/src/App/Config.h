@@ -1,10 +1,12 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#define VERSION "Ver 3.0.6 20251229"
+#define VERSION "Ver 3.0.7 20251229"
 #define PACKAGE_URL "https://invido.it"
 #define AUTHOR "igorrun"
-#define VERSION_HOME "030005"
+#ifdef WIN32
+    #define VERSION_HOME "030007" // this is used to reset settings and score in windows
+#endif
 
 // Platform detection
 #if defined(__ANDROID__) || defined(ANDROID)

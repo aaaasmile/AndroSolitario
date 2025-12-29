@@ -680,7 +680,7 @@ void AppGfx::ParseCmdLine(int argc, char* argv[], SDL_AppResult& res) {
     res = SDL_APP_CONTINUE;
     for (int i = 1; i < argc; i++) {
         if (strcmp(argv[i], "--version") == 0 || strcmp(argv[i], "-v") == 0) {
-            printf("Solitario version %s (c) 2004-2025 Invido.it\n", VERSION);
+            printf("Solitario version %s (c) 2004-2026 Invido.it\n", VERSION);
             res = SDL_APP_SUCCESS;
         } else if (std::string(argv[i]) == "--language" && i + 1 < argc) {
             std::string language = argv[i + 1];

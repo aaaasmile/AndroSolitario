@@ -137,6 +137,12 @@ Nel file main.cpp uso anche (nota l'utilizzo di SDL_MAIN_USE_CALLBACKS):
     .\solitario.exe
     ninja
 
+Per la versione release:
+
+    rm -r buildrelease
+    cmake -S app/jni/ -B buildrelease  -DSDL_WAYLAND=OFF -DCMAKE_BUILD_TYPE=Release
+    cmake --build buildrelease --config Release
+
 Per far partire il Solitario occorre un device attaccato, altrimenti non parte.
 Siccome ho un'altra versione installata, quella col setup 2_0_1, ho bisogno di salvare
 i files in un'altra directory (.solitario + VERSION_HOME). 
