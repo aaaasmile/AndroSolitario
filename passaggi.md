@@ -137,12 +137,6 @@ Nel file main.cpp uso anche (nota l'utilizzo di SDL_MAIN_USE_CALLBACKS):
     .\solitario.exe
     ninja
 
-Per la versione release:
-
-    rm -r buildrelease
-    cmake -S app/jni/ -B buildrelease  -DSDL_WAYLAND=OFF -DCMAKE_BUILD_TYPE=Release
-    cmake --build buildrelease --config Release
-
 Per far partire il Solitario occorre un device attaccato, altrimenti non parte.
 Siccome ho un'altra versione installata, quella col setup 2_0_1, ho bisogno di salvare
 i files in un'altra directory (.solitario + VERSION_HOME). 
@@ -156,6 +150,16 @@ Per far partire il programma:
 I vari files, compresi i logs, vanno a finire in C:\Users\igor\.solitario030002
 
 Nota che in Windows le librerie die SDL sono tutte Dll.
+
+### Creare una versione Windows (setup)
+Per la versione release, bisogna prima creare il target release:
+
+    rm -r buildrelease
+    cmake -S app/jni/ -B buildrelease  -DSDL_WAYLAND=OFF -DCMAKE_BUILD_TYPE=Release
+    cmake --build buildrelease --config Release
+
+Per creare il setup basta adattare il file mysys/installer_solitario.iss e con il programma 
+Inno Setup (vedi https://jrsoftware.org/isdl.php) dopo la compilazione viene creato il setup, per esempio Solitario_3_0_7_setup.exe. Inno Setup è molto semplice da usare, meglio di nsis col quale ho creato la versione 2.0.1.
 
 ### Problemi in Windows
 - L'icona dell'asso di bastoni non è trasparaente [DONE]
