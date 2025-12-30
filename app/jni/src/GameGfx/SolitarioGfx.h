@@ -264,6 +264,7 @@ class SolitarioGfx {
     LPCardRegionGfx _p_DropRegionForDrag;
     LPCardStackGfx _p_CardStackForDrag;
     bool _isInitDrag;
+    int _doubleTapWait;
 };
 
 #endif

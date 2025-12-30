@@ -45,6 +45,8 @@ SolitarioGfx::SolitarioGfx() {
     _p_DropRegionForDrag = NULL;
     _p_CardStackForDrag = NULL;
     _isInitDrag = false;
+    _doubleTapWait = 300;
+    _lastUpTimestamp = 0;
 }
 
 SolitarioGfx::~SolitarioGfx() {
@@ -256,7 +258,7 @@ LPErrInApp SolitarioGfx::DrawCardStack(SDL_Surface* s,
         return NULL;
 
     DrawSymbol(pcardRegion->X(), pcardRegion->Y(), pcardRegion->Symbol());
-    
+
     for (int i = 0; i < pcardRegion->Size(); i++) {
         LPCardGfx pCard = pcardRegion->Item(i);
         if (pCard->IsFaceUp()) {
@@ -462,7 +464,7 @@ void SolitarioGfx::DoDrag(int x, int y) {
     //     "DoDrag (x=%d, y=%d) => drag_x=%d, drag_y=%d. old_x=%d,
     //     old_y=%d\n", x, y, _dragPileInfo.x, _dragPileInfo.y, _oldx,
     //     _oldy);
-    
+
     if (x < _oldx)
         _dragPileInfo.x -= _oldx - x;
     else
@@ -478,7 +480,7 @@ void SolitarioGfx::DoDrag(int x, int y) {
     SDL_Rect dest{0};
     dest.x = _dragPileInfo.x;
     dest.y = _dragPileInfo.y;
-    
+
     // Do full screen update (On modern hardware, clearing the full screen is
     // cheap and almost always the right tradeoff.)
 
@@ -598,7 +600,7 @@ LPErrInApp SolitarioGfx::zoomDropCardIterate() {
     SDL_BlitSurface(_p_Dragface, NULL, _p_Screen, &rcDrag);
 
     updateTextureAsFlipScreen();
-    
+
     zoomInfo_Inc(g_zoomInfo);
     if (g_zoomInfo->i > 1.0) {
         TRACE_DEBUG("[zoomDropCardIterate] Zoom card - end - x=%d, y=%d \n",
@@ -632,7 +634,8 @@ LPCardRegionGfx SolitarioGfx::FindDropRegion(int id, LPCardStackGfx pStack) {
 
 void SolitarioGfx::DrawStaticScene() {
     // static scene is drawn directly into the screen.
-    // Then the screen is copied into the _p_ScreenBackbufferDrag for drag and drop
+    // Then the screen is copied into the _p_ScreenBackbufferDrag for drag and
+    // drop
     SDL_Rect clipRect;
     SDL_GetSurfaceClipRect(_p_Screen, &clipRect);
     SDL_FillSurfaceRect(_p_Screen, &clipRect,
@@ -654,7 +657,7 @@ void SolitarioGfx::DrawStaticScene() {
     _p_BtToggleSound->DrawButton(_p_Screen);
     _scoreChanged = true;
     drawScore(_p_Screen);
-    
+
     SDL_BlitSurface(_p_Screen, NULL, _p_ScreenBackbufferDrag, NULL);
 
     updateTextureAsFlipScreen();
@@ -848,7 +851,7 @@ LPErrInApp SolitarioGfx::VictoryAnimation() {
         return ERR_UTIL::ErrorCreate(
             "[VictoryAnimation] called in worng state");
     }
-    
+
     if (_state == SolitarioGfx::START_VICTORY) {
         TRACE("Victory animation - Start \n");
         if (g_pVict != NULL) {
@@ -994,7 +997,7 @@ LPErrInApp SolitarioGfx::handleGameLoopFingerDownEvent(SDL_Event* pEvent) {
     pGameSettings->GetTouchPoint(pEvent->tfinger, &pt);
     LPErrInApp err;
     bool isDoubleClick;
-    if (_lastUpTimestamp + 300 > now_time) {
+    if (_lastUpTimestamp + _doubleTapWait > now_time) {
         err = doubleTapOrRightClick(pt, isDoubleClick);
         if (err != NULL) {
             return NULL;
@@ -1035,7 +1038,7 @@ LPErrInApp SolitarioGfx::handleGameLoopMouseDownEvent(SDL_Event* pEvent) {
         Uint64 now_time = SDL_GetTicks();
         _ptLast.x = pEvent->button.x;
         _ptLast.y = pEvent->button.y;
-        if (_lastUpTimestamp + 300 > now_time) {
+        if (_lastUpTimestamp + _doubleTapWait > now_time) {
             _state = SolitarioGfx::IN_DOUBLE_TAPCLICK;
         } else {
             _state = SolitarioGfx::IN_SINGLE_TAPCLICK;
@@ -1471,6 +1474,7 @@ LPErrInApp SolitarioGfx::HandleIterate(bool& done) {
     }
 
     if (_state == SolitarioGfx::IN_DOUBLE_TAPCLICK) {
+        TRACE_DEBUG("[SolitarioGfx - Iterate] doble tap click state \n");
         bool isDoubleClick = false;
         _state = SolitarioGfx::IN_GAME;
         doubleTapOrRightClick(_ptLast, isDoubleClick);
