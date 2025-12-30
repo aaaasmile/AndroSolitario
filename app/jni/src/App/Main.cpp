@@ -51,3 +51,4 @@ void SDL_AppQuit(void* appstate, SDL_AppResult result) {
     TRACE("SDL_AppQuit \n");
     delete g_app;
 }
+
