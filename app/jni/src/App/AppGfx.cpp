@@ -40,6 +40,7 @@ AppGfx::AppGfx() {
     _p_SolitarioGfx = NULL;
     _p_SceneBackground = NULL;
     _p_Screen = NULL;
+    _lastMainLoopticks = 0;
 #ifdef ANDROID
     // this is portrait
     _screenW = 1080;
@@ -116,7 +117,8 @@ LPErrInApp AppGfx::Init() {
     SDL_ReadSurfacePixel(psIcon, 0, 0, &r, &g, &b, &a);
     SDL_SetSurfaceColorKey(
         psIcon, true,
-        SDL_MapRGBA(SDL_GetPixelFormatDetails(psIcon->format), NULL, r, g, b, a));
+        SDL_MapRGBA(SDL_GetPixelFormatDetails(psIcon->format), NULL, r, g, b,
+                    a));
 #if HASWINICON
     if (!SDL_SetWindowIcon(_p_Window, psIcon)) {
         return ERR_UTIL::ErrorCreate("Couldn't set icon on window: %s\n",
@@ -486,6 +488,21 @@ LPErrInApp AppGfx::MainLoopEvent(SDL_Event* pEvent, SDL_AppResult& res) {
 }
 
 LPErrInApp AppGfx::MainLoopIterate() {
+    // Do frame pacing, here is important to avoid freezing
+    // a storm of iterate events (iteration too fast or too slow)
+    Uint64 now = SDL_GetTicks();
+    Uint64 elapsed = now - _lastMainLoopticks;
+
+    Uint64 frames = 16; // 16 is ~60 FPS
+    if (elapsed < frames) {
+        SDL_Delay(frames - elapsed); 
+        return NULL;
+    }
+    _lastMainLoopticks = now;
+    if (elapsed > 100) {
+        TRACE_DEBUG("WARN elapsed over %d\n", elapsed);
+    }
+
     LPErrInApp err;
     bool done = false;
 

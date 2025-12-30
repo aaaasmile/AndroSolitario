@@ -80,6 +80,7 @@ class AppGfx {
     int _Bpp;
     bool _fullScreen;
     std::stack<MenuItemEnum> _histMenu;
+    Uint64 _lastMainLoopticks;
 };
 
 #endif

@@ -45,7 +45,6 @@ SolitarioGfx::SolitarioGfx() {
     _p_DropRegionForDrag = NULL;
     _p_CardStackForDrag = NULL;
     _isInitDrag = false;
-    _lastIterateTimestamp = 0;
 }
 
 SolitarioGfx::~SolitarioGfx() {
@@ -257,6 +256,7 @@ LPErrInApp SolitarioGfx::DrawCardStack(SDL_Surface* s,
         return NULL;
 
     DrawSymbol(pcardRegion->X(), pcardRegion->Y(), pcardRegion->Symbol());
+    
     for (int i = 0; i < pcardRegion->Size(); i++) {
         LPCardGfx pCard = pcardRegion->Item(i);
         if (pCard->IsFaceUp()) {
@@ -384,7 +384,6 @@ LPErrInApp SolitarioGfx::InitDragContinue() {
         TRACE_DEBUG("[INITDRAG_STEP1]  DrawStaticScene \n");
         DrawStaticScene();
         _state = SolitarioGfx::INITDRAG_STEP2;
-        _lastIterateTimestamp = SDL_GetTicks();
         return NULL;
     }
 
@@ -436,18 +435,10 @@ LPErrInApp SolitarioGfx::InitDragContinue() {
         updateTextureAsFlipScreen();
         _state = SolitarioGfx::INITDRAG_AFTER;
         TRACE_DEBUG("[STEP 2]InitDrag - end \n");
-        _lastIterateTimestamp = SDL_GetTicks();
         return NULL;
     }
     if (_state == SolitarioGfx::INITDRAG_AFTER) {
-        Uint64 now_time = SDL_GetTicks();
-        if (_lastIterateTimestamp + 8 > now_time) {
-            // TRACE_DEBUG("Ignore iteration because too fast. State is %d \n",
-            // _state);
-            return NULL;
-        }
         updateTextureAsFlipScreen();
-        _lastIterateTimestamp = now_time;
         _state = SolitarioGfx::IN_GAME;  // ahead set beacause the callback can
                                          // change the state
         if (_continueFnCb != NULL) {
@@ -471,22 +462,7 @@ void SolitarioGfx::DoDrag(int x, int y) {
     //     "DoDrag (x=%d, y=%d) => drag_x=%d, drag_y=%d. old_x=%d,
     //     old_y=%d\n", x, y, _dragPileInfo.x, _dragPileInfo.y, _oldx,
     //     _oldy);
-    SDL_Rect rcs;
-    SDL_Rect rcd;
-
-    rcs.x = _dragPileInfo.x - 2;
-    rcs.y = _dragPileInfo.y - 2;
-    rcs.w = _dragPileInfo.width + 4;
-    rcs.h = _dragPileInfo.height + 4;
-
-    rcd.x = _dragPileInfo.x - 2;
-    rcd.y = _dragPileInfo.y - 2;
-
-    if (_dragPileInfo.x < 0)
-        rcs.x = rcd.x = 0;
-    if (_dragPileInfo.y < 0)
-        rcs.y = rcd.y = 0;
-
+    
     if (x < _oldx)
         _dragPileInfo.x -= _oldx - x;
     else
@@ -499,11 +475,14 @@ void SolitarioGfx::DoDrag(int x, int y) {
     _oldx = x;
     _oldy = y;
 
-    SDL_Rect dest;
+    SDL_Rect dest{0};
     dest.x = _dragPileInfo.x;
     dest.y = _dragPileInfo.y;
+    
+    // Do full screen update (On modern hardware, clearing the full screen is
+    // cheap and almost always the right tradeoff.)
 
-    SDL_BlitSurface(_p_ScreenBackbufferDrag, &rcs, _p_Screen, &rcd);
+    SDL_BlitSurface(_p_ScreenBackbufferDrag, NULL, _p_Screen, NULL);
     SDL_BlitSurface(_p_Dragface, NULL, _p_Screen, &dest);
 
     updateTextureAsFlipScreen();
@@ -599,39 +578,27 @@ void SolitarioGfx::zoomDropCardStart(int* pSx, int* pSy, LPCardGfx pCard, int w,
 }
 
 LPErrInApp SolitarioGfx::zoomDropCardIterate() {
-    SDL_Rect rcs;
-    SDL_Rect rcd;
-    SDL_Rect dest;
-
     int px, py;
     calcPt(*g_zoomInfo->pSx, *g_zoomInfo->pSy, g_zoomInfo->dx, g_zoomInfo->dy,
            g_zoomInfo->i, px, py);
 
-    rcs.x = *g_zoomInfo->pSx - 2;
-    rcs.y = *g_zoomInfo->pSy - 2;
-    rcs.w = g_zoomInfo->w + 4;
-    rcs.h = g_zoomInfo->h + 4;
+    // we are moving the dropped pile to the final destination that could be far
+    // away the static scene is fixed into the _p_ScreenBackbufferDrag. To avoid
+    // the comet effect, the new position rect should also delete the old one.
+    // When we update only the new position (or a part of it) we have the comet
+    // effect. Remember that on each frame we are not clearing the screen with
+    // the static scene but only a rect as border for the dragged pile/card
+    SDL_Rect rcDrag{0};
+    *g_zoomInfo->pSx = rcDrag.x = px;
+    *g_zoomInfo->pSy = rcDrag.y = py;
+    //  TRACE_DEBUG("Iteration slow enought to update the display\n");
+    // Do full screen update (On modern hardware, clearing the full screen is
+    // cheap and almost always the right tradeoff.)
+    SDL_BlitSurface(_p_ScreenBackbufferDrag, NULL, _p_Screen, NULL);
+    SDL_BlitSurface(_p_Dragface, NULL, _p_Screen, &rcDrag);
 
-    rcd.x = *g_zoomInfo->pSx - 2;
-    rcd.y = *g_zoomInfo->pSy - 2;
-
-    if (*g_zoomInfo->pSx < 0)
-        rcs.x = rcd.x = 0;
-    if (*g_zoomInfo->pSy < 0)
-        rcs.y = rcd.y = 0;
-
-    *g_zoomInfo->pSx = dest.x = px;
-    *g_zoomInfo->pSy = dest.y = py;
-
-    Uint64 now_time = SDL_GetTicks();
-    if (_lastIterateTimestamp + 8 <= now_time) {
-        // TRACE_DEBUG("Iteration slow enought to update the display\n");
-        SDL_BlitSurface(_p_ScreenBackbufferDrag, &rcs, _p_Screen, &rcd);
-        SDL_BlitSurface(_p_Dragface, NULL, _p_Screen, &dest);
-        updateTextureAsFlipScreen();
-    }
-    _lastIterateTimestamp = now_time;
-
+    updateTextureAsFlipScreen();
+    
     zoomInfo_Inc(g_zoomInfo);
     if (g_zoomInfo->i > 1.0) {
         TRACE_DEBUG("[zoomDropCardIterate] Zoom card - end - x=%d, y=%d \n",
@@ -665,23 +632,20 @@ LPCardRegionGfx SolitarioGfx::FindDropRegion(int id, LPCardStackGfx pStack) {
 
 void SolitarioGfx::DrawStaticScene() {
     // static scene is drawn directly into the screen.
-    // Then the screen is copied into the back buffer for animations
+    // Then the screen is copied into the _p_ScreenBackbufferDrag for drag and drop
     SDL_Rect clipRect;
     SDL_GetSurfaceClipRect(_p_Screen, &clipRect);
     SDL_FillSurfaceRect(_p_Screen, &clipRect,
                         SDL_MapRGB(SDL_GetPixelFormatDetails(_p_Screen->format),
                                    NULL, 0, 0, 0));
 
-    SDL_Rect rctTarget;
+    SDL_Rect rctTarget{0};
     rctTarget.x = (_p_Screen->w - _p_SceneBackground->w) / 2;
     rctTarget.y = (_p_Screen->h - _p_SceneBackground->h) / 2;
-    rctTarget.w = _p_SceneBackground->w;
-    rctTarget.h = _p_SceneBackground->h;
     SDL_BlitSurface(_p_SceneBackground, NULL, _p_Screen, &rctTarget);
 
     for (regionVI vir = _cardRegionList.begin(); vir != _cardRegionList.end();
          ++vir) {
-        SDL_PumpEvents();
         CardRegionGfx cardRegion = *vir;
         DrawCardStack(&cardRegion);
     }
@@ -690,14 +654,7 @@ void SolitarioGfx::DrawStaticScene() {
     _p_BtToggleSound->DrawButton(_p_Screen);
     _scoreChanged = true;
     drawScore(_p_Screen);
-    // it seems here that SDL_BlitSurface copy only the bitmap and not the
-    // fill rect, do it also into the backbuffer
-    SDL_GetSurfaceClipRect(_p_ScreenBackbufferDrag, &clipRect);
-    SDL_FillSurfaceRect(
-        _p_ScreenBackbufferDrag, &clipRect,
-        SDL_MapRGB(SDL_GetPixelFormatDetails(_p_ScreenBackbufferDrag->format),
-                   NULL, 0, 0, 0));
-
+    
     SDL_BlitSurface(_p_Screen, NULL, _p_ScreenBackbufferDrag, NULL);
 
     updateTextureAsFlipScreen();
@@ -891,14 +848,7 @@ LPErrInApp SolitarioGfx::VictoryAnimation() {
         return ERR_UTIL::ErrorCreate(
             "[VictoryAnimation] called in worng state");
     }
-    Uint64 now_time = SDL_GetTicks();
-    if (_lastIterateTimestamp + 9 > now_time) {
-        // TRACE_DEBUG("Ignore iteration because too fast. State is %d \n",
-        // _state);
-        return NULL;
-    }
-    _lastIterateTimestamp = now_time;
-
+    
     if (_state == SolitarioGfx::START_VICTORY) {
         TRACE("Victory animation - Start \n");
         if (g_pVict != NULL) {
@@ -1044,7 +994,7 @@ LPErrInApp SolitarioGfx::handleGameLoopFingerDownEvent(SDL_Event* pEvent) {
     pGameSettings->GetTouchPoint(pEvent->tfinger, &pt);
     LPErrInApp err;
     bool isDoubleClick;
-    if (_lastUpTimestamp + 500 > now_time) {
+    if (_lastUpTimestamp + 300 > now_time) {
         err = doubleTapOrRightClick(pt, isDoubleClick);
         if (err != NULL) {
             return NULL;
@@ -1085,7 +1035,7 @@ LPErrInApp SolitarioGfx::handleGameLoopMouseDownEvent(SDL_Event* pEvent) {
         Uint64 now_time = SDL_GetTicks();
         _ptLast.x = pEvent->button.x;
         _ptLast.y = pEvent->button.y;
-        if (_lastUpTimestamp + 500 > now_time) {
+        if (_lastUpTimestamp + 300 > now_time) {
             _state = SolitarioGfx::IN_DOUBLE_TAPCLICK;
         } else {
             _state = SolitarioGfx::IN_SINGLE_TAPCLICK;
@@ -1297,7 +1247,6 @@ LPErrInApp SolitarioGfx::endOfDragAndCheckForVictory() {
         _startdrag = false;
         LPCardRegionGfx pDestReg = DoDrop();
         _continueLamdaCb = [this, pDestReg]() -> LPErrInApp {
-            SDL_ShowCursor();
             SDL_SetWindowMouseGrab(_p_Window, false);
 
             if (pDestReg->RegionTypeId() == RegionType::RT_ACE_FOUNDATION) {
@@ -1319,6 +1268,7 @@ LPErrInApp SolitarioGfx::endOfDragAndCheckForVictory() {
             return NULL;
         };
     }
+    SDL_ShowCursor();
     return checkForVictory();
 }
 
@@ -1450,7 +1400,6 @@ LPErrInApp SolitarioGfx::HandleEvent(SDL_Event* pEvent) {
 LPErrInApp SolitarioGfx::HandleIterate(bool& done) {
     LPErrInApp err = NULL;
     if (_state == SolitarioGfx::READY_TO_START) {
-        _lastIterateTimestamp = SDL_GetTicks();
         TRACE_DEBUG("[SolitarioGfx - Iterate] ready to start\n");
         DrawInitialScene();
         return NULL;
@@ -1504,13 +1453,6 @@ LPErrInApp SolitarioGfx::HandleIterate(bool& done) {
     }
 
     if (_state == SolitarioGfx::IN_GAME) {
-        Uint64 now_time = SDL_GetTicks();
-        if (_lastIterateTimestamp + 8 > now_time) {
-            // TRACE_DEBUG("Ignore iteration because too fast. State is %d \n",
-            // _state);
-            return NULL;
-        }
-        _lastIterateTimestamp = now_time;
         if (_statePrev != _state) {
             DrawStaticScene();
             _statePrev = _state;
