@@ -176,6 +176,7 @@ LPErrInApp AppGfx::Init() {
     if (err) {
         return err;
     }
+    _lastMainLoopticks = SDL_GetTicks();
     return NULL;
 }
 

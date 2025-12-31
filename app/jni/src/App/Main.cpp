@@ -13,7 +13,7 @@ AppGfx* g_app = new AppGfx();
 
 SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[]) {
     SDL_AppResult res;
-    TRACE("SDL_AppInit \n");
+    TRACE("[SDL_AppInit] - start \n");
     g_app->ParseCmdLine(argc, argv, res);
     if (res == SDL_APP_SUCCESS) {
         return res;
@@ -23,7 +23,7 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[]) {
         TRACE("Fatal: %s\n", err->ErrorText.c_str());
         return SDL_APP_FAILURE;
     }
-    TRACE("Initialization OK, ready for the main loop \n");
+    TRACE("[SDL_AppInit] - end \n");
     return res;  // Note: SDL_APP_SUCCESS exit the app with
                  // success, here we need to continue
 }
