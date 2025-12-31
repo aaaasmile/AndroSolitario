@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(solitario VERSION 3.0.6 LANGUAGES C CXX)
+project(solitario VERSION 3.0.8 LANGUAGES C CXX)
 
 # Don't mistake osx for unix
 if(UNIX AND NOT ANDROID AND NOT APPLE AND NOT RISCOS)
@@ -56,11 +56,20 @@ else()
 endif()
 
 if(CMAKE_SYSTEM MATCHES Windows)
-   message(STATUS "Target system is Windows: " ${CMAKE_SYSTEM} " MySys: " ${CMAKE_HOST_WIN32})
+    message(STATUS "Target system is Windows: " ${CMAKE_SYSTEM} " MySys: " ${CMAKE_HOST_WIN32})
+    # Configure the .rc file for windows
+    set(ICON_PATH "${CMAKE_SOURCE_DIR}/assets/icons/tressette.ico")
+    set(PROJECT_COMPANY "IgorRun for Invido.it")
+    configure_file(
+        ${CMAKE_CURRENT_SOURCE_DIR}/cmake/windows_icon.rc.in
+        ${CMAKE_BINARY_DIR}/windows_icon.rc
+        @ONLY
+    )
     if(CMAKE_HOST_WIN32)
-        message(STATUS "OK MySys on Windows is a supported target") 
+        message(STATUS "*** > OK MySys on Windows is a supported target, source dir is ${CMAKE_SOURCE_DIR}") 
         # all following commands are additions, specific for the target MySys, to previous definitions
         target_sources(${PROJECT_NAME} PRIVATE mysys2/Util-mysys.cpp)
+        target_sources(${PROJECT_NAME} PRIVATE ${CMAKE_BINARY_DIR}/windows_icon.rc)
         if(CMAKE_BUILD_TYPE STREQUAL "Release")
           target_compile_definitions(${PROJECT_NAME} PRIVATE TRACEINSERVICE)
           target_link_options(${PROJECT_NAME} PRIVATE -mwindows)

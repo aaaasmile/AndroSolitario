@@ -1,7 +1,7 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#define VERSION "Ver 3.0.7 20251229"
+#define VERSION "Ver 3.0.8 20251231"
 #define PACKAGE_URL "https://invido.it"
 #define AUTHOR "igorrun"
 #ifdef WIN32

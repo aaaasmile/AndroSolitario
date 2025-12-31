@@ -160,6 +160,7 @@ Per la versione release, bisogna prima creare il target release:
 
 Per creare il setup basta adattare il file mysys/installer_solitario.iss e con il programma 
 Inno Setup (vedi https://jrsoftware.org/isdl.php) dopo la compilazione viene creato il setup, per esempio Solitario_3_0_7_setup.exe. Inno Setup è molto semplice da usare, meglio di nsis col quale ho creato la versione 2.0.1.
+Bisogna cambiare le versioni nel Config.h, installer_solitario.iss e CmakeList.txt.
 
 ### Problemi in Windows
 - L'icona dell'asso di bastoni non è trasparaente [DONE]

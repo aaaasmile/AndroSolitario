@@ -3,8 +3,8 @@
 ; Non-commercial use only
 
 #define MyAppName "Solitario"
-#define MyAppVersion "3.0.7"
-#define MySetupVersion "3_0_7"
+#define MyAppVersion "3.0.8"
+#define MySetupVersion "3_0_8"
 #define MyAppPublisher "Igorrun"
 #define MyAppURL "https://www.invido.it/"
 #define MyAppExeName "solitario.exe"
@@ -42,8 +42,9 @@ SolidCompression=yes
 WizardStyle=modern dynamic
 
 [Languages]
-Name: "italian"; MessagesFile: "compiler:Languages\Italian.isl"
 Name: "english"; MessagesFile: "compiler:Default.isl"
+Name: "italian"; MessagesFile: "compiler:Languages\Italian.isl"
+
 
 
 [Files]
