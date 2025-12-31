@@ -59,7 +59,6 @@ class SolitarioGfx {
         INITDRAG_STEP1,
         INITDRAG_STEP2,
         INITDRAG_AFTER,
-        ZOOMING,
         START_VICTORY,
         NEW_CARD_VICTORY,
         IN_CARD_VICTORY,

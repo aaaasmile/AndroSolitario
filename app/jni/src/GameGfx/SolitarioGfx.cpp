@@ -537,7 +537,6 @@ LPCardRegionGfx SolitarioGfx::DoDrop(LPCardRegionGfx pDestRegion) {
     return pBestRegion;
 }
 
-
 typedef struct zoomInfo {
     float i = 0.0;
     int dx;
@@ -1314,35 +1313,37 @@ LPErrInApp SolitarioGfx::HandleEvent(SDL_Event* pEvent) {
     if (isInVictoryState()) {
         switch (pEvent->type) {
             case SDL_EVENT_QUIT:
-                _state = SolitarioGfx::SHOW_SCORE;
+                _state = eState::SHOW_SCORE;
                 return NULL;
             case SDL_EVENT_KEY_DOWN:
                 if (pEvent->key.key == SDLK_ESCAPE ||
                     pEvent->key.key == SDLK_SPACE ||
                     pEvent->key.key == SDLK_RETURN) {
-                    _state = SolitarioGfx::SHOW_SCORE;
+                    _state = eState::SHOW_SCORE;
                     return NULL;
                 }
                 break;
             case SDL_EVENT_MOUSE_BUTTON_DOWN:
-                _state = SolitarioGfx::SHOW_SCORE;
+                _state = eState::SHOW_SCORE;
                 return NULL;
             case SDL_EVENT_FINGER_DOWN:
-                _state = SolitarioGfx::SHOW_SCORE;
+                _state = eState::SHOW_SCORE;
                 return NULL;
         }
         return NULL;
     }
 
-    if (_state == SolitarioGfx::IN_MSGBOX) {
+    if (_state == eState::IN_MSGBOX) {
         _p_MsgBox->HandleEvent(pEvent);
         return NULL;
     }
-    if (_state == SolitarioGfx::FADING_OUT ||
-        _state == SolitarioGfx::WAIT_FOR_FADING) {
+    if (_state == eState::IN_ZOOM) {
+        return NULL;
+    }
+    if (_state == eState::FADING_OUT || _state == eState::WAIT_FOR_FADING) {
         if (pEvent->key.key == SDLK_ESCAPE) {
             TRACE_DEBUG("[SolitarioGfx - event] escape\n");
-            _state = SolitarioGfx::TERMINATED;
+            _state = eState::TERMINATED;
             return NULL;
         }
         return NULL;
@@ -1350,18 +1351,18 @@ LPErrInApp SolitarioGfx::HandleEvent(SDL_Event* pEvent) {
     switch (pEvent->type) {
         case SDL_EVENT_QUIT:
             TRACE_DEBUG("[SolitarioGfx - event] quit\n");
-            _state = SolitarioGfx::FADING_OUT;
+            _state = eState::FADING_OUT;
             return NULL;
 
         case SDL_EVENT_KEY_DOWN:
             if (pEvent->key.key == SDLK_ESCAPE) {
                 TRACE_DEBUG("[SolitarioGfx - event] escape\n");
-                _state = SolitarioGfx::TERMINATED;
+                _state = eState::TERMINATED;
                 return NULL;
             }
             if (pEvent->key.key == SDLK_A) {
                 TRACE_DEBUG("[SolitarioGfx - event] animation victory\n");
-                _state = SolitarioGfx::START_VICTORY;
+                _state = eState::START_VICTORY;
             }
             break;
 #if HASTOUCH
