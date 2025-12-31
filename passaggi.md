@@ -151,7 +151,7 @@ I vari files, compresi i logs, vanno a finire in C:\Users\igor\.solitario030002
 
 Nota che in Windows le librerie die SDL sono tutte Dll.
 
-### Creare una versione Windows (setup)
+### Creare una versione Windows (release setup)
 Per la versione release, bisogna prima creare il target release:
 
     rm -r buildrelease
@@ -209,7 +209,17 @@ Ora non rimane altro che compilare:
 
 Rimanendo invece in root, come in wsl2 o windows, non mi funziona poi il build, che va fatto con emmake.
 
-### Nuova versione
+### Emscripten Release
+Nella bash (nota MyRelease, con Release non riesco a vedere emoj UTF-8 fonts, per esempio il suono):
+
+    source ~/emsdk/emsdk_env.sh 
+    rm -r -R build-webrel
+    mkdir build-webrel && cd build-webrel
+
+    emcmake cmake ../app/jni/ -DSDL_WAYLAND=OFF -DSDLTTF_VENDORED=ON -DCMAKE_BUILD_TYPE=MyRelease
+    emmake make -j$(nproc)
+
+### Emscripten Nuova versione
 Quando è pronta una nuova versione, c'è bisogno di nuovi file solitario_xxx.data/js/wasm + index.html.
 In tutto sono 4 files. I files solitario_xxx vengono generati dal file cmakelist.txt col target emscripten.
 Il placeholder xxx è cambiato con la linea 
@@ -218,7 +228,7 @@ Il placeholder xxx è cambiato con la linea
 Nota che PROJECT_VERSION viene definito in testa al file CMakeLIst.txt, qui:
 
     project(solitario VERSION 3.0.5 LANGUAGES C CXX)
-Purtroppo il file index.html non viene generato automaticamente, quindi il file index.html
+Il file index.html non viene generato automaticamente, quindi il file index.html
 
     <script async type="text/javascript" src="solitario_3.0.5.js?v=305"></script>
 

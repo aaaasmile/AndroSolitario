@@ -1,5 +1,6 @@
 build
 build-web
+build-webrel
 buildrelease
 .gradle
 app/src/main/assets

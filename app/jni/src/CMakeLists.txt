@@ -43,17 +43,6 @@ add_executable(${PROJECT_NAME} ${SOURCES} ${SOURCES2})
 
 target_include_directories(${PROJECT_NAME} PRIVATE App . GameGfx CompGfx)
 target_compile_definitions(${PROJECT_NAME} PRIVATE DATA_PREFIX="data/")
-if(CMAKE_BUILD_TYPE STREQUAL "Release")
-    # General C/C++ optimizations
-    message(STATUS "=> Building in RELEASE mode")
-    add_compile_options(
-        -O3           # Maximum optimization
-        -DNDEBUG      # Disable debug code
-        -flto         # Link-time optimization
-    )
-else()
-  target_compile_options(${PROJECT_NAME} PRIVATE $<$<NOT:$<C_COMPILER_ID:MSVC>>:-Wunused -g -O0>)
-endif()
 
 if(CMAKE_SYSTEM MATCHES Windows)
     message(STATUS "Target system is Windows: " ${CMAKE_SYSTEM} " MySys: " ${CMAKE_HOST_WIN32})
@@ -65,6 +54,17 @@ if(CMAKE_SYSTEM MATCHES Windows)
         ${CMAKE_BINARY_DIR}/windows_icon.rc
         @ONLY
     )
+    if(CMAKE_BUILD_TYPE STREQUAL "Release")
+        # General C/C++ optimizations
+        message(STATUS "=> Building in RELEASE mode")
+        add_compile_options(
+            -O3           # Maximum optimization
+            -DNDEBUG      # Disable debug code
+            -flto         # Link-time optimization
+        )
+    else()
+      target_compile_options(${PROJECT_NAME} PRIVATE $<$<NOT:$<C_COMPILER_ID:MSVC>>:-Wunused -g -O0>)
+    endif()
     if(CMAKE_HOST_WIN32)
         message(STATUS "*** > OK MySys on Windows is a supported target, source dir is ${CMAKE_SOURCE_DIR}") 
         # all following commands are additions, specific for the target MySys, to previous definitions
@@ -118,6 +118,7 @@ else()
         message(STATUS "C++ compiler version: ${CMAKE_CXX_COMPILER_VERSION}")
         target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_11)
         target_compile_options(${PROJECT_NAME} PRIVATE -std=c++11)
+        target_compile_options(${PROJECT_NAME} PRIVATE $<$<NOT:$<C_COMPILER_ID:MSVC>>:-Wunused -g -O0>)
         target_include_directories(${PROJECT_NAME} PRIVATE ../SDL/include ../SDL_image/include ../SDL_mixer/include ../SDL_ttf/include)
         target_compile_definitions(${PROJECT_NAME} PRIVATE TRACEINSERVICE _DEBUG WSL2_BUILD)
         ## use SDL from this compiled project
@@ -148,10 +149,9 @@ else()
         )
   else()
     if(CMAKE_SYSTEM MATCHES ".*Emscripten.*")
-      message(STATUS "** SRC Target system is: " ${CMAKE_SYSTEM})
-      target_compile_definitions(${PROJECT_NAME} PRIVATE TRACEINSERVICE _DEBUG)
+      message(STATUS "** SRC Target system is: ${CMAKE_SYSTEM} build SDL is: ${CMAKE_BINARY_DIR}/SDL")
       target_include_directories(${PROJECT_NAME} PRIVATE ../SDL/include ../SDL_image/include ../SDL_mixer/include ../SDL_ttf/include)
-      set(SDL3_DIR "../../../build-web/SDL")
+      set(SDL3_DIR "${CMAKE_BINARY_DIR}/SDL")
       # not needed to set: SDL3_image_DIR SDL3_mixer_DIR SDL3_ttf_DIR and find_package for SDL3_image, SDL3_mixer and SDL3_ttf 
       find_package(SDL3 REQUIRED)
       target_link_libraries(${PROJECT_NAME}
@@ -160,31 +160,31 @@ else()
           SDL3_mixer::SDL3_mixer  
           SDL3_ttf::SDL3_ttf
       )
-      if(CMAKE_BUILD_TYPE STREQUAL "Release")
+      # NOTE: I am using MyRelease because in Release the SDL_ttf doesn't show emoj fonts
+      if(CMAKE_BUILD_TYPE STREQUAL "MyRelease")
+        message(STATUS "** Building Myrelease for: " ${CMAKE_SYSTEM})
+        target_compile_definitions(${PROJECT_NAME} PRIVATE TRACEINSERVICE)
+        add_compile_options(
+            -O3
+            -DNDEBUG      
+            -flto         
+        )
+        # note the SHELL syntax for the -s parameter
         target_link_options(${PROJECT_NAME} PRIVATE
             -O3
-            -s ASSERTIONS=0           # Disable runtime checks
-            -s DEMANGLE_SUPPORT=0     # Disable demangling for size
-            -s ERROR_ON_UNDEFINED_SYMBOLS=1
-            -s FETCH=1
-            -s FILESYSTEM=1
-            -s GL_ASSERTIONS=0
-            -s GL_DEBUG=0
-            -s INITIAL_MEMORY=67108864  # 64MB initial memory
-            -s MAXIMUM_MEMORY=2147483648 # 2GB max memory
-            -s MALLOC="emmalloc"      # Smaller malloc implementation
-            -s NO_EXIT_RUNTIME=1
-            -s SAFE_HEAP=0
-            -s STACK_OVERFLOW_CHECK=0
-            -s STRICT=1
-            -s WASM=1
-            -s WASM_BIGINT=1
-            # Optimize for size
-            -s OPTIMIZE_FOR_SIZE=1
-            # assets
-            --preload-file=${CMAKE_CURRENT_SOURCE_DIR}/../../src/main/assets@/data
+            "SHELL:-s ASSERTIONS=0"
+            "SHELL:-s GL_ASSERTIONS=0"
+            "SHELL:-s GL_DEBUG=0"
+            "SHELL:-s INITIAL_MEMORY=67108864"  
+            "SHELL:-s MAXIMUM_MEMORY=2147483648"
+            "SHELL:-s SAFE_HEAP=0"
+            "SHELL:-s STACK_OVERFLOW_CHECK=0"
+            "SHELL:-s ALLOW_MEMORY_GROWTH=1"
+            "SHELL:--preload-file=${CMAKE_CURRENT_SOURCE_DIR}/../../src/main/assets@/data"
         )
       else()
+        target_compile_definitions(${PROJECT_NAME} PRIVATE TRACEINSERVICE _DEBUG)
+        target_compile_options(${PROJECT_NAME} PRIVATE $<$<NOT:$<C_COMPILER_ID:MSVC>>:-Wunused -g -O0>)
         set_target_properties(${PROJECT_NAME} PROPERTIES
           LINK_FLAGS "--preload-file=${CMAKE_CURRENT_SOURCE_DIR}/../../src/main/assets@/data -s ALLOW_MEMORY_GROWTH=1"
         )
