@@ -203,7 +203,7 @@ class SolitarioGfx {
     ClickCb prepClickQuitCb();
     ClickCb prepClickNewGameCb();
     ClickCb prepClickToggleSoundCb();
-    LPErrInApp drawScore(SDL_Surface* pScreen);
+    LPErrInApp drawScore();
     void updateScoreOnAce(int sizeAce, int oldSizeAce);
     void updateScoreOnTurnOverFaceDown();
     void updateScoreMoveDeckToTableau();

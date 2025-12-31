@@ -537,10 +537,6 @@ LPCardRegionGfx SolitarioGfx::DoDrop(LPCardRegionGfx pDestRegion) {
     return pBestRegion;
 }
 
-static void calcPt(int x0, int y0, int x1, int y1, float t, int& xf, int& yf) {
-    xf = int(x0 + t * (x1 - x0) + .5);
-    yf = int(y0 + t * (y1 - y0) + .5);
-}
 
 typedef struct zoomInfo {
     float i = 0.0;
@@ -549,7 +545,7 @@ typedef struct zoomInfo {
     float precision = 0.1f;
     int w;
     int h;
-    int* pSx = NULL;
+    int* pSx = NULL;  // pointer because a card  x,y rect is attached
     int* pSy = NULL;
 }* LPzoomInfo;
 
@@ -558,6 +554,19 @@ void zoomInfo_Inc(LPzoomInfo self) {
         self->i = self->i + self->precision;
     }
 }
+
+void zoomInfo_CalcPt(LPzoomInfo self, int& xf, int& yf) {
+    if (self) {
+        int x0 = *self->pSx;
+        int y0 = *self->pSy;
+        int x1 = self->dx;
+        int y1 = self->dy;
+        float t = self->i;
+        xf = int(x0 + t * (x1 - x0) + .5);
+        yf = int(y0 + t * (y1 - y0) + .5);
+    }
+}
+
 static LPzoomInfo g_zoomInfo = NULL;
 
 void SolitarioGfx::zoomDropCardStart(int* pSx, int* pSy, LPCardGfx pCard, int w,
@@ -581,21 +590,20 @@ void SolitarioGfx::zoomDropCardStart(int* pSx, int* pSy, LPCardGfx pCard, int w,
 
 LPErrInApp SolitarioGfx::zoomDropCardIterate() {
     int px, py;
-    calcPt(*g_zoomInfo->pSx, *g_zoomInfo->pSy, g_zoomInfo->dx, g_zoomInfo->dy,
-           g_zoomInfo->i, px, py);
+    zoomInfo_CalcPt(g_zoomInfo, px, py);
+
+    SDL_Rect rcDrag{0};
+    rcDrag.x = px;
+    rcDrag.y = py;
+    *g_zoomInfo->pSx = px;
+    *g_zoomInfo->pSy = py;
 
     // we are moving the dropped pile to the final destination that could be far
     // away the static scene is fixed into the _p_ScreenBackbufferDrag. To avoid
-    // the comet effect, the new position rect should also delete the old one.
-    // When we update only the new position (or a part of it) we have the comet
-    // effect. Remember that on each frame we are not clearing the screen with
-    // the static scene but only a rect as border for the dragged pile/card
-    SDL_Rect rcDrag{0};
-    *g_zoomInfo->pSx = rcDrag.x = px;
-    *g_zoomInfo->pSy = rcDrag.y = py;
-    //  TRACE_DEBUG("Iteration slow enought to update the display\n");
-    // Do full screen update (On modern hardware, clearing the full screen is
-    // cheap and almost always the right tradeoff.)
+    // the comet effect, the full display is updated no legacy rect optimization
+
+    //  Do full screen update (On modern hardware, clearing the full screen is
+    //  cheap and almost always the right tradeoff.)
     SDL_BlitSurface(_p_ScreenBackbufferDrag, NULL, _p_Screen, NULL);
     SDL_BlitSurface(_p_Dragface, NULL, _p_Screen, &rcDrag);
 
@@ -656,7 +664,7 @@ void SolitarioGfx::DrawStaticScene() {
     _p_BtQuit->DrawButton(_p_Screen);
     _p_BtToggleSound->DrawButton(_p_Screen);
     _scoreChanged = true;
-    drawScore(_p_Screen);
+    drawScore();
 
     SDL_BlitSurface(_p_Screen, NULL, _p_ScreenBackbufferDrag, NULL);
 
@@ -1463,7 +1471,7 @@ LPErrInApp SolitarioGfx::HandleIterate(bool& done) {
         updateBadScoreScoreOnTime();
         // write direct into the screen because it could be that a
         // is in action and the screen for a back buffer is dirty
-        err = drawScore(_p_Screen);
+        err = drawScore();
         if (err != NULL)
             return err;
     }
@@ -1781,7 +1789,7 @@ void SolitarioGfx::BtToggleSoundClick() {
     DrawStaticScene();
 }
 
-LPErrInApp SolitarioGfx::drawScore(SDL_Surface* pScreen) {
+LPErrInApp SolitarioGfx::drawScore() {
     if (!_scoreChanged) {
         return NULL;
     }
@@ -1796,7 +1804,7 @@ LPErrInApp SolitarioGfx::drawScore(SDL_Surface* pScreen) {
     if (_scoreGame < -2000) {
         _scoreGame = -2000;
     }
-    int ty = pScreen->h - offsetY;
+    int ty = _p_Screen->h - offsetY;
     char buff[256];
     snprintf(buff, sizeof(buff), "%s : %d",
              pLanguages->GetCStringId(Languages::ID_SCORE), (int)_scoreGame);
@@ -1815,8 +1823,8 @@ LPErrInApp SolitarioGfx::drawScore(SDL_Surface* pScreen) {
                         SDL_MapRGB(SDL_GetPixelFormatDetails(_p_Screen->format),
                                    NULL, 0, 0, 0));
 
-    LPErrInApp err =
-        GFX_UTIL::DrawString(pScreen, buff, tx, ty, colorText, _p_FontBigText);
+    LPErrInApp err = GFX_UTIL::DrawString(_p_Screen, buff, tx, ty, colorText,
+                                          _p_FontBigText);
     if (err != NULL) {
         return err;
     }
