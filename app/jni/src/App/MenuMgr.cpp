@@ -171,6 +171,9 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen,
                                // SDL_Window* pWindow,
                                UpdateScreenCb& fnUpdateScreen,
                                MenuDelegator& menuDelegator) {
+    if(pScreen == NULL){
+        return ERR_UTIL::ErrorCreate("Screen is not initialized\n");
+    }
     _fnUpdateScreen = fnUpdateScreen;
     if (_fnUpdateScreen.tc == NULL) {
         return ERR_UTIL::ErrorCreate("MenuMgr: update screen is not defined\n");
@@ -188,9 +191,9 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen,
     _screenH = clipRect.h;
     _box_Y = _screenH / 5;
 
-    //if (_screenW == 1024 && _screenH == 768) {
-        _rctPanelRedBox.w = 500;
-        _rctPanelRedBox.h = 560;
+    // if (_screenW == 1024 && _screenH == 768) {
+    _rctPanelRedBox.w = 500;
+    _rctPanelRedBox.h = 560;
     // } else {
     //     _rctPanelRedBox.w = _screenW - _box_X * 2;
     //     _rctPanelRedBox.h = _screenH - _box_Y * 2;
@@ -251,10 +254,10 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen,
     //     rctBt1.y = _p_Screen->h - rctBt1.h - 50;
     //     rctBt1.x = _p_Screen->w - rctBt1.w - 90;
     // } else {
-        rctBt1.h = 28;
-        rctBt1.w = 150;
-        rctBt1.y = _p_Screen->h - rctBt1.h - 20;
-        rctBt1.x = _p_Screen->w - rctBt1.w - 20;
+    rctBt1.h = 28;
+    rctBt1.w = 150;
+    rctBt1.y = _p_Screen->h - rctBt1.h - 20;
+    rctBt1.x = _p_Screen->w - rctBt1.w - 20;
     //}
     _p_homeUrl = new LabelLinkGfx();
     ClickCb cbNUll = ClickCb{.tc = NULL, .self = NULL};
@@ -272,10 +275,10 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen,
     //     rctBt1.y = _p_homeUrl->PosY() - 60;
     //     rctBt1.x = _p_homeUrl->PosX();
     // } else {
-        rctBt1.h = 28;
-        rctBt1.w = 150;
-        rctBt1.y = _p_homeUrl->PosY() - 20;
-        rctBt1.x = _p_homeUrl->PosX();
+    rctBt1.h = 28;
+    rctBt1.w = 150;
+    rctBt1.y = _p_homeUrl->PosY() - 20;
+    rctBt1.x = _p_homeUrl->PosX();
     //}
     _p_LabelVersion->Initialize(&rctBt1, _p_ScreenBackbuffer, _p_fontVera);
     _p_LabelVersion->SetState(LabelGfx::INVISIBLE);
@@ -299,7 +302,7 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen,
 
 LPErrInApp MenuMgr::drawStaticScene() {
     LPLanguages pLanguages = _p_GameSettings->GetLanguageMan();
-    SDL_Rect rctTarget;
+    SDL_Rect rctTarget = {0};
     LPErrInApp err = NULL;
     rctTarget.x = (_p_ScreenBackbuffer->w - _p_SceneBackground->w) / 2;
     rctTarget.y = (_p_ScreenBackbuffer->h - _p_SceneBackground->h) / 2;

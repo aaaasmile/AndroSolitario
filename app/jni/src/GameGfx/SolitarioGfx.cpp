@@ -146,7 +146,8 @@ LPErrInApp SolitarioGfx::Initialize(SDL_Surface* pScreen,
     _p_Window = pWindow;
     // _p_ScreenTexture =
     //     SDL_CreateTexture(r, SDL_PIXELFORMAT_ARGB8888,
-    //                       SDL_TEXTUREACCESS_STREAMING, pScreen->w, pScreen->h);
+    //                       SDL_TEXTUREACCESS_STREAMING, pScreen->w,
+    //                       pScreen->h);
     // if (_p_ScreenTexture == NULL) {
     //     return ERR_UTIL::ErrorCreate("Cannot create texture: %s\n",
     //                                  SDL_GetError());
@@ -180,31 +181,36 @@ LPErrInApp SolitarioGfx::Initialize(SDL_Surface* pScreen,
     } else {
         return ERR_UTIL::ErrorCreate("Only pac file supported");
     }
-    SDL_Rect rctBt1;
+
+    SDL_Rect rctBt1={0};
     int btw = 120;
     int btwSymb = 60;
     int bth = 34;
     int btoffsetY = 70;
-    int btposx = 150;
     int btintraX = 30;
-    // if (pGameSettings->NeedScreenMagnify()) {
-    //     btw = 200;
-    //     bth = 70;
-    //     btoffsetY = 400;
-    //     btposx = 500;
-    //     btintraX = 50;
-    //     btwSymb = 90;
-    // }
-    if (_p_Screen->w == 1024) {
-        btposx = 500;
-    }
+    int soundIntraX = 70; // extra space for volume control (not yet implemented)
+
+    int buttons_w = 2 * btw + btwSymb + 2 * btintraX + soundIntraX;
+    int btposx = (_p_Screen->w - buttons_w) / 2 ;
+    
+    // Sound Toggle
+    rctBt1.w = btwSymb;
+    rctBt1.h = bth;
+    rctBt1.x = btposx;
+    rctBt1.y = _p_Screen->h - btoffsetY;
+    ClickCb cbBtToggleSound = prepClickToggleSoundCb();
+    _p_BtToggleSound = new ButtonGfx();
+    _p_BtToggleSound->InitializeAsSymbol(&rctBt1, _p_Screen,
+                                         pGameSettings->GetFontSymb(),
+                                         MYIDTOGGLESOUND, cbBtToggleSound);
+    _p_BtToggleSound->SetVisibleState(ButtonGfx::INVISIBLE);    
+
+
     // button Quit
     ClickCb cbBtQuit = prepClickQuitCb();
     _p_BtQuit = new ButtonGfx();
+    rctBt1.x = rctBt1.x + rctBt1.w + soundIntraX;
     rctBt1.w = btw;
-    rctBt1.h = bth;
-    rctBt1.y = _p_Screen->h - btoffsetY;
-    rctBt1.x = btposx;
     _p_BtQuit->Initialize(&rctBt1, _p_Screen, _p_FontBigText, MYIDQUIT,
                           cbBtQuit);
     _p_BtQuit->SetVisibleState(ButtonGfx::INVISIBLE);
@@ -213,29 +219,11 @@ LPErrInApp SolitarioGfx::Initialize(SDL_Surface* pScreen,
     ClickCb cbBtNewGame = prepClickNewGameCb();
     _p_BtNewGame = new ButtonGfx();
     rctBt1.x = rctBt1.x + rctBt1.w + btintraX;
+    rctBt1.w = btw;
     _p_BtNewGame->Initialize(&rctBt1, _p_Screen, _p_FontBigText, MYIDNEWGAME,
                              cbBtNewGame);
     _p_BtNewGame->SetVisibleState(ButtonGfx::INVISIBLE);
-    // button toggle sound
-    int tx = btposx;
-    // int offsetY = 30;
-    //  if (pGameSettings->NeedScreenMagnify()) {
-    //      tx = btposx;
-    //      offsetY = 250;
-    //      rctBt1.y = _p_Screen->h - offsetY;
-    //  } else {
-    tx = tx - btw - 30;
-    //}
-
-    rctBt1.x = tx;
-    rctBt1.w = btwSymb;
-    ClickCb cbBtToggleSound = prepClickToggleSoundCb();
-    _p_BtToggleSound = new ButtonGfx();
-    _p_BtToggleSound->InitializeAsSymbol(&rctBt1, _p_Screen,
-                                         pGameSettings->GetFontSymb(),
-                                         MYIDTOGGLESOUND, cbBtToggleSound);
-    _p_BtToggleSound->SetVisibleState(ButtonGfx::INVISIBLE);
-
+    
     TRACE_DEBUG("Solitario initialized \n");
     return NULL;
 }
@@ -983,8 +971,8 @@ LPErrInApp SolitarioGfx::newGame() {
 
     // deal
     int i;
-    for (i = Found_Ix1; i <= Found_Ix7; i++) {
-        LPCardStackGfx pStack = PopStackFromRegion(DeckPile_Ix, i);
+    for (i = eRegionIx::Found_Ix1; i <= eRegionIx::Found_Ix7; i++) {
+        LPCardStackGfx pStack = PopStackFromRegion(eRegionIx::DeckPile_Ix, i);
         PushStackInRegion(i, pStack);
         delete pStack;
     }
