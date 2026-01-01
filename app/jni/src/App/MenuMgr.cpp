@@ -188,21 +188,21 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen,
     _screenH = clipRect.h;
     _box_Y = _screenH / 5;
 
-    if (_screenW == 1024 && _screenH == 768) {
+    //if (_screenW == 1024 && _screenH == 768) {
         _rctPanelRedBox.w = 500;
         _rctPanelRedBox.h = 560;
-    } else {
-        _rctPanelRedBox.w = _screenW - _box_X * 2;
-        _rctPanelRedBox.h = _screenH - _box_Y * 2;
-        _rctPanelRedBox.w = std::max(_rctPanelRedBox.w, 800);
-        _rctPanelRedBox.h = std::max(_rctPanelRedBox.h, 600);
-        if (_rctPanelRedBox.w > 1024) {
-            _rctPanelRedBox.w = 1024;
-        }
-        if (_rctPanelRedBox.h > 1200) {
-            _rctPanelRedBox.h = 1200;
-        }
-    }
+    // } else {
+    //     _rctPanelRedBox.w = _screenW - _box_X * 2;
+    //     _rctPanelRedBox.h = _screenH - _box_Y * 2;
+    //     _rctPanelRedBox.w = std::max(_rctPanelRedBox.w, 800);
+    //     _rctPanelRedBox.h = std::max(_rctPanelRedBox.h, 600);
+    //     if (_rctPanelRedBox.w > 1024) {
+    //         _rctPanelRedBox.w = 1024;
+    //     }
+    //     if (_rctPanelRedBox.h > 1200) {
+    //         _rctPanelRedBox.h = 1200;
+    //     }
+    // }
 
     _rctPanelRedBox.x = (_screenW - _rctPanelRedBox.w) / 2;
     _rctPanelRedBox.y = (_screenH - _rctPanelRedBox.h) / 2;
