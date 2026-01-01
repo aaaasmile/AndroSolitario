@@ -47,6 +47,7 @@ GameSettings::GameSettings() {
     BackgroundType = BackgroundTypeEnum::Mantova;
     _p_Languages = NULL;
     _p_MusicManager = NULL;
+    GameName = "Solitario";
 }
 
 GameSettings::~GameSettings() {
@@ -307,32 +308,9 @@ void GameSettings::GetTouchPoint(SDL_TouchFingerEvent& tfinger,
     pPoint->y = tfinger.y * _screenRect.h;
 }
 
-LPErrInApp GameSettings::CalcDisplaySize(int w, int h) {
+LPErrInApp GameSettings::SetDisplaySize(int w, int h) {
     _screenRect.w = w;
     _screenRect.h = h;
-#ifdef ANDROID
-    int num_displays;
-    SDL_DisplayID* displays = SDL_GetDisplays(&num_displays);
-    if (num_displays == 0) {
-        return NULL;
-    }
-    SDL_DisplayID Id = *displays;
-    SDL_Rect screenRect;
-    if (!SDL_GetDisplayBounds(Id, &screenRect)) {
-        return ERR_UTIL::ErrorCreate("CalcDisplaySize error: %s\n",
-                                     SDL_GetError());
-    }
-    if (screenRect.w > _screenRect.w) {
-        _screenRect.w = screenRect.w;
-    }
-    if (screenRect.h > _screenRect.h) {
-        _screenRect.h = screenRect.h;
-    }
-    TRACE_DEBUG("Display bound for size is width %d, height %d", _screenRect.w,
-                _screenRect.h);
-
-    SDL_free(displays);
-#endif
     return NULL;
 }
 

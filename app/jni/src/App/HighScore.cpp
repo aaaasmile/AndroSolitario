@@ -327,13 +327,13 @@ LPErrInApp HighScore::HandleIterate(bool& done) {
         int cx = 100;
         int dx = 30;
         int ex = 50;
-        if (_p_GameSettings->NeedScreenMagnify()) {
-            ax = 100;
-            bx = 550;
-            cx = 180;
-            dx = 50;
-            ex = 100;
-        }
+        // if (_p_GameSettings->NeedScreenMagnify()) {
+        //     ax = 100;
+        //     bx = 550;
+        //     cx = 180;
+        //     dx = 50;
+        //     ex = 100;
+        // }
         int xIni = (_p_surfScreen->w - (ax + bx + cx + dx + ex)) / 2;
         int yIni = 200;
         int xOff, yOff;

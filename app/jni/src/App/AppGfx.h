@@ -41,6 +41,7 @@ class AppGfx {
     LPErrInApp EnterMenu(MenuItemEnum menuItem); 
     LPErrInApp SettingsChanged(bool backGroundChanged, bool languageChanged);
     LPErrInApp ChangeSceneBackground(SDL_Surface** ppSceneBackground);
+    void UpdateScreen(SDL_Surface* pScreen);
 
    private:
     LPErrInApp startGameLoop();
@@ -57,6 +58,7 @@ class AppGfx {
 
     MenuDelegator prepMenuDelegator();
     OptionDelegator prepOptionDelegator();
+    UpdateScreenCb prepScreenUpdater();
     void clearBackground();
     LPErrInApp loadSceneBackground();
 
@@ -75,8 +77,8 @@ class AppGfx {
     CreditsView* _p_CreditsView;
     OptionsGfx* _p_OptGfx;
 
-    int _screenW;
-    int _screenH;
+    //int _screenW;
+    //int _screenH;
     int _Bpp;
     bool _fullScreen;
     std::stack<MenuItemEnum> _histMenu;

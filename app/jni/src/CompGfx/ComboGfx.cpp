@@ -39,13 +39,13 @@ void ComboGfx::Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
     _fncbClickEvent = fncbClickEvent;
     _rctCtrl = *pRect;
     _p_sdlRenderer = psdlRenderer;
-    LPGameSettings pGameSettings = GameSettings::GetSettings();
+    //LPGameSettings pGameSettings = GameSettings::GetSettings();
 
     int boxIncW = 34;
     int boxIncH = _rctCtrl.h;
-    if (pGameSettings->NeedScreenMagnify()) {
-        boxIncW = 50;
-    }
+    // if (pGameSettings->NeedScreenMagnify()) {
+    //     boxIncW = 50;
+    // }
     _rctText.x = _rctCtrl.x + boxIncW;
     _rctText.y = _rctCtrl.y;
     _rctText.w = _rctCtrl.w - 2 * boxIncW;

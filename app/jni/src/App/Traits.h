@@ -59,6 +59,19 @@ typedef struct {
     VCheckboxClickCb const* tc;
     void* self;
 } CheckboxClickCb, *LPCheckboxClickCb;
+
+// trait for render
+
+typedef struct {
+    void (*const UpdateScreen)(void* self, SDL_Surface* pScreen);
+} VUpdateScreenCb, *LPVUpdateScreenCb;
+
+typedef struct {
+    VUpdateScreenCb const* tc;
+    void* self;
+} UpdateScreenCb, *LPUpdateScreenCb;
+
+
 };  // namespace traits
 
 #endif

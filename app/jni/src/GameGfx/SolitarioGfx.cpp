@@ -181,14 +181,14 @@ LPErrInApp SolitarioGfx::Initialize(SDL_Surface* s, SDL_Renderer* r,
     int btoffsetY = 70;
     int btposx = 150;
     int btintraX = 30;
-    if (pGameSettings->NeedScreenMagnify()) {
-        btw = 200;
-        bth = 70;
-        btoffsetY = 400;
-        btposx = 500;
-        btintraX = 50;
-        btwSymb = 90;
-    }
+    // if (pGameSettings->NeedScreenMagnify()) {
+    //     btw = 200;
+    //     bth = 70;
+    //     btoffsetY = 400;
+    //     btposx = 500;
+    //     btintraX = 50;
+    //     btwSymb = 90;
+    // }
     if (_p_Screen->w == 1024) {
         btposx = 500;
     }
@@ -212,14 +212,14 @@ LPErrInApp SolitarioGfx::Initialize(SDL_Surface* s, SDL_Renderer* r,
     _p_BtNewGame->SetVisibleState(ButtonGfx::INVISIBLE);
     // button toggle sound
     int tx = btposx;
-    int offsetY = 30;
-    if (pGameSettings->NeedScreenMagnify()) {
-        tx = btposx;
-        offsetY = 250;
-        rctBt1.y = _p_Screen->h - offsetY;
-    } else {
+    //int offsetY = 30;
+    // if (pGameSettings->NeedScreenMagnify()) {
+    //     tx = btposx;
+    //     offsetY = 250;
+    //     rctBt1.y = _p_Screen->h - offsetY;
+    // } else {
         tx = tx - btw - 30;
-    }
+    //}
 
     rctBt1.x = tx;
     rctBt1.w = btwSymb;
@@ -1606,23 +1606,23 @@ LPErrInApp SolitarioGfx::Show() {
     int yOverlapCard = 32;
     int xOffsetIntraStack = 17;
     int xOffsetFaceUp = 25;
-    if (pGameSettings->NeedScreenMagnify()) {
-        if (g_CardWidth <= 127) {
-            xLine0 = 50;
-            yLine0 = 150;
-            yoffsetLine0 = 150;
-            yOverlapCard = 56;
-            xOffsetIntraStack = 40;
-            xOffsetFaceUp = 60;
-        } else {
-            xLine0 = 20;
-            yLine0 = 120;
-            yoffsetLine0 = 130;
-            yOverlapCard = 40;
-            xOffsetIntraStack = 24;
-            xOffsetFaceUp = 48;
-        }
-    }
+    // if (pGameSettings->NeedScreenMagnify()) {
+    //     if (g_CardWidth <= 127) {
+    //         xLine0 = 50;
+    //         yLine0 = 150;
+    //         yoffsetLine0 = 150;
+    //         yOverlapCard = 56;
+    //         xOffsetIntraStack = 40;
+    //         xOffsetFaceUp = 60;
+    //     } else {
+    //         xLine0 = 20;
+    //         yLine0 = 120;
+    //         yoffsetLine0 = 130;
+    //         yOverlapCard = 40;
+    //         xOffsetIntraStack = 24;
+    //         xOffsetFaceUp = 48;
+    //     }
+    // }
 
     // index 0 (deck with face down)
     CreateRegion(RT_DECKSTOCK,           // ID
@@ -1684,10 +1684,10 @@ void SolitarioGfx::showYesNoMsgBox(LPCSTR strText) {
     _p_MsgBox = new MesgBoxGfx();
     int offsetW = 100;
     int offsetH = 130;
-    if (pGameSettings->NeedScreenMagnify()) {
-        offsetW = 150;
-        offsetH = 260;
-    }
+    // if (pGameSettings->NeedScreenMagnify()) {
+    //     offsetW = 150;
+    //     offsetH = 260;
+    // }
     SDL_Rect rctBox;
     rctBox.w = _p_Screen->w - offsetW;
     rctBox.h = offsetH;
@@ -1722,10 +1722,10 @@ void SolitarioGfx::showOkMsgBox(LPCSTR strText) {
 
     int offsetW = 100;
     int offsetH = 130;
-    if (pGameSettings->NeedScreenMagnify()) {
-        offsetW = 150;
-        offsetH = 260;
-    }
+    // if (pGameSettings->NeedScreenMagnify()) {
+    //     offsetW = 150;
+    //     offsetH = 260;
+    // }
     SDL_Rect rctBox;
     rctBox.w = _p_Screen->w - offsetW;
     rctBox.h = offsetH;
@@ -1798,10 +1798,10 @@ LPErrInApp SolitarioGfx::drawScore() {
     LPLanguages pLanguages = pGameSettings->GetLanguageMan();
     int tx = 10;
     int offsetY = 30;
-    if (pGameSettings->NeedScreenMagnify()) {
-        tx = 100;
-        offsetY = 400;
-    }
+    // if (pGameSettings->NeedScreenMagnify()) {
+    //     tx = 100;
+    //     offsetY = 400;
+    // }
     if (_scoreGame < -2000) {
         _scoreGame = -2000;
     }

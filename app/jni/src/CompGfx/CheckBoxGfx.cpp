@@ -94,12 +94,12 @@ void CheckBoxGfx::DrawButton(SDL_Surface* pScreen) {
     int ckbtW = 16;
     int ckbtH = 16;
     int intraOffsetX = 10;
-    LPGameSettings pGameSettings = GameSettings::GetSettings();
-    if (pGameSettings->NeedScreenMagnify()) {
-        ckbtW = 40;
-        ckbtH = 40;
-        intraOffsetX = 40;
-    }
+    //LPGameSettings pGameSettings = GameSettings::GetSettings();
+    // if (pGameSettings->NeedScreenMagnify()) {
+    //     ckbtW = 40;
+    //     ckbtH = 40;
+    //     intraOffsetX = 40;
+    // }
     SDL_Rect rctCheck;
     if (_clicked) {
         rctCheck.x = _rctCtrl.x;

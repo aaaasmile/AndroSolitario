@@ -51,15 +51,15 @@ LPErrInApp MesgBoxGfx::Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
     _colCurrent = GFX_UTIL_COLOR::White;
     SDL_Rect rctBt1;
     ClickCb cbBt = prepClickBtCb();
-    LPGameSettings pGameSettings = GameSettings::GetSettings();
+    //LPGameSettings pGameSettings = GameSettings::GetSettings();
     int btw = 120;
     int bth = 28;
     int btoffsetY = 10;
-    if (pGameSettings->NeedScreenMagnify()) {
-        btw = 200;
-        bth = 62;
-        btoffsetY = 20;
-    }
+    // if (pGameSettings->NeedScreenMagnify()) {
+    //     btw = 200;
+    //     bth = 62;
+    //     btoffsetY = 20;
+    // }
 
     if (_typeMsg == TY_MB_YES_NO) {
         int space2bt = 20;

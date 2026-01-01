@@ -34,6 +34,64 @@ static const char* g_lpszImageSplashComm =
     DATA_PREFIX "images/commessaggio.jpg";
 static const char* g_lpszImageSplashMantova = DATA_PREFIX "images/mantova.jpg";
 
+typedef struct {
+    int targetWidth, targetHeight;
+    int displayWidth, displayHeight;
+    float scale;
+    bool showFullPortrait;
+} ResolutionMgr;
+
+static void resolutionMgr_InitPortraitDev(ResolutionMgr& rm) {
+    rm.targetWidth = 720;
+    rm.targetHeight = 1280;
+    rm.showFullPortrait = false;
+    rm.scale = 0.7;
+    rm.displayWidth = (int)(rm.targetWidth * rm.scale);
+    rm.displayHeight = (int)(rm.targetHeight * rm.scale);
+}
+
+static void resolutionMgr_InitStandard(ResolutionMgr& rm) {
+    rm.targetWidth = 1024;
+    rm.targetHeight = 768;
+    rm.showFullPortrait = false;
+    rm.scale = 1.0;
+    rm.displayWidth = rm.targetWidth;
+    rm.displayHeight = rm.targetHeight;
+}
+
+static void resolutionMgr_InitFullPortrait(ResolutionMgr& rm) {
+    rm.targetWidth = 720;
+    rm.targetHeight = 1280;
+    rm.showFullPortrait = true;
+    rm.scale = 1;
+    rm.displayWidth = rm.targetWidth * rm.scale;
+    rm.displayHeight = rm.targetHeight * rm.scale;
+
+    int num_displays;
+    SDL_DisplayID* displays = SDL_GetDisplays(&num_displays);
+    if (num_displays == 0) {
+        return;
+    }
+    SDL_DisplayID Id = *displays;
+    SDL_Rect screenRect;
+    if (!SDL_GetDisplayBounds(Id, &screenRect)) {
+        TRACE("CalcDisplaySize error: %s\n", SDL_GetError());
+        return;
+    }
+    if (screenRect.w > rm.displayWidth) {
+        rm.displayWidth = screenRect.w;
+    }
+    if (screenRect.h > rm.displayHeight) {
+        rm.displayHeight = screenRect.h;
+    }
+    TRACE_DEBUG("Display bound for size is width %d, height %d",
+                rm.displayWidth, rm.displayHeight);
+
+    SDL_free(displays);
+}
+
+static ResolutionMgr g_ResolutionMgr;
+
 AppGfx::AppGfx() {
     _p_Window = NULL;
     _p_ScreenTexture = NULL;
@@ -41,14 +99,6 @@ AppGfx::AppGfx() {
     _p_SceneBackground = NULL;
     _p_Screen = NULL;
     _lastMainLoopticks = 0;
-#ifdef ANDROID
-    // this is portrait
-    _screenW = 1080;
-    _screenH = 1920;
-#else
-    _screenH = 768;   // 960; //768;
-    _screenW = 1024;  // 540;//1024;
-#endif
     _Bpp = 0;
     _p_MusicManager = NULL;
     _p_CreditTitle = NULL;
@@ -57,13 +107,23 @@ AppGfx::AppGfx() {
     _p_CreditsView = new CreditsView();
     _p_OptGfx = new OptionsGfx();
     _p_HighScore = new HighScore();
+    // #ifdef ANDROID
+    //     // this is portrait
+    //     //_screenW = 1080;
+    //     //_screenH = 1920;
+    //     resolutionMgr_InitFullPortrait(g_ResolutionMgr);
+    // #else
+
+    //     //_screenH = 768;   // 960; //768;
+    //     //_screenW = 1024;  // 540;//1024;
+    // #endif
 }
 
 AppGfx::~AppGfx() { terminate(); }
 
 LPErrInApp AppGfx::Init() {
     TRACE("Init App\n");
-    _p_GameSettings->GameName = "Solitario";
+    //_p_GameSettings->GameName = "Solitario";
 #ifdef WIN32
     LPCSTR exeDirPath = GAMESET::GetExeAppFolder();
     TRACE("Exe directory is %s\n", exeDirPath);
@@ -88,6 +148,16 @@ LPErrInApp AppGfx::Init() {
                                          SDL_GetError());
         }
     }
+    if (_p_GameSettings->IsPortrait()) {
+        if (_p_GameSettings->IsFullPortait()) {
+            resolutionMgr_InitFullPortrait(g_ResolutionMgr);
+        } else {
+            resolutionMgr_InitPortraitDev(g_ResolutionMgr);
+        }
+    } else {
+        resolutionMgr_InitStandard(g_ResolutionMgr);
+    }
+
     err = createWindow();
     if (err != NULL) {
         return err;
@@ -100,9 +170,9 @@ LPErrInApp AppGfx::Init() {
     if (!TTF_Init()) {
         return ERR_UTIL::ErrorCreate("Font init error");
     }
-    if (_p_GameSettings->NeedScreenMagnify()) {
-        _p_GameSettings->UseBigFontSize();
-    }
+    // if (_p_GameSettings->NeedScreenMagnify()) {
+    //     _p_GameSettings->UseBigFontSize();
+    // }
     TRACE_DEBUG("Font initialized OK\n");
 
     const char* title = pLanguages->GetCStringId(Languages::ID_SOLITARIO);
@@ -156,9 +226,11 @@ LPErrInApp AppGfx::Init() {
     }
 
     MenuDelegator menuDelegator = prepMenuDelegator();
+    UpdateScreenCb screenUpdater = prepScreenUpdater();
     _p_MenuMgr = new MenuMgr();
-    err = _p_MenuMgr->Initialize(_p_Screen, _p_sdlRenderer, _p_Window,
-                                 menuDelegator);
+    // err = _p_MenuMgr->Initialize(_p_Screen, _p_sdlRenderer, _p_Window,
+    //                              menuDelegator);
+    err = _p_MenuMgr->Initialize(_p_Screen, screenUpdater, menuDelegator);
     if (err != NULL) {
         return err;
     }
@@ -255,19 +327,23 @@ LPErrInApp AppGfx::createWindow() {
     flagwin = SDL_WINDOW_FULLSCREEN;
 #endif
 
-    _p_Window = SDL_CreateWindow(_p_GameSettings->GameName.c_str(), _screenW,
-                                 _screenH, flagwin);
+    TRACE_DEBUG("Create window with width %d, height %d\n",
+                g_ResolutionMgr.displayWidth, g_ResolutionMgr.displayHeight);
+    _p_Window = SDL_CreateWindow(_p_GameSettings->GameName.c_str(),
+                                 g_ResolutionMgr.displayWidth,
+                                 g_ResolutionMgr.displayHeight, flagwin);
 
     if (_p_Window == NULL) {
         return ERR_UTIL::ErrorCreate("Error SDL_CreateWindow: %s\n",
                                      SDL_GetError());
     }
-    LPErrInApp err = _p_GameSettings->CalcDisplaySize(_screenW, _screenH);
+    LPErrInApp err = _p_GameSettings->SetDisplaySize(
+        g_ResolutionMgr.displayWidth, g_ResolutionMgr.displayHeight);
     if (err != NULL) {
         return err;
     }
-    _screenH = _p_GameSettings->GetScreenHeight();
-    _screenW = _p_GameSettings->GetScreenWidth();
+    //_screenH = _p_GameSettings->GetScreenHeight();
+    //_screenW = _p_GameSettings->GetScreenWidth();
 
     _p_sdlRenderer = SDL_CreateRenderer(_p_Window, NULL);
 
@@ -277,7 +353,8 @@ LPErrInApp AppGfx::createWindow() {
     }
 
     _p_Screen = GFX_UTIL::SDL_CreateRGBSurface(
-        _screenW, _screenH, 32, 0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
+        g_ResolutionMgr.targetWidth, g_ResolutionMgr.targetHeight, 32,
+        0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
 
     if (_p_Screen == NULL) {
         return ERR_UTIL::ErrorCreate("Error SDL_CreateRGBSurface: %s\n",
@@ -286,9 +363,9 @@ LPErrInApp AppGfx::createWindow() {
     if (_p_ScreenTexture != NULL) {
         SDL_DestroyTexture(_p_ScreenTexture);
     }
-    _p_ScreenTexture =
-        SDL_CreateTexture(_p_sdlRenderer, SDL_PIXELFORMAT_ARGB8888,
-                          SDL_TEXTUREACCESS_STREAMING, _screenW, _screenH);
+    _p_ScreenTexture = SDL_CreateTexture(
+        _p_sdlRenderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING,
+        g_ResolutionMgr.targetWidth, g_ResolutionMgr.targetHeight);
     if (_p_ScreenTexture == NULL) {
         return ERR_UTIL::ErrorCreate("Error SDL_CreateTexture: %s\n",
                                      SDL_GetError());
@@ -378,12 +455,22 @@ LPErrInApp fncBind_ChangeSceneBackground(void* self,
     return pApp->ChangeSceneBackground(ppSceneBackground);
 }
 
+void fncBind_UpdateScreen(void* self, SDL_Surface* pScreen) {
+    AppGfx* pApp = (AppGfx*)self;
+    return pApp->UpdateScreen(pScreen);
+}
+
 MenuDelegator AppGfx::prepMenuDelegator() {
     // Use only static otherwise you loose it
     static VMenuDelegator const tc = {.LeaveMenu = (&fncBind_LeaveMenu),
                                       .EnterMenu = (&fncBind_EnterMenu)};
 
     return (MenuDelegator){.tc = &tc, .self = this};
+}
+
+UpdateScreenCb AppGfx::prepScreenUpdater() {
+    static VUpdateScreenCb const tc = {.UpdateScreen = (&fncBind_UpdateScreen)};
+    return (UpdateScreenCb){.tc = &tc, .self = this};
 }
 
 OptionDelegator AppGfx::prepOptionDelegator() {
@@ -494,9 +581,9 @@ LPErrInApp AppGfx::MainLoopIterate() {
     Uint64 now = SDL_GetTicks();
     Uint64 elapsed = now - _lastMainLoopticks;
 
-    Uint64 frames = 16; // 16 is ~60 FPS
+    Uint64 frames = 16;  // 16 is ~60 FPS
     if (elapsed < frames) {
-        SDL_Delay(frames - elapsed); 
+        SDL_Delay(frames - elapsed);
         return NULL;
     }
     _lastMainLoopticks = now;
@@ -686,11 +773,31 @@ void AppGfx::clearBackground() {
     updateScreenTexture();
 }
 
+void AppGfx::UpdateScreen(SDL_Surface* pScreen) {
+    _p_Screen = pScreen;
+    updateScreenTexture();
+}
+
 void AppGfx::updateScreenTexture() {
     SDL_UpdateTexture(_p_ScreenTexture, NULL, _p_Screen->pixels,
                       _p_Screen->pitch);
     SDL_RenderClear(_p_sdlRenderer);
-    SDL_RenderTexture(_p_sdlRenderer, _p_ScreenTexture, NULL, NULL);
+    // SDL_RenderTexture(_p_sdlRenderer, _p_ScreenTexture, NULL, NULL);
+    if (g_ResolutionMgr.scale == 1.0) {
+        SDL_RenderTexture(_p_sdlRenderer, _p_ScreenTexture, NULL, NULL);
+    } else {
+        SDL_FRect destRect = {
+            (g_ResolutionMgr.displayWidth -
+             g_ResolutionMgr.targetWidth * g_ResolutionMgr.scale) *
+                0.5f,
+            (g_ResolutionMgr.displayHeight -
+             g_ResolutionMgr.targetHeight * g_ResolutionMgr.scale) *
+                0.5f,
+            (float)g_ResolutionMgr.displayWidth,
+            (float)g_ResolutionMgr.displayHeight};
+        SDL_RenderTexture(_p_sdlRenderer, _p_ScreenTexture, NULL, &destRect);
+    }
+
     SDL_RenderPresent(_p_sdlRenderer);
 }
 
@@ -702,7 +809,7 @@ void AppGfx::ParseCmdLine(int argc, char* argv[], SDL_AppResult& res) {
             res = SDL_APP_SUCCESS;
         } else if (std::string(argv[i]) == "--language" && i + 1 < argc) {
             std::string language = argv[i + 1];
-            TRACE_DEBUG("[ParseCmdLine] Startup language regognized %s \n",
+            TRACE_DEBUG("[ParseCmdLine] Startup language recognized %s \n",
                         language.c_str());
             i++;  // Skip the value in the next loop iteration
             LPGameSettings pGameSettings = GameSettings::GetSettings();
@@ -711,6 +818,10 @@ void AppGfx::ParseCmdLine(int argc, char* argv[], SDL_AppResult& res) {
                 pGameSettings->CurrentLanguage = Languages::eLangId::LANG_ITA;
                 pGameSettings->SetCurrentLang();
             }
+        } else if (strcmp(argv[i], "--portrait") == 0) {
+            TRACE_DEBUG("[ParseCmdLine] portait mode recognized \n");
+            LPGameSettings pGameSettings = GameSettings::GetSettings();
+            pGameSettings->SetPortraitMode(true);
         } else {
             printf("unknown option: %s\n", argv[i]);
             printf("\nUsage: %s --version \n", argv[0]);
