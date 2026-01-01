@@ -29,7 +29,7 @@ class MesgBoxGfx {
                           UpdateScreenCb& fnUpdateScreen);
     LPErrInApp Show(SDL_Surface* pScene_background, LPCSTR lpsBut1_txt,
                     LPCSTR lpsBut2_txt, LPCSTR lpsMsg_txt);
-    LPErrInApp HandleEvent(SDL_Event* pEvent);
+    LPErrInApp HandleEvent(SDL_Event* pEvent, const SDL_Point& targetPos);
     LPErrInApp HandleIterate(bool& done);
     bool IsInProgress() { return _inProgress; }
 

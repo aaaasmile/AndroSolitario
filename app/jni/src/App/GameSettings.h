@@ -73,7 +73,7 @@ class GameSettings {
     LPErrInApp setSettingFileName();
 
    private:
-    SDL_Rect _screenRect = {0};
+    SDL_Rect _screenRect = {0, 0, 0, 0};
     int _fontSmallSize = 11;
     int _fontMediumSize = 18;
     int _fontBigSize = 22;

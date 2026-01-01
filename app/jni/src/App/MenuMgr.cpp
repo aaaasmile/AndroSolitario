@@ -302,7 +302,7 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen,
 
 LPErrInApp MenuMgr::drawStaticScene() {
     LPLanguages pLanguages = _p_GameSettings->GetLanguageMan();
-    SDL_Rect rctTarget = {0};
+    SDL_Rect rctTarget = {0, 0, 0, 0};
     LPErrInApp err = NULL;
     rctTarget.x = (_p_ScreenBackbuffer->w - _p_SceneBackground->w) / 2;
     rctTarget.y = (_p_ScreenBackbuffer->h - _p_SceneBackground->h) / 2;
@@ -493,7 +493,7 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     return NULL;
 }
 
-LPErrInApp MenuMgr::HandleRootMenuEvent(SDL_Event* pEvent) {
+LPErrInApp MenuMgr::HandleRootMenuEvent(SDL_Event* pEvent, const SDL_Point& targetPos) {
     LPErrInApp err;
     // TRACE_DEBUG("Ignore mouse events: %b", ignoreMouseEvent);
     if (pEvent->type == SDL_EVENT_QUIT) {
@@ -549,12 +549,12 @@ LPErrInApp MenuMgr::HandleRootMenuEvent(SDL_Event* pEvent) {
         if (_ignoreMouseEvent) {
             return NULL;
         }
-        SDL_Point motionLocation;
-        motionLocation.x = (int)pEvent->motion.x;
-        motionLocation.y = (int)pEvent->motion.y;
+        // SDL_Point motionLocation;
+        // motionLocation.x = //(int)pEvent->motion.x;
+        // motionLocation.y = //(int)pEvent->motion.y;
 
         MenuItemBox mouseInfoBox;
-        if (g_MenuItemBoxes.IsPointInside(motionLocation, mouseInfoBox)) {
+        if (g_MenuItemBoxes.IsPointInside(targetPos, mouseInfoBox)) {
             _focusedMenuItem = mouseInfoBox.MenuItem;
             if (_focusedMenuItem != MenuItemEnum::NOTHING &&
                 _focusedMenuItem != _prevFocusedMenuItem) {
@@ -564,18 +564,18 @@ LPErrInApp MenuMgr::HandleRootMenuEvent(SDL_Event* pEvent) {
         } else {
             _focusedMenuItem = MenuItemEnum::NOTHING;
         }
-        _p_homeUrl->MouseMove(pEvent);
+        _p_homeUrl->MouseMove(pEvent, targetPos);
     }
     if (pEvent->type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
         if (_ignoreMouseEvent) {
             return NULL;
         }
         MenuItemBox mouseInfoBox;
-        SDL_Point clickLocation;
-        clickLocation.x = (int)pEvent->button.x;
-        clickLocation.y = (int)pEvent->button.y;
+        // SDL_Point clickLocation;
+        // clickLocation.x = (int)pEvent->button.x;
+        // clickLocation.y = (int)pEvent->button.y;
 
-        if (g_MenuItemBoxes.IsPointInside(clickLocation, mouseInfoBox)) {
+        if (g_MenuItemBoxes.IsPointInside(targetPos, mouseInfoBox)) {
             _focusedMenuItem = mouseInfoBox.MenuItem;
             TRACE_DEBUG("Select menu %s from mouse down\n",
                         MenuItemEnumToString(_focusedMenuItem));
@@ -591,7 +591,7 @@ LPErrInApp MenuMgr::HandleRootMenuEvent(SDL_Event* pEvent) {
         if (_ignoreMouseEvent) {
             return NULL;
         }
-        _p_homeUrl->MouseUp(pEvent);
+        _p_homeUrl->MouseUp(pEvent, targetPos);
     }
 
     return NULL;

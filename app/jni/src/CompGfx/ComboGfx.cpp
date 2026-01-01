@@ -37,12 +37,13 @@ ComboGfx::~ComboGfx() {
 
 void ComboGfx::Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
                           TTF_Font* pFont, int iButID,
-                          UpdateScreenCb& fnUpdateScreen, ClickCb& fncbClickEvent) {
+                          UpdateScreenCb& fnUpdateScreen,
+                          ClickCb& fncbClickEvent) {
     _fncbClickEvent = fncbClickEvent;
     _rctCtrl = *pRect;
     _fnUpdateScreen = fnUpdateScreen;
     //_p_sdlRenderer = psdlRenderer;
-    //LPGameSettings pGameSettings = GameSettings::GetSettings();
+    // LPGameSettings pGameSettings = GameSettings::GetSettings();
 
     int boxIncW = 34;
     int boxIncH = _rctCtrl.h;
@@ -120,25 +121,32 @@ void ComboGfx::SetVisibleState(VisbleState eVal) {
     }
 }
 
-void ComboGfx::MouseMove(SDL_Event* pEvent, SDL_Surface* pScreen,
-                         SDL_Texture* pScene_background,
-                         SDL_Texture* pScreenTexture) {
+void ComboGfx::MouseMove(SDL_Event* pEvent, const SDL_Point& targetPos) {
     if (_visibleState == VISIBLE && _enabled) {
-        if (pEvent->motion.x >= _rctCtrl.x &&
-            pEvent->motion.x <= _rctCtrl.x + _rctCtrl.w &&
-            pEvent->motion.y >= _rctCtrl.y &&
-            pEvent->motion.y <= _rctCtrl.y + _rctCtrl.h) {
+        if (targetPos.x >= _rctCtrl.x &&
+            targetPos.x <= _rctCtrl.x + _rctCtrl.w &&
+            targetPos.y >= _rctCtrl.y &&
+            targetPos.y <= _rctCtrl.y + _rctCtrl.h) {
+            int mx = targetPos.x;
+            int my = targetPos.y;
+            if (mx >= _rctBoxUp.x && mx <= _rctBoxUp.x + _rctBoxUp.w &&
+                my >= _rctBoxUp.y && my <= _rctBoxUp.y + _rctBoxUp.h) {
+                _upBoxSelected = true;
+            } else if (mx >= _rctBoxDown.x &&
+                       mx <= _rctBoxDown.x + _rctBoxDown.w &&
+                       my >= _rctBoxDown.y &&
+                       my <= _rctBoxDown.y + _rctBoxDown.h) {
+                _downBoxSelected = true;
+            }
             // mouse inner button
             _color = GFX_UTIL_COLOR::Orange;
-            RedrawButton(pScreen, pScene_background, pScreenTexture);
+            //RedrawButton(pScreen, pScene_background, pScreenTexture);
         } else {
             // mouse outside
-            if (_color.r == GFX_UTIL_COLOR::Orange.r &&
-                _color.g == GFX_UTIL_COLOR::Orange.g &&
-                _color.b == GFX_UTIL_COLOR::Orange.b) {
-                // button was selected
-                _color = GFX_UTIL_COLOR::White;
-                RedrawButton(pScreen, pScene_background, pScreenTexture);
+            if (_upBoxSelected || _downBoxSelected){
+                _upBoxSelected = false;
+                _downBoxSelected = false;
+                //RedrawButton(pScreen, pScene_background, pScreenTexture);
             }
         }
     }
@@ -177,13 +185,13 @@ void ComboGfx::FingerDown(SDL_Event* pEvent) {
     }
 }
 
-void ComboGfx::MouseUp(SDL_Event* pEvent) {
+void ComboGfx::MouseUp(SDL_Event* pEvent, const SDL_Point& targetPos) {
     if (_p_GameSettings->InputType == InputTypeEnum::TouchWithoutMouse) {
         return;
     }
     if (_visibleState == VISIBLE && _enabled) {
-        int mx = pEvent->motion.x;
-        int my = pEvent->motion.y;
+        int mx = targetPos.x;
+        int my = targetPos.y;
         if (mx >= _rctBoxUp.x && mx <= _rctBoxUp.x + _rctBoxUp.w &&
             my >= _rctBoxUp.y && my <= _rctBoxUp.y + _rctBoxUp.h) {
             // mouse on up box
@@ -218,25 +226,27 @@ void ComboGfx::DrawButton(SDL_Surface* pScreen) {
     if (_visibleState == INVISIBLE) {
         return;
     }
-    bool upBoxSelected = false;
-    bool downBoxSelected = false;
+    // bool upBoxSelected = false;
+    // bool downBoxSelected = false;
     if (_enabled) {
-        int mx, my;
-        float fmx, fmy;
-        SDL_GetMouseState(&fmx, &fmy);
-        mx = (int)fmx;
-        my = (int)fmy;
+        // int mx, my;
+        // float fmx, fmy;
+        // SDL_GetMouseState(&fmx, &fmy);
+        // mx = (int)fmx;
+        // my = (int)fmy;
 
-        if (mx >= _rctBoxUp.x && mx <= _rctBoxUp.x + _rctBoxUp.w &&
-            my >= _rctBoxUp.y && my <= _rctBoxUp.y + _rctBoxUp.h) {
-            upBoxSelected = true;
-        } else if (mx >= _rctBoxDown.x && mx <= _rctBoxDown.x + _rctBoxDown.w &&
-                   my >= _rctBoxDown.y && my <= _rctBoxDown.y + _rctBoxDown.h) {
-            downBoxSelected = true;
-        }
+        // if (mx >= _rctBoxUp.x && mx <= _rctBoxUp.x + _rctBoxUp.w &&
+        //     my >= _rctBoxUp.y && my <= _rctBoxUp.y + _rctBoxUp.h) {
+        //     upBoxSelected = true;
+        // } else if (mx >= _rctBoxDown.x && mx <= _rctBoxDown.x + _rctBoxDown.w
+        // &&
+        //            my >= _rctBoxDown.y && my <= _rctBoxDown.y +
+        //            _rctBoxDown.h) {
+        //     downBoxSelected = true;
+        // }
 
         // background on up/down boxes
-        if (upBoxSelected) {
+        if (_upBoxSelected) {
             GFX_UTIL::DrawStaticSpriteEx(pScreen, 0, 0, _rctBoxUp.w,
                                          _rctBoxUp.h, _rctBoxUp.x, _rctBoxUp.y,
                                          _p_surfBoxSel);
@@ -245,7 +255,7 @@ void ComboGfx::DrawButton(SDL_Surface* pScreen) {
                                          _rctBoxUp.h, _rctBoxUp.x, _rctBoxUp.y,
                                          _p_surfBoxUNSel);
         }
-        if (downBoxSelected) {
+        if (_downBoxSelected) {
             GFX_UTIL::DrawStaticSpriteEx(pScreen, 0, 0, _rctBoxDown.w,
                                          _rctBoxDown.h, _rctBoxDown.x,
                                          _rctBoxDown.y, _p_surfBoxSel);
@@ -279,7 +289,7 @@ void ComboGfx::DrawButton(SDL_Surface* pScreen) {
         if (yOffset < 0) {
             yOffset = 0;
         }
-        if (upBoxSelected) {
+        if (_upBoxSelected) {
             _color = GFX_UTIL_COLOR::Orange;
         } else {
             _color = GFX_UTIL_COLOR::White;
@@ -294,7 +304,7 @@ void ComboGfx::DrawButton(SDL_Surface* pScreen) {
         if (xOffset < 0) {
             xOffset = 1;
         }
-        if (downBoxSelected) {
+        if (_downBoxSelected) {
             _color = GFX_UTIL_COLOR::Orange;
         } else {
             _color = GFX_UTIL_COLOR::White;
@@ -332,15 +342,16 @@ void ComboGfx::DrawButton(SDL_Surface* pScreen) {
     }
 }
 
-void ComboGfx::RedrawButton(SDL_Surface* pScreen,
-                            SDL_Texture* pScene_background,
-                            SDL_Texture* pScreenTexture) {
-    if (pScene_background) {
-        //SDL_RenderTexture(_p_sdlRenderer, pScene_background, NULL, NULL);
-        (_fnUpdateScreen.tc)->RenderTexture(_fnUpdateScreen.self, pScene_background);
-    }
-    DrawButton(pScreen);
-    // SDL_RenderTexture(_p_sdlRenderer, pScreenTexture, NULL, NULL);
-    // SDL_RenderPresent(_p_sdlRenderer);
-    (_fnUpdateScreen.tc)->UpdateScreen(_fnUpdateScreen.self, pScreen);
-}
+// void ComboGfx::RedrawButton(SDL_Surface* pScreen,
+//                             SDL_Texture* pScene_background,
+//                             SDL_Texture* pScreenTexture) {
+//     if (pScene_background) {
+//         // SDL_RenderTexture(_p_sdlRenderer, pScene_background, NULL, NULL);
+//         (_fnUpdateScreen.tc)
+//             ->RenderTexture(_fnUpdateScreen.self, pScene_background);
+//     }
+//     DrawButton(pScreen);
+//     // SDL_RenderTexture(_p_sdlRenderer, pScreenTexture, NULL, NULL);
+//     // SDL_RenderPresent(_p_sdlRenderer);
+//     (_fnUpdateScreen.tc)->UpdateScreen(_fnUpdateScreen.self, pScreen);
+// }

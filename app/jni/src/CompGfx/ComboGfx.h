@@ -18,10 +18,9 @@ class ComboGfx {
                     int iButID, UpdateScreenCb& fnUpdateScreen,
                     ClickCb& fncbClickEvent);
     void SetButtonText(LPCSTR strCaption) { _buttonText = strCaption; }
-    void MouseMove(SDL_Event* pEvent, SDL_Surface* pScreen,
-                   SDL_Texture* pScene_background, SDL_Texture* pScreenTexture);
+    void MouseMove(SDL_Event* pEvent, const SDL_Point& targetPos);
     void FingerDown(SDL_Event* pEvent);
-    void MouseUp(SDL_Event* pEvent);
+    void MouseUp(SDL_Event* pEvent, const SDL_Point& targetPos);
     void DrawButton(SDL_Surface* pScreen);
     void EnableWindow(bool bVal) { _enabled = bVal; }
     void SetVisibleState(VisbleState eVal);
@@ -56,6 +55,9 @@ class ComboGfx {
     VCT_STRING _vctDataStrings;
     int _currDataIndex;
     GameSettings* _p_GameSettings;
+
+    bool _upBoxSelected = false;
+    bool _downBoxSelected = false;
 };
 
 #endif

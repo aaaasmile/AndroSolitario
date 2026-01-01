@@ -48,12 +48,12 @@ void LabelLinkGfx::SetState(eSate eVal) {
     _isDirty = true;
 }
 
-void LabelLinkGfx::MouseMove(SDL_Event* pEvent) {
+void LabelLinkGfx::MouseMove(SDL_Event* pEvent, const SDL_Point& targetPos) {
     if (_stateGfx == VISIBLE && _isEnabled) {
-        if (pEvent->motion.x >= _rctCtrl.x &&
-            pEvent->motion.x <= _rctCtrl.x + _rctCtrl.w &&
-            pEvent->motion.y >= _rctCtrl.y &&
-            pEvent->motion.y <= _rctCtrl.y + _rctCtrl.h) {
+        if (targetPos.x >= _rctCtrl.x &&
+            targetPos.x <= _rctCtrl.x + _rctCtrl.w &&
+            targetPos.y >= _rctCtrl.y &&
+            targetPos.y <= _rctCtrl.y + _rctCtrl.h) {
             // mouse inner button
             if (_mouseOuside) {
                 _isDirty = true;
@@ -69,12 +69,12 @@ void LabelLinkGfx::MouseMove(SDL_Event* pEvent) {
     }
 }
 
-void LabelLinkGfx::MouseUp(SDL_Event* pEvent) {
+void LabelLinkGfx::MouseUp(SDL_Event* pEvent, const SDL_Point& targetPos) {
     if (_stateGfx == VISIBLE && _isEnabled) {
-        if (pEvent->motion.x >= _rctCtrl.x &&
-            pEvent->motion.x <= _rctCtrl.x + _rctCtrl.w &&
-            pEvent->motion.y >= _rctCtrl.y &&
-            pEvent->motion.y <= _rctCtrl.y + _rctCtrl.h) {
+        if (targetPos.x >= _rctCtrl.x &&
+            targetPos.x <= _rctCtrl.x + _rctCtrl.w &&
+            targetPos.y >= _rctCtrl.y &&
+            targetPos.y <= _rctCtrl.y + _rctCtrl.h) {
             // mouse go up inner the button
             // send a click event
             if ((_fncbClickEvent.tc) != NULL)
@@ -100,17 +100,16 @@ void LabelLinkGfx::Draw(SDL_Surface* pScreen) {
     if (_stateGfx != INVISIBLE) {
         if (_isEnabled) {
             // begin stuff mouse
-            int mx, my;
-            float fmx, fmy;
-            SDL_GetMouseState(&fmx, &fmy);
-            mx = (int)fmx;
-            my = (int)fmy;
-            if (mx >= _rctCtrl.x && mx <= _rctCtrl.x + _rctCtrl.w &&
-                my >= _rctCtrl.y && my <= _rctCtrl.y + _rctCtrl.h) {
+            // int mx, my;
+            // float fmx, fmy;
+            // SDL_GetMouseState(&fmx, &fmy);
+            // mx = (int)fmx;
+            // my = (int)fmy;
+            if (_mouseOuside) {
                 // mouse on button
-                _color = GFX_UTIL_COLOR::Orange;
-            } else {
                 _color = GFX_UTIL_COLOR::White;
+            } else {
+                _color = GFX_UTIL_COLOR::Orange;
             }
             // end stuff mouse
 

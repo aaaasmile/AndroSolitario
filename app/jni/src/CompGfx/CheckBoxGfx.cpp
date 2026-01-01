@@ -59,18 +59,18 @@ void CheckBoxGfx::FingerDown(SDL_Event* pEvent) {
     }
 }
 
-void CheckBoxGfx::MouseMove(SDL_Event* pEvent, SDL_Surface* pScreen,
+void CheckBoxGfx::MouseMove(SDL_Event* pEvent, const SDL_Point& targetPos,  SDL_Surface* pScreen,
                             SDL_Surface* pScene_background) {}
 
-void CheckBoxGfx::MouseUp(SDL_Event* pEvent) {
+void CheckBoxGfx::MouseUp(SDL_Event* pEvent, const SDL_Point& targetPos) {
     if (_p_GameSettings->InputType == InputTypeEnum::TouchWithoutMouse) {
         return;
     }
     if (_visibleState == VISIBLE && _enabled) {
-        if (pEvent->motion.x >= _rctCtrl.x &&
-            pEvent->motion.x <= _rctCtrl.x + _rctCtrl.w &&
-            pEvent->motion.y >= _rctCtrl.y &&
-            pEvent->motion.y <= _rctCtrl.y + _rctCtrl.h) {
+        if (targetPos.x >= _rctCtrl.x &&
+            targetPos.x <= _rctCtrl.x + _rctCtrl.w &&
+            targetPos.y >= _rctCtrl.y &&
+            targetPos.y <= _rctCtrl.y + _rctCtrl.h) {
             if (_clicked) {
                 _clicked = false;
             } else {
@@ -94,12 +94,6 @@ void CheckBoxGfx::DrawButton(SDL_Surface* pScreen) {
     int ckbtW = 16;
     int ckbtH = 16;
     int intraOffsetX = 10;
-    //LPGameSettings pGameSettings = GameSettings::GetSettings();
-    // if (pGameSettings->NeedScreenMagnify()) {
-    //     ckbtW = 40;
-    //     ckbtH = 40;
-    //     intraOffsetX = 40;
-    // }
     SDL_Rect rctCheck;
     if (_clicked) {
         rctCheck.x = _rctCtrl.x;

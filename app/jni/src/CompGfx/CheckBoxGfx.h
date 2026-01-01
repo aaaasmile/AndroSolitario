@@ -24,10 +24,10 @@ class CheckBoxGfx {
     void Initialize(SDL_Rect* pRect, SDL_Surface* pScreen, TTF_Font* pFont,
                     int iButID, CheckboxClickCb& fncbClickEvent);
     void SetWindowText(LPCSTR strCaption) { _buttonText = strCaption; }
-    void MouseMove(SDL_Event* pEvent, SDL_Surface* pScreen,
+    void MouseMove(SDL_Event* pEvent, const SDL_Point& targetPos, SDL_Surface* pScreen,
                    SDL_Surface* pScene_background);
     void FingerDown(SDL_Event* pEvent);
-    void MouseUp(SDL_Event* pEvent);
+    void MouseUp(SDL_Event* pEvent, const SDL_Point& targetPos);
     void DrawButton(SDL_Surface* pScreen);
     void EnableWindow(bool bVal) { _enabled = bVal; }
     void SetVisibleState(VisbleState eVal);

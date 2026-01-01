@@ -27,9 +27,9 @@ class ButtonGfx {
     void SetButtonText(LPCSTR text) {
         _buttonText = text;
     }
-    bool MouseMove(SDL_Event* pEvent);
-    bool MouseUp(SDL_Event* pEvent);
-    bool MouseDown(SDL_Event* pEvent);
+    bool MouseMove(SDL_Event* pEvent, const SDL_Point& targetPos);
+    bool MouseUp(SDL_Event* pEvent, const SDL_Point& targetPos);
+    bool MouseDown(SDL_Event* pEvent, const SDL_Point& targetPos);
     void FingerDown(SDL_Event* pEvent);
     void DrawButton(SDL_Surface* pScreen);
     void Enable(bool bVal) { _enabled = bVal; }

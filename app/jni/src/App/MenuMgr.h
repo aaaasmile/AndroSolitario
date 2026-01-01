@@ -29,7 +29,7 @@ class MenuMgr {
     //                       SDL_Window* pWindow, MenuDelegator& menuDelegator);
     LPErrInApp Initialize(SDL_Surface* pScreen, UpdateScreenCb& fnUpdateScreen,
                           MenuDelegator& menuDelegator);
-    LPErrInApp HandleRootMenuEvent(SDL_Event* pEvent);
+    LPErrInApp HandleRootMenuEvent(SDL_Event* pEvent, const SDL_Point& targetPos);
     LPErrInApp HandleRootMenuIterate();
     void SetBackground(SDL_Surface* pVal) { _p_SceneBackground = pVal; }
 

@@ -40,7 +40,24 @@ typedef struct {
     float scale;
     bool showFullPortrait;
     bool isDev;
+    SDL_FRect viewport = {0, 0, 0, 0};
 } ResolutionMgr;
+
+static void resolutionMgr_UpdateViewport(ResolutionMgr& rm, int w, int h) {
+    rm.displayWidth = w;
+    rm.displayHeight = h;
+
+    TRACE_DEBUG("[UpdateViewport] Resize win, new width %d, height %d \n", w,
+                h);
+
+    float scaledWidth = rm.targetWidth * rm.scale;
+    float scaledHeight = rm.targetHeight * rm.scale;
+
+    rm.viewport.x = (rm.displayWidth - scaledWidth) * 0.5f;    // Centered X
+    rm.viewport.y = (rm.displayHeight - scaledHeight) * 0.5f;  // Centered Y
+    rm.viewport.w = scaledWidth;
+    rm.viewport.h = scaledHeight;
+}
 
 static void resolutionMgr_InitPortraitDev(ResolutionMgr& rm) {
     rm.targetWidth = 720;
@@ -50,6 +67,7 @@ static void resolutionMgr_InitPortraitDev(ResolutionMgr& rm) {
     rm.scale = 0.7;
     rm.displayWidth = (int)(rm.targetWidth * rm.scale);
     rm.displayHeight = (int)(rm.targetHeight * rm.scale);
+    resolutionMgr_UpdateViewport(rm, rm.displayWidth, rm.displayHeight);
 }
 
 static void resolutionMgr_InitStandard(ResolutionMgr& rm) {
@@ -66,7 +84,7 @@ static void resolutionMgr_InitFullPortrait(ResolutionMgr& rm) {
     rm.targetWidth = 720;
     rm.targetHeight = 1280;
     rm.showFullPortrait = true;
-    rm.scale = 1;
+    rm.scale = 1.0;
     rm.isDev = false;
     rm.displayWidth = rm.targetWidth * rm.scale;
     rm.displayHeight = rm.targetHeight * rm.scale;
@@ -536,19 +554,74 @@ LPErrInApp AppGfx::EnterMenu(MenuItemEnum menuItem) {
     return NULL;
 }
 
+void AppGfx::transformMouseToTarget(int mouseX, int mouseY,
+                                    SDL_Point* pTargetPos) {
+    if (g_ResolutionMgr.scale == 1.0) {
+        pTargetPos->x = mouseX;
+        pTargetPos->y = mouseY;
+        return;
+    }
+
+    pTargetPos->x = -1;
+    pTargetPos->y = -1;
+
+    // Check if mouse is within the game viewport
+    if (mouseX < g_ResolutionMgr.viewport.x ||
+        mouseY < g_ResolutionMgr.viewport.y ||
+        mouseX > g_ResolutionMgr.viewport.x + g_ResolutionMgr.viewport.w ||
+        mouseY > g_ResolutionMgr.viewport.y + g_ResolutionMgr.viewport.h) {
+        return;  // Mouse outside game area
+    }
+
+    // Convert to target coordinates
+    pTargetPos->x =
+        (int)((mouseX - g_ResolutionMgr.viewport.x) / g_ResolutionMgr.scale);
+    pTargetPos->y =
+        (int)((mouseY - g_ResolutionMgr.viewport.y) / g_ResolutionMgr.scale);
+
+    // Clamp to valid range
+    pTargetPos->x =
+        SDL_clamp(pTargetPos->x, 0, g_ResolutionMgr.targetWidth - 1);
+    pTargetPos->y =
+        SDL_clamp(pTargetPos->y, 0, g_ResolutionMgr.targetHeight - 1);
+}
+
 LPErrInApp AppGfx::MainLoopEvent(SDL_Event* pEvent, SDL_AppResult& res) {
     LPErrInApp err;
     res = SDL_APP_CONTINUE;
+    SDL_Point targetPos = {-1, -1};
+
+    switch (pEvent->type) {
+        case SDL_EVENT_MOUSE_MOTION: {
+            transformMouseToTarget(pEvent->motion.x, pEvent->motion.y,
+                                   &targetPos);
+            break;
+        }
+
+        case SDL_EVENT_MOUSE_BUTTON_DOWN:
+        case SDL_EVENT_MOUSE_BUTTON_UP: {
+            transformMouseToTarget(pEvent->button.x, pEvent->button.y,
+                                   &targetPos);
+            break;
+        }
+
+        case SDL_EVENT_WINDOW_RESIZED:
+            resolutionMgr_UpdateViewport(g_ResolutionMgr, pEvent->window.data1,
+                                         pEvent->window.data2);
+            break;
+        default:
+            break;
+    }
 
     switch (_histMenu.top()) {
         case MenuItemEnum::MENU_ROOT:
-            err = _p_MenuMgr->HandleRootMenuEvent(pEvent);
+            err = _p_MenuMgr->HandleRootMenuEvent(pEvent, targetPos);
             if (err != NULL)
                 return err;
             break;
 
         case MenuItemEnum::MENU_GAME:
-            err = _p_SolitarioGfx->HandleEvent(pEvent);
+            err = _p_SolitarioGfx->HandleEvent(pEvent, targetPos);
             if (err != NULL)
                 return err;
             break;
@@ -569,7 +642,7 @@ LPErrInApp AppGfx::MainLoopEvent(SDL_Event* pEvent, SDL_AppResult& res) {
             break;
 
         case MenuItemEnum::MENU_OPTIONS:
-            err = _p_OptGfx->HandleEvent(pEvent);
+            err = _p_OptGfx->HandleEvent(pEvent, targetPos);
             if (err != NULL)
                 return err;
             break;

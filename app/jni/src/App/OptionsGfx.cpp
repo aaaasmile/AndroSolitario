@@ -99,7 +99,8 @@ CheckboxClickCb OptionsGfx::prepCheckBoxClickMusic() {
 #endif
 }
 
-LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen, UpdateScreenCb& fnUpdateScreen,
+LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen,
+                                  UpdateScreenCb& fnUpdateScreen,
                                   OptionDelegator& optDlg,
                                   SDL_Window* pWindow) {
     if (_initilized) {
@@ -300,7 +301,8 @@ LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen, UpdateScreenCb& fnUpdate
     return NULL;
 }
 
-LPErrInApp OptionsGfx::HandleEvent(SDL_Event* pEvent) {
+LPErrInApp OptionsGfx::HandleEvent(SDL_Event* pEvent,
+                                   const SDL_Point& targetPos) {
     LPErrInApp err;
     if (pEvent->type == SDL_EVENT_QUIT) {
         _inProgress = false;
@@ -333,16 +335,22 @@ LPErrInApp OptionsGfx::HandleEvent(SDL_Event* pEvent) {
     }
     if (pEvent->type == SDL_EVENT_MOUSE_BUTTON_UP) {
         if (_mouseDownRec) {
-            _p_buttonOK->MouseUp(pEvent);
-            _p_comboLang->MouseUp(pEvent);
-            _p_checkMusic->MouseUp(pEvent);
-            _p_comboBackground->MouseUp(pEvent);
-            _p_comboDeck->MouseUp(pEvent);
+            _p_buttonOK->MouseUp(pEvent, targetPos);
+            _p_comboLang->MouseUp(pEvent, targetPos);
+            _p_checkMusic->MouseUp(pEvent, targetPos);
+            _p_comboBackground->MouseUp(pEvent, targetPos);
+            _p_comboDeck->MouseUp(pEvent, targetPos);
             _mouseDownRec = false;
         }
     }
+    if (pEvent->type == SDL_EVENT_MOUSE_MOTION) {
+        _p_buttonOK->MouseMove(pEvent, targetPos);
+        _p_comboLang->MouseMove(pEvent, targetPos);
+        _p_comboBackground->MouseMove(pEvent, targetPos);
+        _p_comboDeck->MouseMove(pEvent, targetPos);
+    }
 #endif
-    _p_textInput->HandleEvent(pEvent);
+    _p_textInput->HandleEvent(pEvent, targetPos);
     return NULL;
 }
 

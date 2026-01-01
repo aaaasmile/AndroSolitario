@@ -48,7 +48,7 @@ void TextInputGfx::Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
     _p_fontText = pFont;
 }
 
-void TextInputGfx::HandleEvent(SDL_Event* pEvent) {
+void TextInputGfx::HandleEvent(SDL_Event* pEvent, const SDL_Point& targetPos) {
 #if HASMOUSE
     LPGameSettings pGameSettings = GameSettings::GetSettings();
     if (pEvent->type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
@@ -56,8 +56,8 @@ void TextInputGfx::HandleEvent(SDL_Event* pEvent) {
         if (pGameSettings->InputType == InputTypeEnum::TouchWithoutMouse) {
             return;
         }
-        int mouseX = pEvent->button.x;
-        int mouseY = pEvent->button.y;
+        int mouseX = targetPos.x;
+        int mouseY = targetPos.y;
 
         _hasFocus =
             (mouseX >= _rctCtrl.x && mouseX <= _rctCtrl.x + _rctCtrl.w &&

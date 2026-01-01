@@ -56,6 +56,7 @@ class AppGfx {
     LPErrInApp showGeneralOptions();
     void backToMenuRootWithMusic();
     void backToMenuRootSameMusic();
+    void transformMouseToTarget(int windowX, int windowY, SDL_Point* pTargetPos);
 
     MenuDelegator prepMenuDelegator();
     OptionDelegator prepOptionDelegator();

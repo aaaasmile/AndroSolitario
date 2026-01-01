@@ -40,7 +40,7 @@ class OptionsGfx {
     LPErrInApp Initialize(SDL_Surface* pScreen, UpdateScreenCb& fnUpdateScreen,
                           OptionDelegator& optDlg, SDL_Window* pWindow);
     LPErrInApp Show(SDL_Surface* pScene_background, STRING& strCaption);
-    LPErrInApp HandleEvent(SDL_Event* pEvent);
+    LPErrInApp HandleEvent(SDL_Event* pEvent, const SDL_Point& targetPos);
     LPErrInApp HandleIterate(bool& done);
     void SetCaption(STRING& strCaption) { _headerText = strCaption; }
     LPErrInApp OptionsEnd();

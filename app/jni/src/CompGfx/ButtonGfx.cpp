@@ -11,7 +11,6 @@ static bool IsPointInsideCtrl(const SDL_Rect& rct, const SDL_Point& pt) {
     return false;
 }
 
-
 ButtonGfx::ButtonGfx() {
     _visibleState = INVISIBLE;
     _p_fontText = 0;
@@ -73,16 +72,16 @@ void ButtonGfx::InitializeAsSymbol(SDL_Rect* pRect, SDL_Surface* pScreen,
     _buttonType = SYMBOL_BT;
 }
 
-bool ButtonGfx::MouseMove(SDL_Event* pEvent) {
+bool ButtonGfx::MouseMove(SDL_Event* pEvent, const SDL_Point& targetPos) {
     if (_p_GameSettings->InputType == InputTypeEnum::TouchWithoutMouse) {
         return false;
     }
     MouseState previous = _mouseState;
     if (_visibleState == VISIBLE && _enabled) {
-        if (pEvent->motion.x >= _rctButton.x &&
-            pEvent->motion.x <= _rctButton.x + _rctButton.w &&
-            pEvent->motion.y >= _rctButton.y &&
-            pEvent->motion.y <= _rctButton.y + _rctButton.h) {
+        if (targetPos.x >= _rctButton.x &&
+            targetPos.x <= _rctButton.x + _rctButton.w &&
+            targetPos.y >= _rctButton.y &&
+            targetPos.y <= _rctButton.y + _rctButton.h) {
             _mouseState = MouseState::INSIDE;
         } else {
             _mouseState = MouseState::OUTSIDE;
@@ -92,16 +91,16 @@ bool ButtonGfx::MouseMove(SDL_Event* pEvent) {
     return previous != _mouseState;
 }
 
-bool ButtonGfx::MouseDown(SDL_Event* pEvent) {
+bool ButtonGfx::MouseDown(SDL_Event* pEvent, const SDL_Point& targetPos) {
     if (_p_GameSettings->InputType == InputTypeEnum::TouchWithoutMouse) {
         return false;
     }
     _mouseIsDown = false;
     if (_visibleState == VISIBLE && _enabled) {
-        if (pEvent->motion.x >= _rctButton.x &&
-            pEvent->motion.x <= _rctButton.x + _rctButton.w &&
-            pEvent->motion.y >= _rctButton.y &&
-            pEvent->motion.y <= _rctButton.y + _rctButton.h) {
+        if (targetPos.x >= _rctButton.x &&
+            targetPos.x <= _rctButton.x + _rctButton.w &&
+            targetPos.y >= _rctButton.y &&
+            targetPos.y <= _rctButton.y + _rctButton.h) {
             _mouseIsDown = true;
         }
     }
@@ -117,13 +116,12 @@ void ButtonGfx::FingerDown(SDL_Event* pEvent) {
     }
 }
 
-bool ButtonGfx::MouseUp(SDL_Event* pEvent) {
+bool ButtonGfx::MouseUp(SDL_Event* pEvent, const SDL_Point& targetPos) {
     if (_p_GameSettings->InputType == InputTypeEnum::TouchWithoutMouse) {
         return false;
     }
     if (_visibleState == VISIBLE && _enabled) {
-        SDL_Point pt = {(int)pEvent->motion.x, (int)pEvent->motion.y};
-        if (IsPointInsideCtrl(_rctButton, pt)) {
+        if (IsPointInsideCtrl(_rctButton, targetPos)) {
             if ((_fncbClickEvent.tc) != NULL)
                 (_fncbClickEvent.tc)->Click(_fncbClickEvent.self, _butID);
             _mouseState = MouseState::INSIDE;
@@ -143,32 +141,38 @@ void ButtonGfx::DrawButton(SDL_Surface* pScreen) {
         return;
     }
 
-    int mx, my;
     SDL_Color colorText;
-    float fmx, fmy;
-    SDL_GetMouseState(&fmx, &fmy);
-    mx = (int)fmx;
-    my = (int)fmy;
-    SDL_Point pt = {mx, my};
-    if (IsPointInsideCtrl(_rctButton, pt)) {
+    // int mx, my;
+    // float fmx, fmy;
+    // SDL_GetMouseState(&fmx, &fmy);
+    // mx = (int)fmx;
+    // my = (int)fmy;
+    // SDL_Point pt = {mx, my};
+    // if (IsPointInsideCtrl(_rctButton, pt)) {
+    //     colorText = GFX_UTIL_COLOR::Orange;
+    //     _mouseState = MouseState::INSIDE;
+    // } else {
+    //     colorText = GFX_UTIL_COLOR::White;
+    //     _mouseState = MouseState::OUTSIDE;
+    // }
+    // Remeber Mouse coordinate are on viewport, this is get with mouse move
+    if (_mouseState == MouseState::INSIDE) {
         colorText = GFX_UTIL_COLOR::Orange;
-        _mouseState = MouseState::INSIDE;
     } else {
         colorText = GFX_UTIL_COLOR::White;
-        _mouseState = MouseState::OUTSIDE;
     }
 
     GFX_UTIL::DrawStaticSpriteEx(pScreen, 0, 0, _rctButton.w, _rctButton.h,
                                  _rctButton.x, _rctButton.y, _p_buttonSurface);
     int tx, ty;
-    if (_buttonType == TEXT_BUTTON){
+    if (_buttonType == TEXT_BUTTON) {
         TTF_GetStringSize(_p_fontText, _buttonText.c_str(), 0, &tx, &ty);
-    }else {
-        TTF_MeasureString(_p_fontText, _buttonText.c_str(), 1, _rctButton.w, &tx, NULL);
+    } else {
+        TTF_MeasureString(_p_fontText, _buttonText.c_str(), 1, _rctButton.w,
+                          &tx, NULL);
         tx += 5;
         ty -= 5;
     }
-    
 
     int iXOffSet = (_rctButton.w - tx) / 2;
     if (iXOffSet < 0) {

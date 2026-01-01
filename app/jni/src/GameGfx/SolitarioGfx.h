@@ -79,7 +79,7 @@ class SolitarioGfx {
 
     LPErrInApp Initialize(SDL_Surface* s, UpdateScreenCb& fnUpdateScreen, SDL_Window* w,
                           SDL_Surface* pSceneBackground, HighScore* pHighScore);
-    LPErrInApp HandleEvent(SDL_Event* pEvent);
+    LPErrInApp HandleEvent(SDL_Event* pEvent, const SDL_Point& targetPos);
     LPErrInApp HandleIterate(bool& done);
     LPErrInApp Show();
 
@@ -188,7 +188,7 @@ class SolitarioGfx {
     void setDeckType(DeckType& dt) { _deckType.CopyFrom(dt); }
     void clearSurface();
     LPErrInApp newGame();
-    LPErrInApp handleGameLoopMouseDownEvent(SDL_Event* pEvent);
+    LPErrInApp handleGameLoopMouseDownEvent(SDL_Event* pEvent, const SDL_Point& targetPos);
     LPErrInApp handleGameLoopFingerDownEvent(SDL_Event* pEvent);
     LPErrInApp handleGameLoopFingerUpEvent(SDL_Event* pEvent);
     LPErrInApp handleGameLoopFingerMotion(SDL_Event* pEvent);
@@ -196,9 +196,8 @@ class SolitarioGfx {
     LPErrInApp doubleTapOrRightClick(SDL_Point& pt, bool& isDoubleClick);
     LPErrInApp endOfDragAndCheckForVictory();
     LPErrInApp checkForVictory();
-    //void dropAfterZoom();
-    void handleGameLoopMouseMoveEvent(SDL_Event* pEvent);
-    LPErrInApp handleGameLoopMouseUpEvent(SDL_Event* pEvent);
+    void handleGameLoopMouseMoveEvent(SDL_Event* pEvent, const SDL_Point& targetPos);
+    LPErrInApp handleGameLoopMouseUpEvent(SDL_Event* pEvent, const SDL_Point& targetPos);
     ClickCb prepClickQuitCb();
     ClickCb prepClickNewGameCb();
     ClickCb prepClickToggleSoundCb();

@@ -182,7 +182,7 @@ LPErrInApp SolitarioGfx::Initialize(SDL_Surface* pScreen,
         return ERR_UTIL::ErrorCreate("Only pac file supported");
     }
 
-    SDL_Rect rctBt1={0};
+    SDL_Rect rctBt1 = {0, 0, 0, 0};
     int btw = 120;
     int btwSymb = 60;
     int bth = 34;
@@ -471,7 +471,7 @@ void SolitarioGfx::DoDrag(int x, int y) {
     _oldx = x;
     _oldy = y;
 
-    SDL_Rect dest{0};
+    SDL_Rect dest = {0, 0, 0, 0};
     dest.x = _dragPileInfo.x;
     dest.y = _dragPileInfo.y;
 
@@ -585,7 +585,7 @@ LPErrInApp SolitarioGfx::zoomDropCardIterate() {
     int px, py;
     zoomInfo_CalcPt(g_zoomInfo, px, py);
 
-    SDL_Rect rcDrag{0};
+    SDL_Rect rcDrag = {0, 0, 0, 0};
     rcDrag.x = px;
     rcDrag.y = py;
     *g_zoomInfo->pSx = px;
@@ -643,7 +643,7 @@ void SolitarioGfx::DrawStaticScene() {
                         SDL_MapRGB(SDL_GetPixelFormatDetails(_p_Screen->format),
                                    NULL, 0, 0, 0));
 
-    SDL_Rect rctTarget{0};
+    SDL_Rect rctTarget = {0, 0, 0, 0};
     rctTarget.x = (_p_Screen->w - _p_SceneBackground->w) / 2;
     rctTarget.y = (_p_Screen->h - _p_SceneBackground->h) / 2;
     SDL_BlitSurface(_p_SceneBackground, NULL, _p_Screen, &rctTarget);
@@ -1034,11 +1034,11 @@ LPErrInApp SolitarioGfx::handleGameLoopFingerMotion(SDL_Event* pEvent) {
     return NULL;
 }
 
-LPErrInApp SolitarioGfx::handleGameLoopMouseDownEvent(SDL_Event* pEvent) {
+LPErrInApp SolitarioGfx::handleGameLoopMouseDownEvent(SDL_Event* pEvent, const SDL_Point& targetPos) {
     if (pEvent->button.button == SDL_BUTTON_LEFT) {
         Uint64 now_time = SDL_GetTicks();
-        _ptLast.x = pEvent->button.x;
-        _ptLast.y = pEvent->button.y;
+        _ptLast.x = targetPos.x;
+        _ptLast.y = targetPos.y;
         if (_lastUpTimestamp + _doubleTapWait > now_time) {
             _state = SolitarioGfx::IN_DOUBLE_TAPCLICK;
         } else {
@@ -1046,8 +1046,8 @@ LPErrInApp SolitarioGfx::handleGameLoopMouseDownEvent(SDL_Event* pEvent) {
         }
         _lastUpTimestamp = SDL_GetTicks();
     } else if (pEvent->button.button == SDL_BUTTON_RIGHT) {
-        _ptLast.x = pEvent->button.x;
-        _ptLast.y = pEvent->button.y;
+        _ptLast.x = targetPos.x;
+        _ptLast.y = targetPos.y;
         _state = SolitarioGfx::IN_DOUBLE_TAPCLICK;
     }
     return NULL;
@@ -1222,26 +1222,26 @@ LPErrInApp SolitarioGfx::singleTapOrLeftClick(SDL_Point& pt) {
     return NULL;
 }
 
-void SolitarioGfx::handleGameLoopMouseMoveEvent(SDL_Event* pEvent) {
+void SolitarioGfx::handleGameLoopMouseMoveEvent(SDL_Event* pEvent, const SDL_Point& targetPos) {
     if (pEvent->motion.state == SDL_BUTTON_MASK(1) && _startdrag) {
         // TRACE_DEBUG("handleGameLoopMouseMoveEvent - DoDrag trigger \n");
-        DoDrag(pEvent->motion.x, pEvent->motion.y);
+        DoDrag(targetPos.x, targetPos.y);
     }
-    bool statusChanged = _p_BtNewGame->MouseMove(pEvent);
-    statusChanged = statusChanged || _p_BtQuit->MouseMove(pEvent) ||
-                    _p_BtToggleSound->MouseMove(pEvent);
+    bool statusChanged = _p_BtNewGame->MouseMove(pEvent, targetPos);
+    statusChanged = statusChanged || _p_BtQuit->MouseMove(pEvent, targetPos) ||
+                    _p_BtToggleSound->MouseMove(pEvent, targetPos);
     if (statusChanged) {
         // TRACE_DEBUG("handleGameLoopMouseMoveEvent - status changed \n");
         DrawStaticScene();
     }
 }
 
-LPErrInApp SolitarioGfx::handleGameLoopMouseUpEvent(SDL_Event* pEvent) {
+LPErrInApp SolitarioGfx::handleGameLoopMouseUpEvent(SDL_Event* pEvent, const SDL_Point& targetPos) {
     TRACE_DEBUG("handleGameLoopMouseUpEvent \n");
     _isInitDrag = false;
-    _p_BtQuit->MouseUp(pEvent);
-    _p_BtNewGame->MouseUp(pEvent);
-    _p_BtToggleSound->MouseUp(pEvent);
+    _p_BtQuit->MouseUp(pEvent, targetPos);
+    _p_BtNewGame->MouseUp(pEvent, targetPos);
+    _p_BtToggleSound->MouseUp(pEvent, targetPos);
     return endOfDragAndCheckForVictory();
 }
 
@@ -1302,7 +1302,7 @@ LPErrInApp SolitarioGfx::checkForVictory() {
     return NULL;
 }
 
-LPErrInApp SolitarioGfx::HandleEvent(SDL_Event* pEvent) {
+LPErrInApp SolitarioGfx::HandleEvent(SDL_Event* pEvent, const SDL_Point& targetPos) {
     LPErrInApp err = NULL;
     if (isInVictoryState()) {
         switch (pEvent->type) {
@@ -1328,7 +1328,7 @@ LPErrInApp SolitarioGfx::HandleEvent(SDL_Event* pEvent) {
     }
 
     if (_state == eState::IN_MSGBOX) {
-        _p_MsgBox->HandleEvent(pEvent);
+        _p_MsgBox->HandleEvent(pEvent, targetPos);
         return NULL;
     }
     if (_state == eState::IN_ZOOM) {
@@ -1381,7 +1381,7 @@ LPErrInApp SolitarioGfx::HandleEvent(SDL_Event* pEvent) {
 #if HASMOUSE
         case SDL_EVENT_MOUSE_BUTTON_DOWN:
             TRACE_DEBUG("Event SDL_EVENT_MOUSE_BUTTON_DOWN - start\n");
-            err = handleGameLoopMouseDownEvent(pEvent);
+            err = handleGameLoopMouseDownEvent(pEvent, targetPos);
             // TRACE_DEBUG("Event SDL_EVENT_MOUSE_BUTTON_DOWN - end
             // \n");
             if (err != NULL)
@@ -1389,12 +1389,12 @@ LPErrInApp SolitarioGfx::HandleEvent(SDL_Event* pEvent) {
             break;
 
         case SDL_EVENT_MOUSE_MOTION:
-            handleGameLoopMouseMoveEvent(pEvent);
+            handleGameLoopMouseMoveEvent(pEvent, targetPos);
             break;
 
         case SDL_EVENT_MOUSE_BUTTON_UP:
             TRACE_DEBUG("Event SDL_EVENT_MOUSE_BUTTON_UP \n");
-            err = handleGameLoopMouseUpEvent(pEvent);
+            err = handleGameLoopMouseUpEvent(pEvent, targetPos);
             if (err != NULL)
                 return err;
             break;

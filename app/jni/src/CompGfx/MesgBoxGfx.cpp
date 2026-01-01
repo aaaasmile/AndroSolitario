@@ -128,7 +128,7 @@ void MesgBoxGfx::ButCmdClicked(int butID) {
     }
 }
 
-LPErrInApp MesgBoxGfx::HandleEvent(SDL_Event* pEvent) {
+LPErrInApp MesgBoxGfx::HandleEvent(SDL_Event* pEvent, const SDL_Point& targetPos) {
     if (pEvent->type == SDL_EVENT_KEY_DOWN) {
         if (pEvent->key.key == SDLK_RETURN) {
             if (_typeMsg == TY_MB_YES_NO) {
@@ -150,14 +150,19 @@ LPErrInApp MesgBoxGfx::HandleEvent(SDL_Event* pEvent) {
 #endif
 #if HASMOUSE
     if (pEvent->type == SDL_EVENT_MOUSE_MOTION) {
-        // Not needed because mouse recognition is done on draw button
+        if (_p_BtButt1) {
+            _p_BtButt1->MouseMove(pEvent, targetPos);
+        }
+        if (_p_BtButt2) {
+            _p_BtButt2->MouseMove(pEvent, targetPos);
+        }
     }
     if (pEvent->type == SDL_EVENT_MOUSE_BUTTON_UP) {
         if (_p_BtButt1) {
-            _p_BtButt1->MouseUp(pEvent);
+            _p_BtButt1->MouseUp(pEvent, targetPos);
         }
         if (_p_BtButt2) {
-            _p_BtButt2->MouseUp(pEvent);
+            _p_BtButt2->MouseUp(pEvent, targetPos);
         }
     }
 #endif
