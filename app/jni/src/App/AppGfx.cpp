@@ -39,12 +39,14 @@ typedef struct {
     int displayWidth, displayHeight;
     float scale;
     bool showFullPortrait;
+    bool isDev;
 } ResolutionMgr;
 
 static void resolutionMgr_InitPortraitDev(ResolutionMgr& rm) {
     rm.targetWidth = 720;
     rm.targetHeight = 1280;
     rm.showFullPortrait = false;
+    rm.isDev = true;
     rm.scale = 0.7;
     rm.displayWidth = (int)(rm.targetWidth * rm.scale);
     rm.displayHeight = (int)(rm.targetHeight * rm.scale);
@@ -55,6 +57,7 @@ static void resolutionMgr_InitStandard(ResolutionMgr& rm) {
     rm.targetHeight = 768;
     rm.showFullPortrait = false;
     rm.scale = 1.0;
+    rm.isDev = false;
     rm.displayWidth = rm.targetWidth;
     rm.displayHeight = rm.targetHeight;
 }
@@ -64,6 +67,7 @@ static void resolutionMgr_InitFullPortrait(ResolutionMgr& rm) {
     rm.targetHeight = 1280;
     rm.showFullPortrait = true;
     rm.scale = 1;
+    rm.isDev = false;
     rm.displayWidth = rm.targetWidth * rm.scale;
     rm.displayHeight = rm.targetHeight * rm.scale;
 
@@ -805,6 +809,16 @@ void AppGfx::RenderTexture(SDL_Texture* pScreenTexture) {
 }
 
 void AppGfx::updateScreenTexture() {
+    if (g_ResolutionMgr.isDev) {
+        char buffer[256];
+        snprintf(buffer, sizeof(buffer),
+                 "View: %dx%d (Full: %dx%d) | Scale: %.1f%%",
+                 g_ResolutionMgr.displayWidth, g_ResolutionMgr.displayHeight,
+                 g_ResolutionMgr.targetWidth, g_ResolutionMgr.targetHeight,
+                 g_ResolutionMgr.scale * 100.0f);
+        GFX_UTIL::DrawString(_p_Screen, buffer, 10, 10, GFX_UTIL_COLOR::Red,
+                             _p_GameSettings->GetFontAriblk());
+    }
     SDL_UpdateTexture(_p_ScreenTexture, NULL, _p_Screen->pixels,
                       _p_Screen->pitch);
     SDL_RenderClear(_p_sdlRenderer);
