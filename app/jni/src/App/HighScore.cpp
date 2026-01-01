@@ -24,10 +24,12 @@ using namespace std;
 
 HighScore::HighScore() {
     _p_FadeAction = new FadeAction();
-    _p_sdlRenderer = NULL;
+    //_p_sdlRenderer = NULL;
     _p_surfScreen = NULL;
     _p_SurfTitle = NULL;
-    _p_ScreenTexture = NULL;
+    //_p_ScreenTexture = NULL;
+    _fnUpdateScreen.tc = NULL;
+    _fnUpdateScreen.self = NULL;
     _p_GameSettings = NULL;
     _p_MusicManager = NULL;
     _lastUpTimestamp = 0;
@@ -49,10 +51,10 @@ HighScore::HighScore() {
 HighScore::~HighScore() {
     TRACE_DEBUG("HighScore destructor\n");
     delete _p_FadeAction;
-    if (_p_ScreenTexture != NULL) {
-        SDL_DestroyTexture(_p_ScreenTexture);
-        _p_ScreenTexture = NULL;
-    }
+    // if (_p_ScreenTexture != NULL) {
+    //     SDL_DestroyTexture(_p_ScreenTexture);
+    //     _p_ScreenTexture = NULL;
+    // }
 }
 
 #if PLATFORM_EMS
@@ -272,15 +274,15 @@ LPErrInApp HighScore::HandleIterate(bool& done) {
 
     if (_state == HighScore::INIT) {
         TRACE("HighScore Init \n");
-        if (_p_ScreenTexture != NULL) {
-            SDL_DestroyTexture(_p_ScreenTexture);
-        }
-        _p_ScreenTexture =
-            SDL_CreateTextureFromSurface(_p_sdlRenderer, _p_surfScreen);
+        // if (_p_ScreenTexture != NULL) {
+        //     SDL_DestroyTexture(_p_ScreenTexture);
+        // }
+        // _p_ScreenTexture =
+        //     SDL_CreateTextureFromSurface(_p_sdlRenderer, _p_surfScreen);
         if (!_ignoreMouseEvent) {
             TRACE("HighScore Init - fade start \n");
             _p_FadeAction->Fade(_p_surfScreen, _p_surfScreen, 2, true,
-                                _p_sdlRenderer, NULL);
+                                _fnUpdateScreen, NULL);
             _state = HighScore::WAIT_FOR_FADING;
             _stateAfter = HighScore::IN_PROGRESS;
         } else {
@@ -399,10 +401,11 @@ LPErrInApp HighScore::HandleIterate(bool& done) {
         }
         _lastUpTimestamp = now_time;
 
-        SDL_UpdateTexture(_p_ScreenTexture, NULL, _p_surfScreen->pixels,
-                          _p_surfScreen->pitch);
-        SDL_RenderTexture(_p_sdlRenderer, _p_ScreenTexture, NULL, NULL);
-        SDL_RenderPresent(_p_sdlRenderer);
+        // SDL_UpdateTexture(_p_ScreenTexture, NULL, _p_surfScreen->pixels,
+        //                   _p_surfScreen->pitch);
+        // SDL_RenderTexture(_p_sdlRenderer, _p_ScreenTexture, NULL, NULL);
+        // SDL_RenderPresent(_p_sdlRenderer);
+        (_fnUpdateScreen.tc)->UpdateScreen(_fnUpdateScreen.self, _p_surfScreen);
 
         uint32_t elapsed_sec = (now_time / 1000) - (_start_time / 1000);
         if (elapsed_sec > 20) {
@@ -417,7 +420,7 @@ LPErrInApp HighScore::HandleIterate(bool& done) {
     if (_state == HighScore::DONE) {
         TRACE("HighScore done \n");
         _p_FadeAction->Fade(_p_surfScreen, _p_surfScreen, 1, true,
-                            _p_sdlRenderer, NULL);
+                            _fnUpdateScreen, NULL);
         _state = HighScore::WAIT_FOR_FADING;
         _stateAfter = HighScore::TERMINATED;
         return NULL;
@@ -434,9 +437,10 @@ LPErrInApp HighScore::HandleIterate(bool& done) {
 }
 
 LPErrInApp HighScore::Show(SDL_Surface* p_surf_screen, SDL_Surface* pSurfTitle,
-                           SDL_Renderer* psdlRenderer) {
+                           UpdateScreenCb& fnUpdateScreen) {
     TRACE("HighScore Show \n");
-    _p_sdlRenderer = psdlRenderer;
+    //_p_sdlRenderer = psdlRenderer;
+    _fnUpdateScreen = fnUpdateScreen;
     _p_surfScreen = p_surf_screen;
     _p_SurfTitle = pSurfTitle;
     _start_time = SDL_GetTicks();

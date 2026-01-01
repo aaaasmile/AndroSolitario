@@ -26,7 +26,7 @@ class MesgBoxGfx {
 
     LPErrInApp Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
                           TTF_Font* pFont, eMSGBOX_TYPE eval,
-                          SDL_Renderer* pRenderer);
+                          UpdateScreenCb& fnUpdateScreen);
     LPErrInApp Show(SDL_Surface* pScene_background, LPCSTR lpsBut1_txt,
                     LPCSTR lpsBut2_txt, LPCSTR lpsMsg_txt);
     LPErrInApp HandleEvent(SDL_Event* pEvent);
@@ -45,7 +45,6 @@ class MesgBoxGfx {
     ClickCb prepClickBtCb();
 
    private:
-    SDL_Renderer* _p_sdlRenderer;
     SDL_Rect _rctMsgBox;
     STRING _strMsgText;
     SDL_Surface* _p_Surf_Bar;
@@ -59,9 +58,11 @@ class MesgBoxGfx {
     VCT_STRING _dataStrings;
     Uint8 _alpha;
     bool _inProgress;
-    SDL_Texture* _p_ScreenTexture;
+    //SDL_Renderer* _p_sdlRenderer;
+    //SDL_Texture* _p_ScreenTexture;
     SDL_Surface* _p_ShadowSrf;
     SDL_Surface* _p_Scene_background;
+    UpdateScreenCb _fnUpdateScreen;
 };
 
 #endif

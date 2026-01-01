@@ -1,9 +1,9 @@
 #include "MesgBoxGfx.h"
 
 #include "ButtonGfx.h"
+#include "Config.h"
 #include "GameSettings.h"
 #include "GfxUtil.h"
-#include "Config.h"
 
 MesgBoxGfx::MesgBoxGfx(void) {
     _p_Screen = 0;
@@ -13,7 +13,9 @@ MesgBoxGfx::MesgBoxGfx(void) {
     _p_BtButt2 = 0;
     _alpha = 70;
     _inProgress = false;
-    _p_ScreenTexture = NULL;
+    //_p_ScreenTexture = NULL;
+    _fnUpdateScreen.tc = NULL;
+    _fnUpdateScreen.self = NULL;
     _p_ShadowSrf = NULL;
 }
 
@@ -28,7 +30,7 @@ MesgBoxGfx::~MesgBoxGfx(void) {
 
 LPErrInApp MesgBoxGfx::Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
                                   TTF_Font* pFont, eMSGBOX_TYPE eval,
-                                  SDL_Renderer* pRenderer) {
+                                  UpdateScreenCb& fnUpdateScreen) {
     if (!pRect || !pScreen || !pFont) {
         return ERR_UTIL::ErrorCreate("Invalid msgbox initialize argument");
     }
@@ -36,7 +38,8 @@ LPErrInApp MesgBoxGfx::Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
     _p_Screen = pScreen;
     _p_FontText = pFont;
     _typeMsg = eval;
-    _p_sdlRenderer = pRenderer;
+    //_p_sdlRenderer = pRenderer;
+    _fnUpdateScreen = fnUpdateScreen;
 
     _p_Surf_Bar = GFX_UTIL::SDL_CreateRGBSurface(_rctMsgBox.w, _rctMsgBox.h, 32,
                                                  0, 0, 0, 0);
@@ -51,7 +54,7 @@ LPErrInApp MesgBoxGfx::Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
     _colCurrent = GFX_UTIL_COLOR::White;
     SDL_Rect rctBt1;
     ClickCb cbBt = prepClickBtCb();
-    //LPGameSettings pGameSettings = GameSettings::GetSettings();
+    // LPGameSettings pGameSettings = GameSettings::GetSettings();
     int btw = 120;
     int bth = 28;
     int btoffsetY = 10;
@@ -70,7 +73,8 @@ LPErrInApp MesgBoxGfx::Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
         rctBt1.y = _rctMsgBox.y + _rctMsgBox.h - btoffsetY - rctBt1.h;
         rctBt1.x =
             (_rctMsgBox.w - (2 * rctBt1.w + space2bt)) / 2 + _rctMsgBox.x;
-        _p_BtButt1->Initialize(&rctBt1, pScreen, pFont, eMSGBOX_ID::ID_BT_YES, cbBt);
+        _p_BtButt1->Initialize(&rctBt1, pScreen, pFont, eMSGBOX_ID::ID_BT_YES,
+                               cbBt);
         _p_BtButt1->SetVisibleState(ButtonGfx::INVISIBLE);
 
         // button no
@@ -81,7 +85,8 @@ LPErrInApp MesgBoxGfx::Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
         rctBt1.h = bth;
         rctBt1.y = rctBt1.y;
         rctBt1.x = rctBt1.x + rctBt1.w + space2bt;
-        _p_BtButt2->Initialize(&rctBt1, pScreen, pFont, eMSGBOX_ID::ID_BT_NO, cbBt);
+        _p_BtButt2->Initialize(&rctBt1, pScreen, pFont, eMSGBOX_ID::ID_BT_NO,
+                               cbBt);
         _p_BtButt2->SetVisibleState(ButtonGfx::INVISIBLE);
 
     } else if (_typeMsg == TY_MBOK) {
@@ -218,20 +223,21 @@ LPErrInApp MesgBoxGfx::HandleIterate(bool& done) {
     }
 
     SDL_BlitSurface(_p_ShadowSrf, NULL, _p_Screen, NULL);
-    SDL_UpdateTexture(_p_ScreenTexture, NULL, _p_Screen->pixels,
-                      _p_Screen->pitch);
-    SDL_RenderTexture(_p_sdlRenderer, _p_ScreenTexture, NULL, NULL);
-    SDL_RenderPresent(_p_sdlRenderer);
+    // SDL_UpdateTexture(_p_ScreenTexture, NULL, _p_Screen->pixels,
+    //                   _p_Screen->pitch);
+    // SDL_RenderTexture(_p_sdlRenderer, _p_ScreenTexture, NULL, NULL);
+    // SDL_RenderPresent(_p_sdlRenderer);
+    (_fnUpdateScreen.tc)->UpdateScreen(_fnUpdateScreen.self, _p_Screen);
 
     if (!_inProgress) {
         if (_p_ShadowSrf != NULL) {
             SDL_DestroySurface(_p_ShadowSrf);
             _p_ShadowSrf = NULL;
         }
-        if (_p_ScreenTexture != NULL) {
-            SDL_DestroyTexture(_p_ScreenTexture);
-            _p_ScreenTexture = NULL;
-        }
+        // if (_p_ScreenTexture != NULL) {
+        //     SDL_DestroyTexture(_p_ScreenTexture);
+        //     _p_ScreenTexture = NULL;
+        // }
         done = true;
     }
 
@@ -247,7 +253,7 @@ LPErrInApp MesgBoxGfx::Show(SDL_Surface* pScene_background, LPCSTR lpsBut1Txt,
     _inProgress = true;
     _p_Scene_background = pScene_background;
     _result = RES_YES;
-    
+
     _strMsgText = lpsMsgTxt;
     if (_p_BtButt1) {
         _p_BtButt1->SetButtonText(lpsBut1Txt);
@@ -263,11 +269,11 @@ LPErrInApp MesgBoxGfx::Show(SDL_Surface* pScene_background, LPCSTR lpsBut1Txt,
     _p_ShadowSrf = GFX_UTIL::SDL_CreateRGBSurface(_p_Screen->w, _p_Screen->h,
                                                   32, 0, 0, 0, 0);
 
-    if (_p_ScreenTexture != NULL) {
-        SDL_DestroyTexture(_p_ScreenTexture);
-    }
-    _p_ScreenTexture =
-        SDL_CreateTextureFromSurface(_p_sdlRenderer, _p_ShadowSrf);
+    // if (_p_ScreenTexture != NULL) {
+    //     SDL_DestroyTexture(_p_ScreenTexture);
+    // }
+    // _p_ScreenTexture =
+    //     SDL_CreateTextureFromSurface(_p_sdlRenderer, _p_ShadowSrf);
 
     return NULL;
 }

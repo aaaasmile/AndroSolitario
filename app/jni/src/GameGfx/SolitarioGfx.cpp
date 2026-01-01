@@ -32,7 +32,7 @@ SolitarioGfx::SolitarioGfx() {
     _startdrag = false;
     _p_Dragface = NULL;
     _p_SceneBackground = NULL;
-    _p_ScreenTexture = NULL;
+    //_p_ScreenTexture = NULL;
     _p_BtQuit = NULL;
     _p_BtNewGame = NULL;
     _p_BtToggleSound = NULL;
@@ -47,6 +47,8 @@ SolitarioGfx::SolitarioGfx() {
     _isInitDrag = false;
     _doubleTapWait = 300;
     _lastUpTimestamp = 0;
+    _fnUpdateScreen.tc = NULL;
+    _fnUpdateScreen.self = NULL;
 }
 
 SolitarioGfx::~SolitarioGfx() {
@@ -79,10 +81,10 @@ void SolitarioGfx::clearSurface() {
         SDL_DestroySurface(_p_ScreenBackbufferDrag);
         _p_ScreenBackbufferDrag = NULL;
     }
-    if (_p_ScreenTexture != NULL) {
-        SDL_DestroyTexture(_p_ScreenTexture);
-        _p_ScreenTexture = NULL;
-    }
+    // if (_p_ScreenTexture != NULL) {
+    //     SDL_DestroyTexture(_p_ScreenTexture);
+    //     _p_ScreenTexture = NULL;
+    // }
     if (_p_AlphaDisplay != NULL) {
         SDL_DestroySurface(_p_AlphaDisplay);
         _p_AlphaDisplay = NULL;
@@ -123,8 +125,9 @@ ClickCb SolitarioGfx::prepClickToggleSoundCb() {
     return (ClickCb){.tc = &tc, .self = this};
 }
 
-LPErrInApp SolitarioGfx::Initialize(SDL_Surface* s, SDL_Renderer* r,
-                                    SDL_Window* w,
+LPErrInApp SolitarioGfx::Initialize(SDL_Surface* pScreen,
+                                    UpdateScreenCb& fnUpdateScreen,
+                                    SDL_Window* pWindow,
                                     SDL_Surface* pSceneBackground,
                                     HighScore* pHighScore) {
     TRACE("Initialize Solitario\n");
@@ -136,15 +139,18 @@ LPErrInApp SolitarioGfx::Initialize(SDL_Surface* s, SDL_Renderer* r,
         pGameSettings->BackgroundType == BackgroundTypeEnum::Black;
     _p_FontBigText = pGameSettings->GetFontAriblk();
     LPErrInApp err;
-    _p_Screen = s;
-    _p_sdlRenderer = r;
-    _p_Window = w;
-    _p_ScreenTexture = SDL_CreateTexture(
-        r, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, s->w, s->h);
-    if (_p_ScreenTexture == NULL) {
-        return ERR_UTIL::ErrorCreate("Cannot create texture: %s\n",
-                                     SDL_GetError());
-    }
+    _p_Screen = pScreen;
+    _fnUpdateScreen = fnUpdateScreen;
+    //_p_sdlRenderer = r;
+
+    _p_Window = pWindow;
+    // _p_ScreenTexture =
+    //     SDL_CreateTexture(r, SDL_PIXELFORMAT_ARGB8888,
+    //                       SDL_TEXTUREACCESS_STREAMING, pScreen->w, pScreen->h);
+    // if (_p_ScreenTexture == NULL) {
+    //     return ERR_UTIL::ErrorCreate("Cannot create texture: %s\n",
+    //                                  SDL_GetError());
+    // }
 
     _p_AlphaDisplay = GFX_UTIL::SDL_CreateRGBSurface(_p_Screen->w, _p_Screen->h,
                                                      32, 0, 0, 0, 0);
@@ -212,13 +218,13 @@ LPErrInApp SolitarioGfx::Initialize(SDL_Surface* s, SDL_Renderer* r,
     _p_BtNewGame->SetVisibleState(ButtonGfx::INVISIBLE);
     // button toggle sound
     int tx = btposx;
-    //int offsetY = 30;
-    // if (pGameSettings->NeedScreenMagnify()) {
-    //     tx = btposx;
-    //     offsetY = 250;
-    //     rctBt1.y = _p_Screen->h - offsetY;
-    // } else {
-        tx = tx - btw - 30;
+    // int offsetY = 30;
+    //  if (pGameSettings->NeedScreenMagnify()) {
+    //      tx = btposx;
+    //      offsetY = 250;
+    //      rctBt1.y = _p_Screen->h - offsetY;
+    //  } else {
+    tx = tx - btw - 30;
     //}
 
     rctBt1.x = tx;
@@ -677,7 +683,7 @@ LPErrInApp SolitarioGfx::DrawInitialScene() {
         _p_FadeAction->InstantFade(_p_Screen);
         _state = SolitarioGfx::FIRST_SCENE;
     } else {
-        _p_FadeAction->Fade(_p_Screen, _p_Screen, 2, true, _p_sdlRenderer,
+        _p_FadeAction->Fade(_p_Screen, _p_Screen, 2, true, _fnUpdateScreen,
                             NULL);
         _state = SolitarioGfx::WAIT_FOR_FADING;
         _stateAfter = SolitarioGfx::FIRST_SCENE;
@@ -1510,7 +1516,7 @@ LPErrInApp SolitarioGfx::HandleIterate(bool& done) {
 
     if (_state == SolitarioGfx::FADING_OUT) {
         TRACE_DEBUG("[SolitarioGfx - Iterate] - enter in state FADING_OUT \n");
-        _p_FadeAction->Fade(_p_Screen, _p_Screen, 1, true, _p_sdlRenderer,
+        _p_FadeAction->Fade(_p_Screen, _p_Screen, 1, true, _fnUpdateScreen,
                             NULL);
         if (_p_MusicManager->IsPlayingMusic()) {
             _p_MusicManager->StopMusic(300);
@@ -1696,7 +1702,7 @@ void SolitarioGfx::showYesNoMsgBox(LPCSTR strText) {
 
     _p_MsgBox->ChangeAlpha(150);
     _p_MsgBox->Initialize(&rctBox, _p_Screen, pGameSettings->GetFontMedium(),
-                          MesgBoxGfx::TY_MB_YES_NO, _p_sdlRenderer);
+                          MesgBoxGfx::TY_MB_YES_NO, _fnUpdateScreen);
     SDL_Rect clipRect;
     SDL_GetSurfaceClipRect(_p_AlphaDisplay, &clipRect);
     SDL_FillSurfaceRect(
@@ -1734,7 +1740,7 @@ void SolitarioGfx::showOkMsgBox(LPCSTR strText) {
 
     _p_MsgBox->ChangeAlpha(150);
     _p_MsgBox->Initialize(&rctBox, _p_Screen, pGameSettings->GetFontMedium(),
-                          MesgBoxGfx::TY_MBOK, _p_sdlRenderer);
+                          MesgBoxGfx::TY_MBOK, _fnUpdateScreen);
 
     SDL_Rect clipRect;
     SDL_GetSurfaceClipRect(_p_AlphaDisplay, &clipRect);
@@ -1872,10 +1878,11 @@ void SolitarioGfx::updateBadScoreAceToTableu() {
 }
 
 void SolitarioGfx::updateTextureAsFlipScreen() {
-    SDL_UpdateTexture(_p_ScreenTexture, NULL, _p_Screen->pixels,
-                      _p_Screen->pitch);
-    SDL_RenderTexture(_p_sdlRenderer, _p_ScreenTexture, NULL, NULL);
-    SDL_RenderPresent(_p_sdlRenderer);
+    // SDL_UpdateTexture(_p_ScreenTexture, NULL, _p_Screen->pixels,
+    //                   _p_Screen->pitch);
+    // SDL_RenderTexture(_p_sdlRenderer, _p_ScreenTexture, NULL, NULL);
+    // SDL_RenderPresent(_p_sdlRenderer);
+    (_fnUpdateScreen.tc)->UpdateScreen(_fnUpdateScreen.self, _p_Screen);
 }
 
 void SolitarioGfx::clearScore() {

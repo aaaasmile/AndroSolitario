@@ -16,6 +16,8 @@ ComboGfx::ComboGfx() {
     _p_surfBoxSel = 0;
     _p_surfBoxUNSel = 0;
     _p_GameSettings = GameSettings::GetSettings();
+    _fnUpdateScreen.tc = NULL;
+    _fnUpdateScreen.self = NULL;
 }
 
 ComboGfx::~ComboGfx() {
@@ -35,10 +37,11 @@ ComboGfx::~ComboGfx() {
 
 void ComboGfx::Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
                           TTF_Font* pFont, int iButID,
-                          SDL_Renderer* psdlRenderer, ClickCb& fncbClickEvent) {
+                          UpdateScreenCb& fnUpdateScreen, ClickCb& fncbClickEvent) {
     _fncbClickEvent = fncbClickEvent;
     _rctCtrl = *pRect;
-    _p_sdlRenderer = psdlRenderer;
+    _fnUpdateScreen = fnUpdateScreen;
+    //_p_sdlRenderer = psdlRenderer;
     //LPGameSettings pGameSettings = GameSettings::GetSettings();
 
     int boxIncW = 34;
@@ -333,9 +336,11 @@ void ComboGfx::RedrawButton(SDL_Surface* pScreen,
                             SDL_Texture* pScene_background,
                             SDL_Texture* pScreenTexture) {
     if (pScene_background) {
-        SDL_RenderTexture(_p_sdlRenderer, pScene_background, NULL, NULL);
+        //SDL_RenderTexture(_p_sdlRenderer, pScene_background, NULL, NULL);
+        (_fnUpdateScreen.tc)->RenderTexture(_fnUpdateScreen.self, pScene_background);
     }
     DrawButton(pScreen);
-    SDL_RenderTexture(_p_sdlRenderer, pScreenTexture, NULL, NULL);
-    SDL_RenderPresent(_p_sdlRenderer);
+    // SDL_RenderTexture(_p_sdlRenderer, pScreenTexture, NULL, NULL);
+    // SDL_RenderPresent(_p_sdlRenderer);
+    (_fnUpdateScreen.tc)->UpdateScreen(_fnUpdateScreen.self, pScreen);
 }

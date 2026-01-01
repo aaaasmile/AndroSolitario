@@ -19,10 +19,12 @@ OptionsGfx::OptionsGfx() {
     _p_MusicManager = NULL;
     _p_GameSettings = GameSettings::GetSettings();
     _mouseDownRec = false;
-    _p_ScreenTexture = NULL;
+    //_p_ScreenTexture = NULL;
+    _fnUpdateScreen.tc = NULL;
+    _fnUpdateScreen.self = NULL;
     _p_ShadowSrf = NULL;
     _inProgress = false;
-    _p_sdlRenderer = NULL;
+    //_p_sdlRenderer = NULL;
     _p_checkMusic = NULL;
     _p_comboLang = NULL;
     _p_comboDeck = NULL;
@@ -53,10 +55,10 @@ OptionsGfx::~OptionsGfx() {
         SDL_DestroySurface(_p_ShadowSrf);
         _p_ShadowSrf = NULL;
     }
-    if (_p_ScreenTexture != NULL) {
-        SDL_DestroyTexture(_p_ScreenTexture);
-        _p_ScreenTexture = NULL;
-    }
+    // if (_p_ScreenTexture != NULL) {
+    //     SDL_DestroyTexture(_p_ScreenTexture);
+    //     _p_ScreenTexture = NULL;
+    // }
 }
 
 // Prepare the Click() trait
@@ -97,7 +99,7 @@ CheckboxClickCb OptionsGfx::prepCheckBoxClickMusic() {
 #endif
 }
 
-LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
+LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen, UpdateScreenCb& fnUpdateScreen,
                                   OptionDelegator& optDlg,
                                   SDL_Window* pWindow) {
     if (_initilized) {
@@ -123,7 +125,8 @@ LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
     _p_MusicManager = _p_GameSettings->GetMusicManager();
     _p_fontCtrl = _p_GameSettings->GetFontAriblk();
     _p_fontText = _p_GameSettings->GetFontMedium();
-    _p_sdlRenderer = pRenderer;
+    //_p_sdlRenderer = pRenderer;
+    _fnUpdateScreen = fnUpdateScreen;
 
     _p_surfBar = GFX_UTIL::SDL_CreateRGBSurface(_rctOptBox.w, _rctOptBox.h, 32,
                                                 0, 0, 0, 0);
@@ -182,7 +185,7 @@ LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
     rctBt1.y = _rctOptBox.y + comboOffsetY;
     rctBt1.x = _rctOptBox.x + comboOffsetX;
     _p_comboLang->Initialize(&rctBt1, pScreen, _p_fontText, MYIDCOMBOLANG,
-                             pRenderer, nullCb);
+                             _fnUpdateScreen, nullCb);
     _p_comboLang->SetVisibleState(ComboGfx::INVISIBLE);
     // Music
     // check box music
@@ -202,7 +205,7 @@ LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
     rctBt1.y = _p_checkMusic->PosY() + _p_checkMusic->Height() + combo2OffsetY;
     rctBt1.x = _p_checkMusic->PosX();
     _p_comboBackground->Initialize(&rctBt1, pScreen, _p_fontText, MYIDCOMBOBACK,
-                                   pRenderer, nullCb);
+                                   _fnUpdateScreen, nullCb);
     _p_comboBackground->SetVisibleState(ComboGfx::INVISIBLE);
     // Player name
     _p_textInput = new TextInputGfx();
@@ -222,7 +225,7 @@ LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
     rctBt1.x = _p_textInput->PosX();
 
     _p_comboDeck->Initialize(&rctBt1, pScreen, _p_fontText, MYIDCOMBODECK,
-                             pRenderer, nullCb);
+                             _fnUpdateScreen, nullCb);
     _p_comboDeck->SetVisibleState(ComboGfx::INVISIBLE);
 
     // init surfaces with all pac decks
@@ -461,10 +464,11 @@ LPErrInApp OptionsGfx::HandleIterate(bool& done) {
 
     // render the dialogbox
     SDL_BlitSurface(_p_ShadowSrf, NULL, _p_screen, NULL);
-    SDL_UpdateTexture(_p_ScreenTexture, NULL, _p_screen->pixels,
-                      _p_screen->pitch);
-    SDL_RenderTexture(_p_sdlRenderer, _p_ScreenTexture, NULL, NULL);
-    SDL_RenderPresent(_p_sdlRenderer);
+    // SDL_UpdateTexture(_p_ScreenTexture, NULL, _p_screen->pixels,
+    //                   _p_screen->pitch);
+    // SDL_RenderTexture(_p_sdlRenderer, _p_ScreenTexture, NULL, NULL);
+    // SDL_RenderPresent(_p_sdlRenderer);
+    (_fnUpdateScreen.tc)->UpdateScreen(_fnUpdateScreen.self, _p_screen);
 
     _p_textInput->Update();
 
@@ -474,10 +478,10 @@ LPErrInApp OptionsGfx::HandleIterate(bool& done) {
             SDL_DestroySurface(_p_ShadowSrf);
             _p_ShadowSrf = NULL;
         }
-        if (_p_ScreenTexture != NULL) {
-            SDL_DestroyTexture(_p_ScreenTexture);
-            _p_ScreenTexture = NULL;
-        }
+        // if (_p_ScreenTexture != NULL) {
+        //     SDL_DestroyTexture(_p_ScreenTexture);
+        //     _p_ScreenTexture = NULL;
+        // }
         done = true;
     }
     return NULL;
@@ -545,11 +549,11 @@ LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
     }
     _p_ShadowSrf = GFX_UTIL::SDL_CreateRGBSurface(_p_screen->w, _p_screen->h,
                                                   32, 0, 0, 0, 0);
-    if (_p_ScreenTexture != NULL) {
-        SDL_DestroyTexture(_p_ScreenTexture);
-    }
-    _p_ScreenTexture =
-        SDL_CreateTextureFromSurface(_p_sdlRenderer, _p_ShadowSrf);
+    // if (_p_ScreenTexture != NULL) {
+    //     SDL_DestroyTexture(_p_ScreenTexture);
+    // }
+    // _p_ScreenTexture =
+    //     SDL_CreateTextureFromSurface(_p_sdlRenderer, _p_ShadowSrf);
 
     TRACE_DEBUG(
         "[TAROCK_PIEMONT] _p_ShadowSrf buffer format: %s, w: %d, h: %d\n",

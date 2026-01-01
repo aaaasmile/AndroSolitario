@@ -77,7 +77,7 @@ class SolitarioGfx {
     SolitarioGfx();
     ~SolitarioGfx();
 
-    LPErrInApp Initialize(SDL_Surface* s, SDL_Renderer* r, SDL_Window* w,
+    LPErrInApp Initialize(SDL_Surface* s, UpdateScreenCb& fnUpdateScreen, SDL_Window* w,
                           SDL_Surface* pSceneBackground, HighScore* pHighScore);
     LPErrInApp HandleEvent(SDL_Event* pEvent);
     LPErrInApp HandleIterate(bool& done);
@@ -222,10 +222,11 @@ class SolitarioGfx {
     SDL_Surface* _p_Screen;
     SDL_Surface* _p_AlphaDisplay;
     SDL_Surface* _p_ScreenBackbufferDrag;
-    SDL_Texture* _p_ScreenTexture;
+    //SDL_Texture* _p_ScreenTexture;
     SDL_Surface* _p_Dragface;
     SDL_Surface* _p_SceneBackground;
-    SDL_Renderer* _p_sdlRenderer;
+    //SDL_Renderer* _p_sdlRenderer;
+    UpdateScreenCb _fnUpdateScreen;
     SDL_Window* _p_Window;
     TTF_Font* _p_FontBigText;
     HighScore* _p_HighScore;

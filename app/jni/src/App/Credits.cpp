@@ -136,21 +136,23 @@ CreditsView::CreditsView() {
     _line = 0;
     _lastUpTimestamp = 0;
     _state = CreditsView::READY_TO_START;
-    _p_sdlRenderer = NULL;
+    //_p_sdlRenderer = NULL;
     _p_surfScreen = NULL;
     _p_SurfTitle = NULL;
-    _p_ScreenTexture = NULL;
+    //_p_ScreenTexture = NULL;
     _p_GameSettings = NULL;
     _p_MusicManager = NULL;
     _p_FadeAction = new FadeAction();
+    _fnUpdateScreen.tc = NULL;
+    _fnUpdateScreen.self = NULL;
 }
 
 CreditsView::~CreditsView() {
     delete _p_FadeAction;
-    if (_p_ScreenTexture != NULL) {
-        SDL_DestroyTexture(_p_ScreenTexture);
-        _p_ScreenTexture = NULL;
-    }
+    // if (_p_ScreenTexture != NULL) {
+    //     SDL_DestroyTexture(_p_ScreenTexture);
+    //     _p_ScreenTexture = NULL;
+    // }
 }
 
 LPErrInApp CreditsView::HandleEvent(SDL_Event* pEvent) {
@@ -198,14 +200,15 @@ LPErrInApp CreditsView::HandleIterate(bool& done) {
         TRACE_DEBUG("[CreditsView] State init\n");
         _line = 0;
         _scroll = 0;
-        if (_p_ScreenTexture != NULL) {
-            SDL_DestroyTexture(_p_ScreenTexture);
-        }
-        _p_ScreenTexture =
-            SDL_CreateTextureFromSurface(_p_sdlRenderer, _p_surfScreen);
+        // if (_p_ScreenTexture != NULL) {
+        //     SDL_DestroyTexture(_p_ScreenTexture);
+        // }
+        // _p_ScreenTexture =
+        //     SDL_CreateTextureFromSurface(_p_sdlRenderer, _p_surfScreen);
         if (!_ignoreMouseEvent) {
             _p_FadeAction->Fade(_p_surfScreen, _p_surfScreen, 2, true,
-                                _p_sdlRenderer, NULL);
+                                //_p_sdlRenderer, NULL);
+                                _fnUpdateScreen, NULL);
             _state = CreditsView::WAIT_FOR_FADING;
             _stateAfter = CreditsView::IN_PROGRESS;
         } else {
@@ -270,16 +273,17 @@ LPErrInApp CreditsView::HandleIterate(bool& done) {
                 }
             }
         }
-        SDL_UpdateTexture(_p_ScreenTexture, NULL, _p_surfScreen->pixels,
-                          _p_surfScreen->pitch);
-        SDL_RenderTexture(_p_sdlRenderer, _p_ScreenTexture, NULL, NULL);
-        SDL_RenderPresent(_p_sdlRenderer);
+        // SDL_UpdateTexture(_p_ScreenTexture, NULL, _p_surfScreen->pixels,
+        //                   _p_surfScreen->pitch);
+        // SDL_RenderTexture(_p_sdlRenderer, _p_ScreenTexture, NULL, NULL);
+        // SDL_RenderPresent(_p_sdlRenderer);
+        (_fnUpdateScreen.tc)->UpdateScreen(_fnUpdateScreen.self, _p_surfScreen);
     }
 
     if (_state == CreditsView::DONE) {
         TRACE("CreditsView done \n");
         _p_FadeAction->Fade(_p_surfScreen, _p_surfScreen, 1, true,
-                            _p_sdlRenderer, NULL);
+                            _fnUpdateScreen, NULL);
         _state = CreditsView::WAIT_FOR_FADING;
         _stateAfter = CreditsView::TERMINATED;
     }
@@ -296,10 +300,10 @@ LPErrInApp CreditsView::HandleIterate(bool& done) {
     return NULL;
 }
 
-void CreditsView::Show(SDL_Surface* p_surf_screen, SDL_Surface* pSurfTitle,
-                       SDL_Renderer* psdlRenderer) {
-    _p_sdlRenderer = psdlRenderer;
-    _p_surfScreen = p_surf_screen;
+void CreditsView::Show(SDL_Surface* pScreen, SDL_Surface* pSurfTitle,
+              UpdateScreenCb& fnUpdateScreen) {
+    _fnUpdateScreen = fnUpdateScreen;
+    _p_surfScreen = pScreen;
     _p_SurfTitle = pSurfTitle;
 
     _p_GameSettings = GameSettings::GetSettings();

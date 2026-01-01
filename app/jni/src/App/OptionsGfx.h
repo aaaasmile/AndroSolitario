@@ -35,7 +35,9 @@ class OptionsGfx {
     OptionsGfx();
     ~OptionsGfx();
 
-    LPErrInApp Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
+    // LPErrInApp Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
+    //                       OptionDelegator& optDlg, SDL_Window* pWindow);
+    LPErrInApp Initialize(SDL_Surface* pScreen, UpdateScreenCb& fnUpdateScreen,
                           OptionDelegator& optDlg, SDL_Window* pWindow);
     LPErrInApp Show(SDL_Surface* pScene_background, STRING& strCaption);
     LPErrInApp HandleEvent(SDL_Event* pEvent);
@@ -54,7 +56,6 @@ class OptionsGfx {
     void setControlLocalCaptions();
 
    private:
-    SDL_Renderer* _p_sdlRenderer;
     SDL_Rect _rctOptBox;
     SDL_Surface* _p_surfBar;
     SDL_Surface* _p_screen;
@@ -76,7 +77,10 @@ class OptionsGfx {
     SDL_Surface* _p_Scene_background;
     bool _inProgress;
     bool _mouseDownRec;
-    SDL_Texture* _p_ScreenTexture;
+    //SDL_Renderer* _p_sdlRenderer;
+    //SDL_Texture* _p_ScreenTexture;
+    UpdateScreenCb _fnUpdateScreen;
+
     SDL_Surface* _p_ShadowSrf;
     int _hbar;
     int _labelOffsetY;

@@ -243,7 +243,7 @@ LPErrInApp AppGfx::Init() {
     }
     OptionDelegator optionDelegator = prepOptionDelegator();
 
-    err = _p_OptGfx->Initialize(_p_Screen, _p_sdlRenderer, optionDelegator,
+    err = _p_OptGfx->Initialize(_p_Screen, screenUpdater, optionDelegator,
                                 _p_Window);
     if (err) {
         return err;
@@ -460,6 +460,11 @@ void fncBind_UpdateScreen(void* self, SDL_Surface* pScreen) {
     return pApp->UpdateScreen(pScreen);
 }
 
+void fncBind_RenderTexture(void* self, SDL_Texture* pScreenTexture) {
+    AppGfx* pApp = (AppGfx*)self;
+    return pApp->RenderTexture(pScreenTexture);
+}
+
 MenuDelegator AppGfx::prepMenuDelegator() {
     // Use only static otherwise you loose it
     static VMenuDelegator const tc = {.LeaveMenu = (&fncBind_LeaveMenu),
@@ -469,7 +474,9 @@ MenuDelegator AppGfx::prepMenuDelegator() {
 }
 
 UpdateScreenCb AppGfx::prepScreenUpdater() {
-    static VUpdateScreenCb const tc = {.UpdateScreen = (&fncBind_UpdateScreen)};
+    static VUpdateScreenCb const tc = {
+        .UpdateScreen = (&fncBind_UpdateScreen),
+        .RenderTexture = (&fncBind_RenderTexture)};
     return (UpdateScreenCb){.tc = &tc, .self = this};
 }
 
@@ -666,8 +673,8 @@ LPErrInApp AppGfx::startGameLoop() {
         delete _p_SolitarioGfx;
     }
     _p_SolitarioGfx = new SolitarioGfx();
-
-    err = _p_SolitarioGfx->Initialize(_p_Screen, _p_sdlRenderer, _p_Window,
+    UpdateScreenCb screenUpdater = prepScreenUpdater();
+    err = _p_SolitarioGfx->Initialize(_p_Screen, screenUpdater, _p_Window,
                                       _p_SceneBackground, _p_HighScore);
     if (err != NULL)
         return err;
@@ -707,7 +714,8 @@ LPErrInApp AppGfx::showHighScore() {
     if (_p_MusicManager->IsPlayingMusic()) {
         _p_MusicManager->StopMusic(600);
     }
-    _p_HighScore->Show(_p_Screen, _p_CreditTitle, _p_sdlRenderer);
+    UpdateScreenCb screenUpdater = prepScreenUpdater();
+    _p_HighScore->Show(_p_Screen, _p_CreditTitle, screenUpdater);
 
     return NULL;
 }
@@ -720,7 +728,8 @@ LPErrInApp AppGfx::showCredits() {
     if (_p_MusicManager->IsPlayingMusic()) {
         _p_MusicManager->StopMusic(600);
     }
-    _p_CreditsView->Show(_p_Screen, _p_CreditTitle, _p_sdlRenderer);
+    UpdateScreenCb screenUpdater = prepScreenUpdater();
+    _p_CreditsView->Show(_p_Screen, _p_CreditTitle, screenUpdater);
 
     return NULL;
 }
@@ -778,13 +787,9 @@ void AppGfx::UpdateScreen(SDL_Surface* pScreen) {
     updateScreenTexture();
 }
 
-void AppGfx::updateScreenTexture() {
-    SDL_UpdateTexture(_p_ScreenTexture, NULL, _p_Screen->pixels,
-                      _p_Screen->pitch);
-    SDL_RenderClear(_p_sdlRenderer);
-    // SDL_RenderTexture(_p_sdlRenderer, _p_ScreenTexture, NULL, NULL);
+void AppGfx::RenderTexture(SDL_Texture* pScreenTexture) {
     if (g_ResolutionMgr.scale == 1.0) {
-        SDL_RenderTexture(_p_sdlRenderer, _p_ScreenTexture, NULL, NULL);
+        SDL_RenderTexture(_p_sdlRenderer, pScreenTexture, NULL, NULL);
     } else {
         SDL_FRect destRect = {
             (g_ResolutionMgr.displayWidth -
@@ -795,9 +800,16 @@ void AppGfx::updateScreenTexture() {
                 0.5f,
             (float)g_ResolutionMgr.displayWidth,
             (float)g_ResolutionMgr.displayHeight};
-        SDL_RenderTexture(_p_sdlRenderer, _p_ScreenTexture, NULL, &destRect);
+        SDL_RenderTexture(_p_sdlRenderer, pScreenTexture, NULL, &destRect);
     }
+}
 
+void AppGfx::updateScreenTexture() {
+    SDL_UpdateTexture(_p_ScreenTexture, NULL, _p_Screen->pixels,
+                      _p_Screen->pitch);
+    SDL_RenderClear(_p_sdlRenderer);
+    // SDL_RenderTexture(_p_sdlRenderer, _p_ScreenTexture, NULL, NULL);
+    RenderTexture(_p_ScreenTexture);
     SDL_RenderPresent(_p_sdlRenderer);
 }
 

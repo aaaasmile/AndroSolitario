@@ -15,7 +15,7 @@ class ComboGfx {
     virtual ~ComboGfx();
 
     void Initialize(SDL_Rect* pRect, SDL_Surface* pScreen, TTF_Font* pFont,
-                    int iButID, SDL_Renderer* psdlRenderer,
+                    int iButID, UpdateScreenCb& fnUpdateScreen,
                     ClickCb& fncbClickEvent);
     void SetButtonText(LPCSTR strCaption) { _buttonText = strCaption; }
     void MouseMove(SDL_Event* pEvent, SDL_Surface* pScreen,
@@ -45,7 +45,8 @@ class ComboGfx {
     STRING _buttonText;
     bool _enabled;
     ClickCb _fncbClickEvent;
-    SDL_Renderer* _p_sdlRenderer;
+    //SDL_Renderer* _p_sdlRenderer;
+    UpdateScreenCb _fnUpdateScreen;
     SDL_Surface* _p_surfBar;
     SDL_Surface* _p_surfBoxSel;
     SDL_Surface* _p_surfBoxUNSel;

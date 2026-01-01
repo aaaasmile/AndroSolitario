@@ -42,6 +42,7 @@ class AppGfx {
     LPErrInApp SettingsChanged(bool backGroundChanged, bool languageChanged);
     LPErrInApp ChangeSceneBackground(SDL_Surface** ppSceneBackground);
     void UpdateScreen(SDL_Surface* pScreen);
+    void RenderTexture(SDL_Texture* pScreenTexture);
 
    private:
     LPErrInApp startGameLoop();

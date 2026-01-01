@@ -64,6 +64,7 @@ typedef struct {
 
 typedef struct {
     void (*const UpdateScreen)(void* self, SDL_Surface* pScreen);
+    void (*const RenderTexture)(void* self, SDL_Texture* pTexture);
 } VUpdateScreenCb, *LPVUpdateScreenCb;
 
 typedef struct {

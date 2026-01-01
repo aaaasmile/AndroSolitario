@@ -3,7 +3,10 @@
 
 #include <SDL3/SDL.h>
 
+#include "Traits.h"
 #include "ErrorInfo.h"
+
+using namespace traits;
 
 class FadeAction;
 class GameSettings;
@@ -16,8 +19,8 @@ class CreditsView {
     CreditsView();
     ~CreditsView();
 
-    void Show(SDL_Surface* screen, SDL_Surface* pSurfTitle,
-              SDL_Renderer* psdlRenderer);
+    void Show(SDL_Surface* pScreen, SDL_Surface* pSurfTitle,
+              UpdateScreenCb& fnUpdateScreen);
     LPErrInApp HandleEvent(SDL_Event* pEvent);
     LPErrInApp HandleIterate(bool& done);
     bool IsOngoing() { return (_state != READY_TO_START); }
@@ -30,8 +33,9 @@ class CreditsView {
     bool _ignoreMouseEvent;
     GameSettings* _p_GameSettings;
     MusicManager* _p_MusicManager;
-    SDL_Texture* _p_ScreenTexture;
-    SDL_Renderer* _p_sdlRenderer;
+    //SDL_Texture* _p_ScreenTexture;
+    //SDL_Renderer* _p_sdlRenderer;
+    UpdateScreenCb _fnUpdateScreen;
     SDL_Surface* _p_surfScreen;
     SDL_Surface* _p_SurfTitle;
 
