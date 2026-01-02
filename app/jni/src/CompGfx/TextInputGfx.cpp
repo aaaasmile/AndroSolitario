@@ -2,9 +2,9 @@
 
 #include <algorithm>
 
+#include "Config.h"
 #include "GameSettings.h"
 #include "GfxUtil.h"
-#include "Config.h"
 
 #if HASTOUCH
 static bool IsPointInsideCtrl(const SDL_Rect& rct, const SDL_Point& pt) {
@@ -64,12 +64,15 @@ void TextInputGfx::HandleEvent(SDL_Event* pEvent, const SDL_Point& targetPos) {
              mouseY >= _rctCtrl.y && mouseY <= _rctCtrl.y + _rctCtrl.h);
 
         if (_hasFocus) {
-            TRACE_DEBUG("[TextInput - event] calling SDL_StartTextInput \n");
+            const char* val = SDL_GetHint(SDL_HINT_EMSCRIPTEN_KEYBOARD_ELEMENT);
+            TRACE_DEBUG(
+                "[TextInput - event] calling SDL_StartTextInput for: %s \n",
+                val);
             SDL_StartTextInput(_p_Window);
         } else {
             SDL_StopTextInput(_p_Window);
         }
-    } 
+    }
 #endif
     if (_hasFocus && pEvent->type == SDL_EVENT_KEY_DOWN) {
         if (pEvent->key.key == SDLK_BACKSPACE && !_text.empty()) {
@@ -90,6 +93,10 @@ void TextInputGfx::HandleEvent(SDL_Event* pEvent, const SDL_Point& targetPos) {
             }
         }
     }
+    if (_hasFocus && pEvent->type == SDL_EVENT_TEXT_EDITING) {
+        TRACE_DEBUG("[HandleEvent - SDL_EVENT_TEXT_EDITING] : %s \n", pEvent->text.text);
+    }
+
 #if HASTOUCH
     if (pEvent->type == SDL_EVENT_FINGER_DOWN) {
         SDL_Point pt;

@@ -163,6 +163,15 @@
     <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" tabindex=-1></canvas>
   </div>
 
+  <input id="sdl-input"
+       type="text"
+       inputmode="text"
+       autocomplete="off"
+       autocorrect="off"
+       autocapitalize="off"
+       spellcheck="false">
+
+
   <script type='text/javascript'>
     var statusElement = document.getElementById('status');
     var progressElement = document.getElementById('progress');
@@ -172,7 +181,7 @@
       preRun: [],
       postRun: [],
       arguments: ['--language', 'italian'],
-      setPortraitMode: function(){
+      setPortraitMode: function () {
         console.log('Set protrait mode');
         Module.arguments.push('--fullportrait', '--web');
       },
@@ -232,10 +241,11 @@
       }
     };
     Module.setStatus('Downloading...');
-    console.log('windows dim ', window.outerWidth, window.outerHeight)
-    if(window.outerHeight > window.outerWidth && window.outerHeight > 1000){
+    console.log('windows dim ', window.screen.width, window.screen.height)
+    if (((window.screen.height > window.screen.width) && (window.screen.height > 900)) ||
+      ((window.outerHeight > window.outerWidth) && (window.outerHeight > 1000))) {
       Module.setPortraitMode();
-    }else{
+    } else {
       console.log("Standard mode");
     }
     window.onerror = function (event) {
@@ -254,7 +264,7 @@
     <time datetime="2026-01-02 21:32">02 Gennaio 2026 - 21:32</time>
   </p>
   <nav>
-    <a href="https://invido.it/" >Invido</a>
+    <a href="https://invido.it/">Invido</a>
   </nav>
   <p class="copyright">© 2004 - 2026 - IgorRun for <em>invido.it</em>. All rights reserved.</p>
 </footer>
