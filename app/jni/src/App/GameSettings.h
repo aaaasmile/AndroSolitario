@@ -65,8 +65,14 @@ class GameSettings {
     void TerminateMusicManager();
 
     void SetPortraitMode(bool val) { _portraitMode = val; }
+    void SetWebMode(bool val) { _webMode = val; }
+    void SetFullPortraitMode(bool val) {
+        _portraitFullMode = val;
+        _portraitMode = val;
+    }
     bool IsPortrait() { return _portraitMode; }
-    bool IsFullPortait() { return _portraitFullMode; }
+    bool IsFullPortrait() { return _portraitFullMode; }
+    bool IsWebMode() { return _webMode; }
 
    private:
     GameSettings();
@@ -84,8 +90,9 @@ class GameSettings {
     TTF_Font* _p_fontSymb;
     Languages* _p_Languages;
     MusicManager* _p_MusicManager;
-    bool _portraitMode;
-    bool _portraitFullMode;
+    bool _portraitMode = false;
+    bool _portraitFullMode = false;
+    bool _webMode = false;
 };
 
 typedef GameSettings* LPGameSettings;

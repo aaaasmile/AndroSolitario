@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(solitario VERSION 3.0.8 LANGUAGES C CXX)
+project(solitario VERSION 3.0.9 LANGUAGES C CXX)
 
 # Don't mistake osx for unix
 if(UNIX AND NOT ANDROID AND NOT APPLE AND NOT RISCOS)

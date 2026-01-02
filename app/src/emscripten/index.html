@@ -172,6 +172,10 @@
       preRun: [],
       postRun: [],
       arguments: ['--language', 'italian'],
+      setPortraitMode: function(){
+        console.log('Set protrait mode');
+        Module.arguments.push('--fullportrait', '--web');
+      },
       print: (function () {
         var element = document.getElementById('output');
         if (element) element.value = ''; // clear browser cache
@@ -228,8 +232,13 @@
       }
     };
     Module.setStatus('Downloading...');
+    console.log('windows dim ', window.outerWidth, window.outerHeight)
+    if(window.outerHeight > window.outerWidth && window.outerHeight > 1000){
+      Module.setPortraitMode();
+    }else{
+      console.log("Standard mode");
+    }
     window.onerror = function (event) {
-      // TODO: do not warn on ok events like simulating an infinite loop or exitStatus
       Module.setStatus('Exception thrown, see JavaScript console');
       spinnerElement.style.display = 'none';
       Module.setStatus = function (text) {
@@ -237,12 +246,12 @@
       };
     };
   </script>
-  <script async type="text/javascript" src="solitario_3.0.8.js?v=308"></script>
+  <script async type="text/javascript" src="solitario_3.0.9.js?v=309"></script>
 </body>
 <footer>
   <p>
     Aggiornato:
-    <time datetime="2025-12-31 15:14">31 Dicembre 2025 - 15:14</time>
+    <time datetime="2026-01-02 21:32">02 Gennaio 2026 - 21:32</time>
   </p>
   <nav>
     <a href="https://invido.it/" >Invido</a>

@@ -34,14 +34,14 @@ static const char* g_lpszImageSplashComm =
     DATA_PREFIX "images/commessaggio.jpg";
 static const char* g_lpszImageSplashMantova = DATA_PREFIX "images/mantova.jpg";
 
-typedef struct {
+typedef struct ResolutionMgr {
     int targetWidth, targetHeight;
     int displayWidth, displayHeight;
     float scale;
     bool showFullPortrait;
     bool isDev;
-    SDL_FRect viewport = {0, 0, 0, 0};
-} ResolutionMgr;
+    SDL_FRect viewport = {0.0, 0.0, 0.0, 0.0};
+}* LPResolutionMgr;
 
 static void resolutionMgr_UpdateViewport(ResolutionMgr& rm, int w, int h) {
     rm.displayWidth = w;
@@ -60,6 +60,7 @@ static void resolutionMgr_UpdateViewport(ResolutionMgr& rm, int w, int h) {
 }
 
 static void resolutionMgr_InitPortraitDev(ResolutionMgr& rm) {
+    TRACE("Portrait DEV mode \n");
     rm.targetWidth = 720;
     rm.targetHeight = 1280;
     rm.showFullPortrait = false;
@@ -71,6 +72,7 @@ static void resolutionMgr_InitPortraitDev(ResolutionMgr& rm) {
 }
 
 static void resolutionMgr_InitStandard(ResolutionMgr& rm) {
+    TRACE("Standard mode \n");
     rm.targetWidth = 1024;
     rm.targetHeight = 768;
     rm.showFullPortrait = false;
@@ -81,6 +83,7 @@ static void resolutionMgr_InitStandard(ResolutionMgr& rm) {
 }
 
 static void resolutionMgr_InitFullPortrait(ResolutionMgr& rm) {
+    TRACE("Full portrait mode \n");
     rm.targetWidth = 720;
     rm.targetHeight = 1280;
     rm.showFullPortrait = true;
@@ -171,7 +174,7 @@ LPErrInApp AppGfx::Init() {
         }
     }
     if (_p_GameSettings->IsPortrait()) {
-        if (_p_GameSettings->IsFullPortait()) {
+        if (_p_GameSettings->IsFullPortrait()) {
             resolutionMgr_InitFullPortrait(g_ResolutionMgr);
         } else {
             resolutionMgr_InitPortraitDev(g_ResolutionMgr);
@@ -918,10 +921,20 @@ void AppGfx::ParseCmdLine(int argc, char* argv[], SDL_AppResult& res) {
                 pGameSettings->SetCurrentLang();
             }
         } else if (strcmp(argv[i], "--portrait") == 0) {
-            TRACE_DEBUG("[ParseCmdLine] portait mode recognized \n");
+            TRACE("[ParseCmdLine] portrait mode recognized \n");
             LPGameSettings pGameSettings = GameSettings::GetSettings();
             pGameSettings->SetPortraitMode(true);
-        } else {
+        } else if (strcmp(argv[i], "--fullportrait") == 0) {
+            TRACE("[ParseCmdLine] full portrait mode recognized \n");
+            LPGameSettings pGameSettings = GameSettings::GetSettings();
+            pGameSettings->SetFullPortraitMode(true);
+        }  
+        else if (strcmp(argv[i], "--web") == 0) {
+            TRACE("[ParseCmdLine] web mode recognized \n");
+            LPGameSettings pGameSettings = GameSettings::GetSettings();
+            pGameSettings->SetWebMode(true);
+        }
+        else {
             printf("unknown option: %s\n", argv[i]);
             printf("\nUsage: %s --version \n", argv[0]);
             res = SDL_APP_SUCCESS;

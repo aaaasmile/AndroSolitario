@@ -1,9 +1,9 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#define VERSION "Ver 3.0.8 20251231"
+#define VERSION "Ver 3.0.9 20260202"
 #define PACKAGE_URL "https://invido.it"
-#define AUTHOR "igorrun"
+#define AUTHOR "igorRun for Invido"
 
 #define VERSION_HOME \
     "030007"  // this is used to reset settings and score in windows
