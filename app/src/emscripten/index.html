@@ -163,15 +163,6 @@
     <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" tabindex=-1></canvas>
   </div>
 
-  <input id="sdl-input"
-       type="text"
-       inputmode="text"
-       autocomplete="off"
-       autocorrect="off"
-       autocapitalize="off"
-       spellcheck="false">
-
-
   <script type='text/javascript'>
     var statusElement = document.getElementById('status');
     var progressElement = document.getElementById('progress');
@@ -241,6 +232,20 @@
       }
     };
     Module.setStatus('Downloading...');
+    window._sdlHiddenInput = document.createElement('input');
+    window._sdlHiddenInput = document.createElement('input');
+    window._sdlHiddenInput.type = 'text';
+    window._sdlHiddenInput.style.cssText = 'position: fixed; top: -100px;left: 0;width: 10px;height: 10px;opacity: 0.01;z - index: -1;';
+    window._sdlHiddenInput.addEventListener('input', function (e) {
+      var text = e.data || e.target.value.slice(-1);
+      if (text) {
+        console.log('wanna send this: ', text);
+        Module._receiveMobileText(text);
+      }
+      e.target.value = '';
+    });
+    document.body.appendChild(window._sdlHiddenInput);
+
     console.log('windows dim ', window.screen.width, window.screen.height)
     if (((window.screen.height > window.screen.width) && (window.screen.height > 900)) ||
       ((window.outerHeight > window.outerWidth) && (window.outerHeight > 1000))) {

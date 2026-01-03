@@ -351,13 +351,6 @@ LPErrInApp AppGfx::createWindow() {
 #ifdef ANDROID
     flagwin = SDL_WINDOW_FULLSCREEN;
 #endif
-#if PLATFORM_EMS
-    if (_p_GameSettings->IsFullPortrait()) {
-        TRACE_DEBUG("[createWindow] Bind to the hidden input \n");
-        SDL_SetHint(SDL_HINT_EMSCRIPTEN_KEYBOARD_ELEMENT, "#sdl-input");
-    }
-#endif
-
     TRACE_DEBUG("[createWindow] creating with width %d, height %d\n",
                 g_ResolutionMgr.displayWidth, g_ResolutionMgr.displayHeight);
     _p_Window = SDL_CreateWindow(_p_GameSettings->GameName.c_str(),

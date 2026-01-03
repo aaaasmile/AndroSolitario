@@ -6,6 +6,38 @@
 #include "GameSettings.h"
 #include "GfxUtil.h"
 
+#if PLATFORM_EMS
+#include <emscripten.h>
+static void showMobileKeyboard() {
+    emscripten_run_script(
+        "if (window._sdlHiddenInput) {"
+        "  window._sdlHiddenInput.value = '';"
+        "  window._sdlHiddenInput.focus();"
+        "  setTimeout(function() {"
+        "    window._sdlHiddenInput.click();"
+        "  }, 50);"
+        "  console.log('wanna focus the hidden input');"
+        "} else {"
+        "  console.log('cannot focus the input')"
+        "}");
+}
+
+void EMSCRIPTEN_KEEPALIVE receiveMobileText(const char* textRec) {
+    if (textRec) {
+        
+        SDL_Event textEvent;
+        SDL_zero(textEvent);
+        textEvent.type = SDL_EVENT_TEXT_INPUT;
+        textEvent.text.text = &textRec[0];
+
+        SDL_PushEvent(&textEvent);
+
+        TRACE_DEBUG("Received mobile text: '%s' \n", textRec);
+    }
+    TRACE_DEBUG("Nothing received \n");
+}
+#endif
+
 #if HASTOUCH
 static bool IsPointInsideCtrl(const SDL_Rect& rct, const SDL_Point& pt) {
     if (pt.x >= rct.x && pt.x <= rct.x + rct.w && pt.y >= rct.y &&
@@ -69,6 +101,12 @@ void TextInputGfx::HandleEvent(SDL_Event* pEvent, const SDL_Point& targetPos) {
                 "[TextInput - event] calling SDL_StartTextInput for: %s \n",
                 val);
             SDL_StartTextInput(_p_Window);
+#if PLATFORM_EMS
+            if (pGameSettings->IsFullPortrait()) {
+                TRACE_DEBUG("[TextInput] try to show the keyboard \n");
+                showMobileKeyboard();
+            }
+#endif
         } else {
             SDL_StopTextInput(_p_Window);
         }
@@ -92,9 +130,6 @@ void TextInputGfx::HandleEvent(SDL_Event* pEvent, const SDL_Point& targetPos) {
                 _text += newText;
             }
         }
-    }
-    if (_hasFocus && pEvent->type == SDL_EVENT_TEXT_EDITING) {
-        TRACE_DEBUG("[HandleEvent - SDL_EVENT_TEXT_EDITING] : %s \n", pEvent->text.text);
     }
 
 #if HASTOUCH
