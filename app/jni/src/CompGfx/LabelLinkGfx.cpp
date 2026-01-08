@@ -99,20 +99,12 @@ void LabelLinkGfx::Draw(SDL_Surface* pScreen) {
     }
     if (_stateGfx != INVISIBLE) {
         if (_isEnabled) {
-            // begin stuff mouse
-            // int mx, my;
-            // float fmx, fmy;
-            // SDL_GetMouseState(&fmx, &fmy);
-            // mx = (int)fmx;
-            // my = (int)fmy;
             if (_mouseOuside) {
-                // mouse on button
                 _color = GFX_UTIL_COLOR::White;
             } else {
                 _color = GFX_UTIL_COLOR::Orange;
             }
-            // end stuff mouse
-
+           
             int tx, ty;
             TTF_GetStringSize(_p_FontText, _ctrlText.c_str(), 0, &tx, &ty);
             int iXOffSet = (_rctCtrl.w - tx) / 2;

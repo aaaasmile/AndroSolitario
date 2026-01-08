@@ -25,8 +25,6 @@ class MenuMgr {
 
     MenuMgr();
     virtual ~MenuMgr();
-    // LPErrInApp Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
-    //                       SDL_Window* pWindow, MenuDelegator& menuDelegator);
     LPErrInApp Initialize(SDL_Surface* pScreen, UpdateScreenCb& fnUpdateScreen,
                           MenuDelegator& menuDelegator);
     LPErrInApp HandleRootMenuEvent(SDL_Event* pEvent, const SDL_Point& targetPos);
@@ -50,9 +48,6 @@ class MenuMgr {
     SDL_Surface* _p_ScreenBackbuffer;
     SDL_Surface* _p_MenuBox;
     SDL_Surface* _p_SceneBackground;
-    // SDL_Window* _p_Window;
-    // SDL_Texture* _p_ScreenTexture;
-    // SDL_Renderer* _p_sdlRenderer;
     UpdateScreenCb _fnUpdateScreen;
     MenuItemEnum _focusedMenuItem;
     MenuItemEnum _prevFocusedMenuItem;

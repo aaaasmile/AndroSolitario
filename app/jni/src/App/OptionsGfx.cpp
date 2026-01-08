@@ -19,12 +19,10 @@ OptionsGfx::OptionsGfx() {
     _p_MusicManager = NULL;
     _p_GameSettings = GameSettings::GetSettings();
     _mouseDownRec = false;
-    //_p_ScreenTexture = NULL;
     _fnUpdateScreen.tc = NULL;
     _fnUpdateScreen.self = NULL;
     _p_ShadowSrf = NULL;
     _inProgress = false;
-    //_p_sdlRenderer = NULL;
     _p_checkMusic = NULL;
     _p_comboLang = NULL;
     _p_comboDeck = NULL;
@@ -55,10 +53,6 @@ OptionsGfx::~OptionsGfx() {
         SDL_DestroySurface(_p_ShadowSrf);
         _p_ShadowSrf = NULL;
     }
-    // if (_p_ScreenTexture != NULL) {
-    //     SDL_DestroyTexture(_p_ScreenTexture);
-    //     _p_ScreenTexture = NULL;
-    // }
 }
 
 // Prepare the Click() trait
@@ -112,10 +106,6 @@ LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen,
     }
     _rctOptBox.w = 600;
     _rctOptBox.h = 580;
-    // if (_p_GameSettings->NeedScreenMagnify()) {
-    //     _rctOptBox.w = 800;
-    //     _rctOptBox.h = 1024;
-    // }
     _rctOptBox.x = (pScreen->w - _rctOptBox.w) / 2;
     _rctOptBox.y = (pScreen->h - _rctOptBox.h) / 2;
     TRACE_DEBUG("rctOptBox is x: %d, y: %d w: %d, h: %d \n", _rctOptBox.x,
@@ -126,7 +116,6 @@ LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen,
     _p_MusicManager = _p_GameSettings->GetMusicManager();
     _p_fontCtrl = _p_GameSettings->GetFontAriblk();
     _p_fontText = _p_GameSettings->GetFontMedium();
-    //_p_sdlRenderer = pRenderer;
     _fnUpdateScreen = fnUpdateScreen;
 
     _p_surfBar = GFX_UTIL::SDL_CreateRGBSurface(_rctOptBox.w, _rctOptBox.h, 32,
@@ -152,11 +141,6 @@ LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen,
     rctBt1.w = 120;
     rctBt1.h = 34;
     int offsetBtY = 30;
-    // if (_p_GameSettings->NeedScreenMagnify()) {
-    //     rctBt1.w = 180;
-    //     rctBt1.h = 65;
-    //     offsetBtY = 50;
-    // }
     rctBt1.y = _rctOptBox.y + _rctOptBox.h - offsetBtY - rctBt1.h;
     rctBt1.x =
         (_rctOptBox.w - rctBt1.w) / 2 + _rctOptBox.x + rctBt1.w + iSpace2bt;
@@ -169,14 +153,6 @@ LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen,
     int combo2OffsetY = 20;
     int combo3OffsetY = 40;
     int comboOffsetX = 50;
-    // if (_p_GameSettings->NeedScreenMagnify()) {
-    //     comboW = 300;
-    //     comboH = 56;
-    //     comboOffsetY = 180;
-    //     combo2OffsetY = 70;
-    //     combo3OffsetY = 120;
-    //     comboOffsetX = 70;
-    // }
     // Combo language
     ClickCb nullCb = {NULL, NULL};
 
@@ -274,7 +250,6 @@ LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen,
                                          y_pos);
         _cardOnEachDeck[2][i].SetDeckSurface(_p_deckAll[i]);
 
-        // if (!_p_GameSettings->NeedScreenMagnify()) {
         SDL_Surface* surface = _p_deckAll[i];
         if (dt.GetType() == eDeckType::TAROCK_PIEMONT) {
             TRACE_DEBUG("[TAROCK_PIEMONT] Deck format: %s, w: %d, h: %d\n",
@@ -294,7 +269,6 @@ LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen,
                 }
             }
         }
-        //}
     }
 
     TRACE_DEBUG("Options - Initialized OK\n");
@@ -472,10 +446,6 @@ LPErrInApp OptionsGfx::HandleIterate(bool& done) {
 
     // render the dialogbox
     SDL_BlitSurface(_p_ShadowSrf, NULL, _p_screen, NULL);
-    // SDL_UpdateTexture(_p_ScreenTexture, NULL, _p_screen->pixels,
-    //                   _p_screen->pitch);
-    // SDL_RenderTexture(_p_sdlRenderer, _p_ScreenTexture, NULL, NULL);
-    // SDL_RenderPresent(_p_sdlRenderer);
     (_fnUpdateScreen.tc)->UpdateScreen(_fnUpdateScreen.self, _p_screen);
 
     _p_textInput->Update();
@@ -486,10 +456,6 @@ LPErrInApp OptionsGfx::HandleIterate(bool& done) {
             SDL_DestroySurface(_p_ShadowSrf);
             _p_ShadowSrf = NULL;
         }
-        // if (_p_ScreenTexture != NULL) {
-        //     SDL_DestroyTexture(_p_ScreenTexture);
-        //     _p_ScreenTexture = NULL;
-        // }
         done = true;
     }
     return NULL;
@@ -547,22 +513,12 @@ LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
     _hbar = 30;
     _captionOffsetX = 10;
     _labelOffsetY = 25;
-    // if (_p_GameSettings->NeedScreenMagnify()) {
-    //     _hbar = 65;
-    //     _captionOffsetX = 20;
-    //     _labelOffsetY = 40;
-    // }
     if (_p_ShadowSrf != NULL) {
         SDL_DestroySurface(_p_ShadowSrf);
     }
     _p_ShadowSrf = GFX_UTIL::SDL_CreateRGBSurface(_p_screen->w, _p_screen->h,
                                                   32, 0, 0, 0, 0);
-    // if (_p_ScreenTexture != NULL) {
-    //     SDL_DestroyTexture(_p_ScreenTexture);
-    // }
-    // _p_ScreenTexture =
-    //     SDL_CreateTextureFromSurface(_p_sdlRenderer, _p_ShadowSrf);
-
+    
     TRACE_DEBUG(
         "[TAROCK_PIEMONT] _p_ShadowSrf buffer format: %s, w: %d, h: %d\n",
         SDL_GetPixelFormatName(_p_ShadowSrf->format), _p_ShadowSrf->w,

@@ -50,8 +50,6 @@ class HighScore {
    private:
     ScoreInfo _scoreInfo[NUMOFSCORE];
     FadeAction* _p_FadeAction;
-    //SDL_Renderer* _p_sdlRenderer;
-    //SDL_Texture* _p_ScreenTexture;
     UpdateScreenCb _fnUpdateScreen;
     SDL_Surface* _p_surfScreen;
     SDL_Surface* _p_SurfTitle;

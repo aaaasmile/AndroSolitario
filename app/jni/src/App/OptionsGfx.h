@@ -35,8 +35,6 @@ class OptionsGfx {
     OptionsGfx();
     ~OptionsGfx();
 
-    // LPErrInApp Initialize(SDL_Surface* pScreen, SDL_Renderer* pRenderer,
-    //                       OptionDelegator& optDlg, SDL_Window* pWindow);
     LPErrInApp Initialize(SDL_Surface* pScreen, UpdateScreenCb& fnUpdateScreen,
                           OptionDelegator& optDlg, SDL_Window* pWindow);
     LPErrInApp Show(SDL_Surface* pScene_background, STRING& strCaption);
@@ -77,8 +75,6 @@ class OptionsGfx {
     SDL_Surface* _p_Scene_background;
     bool _inProgress;
     bool _mouseDownRec;
-    //SDL_Renderer* _p_sdlRenderer;
-    //SDL_Texture* _p_ScreenTexture;
     UpdateScreenCb _fnUpdateScreen;
 
     SDL_Surface* _p_ShadowSrf;
@@ -86,7 +82,6 @@ class OptionsGfx {
     int _labelOffsetY;
     int _captionOffsetX;
     bool _initilized;
-    // previous settings    
     Languages::eLangId _prevLangId;
     eDeckType _prevDeckType;
     bool _prevMusicEnabled;

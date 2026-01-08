@@ -142,19 +142,6 @@ void ButtonGfx::DrawButton(SDL_Surface* pScreen) {
     }
 
     SDL_Color colorText;
-    // int mx, my;
-    // float fmx, fmy;
-    // SDL_GetMouseState(&fmx, &fmy);
-    // mx = (int)fmx;
-    // my = (int)fmy;
-    // SDL_Point pt = {mx, my};
-    // if (IsPointInsideCtrl(_rctButton, pt)) {
-    //     colorText = GFX_UTIL_COLOR::Orange;
-    //     _mouseState = MouseState::INSIDE;
-    // } else {
-    //     colorText = GFX_UTIL_COLOR::White;
-    //     _mouseState = MouseState::OUTSIDE;
-    // }
     // Remeber Mouse coordinate are on viewport, this is get with mouse move
     if (_mouseState == MouseState::INSIDE) {
         colorText = GFX_UTIL_COLOR::Orange;

@@ -32,7 +32,6 @@ SolitarioGfx::SolitarioGfx() {
     _startdrag = false;
     _p_Dragface = NULL;
     _p_SceneBackground = NULL;
-    //_p_ScreenTexture = NULL;
     _p_BtQuit = NULL;
     _p_BtNewGame = NULL;
     _p_BtToggleSound = NULL;
@@ -81,10 +80,6 @@ void SolitarioGfx::clearSurface() {
         SDL_DestroySurface(_p_ScreenBackbufferDrag);
         _p_ScreenBackbufferDrag = NULL;
     }
-    // if (_p_ScreenTexture != NULL) {
-    //     SDL_DestroyTexture(_p_ScreenTexture);
-    //     _p_ScreenTexture = NULL;
-    // }
     if (_p_AlphaDisplay != NULL) {
         SDL_DestroySurface(_p_AlphaDisplay);
         _p_AlphaDisplay = NULL;
@@ -141,18 +136,8 @@ LPErrInApp SolitarioGfx::Initialize(SDL_Surface* pScreen,
     LPErrInApp err;
     _p_Screen = pScreen;
     _fnUpdateScreen = fnUpdateScreen;
-    //_p_sdlRenderer = r;
-
     _p_Window = pWindow;
-    // _p_ScreenTexture =
-    //     SDL_CreateTexture(r, SDL_PIXELFORMAT_ARGB8888,
-    //                       SDL_TEXTUREACCESS_STREAMING, pScreen->w,
-    //                       pScreen->h);
-    // if (_p_ScreenTexture == NULL) {
-    //     return ERR_UTIL::ErrorCreate("Cannot create texture: %s\n",
-    //                                  SDL_GetError());
-    // }
-
+    
     _p_AlphaDisplay = GFX_UTIL::SDL_CreateRGBSurface(_p_Screen->w, _p_Screen->h,
                                                      32, 0, 0, 0, 0);
     if (_p_AlphaDisplay == NULL) {
@@ -1600,24 +1585,7 @@ LPErrInApp SolitarioGfx::Show() {
     int yOverlapCard = 32;
     int xOffsetIntraStack = 17;
     int xOffsetFaceUp = 25;
-    // if (pGameSettings->NeedScreenMagnify()) {
-    //     if (g_CardWidth <= 127) {
-    //         xLine0 = 50;
-    //         yLine0 = 150;
-    //         yoffsetLine0 = 150;
-    //         yOverlapCard = 56;
-    //         xOffsetIntraStack = 40;
-    //         xOffsetFaceUp = 60;
-    //     } else {
-    //         xLine0 = 20;
-    //         yLine0 = 120;
-    //         yoffsetLine0 = 130;
-    //         yOverlapCard = 40;
-    //         xOffsetIntraStack = 24;
-    //         xOffsetFaceUp = 48;
-    //     }
-    // }
-
+    
     // index 0 (deck with face down)
     CreateRegion(RT_DECKSTOCK,           // ID
                  CRD_VISIBLE | CRD_3D,   // attributes
@@ -1678,10 +1646,6 @@ void SolitarioGfx::showYesNoMsgBox(LPCSTR strText) {
     _p_MsgBox = new MesgBoxGfx();
     int offsetW = 100;
     int offsetH = 130;
-    // if (pGameSettings->NeedScreenMagnify()) {
-    //     offsetW = 150;
-    //     offsetH = 260;
-    // }
     SDL_Rect rctBox;
     rctBox.w = _p_Screen->w - offsetW;
     rctBox.h = offsetH;
@@ -1716,10 +1680,6 @@ void SolitarioGfx::showOkMsgBox(LPCSTR strText) {
 
     int offsetW = 100;
     int offsetH = 130;
-    // if (pGameSettings->NeedScreenMagnify()) {
-    //     offsetW = 150;
-    //     offsetH = 260;
-    // }
     SDL_Rect rctBox;
     rctBox.w = _p_Screen->w - offsetW;
     rctBox.h = offsetH;
@@ -1792,10 +1752,6 @@ LPErrInApp SolitarioGfx::drawScore() {
     LPLanguages pLanguages = pGameSettings->GetLanguageMan();
     int tx = 10;
     int offsetY = 30;
-    // if (pGameSettings->NeedScreenMagnify()) {
-    //     tx = 100;
-    //     offsetY = 400;
-    // }
     if (_scoreGame < -2000) {
         _scoreGame = -2000;
     }
@@ -1866,10 +1822,6 @@ void SolitarioGfx::updateBadScoreAceToTableu() {
 }
 
 void SolitarioGfx::updateTextureAsFlipScreen() {
-    // SDL_UpdateTexture(_p_ScreenTexture, NULL, _p_Screen->pixels,
-    //                   _p_Screen->pitch);
-    // SDL_RenderTexture(_p_sdlRenderer, _p_ScreenTexture, NULL, NULL);
-    // SDL_RenderPresent(_p_sdlRenderer);
     (_fnUpdateScreen.tc)->UpdateScreen(_fnUpdateScreen.self, _p_Screen);
 }
 

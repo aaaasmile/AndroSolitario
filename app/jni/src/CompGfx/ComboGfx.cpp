@@ -42,14 +42,9 @@ void ComboGfx::Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
     _fncbClickEvent = fncbClickEvent;
     _rctCtrl = *pRect;
     _fnUpdateScreen = fnUpdateScreen;
-    //_p_sdlRenderer = psdlRenderer;
-    // LPGameSettings pGameSettings = GameSettings::GetSettings();
-
+   
     int boxIncW = 34;
     int boxIncH = _rctCtrl.h;
-    // if (pGameSettings->NeedScreenMagnify()) {
-    //     boxIncW = 50;
-    // }
     _rctText.x = _rctCtrl.x + boxIncW;
     _rctText.y = _rctCtrl.y;
     _rctText.w = _rctCtrl.w - 2 * boxIncW;
@@ -138,15 +133,11 @@ void ComboGfx::MouseMove(SDL_Event* pEvent, const SDL_Point& targetPos) {
                        my <= _rctBoxDown.y + _rctBoxDown.h) {
                 _downBoxSelected = true;
             }
-            // mouse inner button
             _color = GFX_UTIL_COLOR::Orange;
-            //RedrawButton(pScreen, pScene_background, pScreenTexture);
         } else {
-            // mouse outside
             if (_upBoxSelected || _downBoxSelected){
                 _upBoxSelected = false;
                 _downBoxSelected = false;
-                //RedrawButton(pScreen, pScene_background, pScreenTexture);
             }
         }
     }
@@ -164,18 +155,14 @@ void ComboGfx::FingerDown(SDL_Event* pEvent) {
     SDL_Point pt;
     _p_GameSettings->GetTouchPoint(pEvent->tfinger, &pt);
     if (IsPointInsideBox(_rctBoxUp, pt)) {
-        // mouse on up box
         _currDataIndex++;
         if (_currDataIndex >= _vctDataStrings.size()) {
-            // circular buffer
             _currDataIndex = 0;
         }
         if ((_fncbClickEvent.tc) != NULL)
             (_fncbClickEvent.tc)->Click(_fncbClickEvent.self, _currDataIndex);
     } else if (IsPointInsideBox(_rctBoxDown, pt)) {
-        // mouse on down box
         if (_currDataIndex == 0) {
-            // circular buffer
             _currDataIndex = _vctDataStrings.size() - 1;
         } else {
             _currDataIndex--;
@@ -194,10 +181,8 @@ void ComboGfx::MouseUp(SDL_Event* pEvent, const SDL_Point& targetPos) {
         int my = targetPos.y;
         if (mx >= _rctBoxUp.x && mx <= _rctBoxUp.x + _rctBoxUp.w &&
             my >= _rctBoxUp.y && my <= _rctBoxUp.y + _rctBoxUp.h) {
-            // mouse on up box
             _currDataIndex++;
             if (_currDataIndex >= _vctDataStrings.size()) {
-                // circular buffer
                 _currDataIndex = 0;
             }
             if ((_fncbClickEvent.tc) != NULL)
@@ -206,9 +191,7 @@ void ComboGfx::MouseUp(SDL_Event* pEvent, const SDL_Point& targetPos) {
 
         } else if (mx >= _rctBoxDown.x && mx <= _rctBoxDown.x + _rctBoxDown.w &&
                    my >= _rctBoxDown.y && my <= _rctBoxDown.y + _rctBoxDown.h) {
-            // mouse on down box
             if (_currDataIndex == 0) {
-                // circular buffer
                 _currDataIndex = _vctDataStrings.size() - 1;
             } else {
                 _currDataIndex--;
@@ -226,25 +209,7 @@ void ComboGfx::DrawButton(SDL_Surface* pScreen) {
     if (_visibleState == INVISIBLE) {
         return;
     }
-    // bool upBoxSelected = false;
-    // bool downBoxSelected = false;
     if (_enabled) {
-        // int mx, my;
-        // float fmx, fmy;
-        // SDL_GetMouseState(&fmx, &fmy);
-        // mx = (int)fmx;
-        // my = (int)fmy;
-
-        // if (mx >= _rctBoxUp.x && mx <= _rctBoxUp.x + _rctBoxUp.w &&
-        //     my >= _rctBoxUp.y && my <= _rctBoxUp.y + _rctBoxUp.h) {
-        //     upBoxSelected = true;
-        // } else if (mx >= _rctBoxDown.x && mx <= _rctBoxDown.x + _rctBoxDown.w
-        // &&
-        //            my >= _rctBoxDown.y && my <= _rctBoxDown.y +
-        //            _rctBoxDown.h) {
-        //     downBoxSelected = true;
-        // }
-
         // background on up/down boxes
         if (_upBoxSelected) {
             GFX_UTIL::DrawStaticSpriteEx(pScreen, 0, 0, _rctBoxUp.w,
@@ -341,17 +306,3 @@ void ComboGfx::DrawButton(SDL_Surface* pScreen) {
                            _rctBoxUp.y + _rctBoxDown.h, GFX_UTIL_COLOR::White);
     }
 }
-
-// void ComboGfx::RedrawButton(SDL_Surface* pScreen,
-//                             SDL_Texture* pScene_background,
-//                             SDL_Texture* pScreenTexture) {
-//     if (pScene_background) {
-//         // SDL_RenderTexture(_p_sdlRenderer, pScene_background, NULL, NULL);
-//         (_fnUpdateScreen.tc)
-//             ->RenderTexture(_fnUpdateScreen.self, pScene_background);
-//     }
-//     DrawButton(pScreen);
-//     // SDL_RenderTexture(_p_sdlRenderer, pScreenTexture, NULL, NULL);
-//     // SDL_RenderPresent(_p_sdlRenderer);
-//     (_fnUpdateScreen.tc)->UpdateScreen(_fnUpdateScreen.self, pScreen);
-// }

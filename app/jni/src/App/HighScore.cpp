@@ -24,10 +24,8 @@ using namespace std;
 
 HighScore::HighScore() {
     _p_FadeAction = new FadeAction();
-    //_p_sdlRenderer = NULL;
     _p_surfScreen = NULL;
     _p_SurfTitle = NULL;
-    //_p_ScreenTexture = NULL;
     _fnUpdateScreen.tc = NULL;
     _fnUpdateScreen.self = NULL;
     _p_GameSettings = NULL;
@@ -51,10 +49,6 @@ HighScore::HighScore() {
 HighScore::~HighScore() {
     TRACE_DEBUG("HighScore destructor\n");
     delete _p_FadeAction;
-    // if (_p_ScreenTexture != NULL) {
-    //     SDL_DestroyTexture(_p_ScreenTexture);
-    //     _p_ScreenTexture = NULL;
-    // }
 }
 
 #if PLATFORM_EMS
@@ -274,11 +268,6 @@ LPErrInApp HighScore::HandleIterate(bool& done) {
 
     if (_state == HighScore::INIT) {
         TRACE("HighScore Init \n");
-        // if (_p_ScreenTexture != NULL) {
-        //     SDL_DestroyTexture(_p_ScreenTexture);
-        // }
-        // _p_ScreenTexture =
-        //     SDL_CreateTextureFromSurface(_p_sdlRenderer, _p_surfScreen);
         if (!_ignoreMouseEvent) {
             TRACE("HighScore Init - fade start \n");
             _p_FadeAction->Fade(_p_surfScreen, _p_surfScreen, 2, true,
@@ -329,13 +318,6 @@ LPErrInApp HighScore::HandleIterate(bool& done) {
         int cx = 100;
         int dx = 30;
         int ex = 50;
-        // if (_p_GameSettings->NeedScreenMagnify()) {
-        //     ax = 100;
-        //     bx = 550;
-        //     cx = 180;
-        //     dx = 50;
-        //     ex = 100;
-        // }
         int xIni = (_p_surfScreen->w - (ax + bx + cx + dx + ex)) / 2;
         int yIni = 200;
         int xOff, yOff;
@@ -401,10 +383,6 @@ LPErrInApp HighScore::HandleIterate(bool& done) {
         }
         _lastUpTimestamp = now_time;
 
-        // SDL_UpdateTexture(_p_ScreenTexture, NULL, _p_surfScreen->pixels,
-        //                   _p_surfScreen->pitch);
-        // SDL_RenderTexture(_p_sdlRenderer, _p_ScreenTexture, NULL, NULL);
-        // SDL_RenderPresent(_p_sdlRenderer);
         (_fnUpdateScreen.tc)->UpdateScreen(_fnUpdateScreen.self, _p_surfScreen);
 
         uint32_t elapsed_sec = (now_time / 1000) - (_start_time / 1000);
@@ -439,7 +417,6 @@ LPErrInApp HighScore::HandleIterate(bool& done) {
 LPErrInApp HighScore::Show(SDL_Surface* p_surf_screen, SDL_Surface* pSurfTitle,
                            UpdateScreenCb& fnUpdateScreen) {
     TRACE("HighScore Show \n");
-    //_p_sdlRenderer = psdlRenderer;
     _fnUpdateScreen = fnUpdateScreen;
     _p_surfScreen = p_surf_screen;
     _p_SurfTitle = pSurfTitle;

@@ -44,7 +44,6 @@ class ComboGfx {
     STRING _buttonText;
     bool _enabled;
     ClickCb _fncbClickEvent;
-    //SDL_Renderer* _p_sdlRenderer;
     UpdateScreenCb _fnUpdateScreen;
     SDL_Surface* _p_surfBar;
     SDL_Surface* _p_surfBoxSel;

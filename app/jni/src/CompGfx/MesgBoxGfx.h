@@ -58,8 +58,6 @@ class MesgBoxGfx {
     VCT_STRING _dataStrings;
     Uint8 _alpha;
     bool _inProgress;
-    //SDL_Renderer* _p_sdlRenderer;
-    //SDL_Texture* _p_ScreenTexture;
     SDL_Surface* _p_ShadowSrf;
     SDL_Surface* _p_Scene_background;
     UpdateScreenCb _fnUpdateScreen;

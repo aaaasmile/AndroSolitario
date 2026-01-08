@@ -13,7 +13,6 @@ MesgBoxGfx::MesgBoxGfx(void) {
     _p_BtButt2 = 0;
     _alpha = 70;
     _inProgress = false;
-    //_p_ScreenTexture = NULL;
     _fnUpdateScreen.tc = NULL;
     _fnUpdateScreen.self = NULL;
     _p_ShadowSrf = NULL;
@@ -38,7 +37,6 @@ LPErrInApp MesgBoxGfx::Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
     _p_Screen = pScreen;
     _p_FontText = pFont;
     _typeMsg = eval;
-    //_p_sdlRenderer = pRenderer;
     _fnUpdateScreen = fnUpdateScreen;
 
     _p_Surf_Bar = GFX_UTIL::SDL_CreateRGBSurface(_rctMsgBox.w, _rctMsgBox.h, 32,
@@ -54,16 +52,10 @@ LPErrInApp MesgBoxGfx::Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
     _colCurrent = GFX_UTIL_COLOR::White;
     SDL_Rect rctBt1;
     ClickCb cbBt = prepClickBtCb();
-    // LPGameSettings pGameSettings = GameSettings::GetSettings();
     int btw = 120;
     int bth = 28;
     int btoffsetY = 10;
-    // if (pGameSettings->NeedScreenMagnify()) {
-    //     btw = 200;
-    //     bth = 62;
-    //     btoffsetY = 20;
-    // }
-
+    
     if (_typeMsg == TY_MB_YES_NO) {
         int space2bt = 20;
         // button yes
@@ -228,10 +220,6 @@ LPErrInApp MesgBoxGfx::HandleIterate(bool& done) {
     }
 
     SDL_BlitSurface(_p_ShadowSrf, NULL, _p_Screen, NULL);
-    // SDL_UpdateTexture(_p_ScreenTexture, NULL, _p_Screen->pixels,
-    //                   _p_Screen->pitch);
-    // SDL_RenderTexture(_p_sdlRenderer, _p_ScreenTexture, NULL, NULL);
-    // SDL_RenderPresent(_p_sdlRenderer);
     (_fnUpdateScreen.tc)->UpdateScreen(_fnUpdateScreen.self, _p_Screen);
 
     if (!_inProgress) {
@@ -239,10 +227,6 @@ LPErrInApp MesgBoxGfx::HandleIterate(bool& done) {
             SDL_DestroySurface(_p_ShadowSrf);
             _p_ShadowSrf = NULL;
         }
-        // if (_p_ScreenTexture != NULL) {
-        //     SDL_DestroyTexture(_p_ScreenTexture);
-        //     _p_ScreenTexture = NULL;
-        // }
         done = true;
     }
 
@@ -273,12 +257,6 @@ LPErrInApp MesgBoxGfx::Show(SDL_Surface* pScene_background, LPCSTR lpsBut1Txt,
     }
     _p_ShadowSrf = GFX_UTIL::SDL_CreateRGBSurface(_p_Screen->w, _p_Screen->h,
                                                   32, 0, 0, 0, 0);
-
-    // if (_p_ScreenTexture != NULL) {
-    //     SDL_DestroyTexture(_p_ScreenTexture);
-    // }
-    // _p_ScreenTexture =
-    //     SDL_CreateTextureFromSurface(_p_sdlRenderer, _p_ShadowSrf);
 
     return NULL;
 }

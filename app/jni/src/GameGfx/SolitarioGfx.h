@@ -221,10 +221,8 @@ class SolitarioGfx {
     SDL_Surface* _p_Screen;
     SDL_Surface* _p_AlphaDisplay;
     SDL_Surface* _p_ScreenBackbufferDrag;
-    //SDL_Texture* _p_ScreenTexture;
     SDL_Surface* _p_Dragface;
     SDL_Surface* _p_SceneBackground;
-    //SDL_Renderer* _p_sdlRenderer;
     UpdateScreenCb _fnUpdateScreen;
     SDL_Window* _p_Window;
     TTF_Font* _p_FontBigText;

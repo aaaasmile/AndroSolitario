@@ -158,17 +158,11 @@ MenuMgr::~MenuMgr() {
         SDL_DestroySurface(_p_ScreenBackbuffer);
         _p_ScreenBackbuffer = NULL;
     }
-    // if (_p_ScreenTexture != NULL) {
-    //     SDL_DestroyTexture(_p_ScreenTexture);
-    //     _p_ScreenTexture = NULL;
-    // }
     delete _p_homeUrl;
     delete _p_LabelVersion;
 }
 
 LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen,
-                               // SDL_Renderer* pRenderer,
-                               // SDL_Window* pWindow,
                                UpdateScreenCb& fnUpdateScreen,
                                MenuDelegator& menuDelegator) {
     if(pScreen == NULL){
@@ -181,9 +175,7 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen,
     _menuDlgt = menuDelegator;
     LPGameSettings pGameSettings = GameSettings::GetSettings();
     _p_Screen = pScreen;
-    //_p_sdlRenderer = pRenderer;
-    //_p_Window = pWindow;
-
+    
     SDL_Rect clipRect;
     SDL_GetSurfaceClipRect(_p_Screen, &clipRect);
     _screenW = clipRect.w;
@@ -191,22 +183,9 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen,
     _screenH = clipRect.h;
     _box_Y = _screenH / 5;
 
-    // if (_screenW == 1024 && _screenH == 768) {
     _rctPanelRedBox.w = 500;
     _rctPanelRedBox.h = 560;
-    // } else {
-    //     _rctPanelRedBox.w = _screenW - _box_X * 2;
-    //     _rctPanelRedBox.h = _screenH - _box_Y * 2;
-    //     _rctPanelRedBox.w = std::max(_rctPanelRedBox.w, 800);
-    //     _rctPanelRedBox.h = std::max(_rctPanelRedBox.h, 600);
-    //     if (_rctPanelRedBox.w > 1024) {
-    //         _rctPanelRedBox.w = 1024;
-    //     }
-    //     if (_rctPanelRedBox.h > 1200) {
-    //         _rctPanelRedBox.h = 1200;
-    //     }
-    // }
-
+    
     _rctPanelRedBox.x = (_screenW - _rctPanelRedBox.w) / 2;
     _rctPanelRedBox.y = (_screenH - _rctPanelRedBox.h) / 2;
     _box_X = _rctPanelRedBox.x;
@@ -217,14 +196,6 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen,
 
     _p_ScreenBackbuffer = GFX_UTIL::SDL_CreateRGBSurface(
         _p_Screen->w, _p_Screen->h, 32, 0, 0, 0, 0);
-
-    // _p_ScreenTexture = SDL_CreateTexture(pRenderer, SDL_PIXELFORMAT_ARGB8888,
-    //                                      SDL_TEXTUREACCESS_STREAMING,
-    //                                      _p_Screen->w, _p_Screen->h);
-    // if (_p_ScreenTexture == NULL) {
-    //     return ERR_UTIL::ErrorCreate("MenuMgr: Cannot create texture: %s\n",
-    //                                  SDL_GetError());
-    // }
 
     _p_fontAriblk = pGameSettings->GetFontAriblk();
     _p_fontVera = pGameSettings->GetFontVera();
@@ -248,17 +219,10 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen,
     }
     TTF_SetFontStyle(_p_fontVeraUnderscore, TTF_STYLE_UNDERLINE);
     SDL_Rect rctBt1;
-    // if (pGameSettings->NeedScreenMagnify()) {
-    //     rctBt1.h = 56;
-    //     rctBt1.w = 200;
-    //     rctBt1.y = _p_Screen->h - rctBt1.h - 50;
-    //     rctBt1.x = _p_Screen->w - rctBt1.w - 90;
-    // } else {
     rctBt1.h = 28;
     rctBt1.w = 150;
     rctBt1.y = _p_Screen->h - rctBt1.h - 20;
     rctBt1.x = _p_Screen->w - rctBt1.w - 20;
-    //}
     _p_homeUrl = new LabelLinkGfx();
     ClickCb cbNUll = ClickCb{.tc = NULL, .self = NULL};
     _p_homeUrl->Initialize(&rctBt1, _p_ScreenBackbuffer, _p_fontVeraUnderscore,
@@ -269,17 +233,10 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen,
 
     // label version
     _p_LabelVersion = new LabelGfx();
-    // if (pGameSettings->NeedScreenMagnify()) {
-    //     rctBt1.h = 56;
-    //     rctBt1.w = 200;
-    //     rctBt1.y = _p_homeUrl->PosY() - 60;
-    //     rctBt1.x = _p_homeUrl->PosX();
-    // } else {
     rctBt1.h = 28;
     rctBt1.w = 150;
     rctBt1.y = _p_homeUrl->PosY() - 20;
     rctBt1.x = _p_homeUrl->PosX();
-    //}
     _p_LabelVersion->Initialize(&rctBt1, _p_ScreenBackbuffer, _p_fontVera);
     _p_LabelVersion->SetState(LabelGfx::INVISIBLE);
     _p_LabelVersion->SetWindowText(g_lpszVersion);
@@ -324,9 +281,6 @@ LPErrInApp MenuMgr::drawStaticScene() {
     // header bar
     int hbarOffset = 0;
     int hbar = 46;
-    // if (_p_GameSettings->NeedScreenMagnify()) {
-    //     hbar = 65;
-    // }
     GFX_UTIL::FillRect(_p_ScreenBackbuffer, _box_X, _box_Y - (2 + hbarOffset),
                        _rctPanelRedBox.w, hbar, colorBarTitle);
     // wire
@@ -368,9 +322,6 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     int minIntraOffsetY = 80;
     intraOffset = std::min(minIntraOffsetY, intraOffset);
     LPLanguages pLanguages = _p_GameSettings->GetLanguageMan();
-    // if (_p_GameSettings->NeedScreenMagnify()) {
-    //     intraOffset += 50;
-    // }
     if (_rctPanelRedBox.h <= 600) {
         morePlaceY = 0;
     }
@@ -549,9 +500,6 @@ LPErrInApp MenuMgr::HandleRootMenuEvent(SDL_Event* pEvent, const SDL_Point& targ
         if (_ignoreMouseEvent) {
             return NULL;
         }
-        // SDL_Point motionLocation;
-        // motionLocation.x = //(int)pEvent->motion.x;
-        // motionLocation.y = //(int)pEvent->motion.y;
 
         MenuItemBox mouseInfoBox;
         if (g_MenuItemBoxes.IsPointInside(targetPos, mouseInfoBox)) {
@@ -571,9 +519,6 @@ LPErrInApp MenuMgr::HandleRootMenuEvent(SDL_Event* pEvent, const SDL_Point& targ
             return NULL;
         }
         MenuItemBox mouseInfoBox;
-        // SDL_Point clickLocation;
-        // clickLocation.x = (int)pEvent->button.x;
-        // clickLocation.y = (int)pEvent->button.y;
 
         if (g_MenuItemBoxes.IsPointInside(targetPos, mouseInfoBox)) {
             _focusedMenuItem = mouseInfoBox.MenuItem;
@@ -633,10 +578,6 @@ LPErrInApp MenuMgr::drawMenuText(SDL_Surface* psurf, const char* text, int x,
 }
 
 void MenuMgr::updateTextureAsFlipScreen() {
-    // SDL_UpdateTexture(_p_ScreenTexture, NULL, _p_Screen->pixels,
-    //                   _p_Screen->pitch);
-    // SDL_RenderTexture(_p_sdlRenderer, _p_ScreenTexture, NULL, NULL);
-    // SDL_RenderPresent(_p_sdlRenderer);
     (_fnUpdateScreen.tc)->UpdateScreen(_fnUpdateScreen.self, _p_Screen);
 }
 
