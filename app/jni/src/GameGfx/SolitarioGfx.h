@@ -193,7 +193,7 @@ class SolitarioGfx {
     LPErrInApp handleGameLoopFingerUpEvent(SDL_Event* pEvent);
     LPErrInApp handleGameLoopFingerMotion(SDL_Event* pEvent);
     LPErrInApp singleTapOrLeftClick(SDL_Point& pt);
-    LPErrInApp doubleTapOrRightClick(SDL_Point& pt, bool& isDoubleClick);
+    LPErrInApp doubleTapOrRightClick(SDL_Point& pt);
     LPErrInApp endOfDragAndCheckForVictory();
     LPErrInApp checkForVictory();
     void handleGameLoopMouseMoveEvent(SDL_Event* pEvent, const SDL_Point& targetPos);
@@ -212,6 +212,7 @@ class SolitarioGfx {
     void bonusScore();
     void showYesNoMsgBox(LPCSTR strText);
     void showOkMsgBox(LPCSTR strText);
+    LPErrInApp clickOnDeckStock(CardRegionGfx* pCardRegSrc);
 
    private:
     CardStackGfx _dragStack;

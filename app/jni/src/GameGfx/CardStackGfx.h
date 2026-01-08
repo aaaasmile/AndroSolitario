@@ -5,15 +5,15 @@
 #include <time.h>
 
 #include <algorithm>
-#include <vector>
 #include <random>
+#include <vector>
 
 #include "CardGfx.h"
 #include "DeckType.h"
 #include "ErrorInfo.h"
 
 class CardStackGfx {
-public:
+   public:
     LPErrInApp NewDeck(DeckType& deckType, int widthEmpty, int heightEmpty);
     void Shuffle();
     void Clear() { _vct_lpCardGfx.clear(); }
@@ -36,11 +36,17 @@ public:
     LPCardGfx GetCard(int index);
 
     void SetCardsFaceUp(bool bVal);
-    LPCardGfx First() { return _vct_lpCardGfx[0]; }
+    LPCardGfx First() {
+        SDL_assert(_vct_lpCardGfx.size() > 0);
+        return _vct_lpCardGfx[0];
+    }
     LPCardGfx Last() { return _vct_lpCardGfx[_vct_lpCardGfx.size() - 1]; }
-    LPCardGfx Item(int ix) { return _vct_lpCardGfx[ix]; }
+    LPCardGfx Item(int ix) {
+        SDL_assert(_vct_lpCardGfx.size() > ix);
+        return _vct_lpCardGfx[ix];
+    }
 
-private:
+   private:
     std::vector<LPCardGfx> _vct_lpCardGfx;
     DeckType _deckType;
     int _widthEmpty;

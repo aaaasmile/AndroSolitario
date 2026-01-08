@@ -137,7 +137,7 @@ LPErrInApp SolitarioGfx::Initialize(SDL_Surface* pScreen,
     _p_Screen = pScreen;
     _fnUpdateScreen = fnUpdateScreen;
     _p_Window = pWindow;
-    
+
     _p_AlphaDisplay = GFX_UTIL::SDL_CreateRGBSurface(_p_Screen->w, _p_Screen->h,
                                                      32, 0, 0, 0, 0);
     if (_p_AlphaDisplay == NULL) {
@@ -173,11 +173,12 @@ LPErrInApp SolitarioGfx::Initialize(SDL_Surface* pScreen,
     int bth = 34;
     int btoffsetY = 70;
     int btintraX = 30;
-    int soundIntraX = 70; // extra space for volume control (not yet implemented)
+    int soundIntraX =
+        70;  // extra space for volume control (not yet implemented)
 
     int buttons_w = 2 * btw + btwSymb + 2 * btintraX + soundIntraX;
-    int btposx = (_p_Screen->w - buttons_w) / 2 ;
-    
+    int btposx = (_p_Screen->w - buttons_w) / 2;
+
     // Sound Toggle
     rctBt1.w = btwSymb;
     rctBt1.h = bth;
@@ -188,8 +189,7 @@ LPErrInApp SolitarioGfx::Initialize(SDL_Surface* pScreen,
     _p_BtToggleSound->InitializeAsSymbol(&rctBt1, _p_Screen,
                                          pGameSettings->GetFontSymb(),
                                          MYIDTOGGLESOUND, cbBtToggleSound);
-    _p_BtToggleSound->SetVisibleState(ButtonGfx::INVISIBLE);    
-
+    _p_BtToggleSound->SetVisibleState(ButtonGfx::INVISIBLE);
 
     // button Quit
     ClickCb cbBtQuit = prepClickQuitCb();
@@ -208,7 +208,7 @@ LPErrInApp SolitarioGfx::Initialize(SDL_Surface* pScreen,
     _p_BtNewGame->Initialize(&rctBt1, _p_Screen, _p_FontBigText, MYIDNEWGAME,
                              cbBtNewGame);
     _p_BtNewGame->SetVisibleState(ButtonGfx::INVISIBLE);
-    
+
     TRACE_DEBUG("Solitario initialized \n");
     return NULL;
 }
@@ -472,7 +472,9 @@ void SolitarioGfx::DoDrag(int x, int y) {
 LPCardRegionGfx SolitarioGfx::DoDrop() { return DoDrop(NULL); }
 
 LPCardRegionGfx SolitarioGfx::DoDrop(LPCardRegionGfx pDestRegion) {
-    TRACE_DEBUG("DoDrop -  start \n");
+    TRACE_DEBUG("[DoDrop] -  start, PileInfo.x = %d, PileInfo.y \n",
+                _dragPileInfo.x, _dragPileInfo.y);
+    SDL_assert(_dragPileInfo.x >= -g_CardWidth);
     LPCardStackGfx pDestStack;
     LPCardRegionGfx pBestRegion;
 
@@ -982,14 +984,12 @@ LPErrInApp SolitarioGfx::handleGameLoopFingerDownEvent(SDL_Event* pEvent) {
     LPGameSettings pGameSettings = GameSettings::GetSettings();
     pGameSettings->GetTouchPoint(pEvent->tfinger, &pt);
     LPErrInApp err;
-    bool isDoubleClick;
     if (_lastUpTimestamp + _doubleTapWait > now_time) {
-        err = doubleTapOrRightClick(pt, isDoubleClick);
+        err = doubleTapOrRightClick(pt);
         if (err != NULL) {
             return NULL;
         }
-    };
-    if (!isDoubleClick) {
+    } else {
         err = singleTapOrLeftClick(pt);
         if (err != NULL) {
             return NULL;
@@ -1019,7 +1019,14 @@ LPErrInApp SolitarioGfx::handleGameLoopFingerMotion(SDL_Event* pEvent) {
     return NULL;
 }
 
-LPErrInApp SolitarioGfx::handleGameLoopMouseDownEvent(SDL_Event* pEvent, const SDL_Point& targetPos) {
+LPErrInApp SolitarioGfx::handleGameLoopMouseDownEvent(
+    SDL_Event* pEvent, const SDL_Point& targetPos) {
+    if (_startdrag) {
+        TRACE_DEBUG(
+            "Ignore Mousedown because is drag ongoing. Wait for drag end with "
+            "mouse up \n");
+        return NULL;
+    }
     if (pEvent->button.button == SDL_BUTTON_LEFT) {
         Uint64 now_time = SDL_GetTicks();
         _ptLast.x = targetPos.x;
@@ -1038,44 +1045,59 @@ LPErrInApp SolitarioGfx::handleGameLoopMouseDownEvent(SDL_Event* pEvent, const S
     return NULL;
 }
 
-LPErrInApp SolitarioGfx::doubleTapOrRightClick(SDL_Point& pt,
-                                               bool& isDoubleClick) {
+LPErrInApp SolitarioGfx::doubleTapOrRightClick(SDL_Point& pt) {
     TRACE_DEBUG("doubleTapOrRightClick recognized\n");
     LPErrInApp err;
-    CardRegionGfx* srcReg;
     bool isInitDrag = false;
-    isDoubleClick = false;
 
-    srcReg = SelectRegionOnPoint(pt.x, pt.y);
-    if (srcReg == NULL)
+    CardRegionGfx* pCardRegSrc = SelectRegionOnPoint(pt.x, pt.y);
+    if (pCardRegSrc == NULL) {
         return NULL;
-    LPCardGfx pCard = srcReg->GetCard(srcReg->Size() - 1);
+    }
+    LPCardGfx pCard = pCardRegSrc->GetCard(pCardRegSrc->Size() - 1);
     if (pCard == NULL) {
         return NULL;
     }
     if (_p_DropRegionForDrag != NULL) {
-        TRACE_DEBUG("Drag/Drop already ongoing \n");
+        TRACE_DEBUG(
+            "[doubleTapOrRightClick] WARN Drag/Drop already ongoing "
+            "(DropRegionForDrag) \n");
+        return NULL;
+    }
+    if (_p_CardStackForDrag != NULL) {
+        TRACE_DEBUG(
+            "[doubleTapOrRightClick] WARN Drag/Drop already ongoing "
+            "(CardStackForDrag) \n");
         return NULL;
     }
 
-    if (((srcReg->RegionTypeId() == RegionType::RT_TABLEAU) ||
-         (srcReg->RegionTypeId() == RegionType::RT_DECKSTOCK_FACEUP)) &&
-        pCard->IsFaceUp() && srcReg->PtOnTop(pt.x, pt.y)) {
+    if (((pCardRegSrc->RegionTypeId() == RegionType::RT_TABLEAU) ||
+         (pCardRegSrc->RegionTypeId() == RegionType::RT_DECKSTOCK_FACEUP)) &&
+        pCard->IsFaceUp() && pCardRegSrc->PtOnTop(pt.x, pt.y)) {
         _p_DropRegionForDrag =
             FindDropRegion(RegionType::RT_ACE_FOUNDATION, pCard);
         if (_p_DropRegionForDrag == NULL) {
             return NULL;
         }
-        _p_CardStackForDrag = srcReg->PopStack(1);
+        _p_CardStackForDrag = pCardRegSrc->PopStack(1);
         if (_p_CardStackForDrag == NULL) {
             return NULL;
         }
-        err = InitDrag(_p_CardStackForDrag, -1, -1, isInitDrag, srcReg);
+        err = InitDrag(_p_CardStackForDrag, -1, -1, isInitDrag, pCardRegSrc);
         if (err != NULL) {
             return err;
         }
         _continueFnCb = &SolitarioGfx::InitDragAfterFromDoubleTap;
-        isDoubleClick = true;
+        TRACE_DEBUG("[doubleTapOrRightClick] is in process\n");
+        return NULL;
+    }
+    if (pCardRegSrc->RegionTypeId() == RegionType::RT_DECKSTOCK) {
+        TRACE_DEBUG(
+            "[doubleTapOrRightClick] on RT_DECKSTOCK is a single click\n");
+        err = clickOnDeckStock(pCardRegSrc);
+        if (err != NULL) {
+            return err;
+        }
     }
 
     return NULL;
@@ -1110,7 +1132,8 @@ LPErrInApp SolitarioGfx::InitDragAfterFromSingleTapA() {
         _isInitDrag = false;
     } else {
         TRACE_DEBUG(
-            "!![InitDragAfterFromSingleTapA]!! dragging is over, force drop\n");
+            "!![InitDragAfterFromSingleTapA]!! dragging is over, force "
+            "drop\n");
         DoDrop();
     }
     return NULL;
@@ -1123,7 +1146,10 @@ LPErrInApp SolitarioGfx::InitDragAfterFromSingleTapB() {
     _continueLamdaCb = [this]() -> LPErrInApp {
         Reverse(eRegionIx::DeckPile_Ix);
         InitCardCoords(eRegionIx::DeckPile_Ix);
-        delete _p_CardStackForDrag;
+        if (_p_CardStackForDrag != NULL) {
+            delete _p_CardStackForDrag;
+            _p_CardStackForDrag = NULL;
+        }
         updateBadScoreRedial();
         TRACE_DEBUG("InitDragAfterFromSingleTapB - drop end \n");
         return NULL;
@@ -1149,65 +1175,83 @@ LPErrInApp SolitarioGfx::InitDragAfterFromSingleTapC() {
 }
 
 LPErrInApp SolitarioGfx::singleTapOrLeftClick(SDL_Point& pt) {
-    TRACE_DEBUG("singleTapOrLeftClick in state %d\n", _state);
+    TRACE_DEBUG("[singleTapOrLeftClick] in state %d\n", _state);
     LPErrInApp err;
-    CardRegionGfx* srcReg;
+    CardRegionGfx* pCardRegSrc;
     bool isInitDrag = false;
 
-    srcReg = SelectRegionOnPoint(pt.x, pt.y);
-    if (srcReg == NULL) {
+    pCardRegSrc = SelectRegionOnPoint(pt.x, pt.y);
+    if (pCardRegSrc == NULL) {
         return NULL;
     }
 
-    if ((srcReg->RegionTypeId() == RegionType::RT_TABLEAU) &&
-        srcReg->PtOnTop(pt.x, pt.y)) {
-        int id = srcReg->Size() - 1;
-        if (!srcReg->IsCardFaceUp(id)) {
-            srcReg->SetCardFaceUp(true, id);
+    if ((pCardRegSrc->RegionTypeId() == RegionType::RT_TABLEAU) &&
+        pCardRegSrc->PtOnTop(pt.x, pt.y)) {
+        int id = pCardRegSrc->Size() - 1;
+        if (!pCardRegSrc->IsCardFaceUp(id)) {
+            pCardRegSrc->SetCardFaceUp(true, id);
             updateScoreOnTurnOverFaceDown();
         }
     }
 
-    if ((srcReg->RegionTypeId() == RegionType::RT_TABLEAU) ||
-        (srcReg->RegionTypeId() == RegionType::RT_DECKSTOCK_FACEUP) ||
-        (srcReg->RegionTypeId() == RegionType::RT_ACE_FOUNDATION)) {
+    if ((pCardRegSrc->RegionTypeId() == RegionType::RT_TABLEAU) ||
+        (pCardRegSrc->RegionTypeId() == RegionType::RT_DECKSTOCK_FACEUP) ||
+        (pCardRegSrc->RegionTypeId() == RegionType::RT_ACE_FOUNDATION)) {
         // clicked on region that can do dragging
-        err = InitDrag(pt.x, pt.y, isInitDrag, srcReg);
+        err = InitDrag(pt.x, pt.y, isInitDrag, pCardRegSrc);
         if (err != NULL) {
             return err;
         }
         _isInitDrag = isInitDrag;
         _continueFnCb = &SolitarioGfx::InitDragAfterFromSingleTapA;
-    } else if (srcReg->RegionTypeId() == RegionType::RT_DECKSTOCK) {
-        if (srcReg->IsEmpty() && !IsRegionEmpty(DeckFaceUp)) {
-            // from deckfaceup back to deckpile: drag and drop to deckpile
-            // (redial)
-            _p_CardStackForDrag = PopStackFromRegion(
-                eRegionIx::DeckFaceUp, RegionSize(eRegionIx::DeckFaceUp));
-            _p_CardStackForDrag->SetCardsFaceUp(false);
-            err = InitDrag(_p_CardStackForDrag, -1, -1, isInitDrag, srcReg);
+    } else if (pCardRegSrc->RegionTypeId() == RegionType::RT_DECKSTOCK) {
+        if (_p_CardStackForDrag == NULL) {
+            err = clickOnDeckStock(pCardRegSrc);
             if (err != NULL) {
                 return err;
             }
-            _continueFnCb = &SolitarioGfx::InitDragAfterFromSingleTapB;
-        } else if (!srcReg->IsEmpty()) {
-            // the next card goes to the deck face up region: drag and drop
-            // to deck face up
-            _p_CardStackForDrag = PopStackFromRegion(eRegionIx::DeckPile_Ix, 1);
-            _p_CardStackForDrag->SetCardsFaceUp(true);
-            err = InitDrag(_p_CardStackForDrag, -1, -1, isInitDrag, srcReg);
-            if (err != NULL) {
-                return err;
-            }
-            _continueFnCb = &SolitarioGfx::InitDragAfterFromSingleTapC;
+
         } else {
-            TRACE("No more card on the pile deck\n");
+            TRACE_DEBUG(
+                "[singleTapOrLeftClick] WARN Tap on RT_DECKSTOCK ignored "
+                "because drag is ongoing \n");
         }
     }
     return NULL;
 }
 
-void SolitarioGfx::handleGameLoopMouseMoveEvent(SDL_Event* pEvent, const SDL_Point& targetPos) {
+LPErrInApp SolitarioGfx::clickOnDeckStock(CardRegionGfx* pCardRegSrc) {
+    bool isInitDrag = false;
+    LPErrInApp err = NULL;
+    if (pCardRegSrc->IsEmpty() && !IsRegionEmpty(eRegionIx::DeckFaceUp)) {
+        // from deckfaceup back to deckpile: drag and drop to deckpile
+        // (redial)
+        _p_CardStackForDrag = PopStackFromRegion(
+            eRegionIx::DeckFaceUp, RegionSize(eRegionIx::DeckFaceUp));
+        _p_CardStackForDrag->SetCardsFaceUp(false);
+        err = InitDrag(_p_CardStackForDrag, -1, -1, isInitDrag, pCardRegSrc);
+        if (err != NULL) {
+            return err;
+        }
+        _continueFnCb = &SolitarioGfx::InitDragAfterFromSingleTapB;
+    } else if (!pCardRegSrc->IsEmpty()) {
+        // the next card goes to the deck face up region: drag and drop
+        // to deck face up
+        _p_CardStackForDrag = PopStackFromRegion(eRegionIx::DeckPile_Ix, 1);
+        _p_CardStackForDrag->SetCardsFaceUp(true);
+        err = InitDrag(_p_CardStackForDrag, -1, -1, isInitDrag, pCardRegSrc);
+        if (err != NULL) {
+            return err;
+        }
+        _continueFnCb = &SolitarioGfx::InitDragAfterFromSingleTapC;
+    } else {
+        TRACE("No more card on the pile deck\n");
+    }
+    return NULL;
+}
+
+void SolitarioGfx::handleGameLoopMouseMoveEvent(SDL_Event* pEvent,
+                                                const SDL_Point& targetPos) {
     if (pEvent->motion.state == SDL_BUTTON_MASK(1) && _startdrag) {
         // TRACE_DEBUG("handleGameLoopMouseMoveEvent - DoDrag trigger \n");
         DoDrag(targetPos.x, targetPos.y);
@@ -1221,7 +1265,8 @@ void SolitarioGfx::handleGameLoopMouseMoveEvent(SDL_Event* pEvent, const SDL_Poi
     }
 }
 
-LPErrInApp SolitarioGfx::handleGameLoopMouseUpEvent(SDL_Event* pEvent, const SDL_Point& targetPos) {
+LPErrInApp SolitarioGfx::handleGameLoopMouseUpEvent(
+    SDL_Event* pEvent, const SDL_Point& targetPos) {
     TRACE_DEBUG("handleGameLoopMouseUpEvent \n");
     _isInitDrag = false;
     _p_BtQuit->MouseUp(pEvent, targetPos);
@@ -1252,6 +1297,10 @@ LPErrInApp SolitarioGfx::endOfDragAndCheckForVictory() {
             LPErrInApp err = checkForVictory();
             if (err != NULL) {
                 return err;
+            }
+            if (_p_CardStackForDrag != NULL) {
+                delete _p_CardStackForDrag;
+                _p_CardStackForDrag = NULL;
             }
             TRACE_DEBUG("endOfDragAndCheckForVictory - drop end \n");
             return NULL;
@@ -1287,7 +1336,8 @@ LPErrInApp SolitarioGfx::checkForVictory() {
     return NULL;
 }
 
-LPErrInApp SolitarioGfx::HandleEvent(SDL_Event* pEvent, const SDL_Point& targetPos) {
+LPErrInApp SolitarioGfx::HandleEvent(SDL_Event* pEvent,
+                                     const SDL_Point& targetPos) {
     LPErrInApp err = NULL;
     if (isInVictoryState()) {
         switch (pEvent->type) {
@@ -1316,7 +1366,7 @@ LPErrInApp SolitarioGfx::HandleEvent(SDL_Event* pEvent, const SDL_Point& targetP
         _p_MsgBox->HandleEvent(pEvent, targetPos);
         return NULL;
     }
-    if (_state == eState::IN_ZOOM) {
+    if (_state == eState::IN_ZOOM || _state == eState::IN_ZOOM_TERMINATED) {
         return NULL;
     }
     if (_state == eState::FADING_OUT || _state == eState::WAIT_FOR_FADING) {
@@ -1365,7 +1415,15 @@ LPErrInApp SolitarioGfx::HandleEvent(SDL_Event* pEvent, const SDL_Point& targetP
 #endif
 #if HASMOUSE
         case SDL_EVENT_MOUSE_BUTTON_DOWN:
-            TRACE_DEBUG("Event SDL_EVENT_MOUSE_BUTTON_DOWN - start\n");
+            if (_state == eState::INITDRAG_STEP1 ||
+                _state == eState::INITDRAG_STEP2 ||
+                _state == eState::INITDRAG_AFTER) {
+                return NULL;
+            }
+            TRACE_DEBUG(
+                "Event SDL_EVENT_MOUSE_BUTTON_DOWN - start (state %d, "
+                "_startdrag = %d)\n",
+                _state, _startdrag);
             err = handleGameLoopMouseDownEvent(pEvent, targetPos);
             // TRACE_DEBUG("Event SDL_EVENT_MOUSE_BUTTON_DOWN - end
             // \n");
@@ -1436,7 +1494,8 @@ LPErrInApp SolitarioGfx::HandleIterate(bool& done) {
             _p_DropRegionForDrag = NULL;
         } else {
             TRACE_DEBUG(
-                "[SolitarioGfx - Iterate] nothing to do after the zoom (next "
+                "[SolitarioGfx - Iterate] nothing to do after the zoom "
+                "(next "
                 "state %d) \n",
                 _state);
         }
@@ -1456,17 +1515,13 @@ LPErrInApp SolitarioGfx::HandleIterate(bool& done) {
             return err;
     }
 
-    if (_state == SolitarioGfx::IN_SINGLE_TAPCLICK) {
-        _state = SolitarioGfx::IN_GAME;
-        singleTapOrLeftClick(_ptLast);
-    }
-
     if (_state == SolitarioGfx::IN_DOUBLE_TAPCLICK) {
-        TRACE_DEBUG("[SolitarioGfx - Iterate] doble tap click state \n");
-        bool isDoubleClick = false;
+        TRACE_DEBUG("[SolitarioGfx - Iterate] double tap click state \n");
         _state = SolitarioGfx::IN_GAME;
-        doubleTapOrRightClick(_ptLast, isDoubleClick);
-        if (!isDoubleClick) {
+        doubleTapOrRightClick(_ptLast);
+    } else {
+        if (_state == SolitarioGfx::IN_SINGLE_TAPCLICK) {
+            _state = SolitarioGfx::IN_GAME;
             singleTapOrLeftClick(_ptLast);
         }
     }
@@ -1585,7 +1640,7 @@ LPErrInApp SolitarioGfx::Show() {
     int yOverlapCard = 32;
     int xOffsetIntraStack = 17;
     int xOffsetFaceUp = 25;
-    
+
     // index 0 (deck with face down)
     CreateRegion(RT_DECKSTOCK,           // ID
                  CRD_VISIBLE | CRD_3D,   // attributes

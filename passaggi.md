@@ -615,7 +615,7 @@ Questi sono i todo della conversione in Android.
 - Il nome del giocatore deve essere cambiato con le opzioni. Come default può andare bene usare env, 
        ma non va settato nella funzione save high score. [DONE]
 - Il bottone dello stop della musica va messo come icona. [DONE]
-- Il font della message box è troppo piccolo
+- Il font della message box è troppo piccolo [DONE]
 
 ## Manca in Windows
 - Deploy per con l'installer
