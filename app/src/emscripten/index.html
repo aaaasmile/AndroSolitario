@@ -208,14 +208,17 @@
     const aspectScreen = window.screen.width / window.screen.height;
     const aspectOuterScreen = window.outerWidth / window.outerHeight;
     console.log("aspect ratio are: ", aspectScreen, aspectOuterScreen);
+    let type = 'STD';
     if (aspectScreen < 0.75 || aspectOuterScreen < 0.75) {
       Module.setNarrowPortraitMode();
-    } else if (aspectScreen < 1.1 || aspectOuterScreen < 1.1) {
+      type = 'NARROW';
+    } else if ((aspectScreen < 1.1 || aspectOuterScreen < 1.1) && (aspectScreen < 1.9)) {
       Module.setWidePortraitMode();
+      type = 'WIDE';
     } else {
       console.log("no special screen recognized, use the default (no extra arguments provided)");
-      infoEle.textContent = 'Default display for w: ' + window.screen.width + ' h: ' + window.screen.height + ' outer_w: ' + window.outerWidth + ' outer_h: ' + window.outerHeight;
     }
+    infoEle.textContent = 'display ' + type + ' for w: ' + window.screen.width + ' h: ' + window.screen.height + ' outer_w: ' + window.outerWidth + ' outer_h: ' + window.outerHeight;
     window.onerror = function (event) {
       Module.setStatus('Exception thrown, see JavaScript console');
       spinnerElement.style.display = 'none';
@@ -226,15 +229,4 @@
   </script>
   <script async type="text/javascript" src="solitario_3.0.9.js?v=309"></script>
 </body>
-<footer>
-  <p>
-    Aggiornato:
-    <time datetime="2026-01-08 20:59">08 Gennaio 2026 - 20:59</time>
-  </p>
-  <nav>
-    <a href="https://invido.it/">Invido</a>
-  </nav>
-  <p class="copyright">© 2004 - 2026 - IgorRun for <em>invido.it</em>. All rights reserved.</p>
-</footer>
-
 </html>

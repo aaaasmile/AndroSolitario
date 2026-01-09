@@ -413,7 +413,7 @@ LPErrInApp AppGfx::createWindow() {
         int w, h;
         SDL_GetWindowSize(_p_Window, &w, &h);
         TRACE_DEBUG(
-            "[createWindow] after creation, the size is w: %d, h: %d \n", w, h);
+            "[createWindow] in full screen, the size is w: %d, h: %d \n", w, h);
         err = selectLayout(w, h);
         if (err != NULL) {
             return err;
@@ -1019,6 +1019,9 @@ void AppGfx::ParseCmdLine(int argc, char* argv[], SDL_AppResult& res) {
             TRACE("[ParseCmdLine] wide portrait recognized \n");
             LPGameSettings pGameSettings = GameSettings::GetSettings();
             pGameSettings->SetPortraitWideMode(true);
+        } else if (strcmp(argv[i], "--fullscreen") == 0) {
+            TRACE("[ParseCmdLine] fullscreen recognized \n");
+            _fullScreen = true;
         } else {
             TRACE("[ParseCmdLine] ignore unknown option: %s\n", argv[i]);
         }
