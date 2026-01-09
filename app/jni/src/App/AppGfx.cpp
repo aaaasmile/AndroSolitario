@@ -137,11 +137,17 @@ static void resolutionMgr_InitWidePortrait(ResolutionMgr& rm) {
     resolutionMgr_InitWithDisplayBounds(rm);
 }
 
+static void resolutionMgr_calcScale(ResolutionMgr& rm, int w, int h){
+    float scale_x = (float)w / (float)rm.targetWidth;
+    float scale_y = (float)h / (float)rm.targetHeight;
+    rm.scale = std::min(scale_x, scale_y);
+}
+
 static void resolutionMgr_SetNarrowPortrait(ResolutionMgr& rm, int w, int h) {
     TRACE_DEBUG("[SetNarrowPortrait] with w: %d, h: %d \n", w, h);
     rm.targetWidth = 720;
     rm.targetHeight = 1280;
-
+    resolutionMgr_calcScale(rm, w, h);
     resolutionMgr_UpdateViewport(rm, w, h);
 }
 
@@ -149,10 +155,7 @@ static void resolutionMgr_SetWidePortrait(ResolutionMgr& rm, int w, int h) {
     TRACE_DEBUG("[SetWidePortrait] with w: %d, h: %d \n", w, h);
     rm.targetWidth = 800;
     rm.targetHeight = 1024;
-    float scale_x = (float)w / (float)rm.targetWidth;
-    float scale_y = (float)h / (float)rm.targetHeight;
-    rm.scale = std::min(scale_x, scale_y);
-
+    resolutionMgr_calcScale(rm, w, h);
     resolutionMgr_UpdateViewport(rm, w, h);
 }
 
@@ -160,7 +163,7 @@ static void resolutionMgr_SetLandscape(ResolutionMgr& rm, int w, int h) {
     TRACE_DEBUG("[SetLandscape] with w: %d, h: %d \n", w, h);
     rm.targetWidth = 1024;
     rm.targetHeight = 768;
-
+    resolutionMgr_calcScale(rm, w, h);
     resolutionMgr_UpdateViewport(rm, w, h);
 }
 
