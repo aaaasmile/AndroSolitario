@@ -31,8 +31,6 @@
     canvas.emscripten {
       border: 0px none;
       background-color: black;
-      width: 70vw;
-      height: 70vh;
     }
 
     footer {
@@ -126,7 +124,6 @@
       height: 20px;
       width: 300px;
     }
-
   </style>
 </head>
 
@@ -152,9 +149,13 @@
       preRun: [],
       postRun: [],
       arguments: ['--language', 'italian'],
-      setPortraitMode: function () {
-        console.log('Set protrait mode');
-        Module.arguments.push('--fullportrait', '--web');
+      setNarrowPortraitMode: function () {
+        console.log('Set Narrow portrait mode argument');
+        Module.arguments.push('--narrowportrait');
+      },
+      setWidePortraitMode: function () {
+        console.log('Set Wide portrait mode argument');
+        Module.arguments.push('--wideportrait');
       },
       print: (function () {
         return function (text) {
@@ -202,14 +203,18 @@
     };
     Module.setStatus('Downloading...');
 
-    console.log('windows dim ', window.screen.width, window.screen.height)
-    if (((window.screen.height > window.screen.width) && (window.screen.height > 600)) ||
-      ((window.outerHeight > window.outerWidth) && (window.outerHeight > 600))) {
-      Module.setPortraitMode();
-      infoEle.textContent = 'Portrait ' + window.screen.width + ' h: ' + window.screen.height + ' oh: ' + window.outerHeight;
+    console.log('windows dim ', window.screen.width, window.screen.height);
+    console.log('OuterScreen dim ', window.outerWidth, window.outerHeight);
+    const aspectScreen = window.screen.width / window.screen.height;
+    const aspectOuterScreen = window.outerWidth / window.outerHeight;
+    console.log("aspect ratio are: ", aspectScreen, aspectOuterScreen);
+    if (aspectScreen < 0.75 || aspectOuterScreen < 0.75) {
+      Module.setNarrowPortraitMode();
+    } else if (aspectScreen < 1.1 || aspectOuterScreen < 1.1) {
+      Module.setWidePortraitMode();
     } else {
-      console.log("with this display I suggest: Standard mode");
-      infoEle.textContent = 'Standard ' + window.screen.width + ' h: ' + window.screen.height + ' ow ' + window.outerWidth + ' oh: ' + window.outerHeight;
+      console.log("no special screen recognized, use the default (no extra arguments provided)");
+      infoEle.textContent = 'Default display for w: ' + window.screen.width + ' h: ' + window.screen.height + ' outer_w: ' + window.outerWidth + ' outer_h: ' + window.outerHeight;
     }
     window.onerror = function (event) {
       Module.setStatus('Exception thrown, see JavaScript console');

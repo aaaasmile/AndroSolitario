@@ -137,7 +137,7 @@ static void resolutionMgr_InitWidePortrait(ResolutionMgr& rm) {
     resolutionMgr_InitWithDisplayBounds(rm);
 }
 
-static void resolutionMgr_calcScale(ResolutionMgr& rm, int w, int h){
+static void resolutionMgr_calcScale(ResolutionMgr& rm, int w, int h) {
     float scale_x = (float)w / (float)rm.targetWidth;
     float scale_y = (float)h / (float)rm.targetHeight;
     rm.scale = std::min(scale_x, scale_y);
@@ -393,18 +393,11 @@ LPErrInApp AppGfx::createWindow() {
         resolutionMgr_InitLandscape(g_ResolutionMgr);
     }
 
-    // TRACE("[createWindow] create window initially with width %d, height
-    // %d\n",
-    //       g_ResolutionMgr.displayWidth, g_ResolutionMgr.displayHeight);
-    // _p_Window = SDL_CreateWindow(_p_GameSettings->GameName.c_str(),
-    //                              g_ResolutionMgr.displayWidth,
-    //                              g_ResolutionMgr.displayHeight, flagwin);
-
-    TRACE("[createWindow] create window initially with width %d, height %d\n",
-          g_ResolutionMgr.targetWidth, g_ResolutionMgr.targetHeight);
+    TRACE("[createWindow] create window initially with width %d, height% d\n ",
+          g_ResolutionMgr.displayWidth, g_ResolutionMgr.displayHeight);
     _p_Window = SDL_CreateWindow(_p_GameSettings->GameName.c_str(),
-                                 g_ResolutionMgr.targetWidth,
-                                 g_ResolutionMgr.targetHeight, flagwin);
+                                 g_ResolutionMgr.displayWidth,
+                                 g_ResolutionMgr.displayHeight, flagwin);
 
     if (_p_Window == NULL) {
         return ERR_UTIL::ErrorCreate("Error SDL_CreateWindow: %s\n",
@@ -415,14 +408,23 @@ LPErrInApp AppGfx::createWindow() {
         return ERR_UTIL::ErrorCreate("Cannot create renderer: %s\n",
                                      SDL_GetError());
     }
-
-    int w, h;
-    SDL_GetWindowSize(_p_Window, &w, &h);
-    TRACE_DEBUG("[createWindow] after creation, the size is w: %d, h: %d \n", w,
-                h);
-    LPErrInApp err = selectLayout(w, h);
-    if (err != NULL) {
-        return err;
+    LPErrInApp err = NULL;
+    if (_fullScreen) {
+        int w, h;
+        SDL_GetWindowSize(_p_Window, &w, &h);
+        TRACE_DEBUG(
+            "[createWindow] after creation, the size is w: %d, h: %d \n", w, h);
+        err = selectLayout(w, h);
+        if (err != NULL) {
+            return err;
+        }
+    } else {
+        _p_GameSettings->SetDisplaySize(g_ResolutionMgr.displayWidth,
+                                        g_ResolutionMgr.displayHeight);
+        err = createScreenLayout();
+        if (err != NULL) {
+            return err;
+        }
     }
 
     TRACE_DEBUG("createWindow - Success\n");
@@ -431,6 +433,8 @@ LPErrInApp AppGfx::createWindow() {
 
 LPErrInApp AppGfx::selectLayout(int w, int h) {
     TRACE_DEBUG("[selectLayout] with w: %d, h: %d \n", w, h);
+    // this function has issues, resize is ugly and mouse is not precise
+
     int oldtargetHeight = g_ResolutionMgr.targetHeight;
     int oldtargetWidth = g_ResolutionMgr.targetWidth;
     float aspect = (float)w / (float)h;
@@ -456,7 +460,7 @@ LPErrInApp AppGfx::selectLayout(int w, int h) {
 }
 
 LPErrInApp AppGfx::createScreenLayout() {
-    TRACE_DEBUG("[createScreenLayout] create the Screen target");
+    TRACE_DEBUG("[createScreenLayout] create the Screen target \n");
 
     if (_p_Screen != NULL) {
         SDL_DestroySurface(_p_Screen);
@@ -480,6 +484,7 @@ LPErrInApp AppGfx::createScreenLayout() {
         return ERR_UTIL::ErrorCreate("Error SDL_CreateTexture: %s\n",
                                      SDL_GetError());
     }
+    TRACE_DEBUG("[createScreenLayout] - end \n");
     return NULL;
 }
 
@@ -522,7 +527,7 @@ void AppGfx::terminate() {
 }
 
 LPErrInApp AppGfx::loadProfile() {
-    bool dirCreated;
+    bool dirCreated = false;
     char dirpath[PATH_MAX];
     snprintf(dirpath, sizeof(dirpath), "%s", GAMESET::GetHomeFolder());
     LPErrInApp err = GAMESET::CreateHomeFolderIfNotExists(dirCreated);

@@ -20,7 +20,7 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[]) {
     }
     LPErrInApp err = g_app->Init();
     if (err != NULL) {
-        TRACE("Fatal: %s\n", err->ErrorText.c_str());
+        TRACE("[SDL_AppInit] Fatal: %s\n", err->ErrorText.c_str());
         return SDL_APP_FAILURE;
     }
     TRACE("[SDL_AppInit] - end \n");
@@ -32,7 +32,7 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event) {
     SDL_AppResult res;
     LPErrInApp err = g_app->MainLoopEvent(event, res);
     if (err != NULL) {
-        TRACE("Fatal: %s\n", err->ErrorText.c_str());
+        TRACE("[SDL_AppEvent] Fatal: %s\n", err->ErrorText.c_str());
         return SDL_APP_FAILURE;
     }
     return res;
@@ -41,7 +41,7 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event) {
 SDL_AppResult SDL_AppIterate(void* appstate) {
     LPErrInApp err = g_app->MainLoopIterate();
     if (err != NULL) {
-        TRACE("Fatal: %s\n", err->ErrorText.c_str());
+        TRACE("[SDL_AppIterate] Fatal: %s\n", err->ErrorText.c_str());
         return SDL_APP_FAILURE;
     }
     return SDL_APP_CONTINUE;

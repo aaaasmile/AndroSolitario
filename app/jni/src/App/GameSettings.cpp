@@ -362,6 +362,9 @@ const char* GAMESET::GetHomeFolder() {
 
 LPErrInApp GAMESET::CreateHomeFolderIfNotExists(bool& dirCreated) {
     dirCreated = false;
+#if PLATFORM_EMS
+    return NULL;
+#endif
     struct stat st = {0};
     int io_res;
     GetHomeFolder();
