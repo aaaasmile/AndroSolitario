@@ -31,8 +31,8 @@
     canvas.emscripten {
       border: 0px none;
       background-color: black;
-      width: 100vw;
-      height: 100vh;
+      width: 70vw;
+      height: 70vh;
     }
 
     footer {
@@ -127,29 +127,6 @@
       width: 300px;
     }
 
-    #controls {
-      /* display: inline-block; */
-      float: right;
-      vertical-align: top;
-      margin-top: 30px;
-      margin-right: 20px;
-    }
-
-    #output {
-      width: 100%;
-      height: 200px;
-      margin: 0 auto;
-      margin-top: 10px;
-      border-left: 0px;
-      border-right: 0px;
-      padding-left: 0px;
-      padding-right: 0px;
-      display: block;
-      background-color: black;
-      color: white;
-      font-family: 'Lucida Console', Monaco, monospace;
-      outline: none;
-    }
   </style>
 </head>
 
@@ -180,20 +157,9 @@
         Module.arguments.push('--fullportrait', '--web');
       },
       print: (function () {
-        var element = document.getElementById('output');
-        if (element) element.value = ''; // clear browser cache
         return function (text) {
           if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
-          // These replacements are necessary if you render to raw HTML
-          //text = text.replace(/&/g, "&amp;");
-          //text = text.replace(/</g, "&lt;");
-          //text = text.replace(/>/g, "&gt;");
-          //text = text.replace('\n', '<br>', 'g');
-          console.log(text);
-          if (element) {
-            element.value += text + "\n";
-            element.scrollTop = element.scrollHeight; // focus on bottom
-          }
+          console.log('[Print] ', text);
         };
       })(),
       canvas: (function () {

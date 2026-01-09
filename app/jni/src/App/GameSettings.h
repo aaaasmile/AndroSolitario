@@ -33,7 +33,7 @@ class GameSettings {
     LPErrInApp LoadSettings();
     LPErrInApp SaveSettings();
     LPErrInApp LoadFonts();
-    LPErrInApp SetDisplaySize(int w, int h);
+    void SetDisplaySize(int w, int h);
     void GetTouchPoint(SDL_TouchFingerEvent& tfinger, SDL_Point* pPoint);
     int GetScreenHeight() { return _screenRect.h; }
     int GetScreenWidth() { return _screenRect.w; }

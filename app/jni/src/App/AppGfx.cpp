@@ -38,7 +38,6 @@ typedef struct ResolutionMgr {
     int targetWidth, targetHeight;
     int displayWidth, displayHeight;
     float scale;
-    bool showFullPortrait;
     bool isDev;
     SDL_FRect viewport = {0.0, 0.0, 0.0, 0.0};
 }* LPResolutionMgr;
@@ -47,14 +46,16 @@ static void resolutionMgr_UpdateViewport(ResolutionMgr& rm, int w, int h) {
     rm.displayWidth = w;
     rm.displayHeight = h;
 
-    TRACE_DEBUG("[UpdateViewport] Resize win, new width %d, height %d \n", w,
-                h);
+    TRACE_DEBUG(
+        "[UpdateViewport] Resize win, new width %d, height %d, using scale %f "
+        "\n",
+        w, h, rm.scale);
 
     float scaledWidth = rm.targetWidth * rm.scale;
     float scaledHeight = rm.targetHeight * rm.scale;
-
-    rm.viewport.x = (rm.displayWidth - scaledWidth) * 0.5f;    // Centered X
-    rm.viewport.y = (rm.displayHeight - scaledHeight) * 0.5f;  // Centered Y
+    // Centered X, Centered Y
+    rm.viewport.x = (rm.displayWidth - scaledWidth) * 0.5f;
+    rm.viewport.y = (rm.displayHeight - scaledHeight) * 0.5f;
     rm.viewport.w = scaledWidth;
     rm.viewport.h = scaledHeight;
 }
@@ -92,7 +93,6 @@ static void resolutionMgr_InitScaledPortraitDev(ResolutionMgr& rm) {
     // desktop typically to develop the portrait mode on the PC
     rm.targetWidth = 720;
     rm.targetHeight = 1280;
-    rm.showFullPortrait = false;
     rm.isDev = true;
     rm.scale = 0.7;
     rm.displayWidth = (int)(rm.targetWidth * rm.scale);
@@ -105,7 +105,6 @@ static void resolutionMgr_InitLandscape(ResolutionMgr& rm) {
     // for the desktop
     rm.targetWidth = 1024;
     rm.targetHeight = 768;
-    rm.showFullPortrait = false;
     rm.scale = 1.0;
     rm.isDev = false;
     rm.displayWidth = rm.targetWidth;
@@ -117,11 +116,10 @@ static void resolutionMgr_InitNarrowPortrait(ResolutionMgr& rm) {
     // for the Phone
     rm.targetWidth = 720;
     rm.targetHeight = 1280;
-    rm.showFullPortrait = true;
     rm.scale = 1.0;
     rm.isDev = false;
-    rm.displayWidth = rm.targetWidth * rm.scale;
-    rm.displayHeight = rm.targetHeight * rm.scale;
+    rm.displayWidth = rm.targetWidth;
+    rm.displayHeight = rm.targetHeight;
 
     resolutionMgr_InitWithDisplayBounds(rm);
 }
@@ -131,13 +129,39 @@ static void resolutionMgr_InitWidePortrait(ResolutionMgr& rm) {
     // for the Tablet
     rm.targetWidth = 800;
     rm.targetHeight = 1024;
-    rm.showFullPortrait = true;
     rm.scale = 1.0;
     rm.isDev = false;
-    rm.displayWidth = rm.targetWidth * rm.scale;
-    rm.displayHeight = rm.targetHeight * rm.scale;
+    rm.displayWidth = rm.targetWidth;
+    rm.displayHeight = rm.targetHeight;
 
     resolutionMgr_InitWithDisplayBounds(rm);
+}
+
+static void resolutionMgr_SetNarrowPortrait(ResolutionMgr& rm, int w, int h) {
+    TRACE_DEBUG("[SetNarrowPortrait] with w: %d, h: %d \n", w, h);
+    rm.targetWidth = 720;
+    rm.targetHeight = 1280;
+
+    resolutionMgr_UpdateViewport(rm, w, h);
+}
+
+static void resolutionMgr_SetWidePortrait(ResolutionMgr& rm, int w, int h) {
+    TRACE_DEBUG("[SetWidePortrait] with w: %d, h: %d \n", w, h);
+    rm.targetWidth = 800;
+    rm.targetHeight = 1024;
+    float scale_x = (float)w / (float)rm.targetWidth;
+    float scale_y = (float)h / (float)rm.targetHeight;
+    rm.scale = std::min(scale_x, scale_y);
+
+    resolutionMgr_UpdateViewport(rm, w, h);
+}
+
+static void resolutionMgr_SetLandscape(ResolutionMgr& rm, int w, int h) {
+    TRACE_DEBUG("[SetLandscape] with w: %d, h: %d \n", w, h);
+    rm.targetWidth = 1024;
+    rm.targetHeight = 768;
+
+    resolutionMgr_UpdateViewport(rm, w, h);
 }
 
 static ResolutionMgr g_ResolutionMgr;
@@ -366,34 +390,75 @@ LPErrInApp AppGfx::createWindow() {
         resolutionMgr_InitLandscape(g_ResolutionMgr);
     }
 
+    // TRACE("[createWindow] create window initially with width %d, height
+    // %d\n",
+    //       g_ResolutionMgr.displayWidth, g_ResolutionMgr.displayHeight);
+    // _p_Window = SDL_CreateWindow(_p_GameSettings->GameName.c_str(),
+    //                              g_ResolutionMgr.displayWidth,
+    //                              g_ResolutionMgr.displayHeight, flagwin);
+
     TRACE("[createWindow] create window initially with width %d, height %d\n",
-          g_ResolutionMgr.displayWidth, g_ResolutionMgr.displayHeight);
+          g_ResolutionMgr.targetWidth, g_ResolutionMgr.targetHeight);
     _p_Window = SDL_CreateWindow(_p_GameSettings->GameName.c_str(),
-                                 g_ResolutionMgr.displayWidth,
-                                 g_ResolutionMgr.displayHeight, flagwin);
+                                 g_ResolutionMgr.targetWidth,
+                                 g_ResolutionMgr.targetHeight, flagwin);
 
     if (_p_Window == NULL) {
         return ERR_UTIL::ErrorCreate("Error SDL_CreateWindow: %s\n",
                                      SDL_GetError());
     }
-    int w, h;
-    SDL_GetWindowSize(_p_Window, &w, &h);
-    TRACE_DEBUG("[createWindow] after creation, the size is w: %d, h: %d \n", w,
-                h);
-
-    LPErrInApp err = _p_GameSettings->SetDisplaySize(
-        g_ResolutionMgr.displayWidth, g_ResolutionMgr.displayHeight);
-    if (err != NULL) {
-        return err;
-    }
-
     _p_sdlRenderer = SDL_CreateRenderer(_p_Window, NULL);
-
     if (_p_sdlRenderer == NULL) {
         return ERR_UTIL::ErrorCreate("Cannot create renderer: %s\n",
                                      SDL_GetError());
     }
 
+    int w, h;
+    SDL_GetWindowSize(_p_Window, &w, &h);
+    TRACE_DEBUG("[createWindow] after creation, the size is w: %d, h: %d \n", w,
+                h);
+    LPErrInApp err = selectLayout(w, h);
+    if (err != NULL) {
+        return err;
+    }
+
+    TRACE_DEBUG("createWindow - Success\n");
+    return NULL;
+}
+
+LPErrInApp AppGfx::selectLayout(int w, int h) {
+    TRACE_DEBUG("[selectLayout] with w: %d, h: %d \n", w, h);
+    int oldtargetHeight = g_ResolutionMgr.targetHeight;
+    int oldtargetWidth = g_ResolutionMgr.targetWidth;
+    float aspect = (float)w / (float)h;
+    if (aspect < 0.75f) {
+        resolutionMgr_SetNarrowPortrait(g_ResolutionMgr, w, h);
+    } else if (aspect < 1.1f) {
+        resolutionMgr_SetWidePortrait(g_ResolutionMgr, w, h);
+    } else {
+        resolutionMgr_SetLandscape(g_ResolutionMgr, w, h);
+    }
+
+    _p_GameSettings->SetDisplaySize(g_ResolutionMgr.displayWidth,
+                                    g_ResolutionMgr.displayHeight);
+
+    if (_p_Screen != NULL) {
+        if (g_ResolutionMgr.targetHeight == oldtargetHeight &&
+            oldtargetWidth == g_ResolutionMgr.targetWidth) {
+            return NULL;
+        }
+    }
+    createScreenLayout();
+    return NULL;
+}
+
+LPErrInApp AppGfx::createScreenLayout() {
+    TRACE_DEBUG("[createScreenLayout] create the Screen target");
+
+    if (_p_Screen != NULL) {
+        SDL_DestroySurface(_p_Screen);
+        _p_Screen = NULL;
+    }
     _p_Screen = GFX_UTIL::SDL_CreateRGBSurface(
         g_ResolutionMgr.targetWidth, g_ResolutionMgr.targetHeight, 32,
         0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
@@ -412,7 +477,6 @@ LPErrInApp AppGfx::createWindow() {
         return ERR_UTIL::ErrorCreate("Error SDL_CreateTexture: %s\n",
                                      SDL_GetError());
     }
-    TRACE_DEBUG("createWindow - Success\n");
     return NULL;
 }
 
@@ -463,7 +527,7 @@ LPErrInApp AppGfx::loadProfile() {
         return err;
     }
     if (dirCreated) {
-        TRACE("Created dir %s\n", dirpath);
+        TRACE_DEBUG("Created dir %s\n", dirpath);
     }
     _p_GameSettings->SettingsDir = dirpath;
 
@@ -626,8 +690,7 @@ LPErrInApp AppGfx::MainLoopEvent(SDL_Event* pEvent, SDL_AppResult& res) {
         }
 
         case SDL_EVENT_WINDOW_RESIZED:
-            resolutionMgr_UpdateViewport(g_ResolutionMgr, pEvent->window.data1,
-                                         pEvent->window.data2);
+            selectLayout(pEvent->window.data1, pEvent->window.data2);
             break;
         default:
             break;
@@ -915,7 +978,6 @@ void AppGfx::updateScreenTexture() {
     SDL_UpdateTexture(_p_ScreenTexture, NULL, _p_Screen->pixels,
                       _p_Screen->pitch);
     SDL_RenderClear(_p_sdlRenderer);
-    // SDL_RenderTexture(_p_sdlRenderer, _p_ScreenTexture, NULL, NULL);
     RenderTexture(_p_ScreenTexture);
     SDL_RenderPresent(_p_sdlRenderer);
 }

@@ -111,12 +111,12 @@ LPErrInApp GameSettings::LoadSettings() {
 #if PLATFORM_EMS
     std::string defval = MusicEnabled ? "true" : "false";
     std::string result = loadGameSetting("MusicEnabled", defval.c_str());
-    //TRACE_DEBUG("Read setting result '%s'\n", result.c_str());
+    // TRACE_DEBUG("Read setting result '%s'\n", result.c_str());
     MusicEnabled = result == "true" ? true : false;
 
     defval = std::to_string(CurrentLanguage);
     result = loadGameSetting("CurrentLanguage", defval.c_str());
-    int langId = std::stoi(result);    
+    int langId = std::stoi(result);
     CurrentLanguage = (Languages::eLangId)langId;
 
     defval = std::to_string(DeckTypeVal.GetTypeIndex());
@@ -131,7 +131,7 @@ LPErrInApp GameSettings::LoadSettings() {
 
     defval = PlayerName;
     PlayerName = loadGameSetting("PlayerName", defval.c_str());
-    
+
 #else
     LPErrInApp err = setSettingFileName();
     if (err != NULL) {
@@ -308,10 +308,9 @@ void GameSettings::GetTouchPoint(SDL_TouchFingerEvent& tfinger,
     pPoint->y = tfinger.y * _screenRect.h;
 }
 
-LPErrInApp GameSettings::SetDisplaySize(int w, int h) {
+void GameSettings::SetDisplaySize(int w, int h) {
     _screenRect.w = w;
     _screenRect.h = h;
-    return NULL;
 }
 
 //  Namespace GAMESET

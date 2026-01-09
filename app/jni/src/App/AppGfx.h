@@ -47,6 +47,8 @@ class AppGfx {
    private:
     LPErrInApp startGameLoop();
     LPErrInApp createWindow();
+    LPErrInApp selectLayout(int w, int h);
+    LPErrInApp createScreenLayout();
     void terminate();
     LPErrInApp loadProfile();
     void updateScreenTexture();
