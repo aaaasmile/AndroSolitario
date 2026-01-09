@@ -59,42 +59,11 @@ static void resolutionMgr_UpdateViewport(ResolutionMgr& rm, int w, int h) {
     rm.viewport.h = scaledHeight;
 }
 
-static void resolutionMgr_InitPortraitDev(ResolutionMgr& rm) {
-    TRACE("Portrait DEV mode \n");
-    rm.targetWidth = 720;
-    rm.targetHeight = 1280;
-    rm.showFullPortrait = false;
-    rm.isDev = true;
-    rm.scale = 0.7;
-    rm.displayWidth = (int)(rm.targetWidth * rm.scale);
-    rm.displayHeight = (int)(rm.targetHeight * rm.scale);
-    resolutionMgr_UpdateViewport(rm, rm.displayWidth, rm.displayHeight);
-}
-
-static void resolutionMgr_InitStandard(ResolutionMgr& rm) {
-    TRACE("Standard mode \n");
-    rm.targetWidth = 1024;
-    rm.targetHeight = 768;
-    rm.showFullPortrait = false;
-    rm.scale = 1.0;
-    rm.isDev = false;
-    rm.displayWidth = rm.targetWidth;
-    rm.displayHeight = rm.targetHeight;
-}
-
-static void resolutionMgr_InitFullPortrait(ResolutionMgr& rm) {
-    TRACE("Full portrait mode \n");
-    rm.targetWidth = 720;
-    rm.targetHeight = 1280;
-    rm.showFullPortrait = true;
-    rm.scale = 1.0;
-    rm.isDev = false;
-    rm.displayWidth = rm.targetWidth * rm.scale;
-    rm.displayHeight = rm.targetHeight * rm.scale;
-
+static void resolutionMgr_InitWithDisplayBounds(ResolutionMgr& rm) {
     int num_displays;
     SDL_DisplayID* displays = SDL_GetDisplays(&num_displays);
     if (num_displays == 0) {
+        TRACE_DEBUG("[rm - InitWithDisplayBounds] no display found\n");
         return;
     }
     SDL_DisplayID Id = *displays;
@@ -109,10 +78,66 @@ static void resolutionMgr_InitFullPortrait(ResolutionMgr& rm) {
     if (screenRect.h > rm.displayHeight) {
         rm.displayHeight = screenRect.h;
     }
-    TRACE_DEBUG("Display bound for size is width %d, height %d",
-                rm.displayWidth, rm.displayHeight);
+    TRACE(
+        "[rm - InitWithDisplayBounds] Display bound:  displayWidth %d, "
+        "displayHeight %d",
+        rm.displayWidth, rm.displayHeight);
 
     SDL_free(displays);
+}
+
+static void resolutionMgr_InitScaledPortraitDev(ResolutionMgr& rm) {
+    TRACE("[rm - InitScaledPortraitDev] scaled Portrait DEV mode \n");
+    // this is used in a WSL desktop app to get the narrow portrait mode on
+    // desktop typically to develop the portrait mode on the PC
+    rm.targetWidth = 720;
+    rm.targetHeight = 1280;
+    rm.showFullPortrait = false;
+    rm.isDev = true;
+    rm.scale = 0.7;
+    rm.displayWidth = (int)(rm.targetWidth * rm.scale);
+    rm.displayHeight = (int)(rm.targetHeight * rm.scale);
+    resolutionMgr_UpdateViewport(rm, rm.displayWidth, rm.displayHeight);
+}
+
+static void resolutionMgr_InitLandscape(ResolutionMgr& rm) {
+    TRACE("[rm - InitLandscape] Landscape mode \n");
+    // for the desktop
+    rm.targetWidth = 1024;
+    rm.targetHeight = 768;
+    rm.showFullPortrait = false;
+    rm.scale = 1.0;
+    rm.isDev = false;
+    rm.displayWidth = rm.targetWidth;
+    rm.displayHeight = rm.targetHeight;
+}
+
+static void resolutionMgr_InitNarrowPortrait(ResolutionMgr& rm) {
+    TRACE("[rm - InitNarrowPortrait] narrow portrait mode \n");
+    // for the Phone
+    rm.targetWidth = 720;
+    rm.targetHeight = 1280;
+    rm.showFullPortrait = true;
+    rm.scale = 1.0;
+    rm.isDev = false;
+    rm.displayWidth = rm.targetWidth * rm.scale;
+    rm.displayHeight = rm.targetHeight * rm.scale;
+
+    resolutionMgr_InitWithDisplayBounds(rm);
+}
+
+static void resolutionMgr_InitWidePortrait(ResolutionMgr& rm) {
+    TRACE("[rm - InitWidePortrait] wide portrait mode \n");
+    // for the Tablet
+    rm.targetWidth = 800;
+    rm.targetHeight = 1024;
+    rm.showFullPortrait = true;
+    rm.scale = 1.0;
+    rm.isDev = false;
+    rm.displayWidth = rm.targetWidth * rm.scale;
+    rm.displayHeight = rm.targetHeight * rm.scale;
+
+    resolutionMgr_InitWithDisplayBounds(rm);
 }
 
 static ResolutionMgr g_ResolutionMgr;
@@ -132,16 +157,6 @@ AppGfx::AppGfx() {
     _p_CreditsView = new CreditsView();
     _p_OptGfx = new OptionsGfx();
     _p_HighScore = new HighScore();
-    // #ifdef ANDROID
-    //     // this is portrait
-    //     //_screenW = 1080;
-    //     //_screenH = 1920;
-    //     resolutionMgr_InitFullPortrait(g_ResolutionMgr);
-    // #else
-
-    //     //_screenH = 768;   // 960; //768;
-    //     //_screenW = 1024;  // 540;//1024;
-    // #endif
 }
 
 AppGfx::~AppGfx() { terminate(); }
@@ -173,15 +188,6 @@ LPErrInApp AppGfx::Init() {
                                          SDL_GetError());
         }
     }
-    if (_p_GameSettings->IsPortrait()) {
-        if (_p_GameSettings->IsFullPortrait()) {
-            resolutionMgr_InitFullPortrait(g_ResolutionMgr);
-        } else {
-            resolutionMgr_InitPortraitDev(g_ResolutionMgr);
-        }
-    } else {
-        resolutionMgr_InitStandard(g_ResolutionMgr);
-    }
 
     err = createWindow();
     if (err != NULL) {
@@ -195,9 +201,7 @@ LPErrInApp AppGfx::Init() {
     if (!TTF_Init()) {
         return ERR_UTIL::ErrorCreate("Font init error");
     }
-    // if (_p_GameSettings->NeedScreenMagnify()) {
-    //     _p_GameSettings->UseBigFontSize();
-    // }
+
     TRACE_DEBUG("Font initialized OK\n");
 
     const char* title = pLanguages->GetCStringId(Languages::ID_SOLITARIO);
@@ -253,8 +257,6 @@ LPErrInApp AppGfx::Init() {
     MenuDelegator menuDelegator = prepMenuDelegator();
     UpdateScreenCb screenUpdater = prepScreenUpdater();
     _p_MenuMgr = new MenuMgr();
-    // err = _p_MenuMgr->Initialize(_p_Screen, _p_sdlRenderer, _p_Window,
-    //                              menuDelegator);
     err = _p_MenuMgr->Initialize(_p_Screen, screenUpdater, menuDelegator);
     if (err != NULL) {
         return err;
@@ -333,7 +335,7 @@ LPErrInApp AppGfx::loadSceneBackground() {
 }
 
 LPErrInApp AppGfx::createWindow() {
-    TRACE_DEBUG("createWindow\n");
+    TRACE_DEBUG("[createWindow] - start \n");
     SDL_WindowFlags flagwin;
     if (_p_Window != NULL) {
         _p_Window = NULL;
@@ -351,8 +353,21 @@ LPErrInApp AppGfx::createWindow() {
 #ifdef ANDROID
     flagwin = SDL_WINDOW_FULLSCREEN;
 #endif
-    TRACE_DEBUG("[createWindow] creating with width %d, height %d\n",
-                g_ResolutionMgr.displayWidth, g_ResolutionMgr.displayHeight);
+    // setting the initial size, usually from external program arguments
+    if (_p_GameSettings->IsPortrait()) {
+        if (_p_GameSettings->IsDEVPortrait()) {
+            resolutionMgr_InitScaledPortraitDev(g_ResolutionMgr);
+        } else if (_p_GameSettings->IsWidePortrait()) {
+            resolutionMgr_InitWidePortrait(g_ResolutionMgr);
+        } else {
+            resolutionMgr_InitNarrowPortrait(g_ResolutionMgr);
+        }
+    } else {
+        resolutionMgr_InitLandscape(g_ResolutionMgr);
+    }
+
+    TRACE("[createWindow] create window initially with width %d, height %d\n",
+          g_ResolutionMgr.displayWidth, g_ResolutionMgr.displayHeight);
     _p_Window = SDL_CreateWindow(_p_GameSettings->GameName.c_str(),
                                  g_ResolutionMgr.displayWidth,
                                  g_ResolutionMgr.displayHeight, flagwin);
@@ -361,13 +376,16 @@ LPErrInApp AppGfx::createWindow() {
         return ERR_UTIL::ErrorCreate("Error SDL_CreateWindow: %s\n",
                                      SDL_GetError());
     }
+    int w, h;
+    SDL_GetWindowSize(_p_Window, &w, &h);
+    TRACE_DEBUG("[createWindow] after creation, the size is w: %d, h: %d \n", w,
+                h);
+
     LPErrInApp err = _p_GameSettings->SetDisplaySize(
         g_ResolutionMgr.displayWidth, g_ResolutionMgr.displayHeight);
     if (err != NULL) {
         return err;
     }
-    //_screenH = _p_GameSettings->GetScreenHeight();
-    //_screenW = _p_GameSettings->GetScreenWidth();
 
     _p_sdlRenderer = SDL_CreateRenderer(_p_Window, NULL);
 
@@ -919,22 +937,20 @@ void AppGfx::ParseCmdLine(int argc, char* argv[], SDL_AppResult& res) {
                 pGameSettings->CurrentLanguage = Languages::eLangId::LANG_ITA;
                 pGameSettings->SetCurrentLang();
             }
-        } else if (strcmp(argv[i], "--portrait") == 0) {
-            TRACE("[ParseCmdLine] portrait mode recognized \n");
+        } else if (strcmp(argv[i], "--portraitdev") == 0) {
+            TRACE("[ParseCmdLine] portrait dev mode recognized \n");
             LPGameSettings pGameSettings = GameSettings::GetSettings();
-            pGameSettings->SetPortraitMode(true);
-        } else if (strcmp(argv[i], "--fullportrait") == 0) {
-            TRACE("[ParseCmdLine] full portrait mode recognized \n");
+            pGameSettings->SetPortraitDevMode(true);
+        } else if (strcmp(argv[i], "--narrowportrait") == 0) {
+            TRACE("[ParseCmdLine] narrow portrait mode recognized \n");
             LPGameSettings pGameSettings = GameSettings::GetSettings();
-            pGameSettings->SetFullPortraitMode(true);
-        } else if (strcmp(argv[i], "--web") == 0) {
-            TRACE("[ParseCmdLine] web mode recognized \n");
+            pGameSettings->SetPortraitNarrowMode(true);
+        } else if (strcmp(argv[i], "--wideportrait") == 0) {
+            TRACE("[ParseCmdLine] wide portrait recognized \n");
             LPGameSettings pGameSettings = GameSettings::GetSettings();
-            pGameSettings->SetWebMode(true);
+            pGameSettings->SetPortraitWideMode(true);
         } else {
-            printf("unknown option: %s\n", argv[i]);
-            printf("\nUsage: %s --version \n", argv[0]);
-            res = SDL_APP_SUCCESS;
+            TRACE("[ParseCmdLine] ignore unknown option: %s\n", argv[i]);
         }
     }
 }

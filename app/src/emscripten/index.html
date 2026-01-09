@@ -31,6 +31,8 @@
     canvas.emscripten {
       border: 0px none;
       background-color: black;
+      width: 100vw;
+      height: 100vh;
     }
 
     footer {
@@ -233,7 +235,7 @@
       }
     };
     Module.setStatus('Downloading...');
-  
+
     console.log('windows dim ', window.screen.width, window.screen.height)
     if (((window.screen.height > window.screen.width) && (window.screen.height > 600)) ||
       ((window.outerHeight > window.outerWidth) && (window.outerHeight > 600))) {

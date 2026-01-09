@@ -37,9 +37,6 @@ class GameSettings {
     void GetTouchPoint(SDL_TouchFingerEvent& tfinger, SDL_Point* pPoint);
     int GetScreenHeight() { return _screenRect.h; }
     int GetScreenWidth() { return _screenRect.w; }
-    // bool NeedScreenMagnify() {
-    //     return (_screenRect.h > 1200 || _screenRect.w > 1200);
-    // }
     int GetSizeFontSmall() { return _fontSmallSize; }
     int GetSizeFontBig() { return _fontBigSize; }
     int GetSizeFontSym() { return _fontSymSize; }
@@ -64,15 +61,22 @@ class GameSettings {
     LPErrInApp InitMusicManager();
     void TerminateMusicManager();
 
-    void SetPortraitMode(bool val) { _portraitMode = val; }
-    void SetWebMode(bool val) { _webMode = val; }
-    void SetFullPortraitMode(bool val) {
-        _portraitFullMode = val;
+    void SetPortraitDevMode(bool val) {
+        _portraitDevMode = val;
+        _portraitMode = val;
+    }
+    void SetPortraitNarrowMode(bool val) {
+        _portraitNarrowMode = val;
+        _portraitMode = val;
+    }
+    void SetPortraitWideMode(bool val) {
+        _portraitWideMode = val;
         _portraitMode = val;
     }
     bool IsPortrait() { return _portraitMode; }
-    bool IsFullPortrait() { return _portraitFullMode; }
-    bool IsWebMode() { return _webMode; }
+    bool IsNarrowPortrait() { return _portraitNarrowMode; }
+    bool IsWidePortrait() { return _portraitWideMode; }
+    bool IsDEVPortrait() { return _portraitDevMode; }
 
    private:
     GameSettings();
@@ -91,8 +95,9 @@ class GameSettings {
     Languages* _p_Languages;
     MusicManager* _p_MusicManager;
     bool _portraitMode = false;
-    bool _portraitFullMode = false;
-    bool _webMode = false;
+    bool _portraitNarrowMode = false;
+    bool _portraitWideMode = false;
+    bool _portraitDevMode = false;
 };
 
 typedef GameSettings* LPGameSettings;
