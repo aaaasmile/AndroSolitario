@@ -1,7 +1,7 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#define VERSION "Ver 3.0.9 20260109-04"
+#define VERSION "Ver 3.0.9 20260109-05"
 #define PACKAGE_URL "https://invido.it"
 #define AUTHOR "igorRun for Invido"
 

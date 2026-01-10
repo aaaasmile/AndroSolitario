@@ -64,7 +64,8 @@ static void resolutionMgr_InitWithDisplayBounds(ResolutionMgr& rm) {
     int num_displays;
     SDL_DisplayID* displays = SDL_GetDisplays(&num_displays);
     if (num_displays == 0) {
-        TRACE_DEBUG("[rm - InitWithDisplayBounds] no display found\n");
+        TRACE_DEBUG("[rm - InitWithDisplayBounds] no display found (err %s)\n",
+                    SDL_GetError());
         return;
     }
     SDL_DisplayID Id = *displays;
@@ -213,7 +214,11 @@ LPErrInApp AppGfx::Init() {
         if (!SDL_Init(0)) {
             return ERR_UTIL::ErrorCreate("Couldn't initialize SDL: %s\n",
                                          SDL_GetError());
+        } else {
+            TRACE_DEBUG("SDL_Init with 0\n");
         }
+    } else {
+        TRACE_DEBUG("SDL_INIT_VIDEO was already init \n");
     }
 
     err = createWindow();
@@ -362,7 +367,7 @@ LPErrInApp AppGfx::loadSceneBackground() {
 }
 
 LPErrInApp AppGfx::createWindow() {
-    TRACE_DEBUG("[createWindow] - start \n"); 
+    TRACE_DEBUG("[createWindow] - start \n");
     SDL_WindowFlags flagwin;
     if (_p_Window != NULL) {
         _p_Window = NULL;
@@ -409,11 +414,10 @@ LPErrInApp AppGfx::createWindow() {
                                      SDL_GetError());
     }
     LPErrInApp err = NULL;
+    int w, h;
+    SDL_GetWindowSize(_p_Window, &w, &h);
+    TRACE_DEBUG("[createWindow] the window size is now w: %d, h: %d \n", w, h);
     if (_fullScreen) {
-        int w, h;
-        SDL_GetWindowSize(_p_Window, &w, &h);
-        TRACE_DEBUG(
-            "[createWindow] in full screen, the size is w: %d, h: %d \n", w, h);
         err = selectLayout(w, h);
         if (err != NULL) {
             return err;
