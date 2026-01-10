@@ -60,34 +60,6 @@ static void resolutionMgr_UpdateViewport(ResolutionMgr& rm, int w, int h) {
     rm.viewport.h = scaledHeight;
 }
 
-static void resolutionMgr_InitWithDisplayBounds(ResolutionMgr& rm) {
-    int num_displays;
-    SDL_DisplayID* displays = SDL_GetDisplays(&num_displays);
-    if (num_displays == 0) {
-        TRACE_DEBUG("[rm - InitWithDisplayBounds] no display found (err %s)\n",
-                    SDL_GetError());
-        return;
-    }
-    SDL_DisplayID Id = *displays;
-    SDL_Rect screenRect;
-    if (!SDL_GetDisplayBounds(Id, &screenRect)) {
-        TRACE("CalcDisplaySize error: %s\n", SDL_GetError());
-        return;
-    }
-    if (screenRect.w > rm.displayWidth) {
-        rm.displayWidth = screenRect.w;
-    }
-    if (screenRect.h > rm.displayHeight) {
-        rm.displayHeight = screenRect.h;
-    }
-    TRACE(
-        "[rm - InitWithDisplayBounds] Display bound:  displayWidth %d, "
-        "displayHeight %d",
-        rm.displayWidth, rm.displayHeight);
-
-    SDL_free(displays);
-}
-
 static void resolutionMgr_InitScaledPortraitDev(ResolutionMgr& rm) {
     TRACE("[rm - InitScaledPortraitDev] scaled Portrait DEV mode \n");
     // this is used in a WSL desktop app to get the narrow portrait mode on
@@ -121,8 +93,6 @@ static void resolutionMgr_InitNarrowPortrait(ResolutionMgr& rm) {
     rm.isDev = false;
     rm.displayWidth = rm.targetWidth;
     rm.displayHeight = rm.targetHeight;
-
-    resolutionMgr_InitWithDisplayBounds(rm);
 }
 
 static void resolutionMgr_InitWidePortrait(ResolutionMgr& rm) {
@@ -134,8 +104,6 @@ static void resolutionMgr_InitWidePortrait(ResolutionMgr& rm) {
     rm.isDev = false;
     rm.displayWidth = rm.targetWidth;
     rm.displayHeight = rm.targetHeight;
-
-    resolutionMgr_InitWithDisplayBounds(rm);
 }
 
 static void resolutionMgr_calcScale(ResolutionMgr& rm, int w, int h) {
@@ -398,7 +366,7 @@ LPErrInApp AppGfx::createWindow() {
         resolutionMgr_InitLandscape(g_ResolutionMgr);
     }
 
-    TRACE("[createWindow] create window initially with width %d, height% d\n ",
+    TRACE("[createWindow] create window initially with width %d, height %d \n ",
           g_ResolutionMgr.displayWidth, g_ResolutionMgr.displayHeight);
     _p_Window = SDL_CreateWindow(_p_GameSettings->GameName.c_str(),
                                  g_ResolutionMgr.displayWidth,
