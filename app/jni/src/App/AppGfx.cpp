@@ -362,7 +362,7 @@ LPErrInApp AppGfx::loadSceneBackground() {
 }
 
 LPErrInApp AppGfx::createWindow() {
-    TRACE_DEBUG("[createWindow] - start \n");
+    TRACE_DEBUG("[createWindow] - start \n"); 
     SDL_WindowFlags flagwin;
     if (_p_Window != NULL) {
         _p_Window = NULL;

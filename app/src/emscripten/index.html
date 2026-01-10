@@ -4,6 +4,8 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Il gioco del Solitario con le carte da Briscola">
   <title>Solitario SDL</title>
   <style>
     body {
@@ -209,16 +211,16 @@
     const aspectOuterScreen = window.outerWidth / window.outerHeight;
     console.log("aspect ratio are: ", aspectScreen, aspectOuterScreen);
     let type = 'STD';
-    if (aspectScreen < 0.75 || aspectOuterScreen < 0.75) {
+    if (aspectOuterScreen < 0.706) {
       Module.setNarrowPortraitMode();
       type = 'NARROW';
-    } else if ((aspectScreen < 1.1 || aspectOuterScreen < 1.1) && (aspectScreen < 1.9)) {
+    } else if (aspectOuterScreen < 1.1) {
       Module.setWidePortraitMode();
       type = 'WIDE';
     } else {
       console.log("no special screen recognized, use the default (no extra arguments provided)");
     }
-    infoEle.textContent = 'display ' + type + ' for w: ' + window.screen.width + ' h: ' + window.screen.height + ' outer_w: ' + window.outerWidth + ' outer_h: ' + window.outerHeight;
+    infoEle.textContent = 'display ' + type + ' for w: ' + window.screen.width + ' h: ' + window.screen.height + ' outer_w: ' + window.outerWidth + ' outer_h: ' + window.outerHeight + ' asp: ' + aspectScreen + ' asp_o ' + aspectOuterScreen;
     window.onerror = function (event) {
       Module.setStatus('Exception thrown, see JavaScript console');
       spinnerElement.style.display = 'none';
