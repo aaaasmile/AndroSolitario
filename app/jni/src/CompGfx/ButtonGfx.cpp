@@ -151,14 +151,17 @@ void ButtonGfx::DrawButton(SDL_Surface* pScreen) {
 
     GFX_UTIL::DrawStaticSpriteEx(pScreen, 0, 0, _rctButton.w, _rctButton.h,
                                  _rctButton.x, _rctButton.y, _p_buttonSurface);
-    int tx, ty;
+    int tx = 0;
+    int ty = 0;
     if (_buttonType == TEXT_BUTTON) {
         TTF_GetStringSize(_p_fontText, _buttonText.c_str(), 0, &tx, &ty);
     } else {
+        size_t len = 0;
         TTF_MeasureString(_p_fontText, _buttonText.c_str(), 1, _rctButton.w,
-                          &tx, NULL);
+                          &tx, &len);
+        //TRACE_DEBUG("TTF_MeasureString is tx: %d ty: %d \n", tx, hh);
         tx += 5;
-        ty -= 5;
+        ty = 32; // fixed symbol height!
     }
 
     int iXOffSet = (_rctButton.w - tx) / 2;

@@ -32,7 +32,8 @@ typedef struct {
 typedef struct {
     LPErrInApp (*const SettingsChanged)(void* self, bool backGroundChanged,
                                         bool languageChanged);
-    LPErrInApp (*const ChangeSceneBackground)(void* self, SDL_Surface** ppSceneBackground);
+    LPErrInApp (*const ChangeSceneBackground)(void* self,
+                                              SDL_Surface** ppSceneBackground);
 } VOptionDelegator, *LPVOptionDelegator;
 
 typedef struct {
@@ -49,6 +50,16 @@ typedef struct {
     VClickCb const* tc;
     void* self;
 } ClickCb, *LPClickCb;
+
+// trait for keyboard click
+typedef struct {
+    void (*const ClickKey)(void* self, const char* text);
+} VClickKeyboardCb, *LPVClickKeyboardCb;
+
+typedef struct {
+    VClickKeyboardCb const* tc;
+    void* self;
+} ClickKeyboardCb, *LPClickKeyboardCb;
 
 // trait for checkbox click
 typedef struct {
@@ -71,7 +82,6 @@ typedef struct {
     VUpdateScreenCb const* tc;
     void* self;
 } UpdateScreenCb, *LPUpdateScreenCb;
-
 
 };  // namespace traits
 

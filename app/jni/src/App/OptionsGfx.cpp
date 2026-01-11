@@ -6,6 +6,7 @@
 #include "CompGfx/ButtonGfx.h"
 #include "CompGfx/CheckBoxGfx.h"
 #include "CompGfx/ComboGfx.h"
+#include "CompGfx/KeyboardGfx.h"
 #include "CompGfx/TextInputGfx.h"
 #include "Config.h"
 #include "GfxUtil.h"
@@ -29,16 +30,22 @@ OptionsGfx::OptionsGfx() {
     _p_comboBackground = NULL;
     _p_textInput = NULL;
     _p_Scene_background = NULL;
-    _initilized = false;
+    _p_btToggleKeyboard = NULL;
+    _p_KeyboardGfx = NULL;
 }
 
 OptionsGfx::~OptionsGfx() {
     delete _p_buttonOK;
+    delete _p_btToggleKeyboard;
     delete _p_comboLang;
     delete _p_checkMusic;
     delete _p_comboDeck;
     delete _p_comboBackground;
     delete _p_textInput;
+    if (_p_KeyboardGfx != NULL) {
+        delete _p_KeyboardGfx;
+        _p_KeyboardGfx = NULL;
+    }
 
     for (int i = 0; i < eDeckType::NUM_OF_DECK; i++) {
         if (_p_deckAll[i]) {
@@ -58,10 +65,20 @@ OptionsGfx::~OptionsGfx() {
 // Prepare the Click() trait
 void fncBind_ButtonClicked(void* self, int iVal) {
     OptionsGfx* pOptionsGfx = (OptionsGfx*)self;
-    pOptionsGfx->OptionsEnd();
+    switch (iVal) {
+        case OptionsGfx::MYIDOK:
+            pOptionsGfx->OptionsEnd();
+            break;
+        case OptionsGfx::MYIDKYB:
+            pOptionsGfx->ShowHideKeyboard();
+            break;
+        default:
+            TRACE_DEBUG("Ignore bt key id %d \n", iVal);
+            break;
+    }
 }
 
-// Buttons, ok and cancel
+// Buttons, ok, show keyboard
 ClickCb OptionsGfx::prepClickCb() {
 #ifndef _MSC_VER
     static VClickCb const tc = {.Click = (&fncBind_ButtonClicked)};
@@ -97,13 +114,15 @@ LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen,
                                   UpdateScreenCb& fnUpdateScreen,
                                   OptionDelegator& optDlg,
                                   SDL_Window* pWindow) {
-    if (_initilized) {
-        TRACE("[OptionsGfx::Initialize] Already initialized\n");
-    }
-    _initilized = true;
     if (pScreen == NULL) {
         return ERR_UTIL::ErrorCreate("pScreen is null");
     }
+    if (_p_screen != NULL) {
+        if (pScreen->w == _p_screen->w && pScreen->h == _p_screen->h) {
+            return NULL;
+        }
+    }
+
     _rctOptBox.w = 600;
     _rctOptBox.h = 580;
     _rctOptBox.x = (pScreen->w - _rctOptBox.w) / 2;
@@ -134,8 +153,8 @@ LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen,
 
     SDL_Rect rctBt1;
     int iSpace2bt = 20;
+    ClickCb cbBtClicked = prepClickCb();
 
-    ClickCb cbBtOK = prepClickCb();
     // button OK
     _p_buttonOK = new ButtonGfx();
     rctBt1.w = 120;
@@ -144,7 +163,7 @@ LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen,
     rctBt1.y = _rctOptBox.y + _rctOptBox.h - offsetBtY - rctBt1.h;
     rctBt1.x =
         (_rctOptBox.w - rctBt1.w) / 2 + _rctOptBox.x + rctBt1.w + iSpace2bt;
-    _p_buttonOK->Initialize(&rctBt1, pScreen, _p_fontText, MYIDOK, cbBtOK);
+    _p_buttonOK->Initialize(&rctBt1, pScreen, _p_fontText, MYIDOK, cbBtClicked);
     _p_buttonOK->SetVisibleState(ButtonGfx::INVISIBLE);
     // Combo
     int comboW = 220;
@@ -192,6 +211,19 @@ LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen,
                combo2OffsetY;
     rctBt1.x = _p_comboBackground->PosX();
     _p_textInput->Initialize(&rctBt1, pScreen, _p_fontText, pWindow);
+
+    // button keyboard
+    std::string strSymbKeyb = "⌨";
+    SDL_Rect rctBtK;
+    _p_btToggleKeyboard = new ButtonGfx();
+    rctBtK.w = 60;
+    rctBtK.h = 34;
+    rctBtK.y = rctBt1.y;
+    rctBtK.x = rctBt1.x + rctBt1.w + iSpace2bt;
+    _p_btToggleKeyboard->InitializeAsSymbol(
+        &rctBtK, pScreen, _p_GameSettings->GetFontSymb(), MYIDKYB, cbBtClicked);
+    _p_btToggleKeyboard->SetButtonText(strSymbKeyb.c_str());
+    _p_btToggleKeyboard->SetVisibleState(ButtonGfx::INVISIBLE);
 
     // Deck
     // combo deck selection
@@ -424,6 +456,7 @@ LPErrInApp OptionsGfx::HandleIterate(bool& done) {
 
     // player name
     _p_textInput->DrawCtrl(_p_ShadowSrf);
+    _p_btToggleKeyboard->DrawButton(_p_ShadowSrf);
 
     // Combo Deck: Label and control
     STRING strDeckSelectTitle =
@@ -461,6 +494,45 @@ LPErrInApp OptionsGfx::HandleIterate(bool& done) {
     return NULL;
 }
 
+void fncBind_KeyboardClick(void* self, const char* text) {
+    OptionsGfx* pOptionsGfx = (OptionsGfx*)self;
+    pOptionsGfx->TextFromKeyboard(text);
+}
+
+ClickKeyboardCb OptionsGfx::prepareClickKeyboardCb() {
+#ifndef _MSC_VER
+    static VClickKeyboardCb const tc = {.ClickKey = (&fncBind_KeyboardClick)};
+
+    return (ClickKeyboardCb){.tc = &tc, .self = this};
+#else
+    static VClickKeyboardCb const tc = {(&fncBind_KeyboardClick)};
+    ClickKeyboardCb cb = {&tc, this};
+    return cb;
+#endif
+}
+
+void OptionsGfx::TextFromKeyboard(const char* text) {
+    std::string currText = _p_textInput->GetText();
+    std::string newText = currText + std::string(text);
+    _p_textInput->SetText(newText);
+}
+
+void OptionsGfx::ShowHideKeyboard() {
+    if (_p_KeyboardGfx != NULL) {
+        TRACE_DEBUG("[ShowHideKeyboard] hide keyboard \n");
+        delete _p_KeyboardGfx;
+        _p_KeyboardGfx = NULL;
+        return;
+    }
+    TRACE_DEBUG("[ShowHideKeyboard] show keyboard \n");
+    _p_KeyboardGfx = new KeyboardGfx();
+    SDL_Rect rctKeyboard;
+
+    ClickKeyboardCb cbKeyboard = prepareClickKeyboardCb();
+    _p_KeyboardGfx->Show(&rctKeyboard, _p_screen,
+                         _p_GameSettings->GetFontMedium(), cbKeyboard);
+}
+
 LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
                             STRING& strCaption) {
     TRACE_DEBUG("Options - Show\n");
@@ -485,6 +557,7 @@ LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
 
     // Button ok
     _p_buttonOK->SetVisibleState(ButtonGfx::VISIBLE);
+    _p_btToggleKeyboard->SetVisibleState(ButtonGfx::VISIBLE);
 
     // checkbox music
     _p_checkMusic->SetVisibleState(CheckBoxGfx::VISIBLE);
@@ -518,7 +591,7 @@ LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
     }
     _p_ShadowSrf = GFX_UTIL::SDL_CreateRGBSurface(_p_screen->w, _p_screen->h,
                                                   32, 0, 0, 0, 0);
-    
+
     TRACE_DEBUG(
         "[TAROCK_PIEMONT] _p_ShadowSrf buffer format: %s, w: %d, h: %d\n",
         SDL_GetPixelFormatName(_p_ShadowSrf->format), _p_ShadowSrf->w,

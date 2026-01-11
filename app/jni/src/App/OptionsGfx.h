@@ -18,20 +18,22 @@ class CheckBoxGfx;
 class ComboGfx;
 class TextInputGfx;
 class MusicManager;
+class KeyboardGfx;
 
 using namespace traits;
 
 class OptionsGfx {
+   public:
     enum {
         MYIDOK = 0,
         MYIDCANCEL = 1,
         MYIDMUSICCHK = 2,
         MYIDCOMBOLANG = 3,
         MYIDCOMBODECK = 4,
-        MYIDCOMBOBACK = 5
+        MYIDCOMBOBACK = 5,
+        MYIDKYB = 6
     };
 
-   public:
     OptionsGfx();
     ~OptionsGfx();
 
@@ -45,10 +47,13 @@ class OptionsGfx {
     void CheckboxMusicClicked(bool state);
     void Reset() { _inProgress = false; }
     bool IsOngoing() { return _inProgress; }
+    void ShowHideKeyboard();
+    void TextFromKeyboard(const char* text);
 
    private:
     ClickCb prepClickCb();
     CheckboxClickCb prepCheckBoxClickMusic();
+    ClickKeyboardCb prepareClickKeyboardCb();
     void setBackgoundTypeInGameSettings();
     void setLanguageInGameSettings();
     void setControlLocalCaptions();
@@ -61,6 +66,7 @@ class OptionsGfx {
     TTF_Font* _p_fontCtrl;
     SDL_Color _color;
     ButtonGfx* _p_buttonOK;
+    ButtonGfx* _p_btToggleKeyboard;
     STRING _headerText;
     CheckBoxGfx* _p_checkMusic;
     ComboGfx* _p_comboLang;
@@ -81,12 +87,12 @@ class OptionsGfx {
     int _hbar;
     int _labelOffsetY;
     int _captionOffsetX;
-    bool _initilized;
     Languages::eLangId _prevLangId;
     eDeckType _prevDeckType;
     bool _prevMusicEnabled;
     BackgroundTypeEnum _prevBackgroundType;
     std::string _prevName;
+    KeyboardGfx* _p_KeyboardGfx;
 };
 
 #endif

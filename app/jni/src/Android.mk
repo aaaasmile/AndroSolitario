@@ -49,6 +49,7 @@ LOCAL_SRC_FILES := $(APP_PATH)/Main.cpp \
             $(COMPGFX_PATH)/MesgBoxGfx.cpp \
             $(COMPGFX_PATH)/LabelGfx.cpp \
             $(COMPGFX_PATH)/TextInputGfx.cpp \
+            $(COMPGFX_PATH)/KeyboardGfx.cpp \
             $(ANDRO_SPEC_PATH)/AndroTrace.cpp
 
 LOCAL_SHARED_LIBRARIES := SDL3 SDL3_ttf SDL3_mixer SDL3_image 

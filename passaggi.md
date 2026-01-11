@@ -73,8 +73,7 @@ Uso CMake per compilare il target su WSL, mentre ndk con gradle (Android.mk) per
 riguarda il target Android.
 
     rm -r -R build
-    mkdir build
-    cd build
+    mkdir build && cd build
     cmake ../app/jni/ -DSDL_WAYLAND=OFF
     cmake --build .
 o alternativo, senza cambiare la directory (-S è la source dir, -B è la build dir)

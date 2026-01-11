@@ -32,6 +32,7 @@ set(SOURCES App/MusicManager.cpp
             CompGfx/MesgBoxGfx.cpp
             CompGfx/LabelGfx.cpp
             CompGfx/TextInputGfx.cpp
+            CompGfx/KeyboardGfx.cpp
             GameGfx/CardRegionGfx.cpp
             GameGfx/CardStackGfx.cpp
             GameGfx/SolitarioGfx.cpp)
