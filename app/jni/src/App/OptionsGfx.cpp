@@ -528,6 +528,13 @@ ClickKeyboardCb OptionsGfx::prepareClickKeyboardCb() {
 
 void OptionsGfx::TextFromKeyboard(const char* text) {
     std::string currText = _p_textInput->GetText();
+    if (text[0] == '\b') {
+        if (!currText.empty()) {
+            currText.pop_back();
+            _p_textInput->SetText(currText);
+        }
+        return;
+    }
     std::string newText = currText + std::string(text);
     _p_textInput->SetText(newText);
 }

@@ -11,6 +11,11 @@
 
 using namespace traits;
 
+#define ID_SHIFT 1000
+#define ID_BACKSPACE 8
+#define ID_RETURN 13
+#define ID_SPACE 32
+
 class KeyboardGfx {
    public:
     enum VisbleState { VISIBLE, INVISIBLE };
@@ -26,6 +31,7 @@ class KeyboardGfx {
     void SetVisibleState(VisbleState eVal) { _visibleState = eVal; }
     void GetRect(SDL_Rect& rect) { rect = _rctCtrl; }
     void OnButtonClickImpl(int btID);
+    void RefreshLabels();
 
    private:
     ClickCb prepClickCb();
@@ -39,6 +45,7 @@ class KeyboardGfx {
     ClickKeyboardCb _fncbKeyboardEvent;
     
     std::vector<ButtonGfx*> _buttons;
+    bool _isShifted;
 };
 
 #endif
