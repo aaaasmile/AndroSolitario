@@ -10,7 +10,6 @@
 #include "CurrentTime.h"
 #include "Fading.h"
 #include "GfxUtil.h"
-#include "HighScore.h"
 #include "MusicManager.h"
 #include "WinTypeGlobal.h"
 
@@ -124,12 +123,13 @@ LPErrInApp SolitarioGfx::Initialize(SDL_Surface* pScreen,
                                     UpdateScreenCb& fnUpdateScreen,
                                     SDL_Window* pWindow,
                                     SDL_Surface* pSceneBackground,
-                                    HighScore* pHighScore) {
+                                    UpdateHighScoreCb& fnUpdateHighScore) {
     TRACE("Initialize Solitario\n");
     LPGameSettings pGameSettings = GameSettings::GetSettings();
     setDeckType(pGameSettings->DeckTypeVal);
     _p_MusicManager = pGameSettings->GetMusicManager();
-    _p_HighScore = pHighScore;
+    //_p_HighScore = pHighScore;
+    _fnUpdateHighScore = fnUpdateHighScore;
     _sceneBackgroundIsBlack =
         pGameSettings->BackgroundType == BackgroundTypeEnum::Black;
     _p_FontBigText = pGameSettings->GetFontAriblk();
@@ -1326,7 +1326,10 @@ LPErrInApp SolitarioGfx::checkForVictory() {
         _p_currentTime->StopTimer();
         bonusScore();
         DrawStaticScene();
-        err = _p_HighScore->SaveScore(_scoreGame, _deckType.GetNumCards());
+        // err = _p_HighScore->SaveScore(_scoreGame, _deckType.GetNumCards());
+        err = (_fnUpdateHighScore.tc)
+                  ->SaveScore(_fnUpdateHighScore.self, _scoreGame,
+                              _deckType.GetNumCards());
         if (err != NULL) {
             return err;
         }

@@ -83,6 +83,33 @@ typedef struct {
     void* self;
 } UpdateScreenCb, *LPUpdateScreenCb;
 
+// trait for update high score
+typedef struct {
+    LPErrInApp (*const SaveScore)(void* self, int64_t score, int numCard);
+} VUpdateHighScoreCb, *LPVUpdateHighScoreCb;
+
+typedef struct {
+    VUpdateHighScoreCb const* tc;
+    void* self;
+} UpdateHighScoreCb, *LPUpdateHighScoreCb;
+
+// trait for GameGfx
+typedef struct {
+    LPErrInApp (*const HandleEvent)(void* self, SDL_Event* pEvent,
+                                    const SDL_Point& targetPos);
+    LPErrInApp (*const HandleIterate)(void* self, bool& done);
+    LPErrInApp (*const Initialize)(void* self, SDL_Surface* pScreen,
+                                   UpdateScreenCb& fnUpdateScreen,
+                                   SDL_Window* pWindow, SDL_Surface* pSceneBackground,
+                                   UpdateHighScoreCb& fnHighScore);
+    LPErrInApp (*const Show)(void* self);
+} VGameGfxCb, *LPVGameGfxCb;
+
+typedef struct {
+    VGameGfxCb const* tc;
+    void* self;
+} GameGfxCb, *LPGameGfxCb;
+
 };  // namespace traits
 
 #endif

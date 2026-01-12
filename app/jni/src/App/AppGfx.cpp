@@ -18,6 +18,7 @@
 #include "Credits.h"
 #include "ErrorInfo.h"
 #include "Fading.h"
+#include "GameSelector.h"
 #include "GfxUtil.h"
 #include "HighScore.h"
 #include "MenuMgr.h"
@@ -141,7 +142,9 @@ static ResolutionMgr g_ResolutionMgr;
 AppGfx::AppGfx() {
     _p_Window = NULL;
     _p_ScreenTexture = NULL;
-    _p_SolitarioGfx = NULL;
+    //_p_SolitarioGfx = NULL;
+    _fnGameGfxCb.self = NULL;
+    _fnGameGfxCb.tc = NULL;
     _p_SceneBackground = NULL;
     _p_Screen = NULL;
     _lastMainLoopticks = 0;
@@ -153,6 +156,7 @@ AppGfx::AppGfx() {
     _p_CreditsView = new CreditsView();
     _p_OptGfx = new OptionsGfx();
     _p_HighScore = new HighScore();
+    _p_GameSelector = new GameSelector();
 }
 
 AppGfx::~AppGfx() { terminate(); }
@@ -463,6 +467,8 @@ LPErrInApp AppGfx::createScreenLayout() {
 void AppGfx::terminate() {
     delete _p_CreditsView;
     delete _p_OptGfx;
+    delete _p_GameSelector;
+    delete _p_HighScore;
 
     SDL_ShowCursor();
 
@@ -486,12 +492,11 @@ void AppGfx::terminate() {
         _p_MenuMgr = NULL;
     }
 
-    if (_p_SolitarioGfx != NULL) {
-        delete _p_SolitarioGfx;
-        _p_SolitarioGfx = NULL;
-    }
+    // if (_p_SolitarioGfx != NULL) {
+    //     delete _p_SolitarioGfx;
+    //     _p_SolitarioGfx = NULL;
+    // }
 
-    delete _p_HighScore;
     _p_GameSettings->TerminateMusicManager();
 
     SDL_DestroyWindow(_p_Window);
@@ -551,6 +556,11 @@ void fncBind_RenderTexture(void* self, SDL_Texture* pScreenTexture) {
     return pApp->RenderTexture(pScreenTexture);
 }
 
+LPErrInApp fncBind_SaveScore(void* self, int64_t score, int numCard){
+    HighScore* pHighScore = (HighScore*)self;
+    return pHighScore->SaveScore(score, numCard);
+}
+
 MenuDelegator AppGfx::prepMenuDelegator() {
     // Use only static otherwise you loose it
     static VMenuDelegator const tc = {.LeaveMenu = (&fncBind_LeaveMenu),
@@ -564,6 +574,12 @@ UpdateScreenCb AppGfx::prepScreenUpdater() {
         .UpdateScreen = (&fncBind_UpdateScreen),
         .RenderTexture = (&fncBind_RenderTexture)};
     return (UpdateScreenCb){.tc = &tc, .self = this};
+}
+
+UpdateHighScoreCb AppGfx::prepHighScoreCb(){
+    static VUpdateHighScoreCb const tc = {
+        .SaveScore = (&fncBind_SaveScore)};
+    return (UpdateHighScoreCb){.tc = &tc, .self = _p_HighScore};
 }
 
 OptionDelegator AppGfx::prepOptionDelegator() {
@@ -684,7 +700,9 @@ LPErrInApp AppGfx::MainLoopEvent(SDL_Event* pEvent, SDL_AppResult& res) {
             break;
 
         case MenuItemEnum::MENU_GAME:
-            err = _p_SolitarioGfx->HandleEvent(pEvent, targetPos);
+            // err = _p_SolitarioGfx->HandleEvent(pEvent, targetPos);
+            err = (_fnGameGfxCb.tc)
+                      ->HandleEvent(_fnGameGfxCb.self, pEvent, targetPos);
             if (err != NULL)
                 return err;
             break;
@@ -753,7 +771,8 @@ LPErrInApp AppGfx::MainLoopIterate() {
             break;
 
         case MenuItemEnum::MENU_GAME:
-            err = _p_SolitarioGfx->HandleIterate(done);
+            // err = _p_SolitarioGfx->HandleIterate(done);
+            err = (_fnGameGfxCb.tc)->HandleIterate(_fnGameGfxCb.self, done);
             if (err != NULL)
                 return err;
             if (done) {
@@ -803,23 +822,34 @@ LPErrInApp AppGfx::MainLoopIterate() {
 }
 
 LPErrInApp AppGfx::startGameLoop() {
-    TRACE("Start Game Loop, the game is the solitario\n");
+    TRACE("Start Game Loop\n");
     if (_p_MusicManager->IsPlayingMusic()) {
         _p_MusicManager->StopMusic(600);
     }
 
     LPErrInApp err;
-    if (_p_SolitarioGfx != NULL) {
-        delete _p_SolitarioGfx;
+    // if (_p_SolitarioGfx != NULL) {
+    //     delete _p_SolitarioGfx;
+    // }
+    //_p_SolitarioGfx = new SolitarioGfx();
+    _fnGameGfxCb = _p_GameSelector->PrepGameGfx();
+    if (_fnGameGfxCb.tc == NULL || _fnGameGfxCb.self == NULL) {
+        return ERR_UTIL::ErrorCreate("[startGameLoop] unable to get game Gfx");
     }
-    _p_SolitarioGfx = new SolitarioGfx();
+
     UpdateScreenCb screenUpdater = prepScreenUpdater();
-    err = _p_SolitarioGfx->Initialize(_p_Screen, screenUpdater, _p_Window,
-                                      _p_SceneBackground, _p_HighScore);
+    // err = _p_SolitarioGfx->Initialize(_p_Screen, screenUpdater, _p_Window,
+    //                                   _p_SceneBackground, _p_HighScore);
+    UpdateHighScoreCb highScoreCb = prepHighScoreCb();
+
+    err = (_fnGameGfxCb.tc)
+              ->Initialize(_fnGameGfxCb.self, _p_Screen, screenUpdater,
+                           _p_Window, _p_SceneBackground, highScoreCb);
     if (err != NULL)
         return err;
-
-    return _p_SolitarioGfx->Show();
+    err = (_fnGameGfxCb.tc)->Show(_fnGameGfxCb.self);
+    return err;
+    // return _p_SolitarioGfx->Show();
 }
 
 LPErrInApp AppGfx::showHelp() {

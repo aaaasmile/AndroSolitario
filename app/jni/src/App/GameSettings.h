@@ -12,6 +12,7 @@
 
 enum BackgroundTypeEnum { Commessaggio = 0, Mantova = 1, Black = 2 };
 enum InputTypeEnum { Mouse = 0, TouchWithoutMouse = 1 };
+enum GameTypeEnum { Solitario };
 
 class MusicManager;
 
@@ -78,6 +79,8 @@ class GameSettings {
     bool IsWidePortrait() { return _portraitWideMode; }
     bool IsDEVPortrait() { return _portraitDevMode; }
 
+    GameTypeEnum GetGameTypeGfx() { return _gameType; };
+
    private:
     GameSettings();
     LPErrInApp setSettingFileName();
@@ -98,6 +101,7 @@ class GameSettings {
     bool _portraitNarrowMode = false;
     bool _portraitWideMode = false;
     bool _portraitDevMode = false;
+    GameTypeEnum _gameType;
 };
 
 typedef GameSettings* LPGameSettings;

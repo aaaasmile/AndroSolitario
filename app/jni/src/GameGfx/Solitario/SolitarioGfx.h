@@ -1,8 +1,8 @@
 #ifndef SOLIATRIO_GFX__H
 #define SOLIATRIO_GFX__H
 
-#include <vector>
 #include <functional>
+#include <vector>
 
 #include "CardRegionGfx.h"
 #include "ErrorInfo.h"
@@ -71,14 +71,14 @@ class SolitarioGfx {
         WAIT_FOR_FADING,
         TERMINATED
     };
-    
 
    public:
     SolitarioGfx();
     ~SolitarioGfx();
 
-    LPErrInApp Initialize(SDL_Surface* s, UpdateScreenCb& fnUpdateScreen, SDL_Window* w,
-                          SDL_Surface* pSceneBackground, HighScore* pHighScore);
+    LPErrInApp Initialize(SDL_Surface* pScreen, UpdateScreenCb& fnUpdateScreen,
+                          SDL_Window* pWindow, SDL_Surface* pSceneBackground,
+                          UpdateHighScoreCb& fnUpdateHighScore);
     LPErrInApp HandleEvent(SDL_Event* pEvent, const SDL_Point& targetPos);
     LPErrInApp HandleIterate(bool& done);
     LPErrInApp Show();
@@ -188,7 +188,8 @@ class SolitarioGfx {
     void setDeckType(DeckType& dt) { _deckType.CopyFrom(dt); }
     void clearSurface();
     LPErrInApp newGame();
-    LPErrInApp handleGameLoopMouseDownEvent(SDL_Event* pEvent, const SDL_Point& targetPos);
+    LPErrInApp handleGameLoopMouseDownEvent(SDL_Event* pEvent,
+                                            const SDL_Point& targetPos);
     LPErrInApp handleGameLoopFingerDownEvent(SDL_Event* pEvent);
     LPErrInApp handleGameLoopFingerUpEvent(SDL_Event* pEvent);
     LPErrInApp handleGameLoopFingerMotion(SDL_Event* pEvent);
@@ -196,8 +197,10 @@ class SolitarioGfx {
     LPErrInApp doubleTapOrRightClick(SDL_Point& pt);
     LPErrInApp endOfDragAndCheckForVictory();
     LPErrInApp checkForVictory();
-    void handleGameLoopMouseMoveEvent(SDL_Event* pEvent, const SDL_Point& targetPos);
-    LPErrInApp handleGameLoopMouseUpEvent(SDL_Event* pEvent, const SDL_Point& targetPos);
+    void handleGameLoopMouseMoveEvent(SDL_Event* pEvent,
+                                      const SDL_Point& targetPos);
+    LPErrInApp handleGameLoopMouseUpEvent(SDL_Event* pEvent,
+                                          const SDL_Point& targetPos);
     ClickCb prepClickQuitCb();
     ClickCb prepClickNewGameCb();
     ClickCb prepClickToggleSoundCb();
@@ -225,9 +228,10 @@ class SolitarioGfx {
     SDL_Surface* _p_Dragface;
     SDL_Surface* _p_SceneBackground;
     UpdateScreenCb _fnUpdateScreen;
+    UpdateHighScoreCb _fnUpdateHighScore;
     SDL_Window* _p_Window;
     TTF_Font* _p_FontBigText;
-    HighScore* _p_HighScore;
+    // HighScore* _p_HighScore;
     MusicManager* _p_MusicManager;
 
     int _oldx;

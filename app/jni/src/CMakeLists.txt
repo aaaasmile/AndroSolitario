@@ -25,6 +25,7 @@ set(SOURCES App/MusicManager.cpp
             App/TraceService.cpp
             App/HighScore.cpp
             App/CurrentTime.cpp
+            App/GameSelector.cpp
             CompGfx/LabelLinkGfx.cpp
             CompGfx/ButtonGfx.cpp
             CompGfx/CheckBoxGfx.cpp
@@ -33,9 +34,9 @@ set(SOURCES App/MusicManager.cpp
             CompGfx/LabelGfx.cpp
             CompGfx/TextInputGfx.cpp
             CompGfx/KeyboardGfx.cpp
-            GameGfx/CardRegionGfx.cpp
-            GameGfx/CardStackGfx.cpp
-            GameGfx/SolitarioGfx.cpp)
+            GameGfx/Solitario/CardRegionGfx.cpp
+            GameGfx/Solitario/CardStackGfx.cpp
+            GameGfx/Solitario/SolitarioGfx.cpp)
 if (${UNIX_SYS})
     set(SOURCES2 UnixSys/UnixsysTrace.cpp)
 endif()

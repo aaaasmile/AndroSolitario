@@ -24,9 +24,9 @@ LOCAL_C_INCLUDES := $(LOCAL_PATH)/$(SDL_PATH)/include \
 
 # Add your application source files here...
 LOCAL_SRC_FILES := $(APP_PATH)/Main.cpp \
-			$(GAMEGFX_PATH)/CardRegionGfx.cpp \
-            $(GAMEGFX_PATH)/CardStackGfx.cpp \
-            $(GAMEGFX_PATH)/SolitarioGfx.cpp \
+			$(GAMEGFX_PATH)/Solitario/CardRegionGfx.cpp \
+            $(GAMEGFX_PATH)/Solitario/CardStackGfx.cpp \
+            $(GAMEGFX_PATH)/Solitario/SolitarioGfx.cpp \
             $(APP_PATH)/CurrentTime.cpp \
             $(APP_PATH)/MusicManager.cpp \
             $(APP_PATH)/AppGfx.cpp \
@@ -42,6 +42,7 @@ LOCAL_SRC_FILES := $(APP_PATH)/Main.cpp \
             $(APP_PATH)/OptionsGfx.cpp \
             $(APP_PATH)/TraceService.cpp \
             $(APP_PATH)/HighScore.cpp \
+            $(APP_PATH)/GameSelector.cpp \
             $(COMPGFX_PATH)/LabelLinkGfx.cpp \
             $(COMPGFX_PATH)/ButtonGfx.cpp \
             $(COMPGFX_PATH)/CheckBoxGfx.cpp \

@@ -11,9 +11,10 @@
 #include <string>
 
 #include "ErrorInfo.h"
-#include "GameGfx/SolitarioGfx.h"
+//#include "GameGfx/SolitarioGfx.h"
 #include "Languages.h"
 #include "Traits.h"
+#include "GameSettings.h"
 #include "WinTypeGlobal.h"
 
 class MusicManager;
@@ -21,6 +22,7 @@ class HighScore;
 class MenuMgr;
 class CreditsView;
 class OptionsGfx;
+class GameSelector;
 
 using namespace traits;
 
@@ -63,6 +65,8 @@ class AppGfx {
     MenuDelegator prepMenuDelegator();
     OptionDelegator prepOptionDelegator();
     UpdateScreenCb prepScreenUpdater();
+    UpdateHighScoreCb prepHighScoreCb();
+
     void clearBackground();
     LPErrInApp loadSceneBackground();
 
@@ -74,19 +78,19 @@ class AppGfx {
     SDL_Window* _p_Window;
     SDL_Renderer* _p_sdlRenderer;
     GameSettings* _p_GameSettings;
-    SolitarioGfx* _p_SolitarioGfx;
+    //SolitarioGfx* _p_SolitarioGfx;
+    GameSelector* _p_GameSelector;
     MusicManager* _p_MusicManager;
     HighScore* _p_HighScore;
     MenuMgr* _p_MenuMgr;
     CreditsView* _p_CreditsView;
     OptionsGfx* _p_OptGfx;
 
-    //int _screenW;
-    //int _screenH;
     int _Bpp;
     bool _fullScreen;
     std::stack<MenuItemEnum> _histMenu;
     Uint64 _lastMainLoopticks;
+    GameGfxCb _fnGameGfxCb;
 };
 
 #endif
