@@ -58,10 +58,10 @@ void KeyboardGfx::Show(SDL_Rect* pRect, SDL_Surface* pScreen, TTF_Font* pFont,
 
     SDL_FillSurfaceRect(_p_keyboardSurface, NULL,
                         SDL_MapRGB(SDL_GetPixelFormatDetails(pScreen->format),
-                                   NULL, 255, 0, 0));
+                                   NULL, 153, 242, 51));
 
     SDL_SetSurfaceBlendMode(_p_keyboardSurface, SDL_BLENDMODE_BLEND);
-    SDL_SetSurfaceAlphaMod(_p_keyboardSurface, 127);
+    SDL_SetSurfaceAlphaMod(_p_keyboardSurface, 150);
 
     // Initialize buttons
     const char* layout[] = {"QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM"};

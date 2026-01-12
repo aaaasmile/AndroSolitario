@@ -326,6 +326,13 @@ LPErrInApp OptionsGfx::HandleEvent(SDL_Event* pEvent,
                 return err;
         }
     }
+    if (_p_KeyboardGfx != NULL){
+        _p_KeyboardGfx->HandleEvent(pEvent, targetPos);
+        if (pEvent->type == SDL_EVENT_MOUSE_BUTTON_UP) {
+            _p_btToggleKeyboard->MouseUp(pEvent, targetPos);
+        }
+        return NULL;
+    }
 #if HASTOUCH
     if (pEvent->type == SDL_EVENT_FINGER_DOWN) {
         _p_buttonOK->FingerDown(pEvent);
@@ -360,9 +367,7 @@ LPErrInApp OptionsGfx::HandleEvent(SDL_Event* pEvent,
     }
 #endif
     _p_textInput->HandleEvent(pEvent, targetPos);
-    if (_p_KeyboardGfx != NULL){
-        _p_KeyboardGfx->HandleEvent(pEvent, targetPos);
-    }
+    
     return NULL;
 }
 
@@ -539,7 +544,7 @@ void OptionsGfx::ShowHideKeyboard() {
     SDL_Rect rctKeyboard;
     rctKeyboard.x = 2;
     rctKeyboard.y = (_p_screen->h / 2) + 100;
-    rctKeyboard.w = _p_screen->w - 10;
+    rctKeyboard.w = _p_screen->w - 2;
     rctKeyboard.h = (_p_screen->h / 2) - 100;
 
     ClickKeyboardCb cbKeyboard = prepareClickKeyboardCb();
