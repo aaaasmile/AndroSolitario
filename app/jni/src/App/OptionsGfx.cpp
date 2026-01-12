@@ -463,10 +463,7 @@ LPErrInApp OptionsGfx::HandleIterate(bool& done) {
     // player name
     _p_textInput->DrawCtrl(_p_ShadowSrf);
     _p_btToggleKeyboard->DrawButton(_p_ShadowSrf);
-    if (_p_KeyboardGfx != NULL){
-        _p_KeyboardGfx->DrawCtrl(_p_ShadowSrf);
-    }
-
+    
     // Combo Deck: Label and control
     STRING strDeckSelectTitle =
         pLanguages->GetStringId(Languages::ID_CHOOSEDECK);
@@ -486,12 +483,16 @@ LPErrInApp OptionsGfx::HandleIterate(bool& done) {
     _cardOnEachDeck[1][iCurrIndex].DrawCardPac(_p_ShadowSrf);
     _cardOnEachDeck[2][iCurrIndex].DrawCardPac(_p_ShadowSrf);
 
+    if (_p_KeyboardGfx != NULL){
+        _p_KeyboardGfx->DrawCtrl(_p_ShadowSrf);
+    }
+
     // render the dialogbox
     SDL_BlitSurface(_p_ShadowSrf, NULL, _p_screen, NULL);
     (_fnUpdateScreen.tc)->UpdateScreen(_fnUpdateScreen.self, _p_screen);
 
     _p_textInput->Update();
-
+    
     if (!_inProgress) {
         // time to leave
         if (_p_ShadowSrf != NULL) {

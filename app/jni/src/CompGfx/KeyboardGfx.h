@@ -6,6 +6,8 @@
 
 #include "Traits.h"
 #include "WinTypeGlobal.h"
+#include "ButtonGfx.h"
+#include <vector>
 
 using namespace traits;
 
@@ -23,8 +25,11 @@ class KeyboardGfx {
     void DrawCtrl(SDL_Surface* pScreen);
     void SetVisibleState(VisbleState eVal) { _visibleState = eVal; }
     void GetRect(SDL_Rect& rect) { rect = _rctCtrl; }
+    void OnButtonClickImpl(int btID);
 
    private:
+    ClickCb prepClickCb();
+
     SDL_Surface* _p_keyboardSurface;
     TTF_Font* _p_fontText;
     bool _mouseIsDown;
@@ -32,6 +37,8 @@ class KeyboardGfx {
     VisbleState _visibleState;
     SDL_Rect _rctCtrl;
     ClickKeyboardCb _fncbKeyboardEvent;
+    
+    std::vector<ButtonGfx*> _buttons;
 };
 
 #endif
