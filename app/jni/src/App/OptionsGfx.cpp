@@ -326,6 +326,13 @@ LPErrInApp OptionsGfx::HandleEvent(SDL_Event* pEvent,
                 return err;
         }
     }
+    if (_p_KeyboardGfx != NULL){
+        _p_KeyboardGfx->HandleEvent(pEvent, targetPos);
+        if (pEvent->type == SDL_EVENT_MOUSE_BUTTON_UP) {
+            _p_btToggleKeyboard->MouseUp(pEvent, targetPos);
+        }
+        return NULL;
+    }
 #if HASTOUCH
     if (pEvent->type == SDL_EVENT_FINGER_DOWN) {
         _p_buttonOK->FingerDown(pEvent);
@@ -360,9 +367,7 @@ LPErrInApp OptionsGfx::HandleEvent(SDL_Event* pEvent,
     }
 #endif
     _p_textInput->HandleEvent(pEvent, targetPos);
-    if (_p_KeyboardGfx != NULL){
-        _p_KeyboardGfx->HandleEvent(pEvent, targetPos);
-    }
+    
     return NULL;
 }
 
@@ -463,10 +468,7 @@ LPErrInApp OptionsGfx::HandleIterate(bool& done) {
     // player name
     _p_textInput->DrawCtrl(_p_ShadowSrf);
     _p_btToggleKeyboard->DrawButton(_p_ShadowSrf);
-    if (_p_KeyboardGfx != NULL){
-        _p_KeyboardGfx->DrawCtrl(_p_ShadowSrf);
-    }
-
+    
     // Combo Deck: Label and control
     STRING strDeckSelectTitle =
         pLanguages->GetStringId(Languages::ID_CHOOSEDECK);
@@ -486,12 +488,16 @@ LPErrInApp OptionsGfx::HandleIterate(bool& done) {
     _cardOnEachDeck[1][iCurrIndex].DrawCardPac(_p_ShadowSrf);
     _cardOnEachDeck[2][iCurrIndex].DrawCardPac(_p_ShadowSrf);
 
+    if (_p_KeyboardGfx != NULL){
+        _p_KeyboardGfx->DrawCtrl(_p_ShadowSrf);
+    }
+
     // render the dialogbox
     SDL_BlitSurface(_p_ShadowSrf, NULL, _p_screen, NULL);
     (_fnUpdateScreen.tc)->UpdateScreen(_fnUpdateScreen.self, _p_screen);
 
     _p_textInput->Update();
-
+    
     if (!_inProgress) {
         // time to leave
         if (_p_ShadowSrf != NULL) {
@@ -522,8 +528,22 @@ ClickKeyboardCb OptionsGfx::prepareClickKeyboardCb() {
 
 void OptionsGfx::TextFromKeyboard(const char* text) {
     std::string currText = _p_textInput->GetText();
+    if (text[0] == '\b') {
+        if (!currText.empty()) {
+            currText.pop_back();
+            _p_textInput->SetText(currText);
+        }
+        return;
+    }else if (text[0] == '\n') {
+        if(_p_KeyboardGfx != NULL){
+            ShowHideKeyboard();
+            _p_textInput->SetHasFocus(false);
+        }
+        return;
+    }
     std::string newText = currText + std::string(text);
     _p_textInput->SetText(newText);
+    _p_textInput->SetHasFocus(true);
 }
 
 void OptionsGfx::ShowHideKeyboard() {
@@ -538,7 +558,7 @@ void OptionsGfx::ShowHideKeyboard() {
     SDL_Rect rctKeyboard;
     rctKeyboard.x = 2;
     rctKeyboard.y = (_p_screen->h / 2) + 100;
-    rctKeyboard.w = _p_screen->w - 10;
+    rctKeyboard.w = _p_screen->w - 2;
     rctKeyboard.h = (_p_screen->h / 2) - 100;
 
     ClickKeyboardCb cbKeyboard = prepareClickKeyboardCb();

@@ -6,8 +6,15 @@
 
 #include "Traits.h"
 #include "WinTypeGlobal.h"
+#include "ButtonGfx.h"
+#include <vector>
 
 using namespace traits;
+
+#define ID_SHIFT 1000
+#define ID_BACKSPACE 8
+#define ID_RETURN 13
+#define ID_SPACE 32
 
 class KeyboardGfx {
    public:
@@ -23,8 +30,12 @@ class KeyboardGfx {
     void DrawCtrl(SDL_Surface* pScreen);
     void SetVisibleState(VisbleState eVal) { _visibleState = eVal; }
     void GetRect(SDL_Rect& rect) { rect = _rctCtrl; }
+    void OnButtonClickImpl(int btID);
+    void RefreshLabels();
 
    private:
+    ClickCb prepClickCb();
+
     SDL_Surface* _p_keyboardSurface;
     TTF_Font* _p_fontText;
     bool _mouseIsDown;
@@ -32,6 +43,9 @@ class KeyboardGfx {
     VisbleState _visibleState;
     SDL_Rect _rctCtrl;
     ClickKeyboardCb _fncbKeyboardEvent;
+    
+    std::vector<ButtonGfx*> _buttons;
+    bool _isShifted;
 };
 
 #endif
