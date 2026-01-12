@@ -52,7 +52,7 @@ void TextInputGfx::HandleEvent(SDL_Event* pEvent, const SDL_Point& targetPos) {
 #if HASMOUSE
     LPGameSettings pGameSettings = GameSettings::GetSettings();
     if (pEvent->type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
-        TRACE_DEBUG("[TextInput - event] SDL_EVENT_MOUSE_BUTTON_DOWN \n");
+        //TRACE_DEBUG("[TextInput - event] SDL_EVENT_MOUSE_BUTTON_DOWN \n");
         if (pGameSettings->InputType == InputTypeEnum::TouchWithoutMouse) {
             return;
         }

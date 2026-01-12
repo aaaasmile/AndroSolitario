@@ -329,6 +329,7 @@ LPErrInApp OptionsGfx::HandleEvent(SDL_Event* pEvent,
 #if HASTOUCH
     if (pEvent->type == SDL_EVENT_FINGER_DOWN) {
         _p_buttonOK->FingerDown(pEvent);
+        _p_btToggleKeyboard->FingerDown(pEvent);
         _p_checkMusic->FingerDown(pEvent);
         _p_comboLang->FingerDown(pEvent);
         _p_comboBackground->FingerDown(pEvent);
@@ -342,6 +343,7 @@ LPErrInApp OptionsGfx::HandleEvent(SDL_Event* pEvent,
     if (pEvent->type == SDL_EVENT_MOUSE_BUTTON_UP) {
         if (_mouseDownRec) {
             _p_buttonOK->MouseUp(pEvent, targetPos);
+            _p_btToggleKeyboard->MouseUp(pEvent, targetPos);
             _p_comboLang->MouseUp(pEvent, targetPos);
             _p_checkMusic->MouseUp(pEvent, targetPos);
             _p_comboBackground->MouseUp(pEvent, targetPos);
@@ -351,12 +353,16 @@ LPErrInApp OptionsGfx::HandleEvent(SDL_Event* pEvent,
     }
     if (pEvent->type == SDL_EVENT_MOUSE_MOTION) {
         _p_buttonOK->MouseMove(pEvent, targetPos);
+        _p_btToggleKeyboard->MouseMove(pEvent, targetPos);
         _p_comboLang->MouseMove(pEvent, targetPos);
         _p_comboBackground->MouseMove(pEvent, targetPos);
         _p_comboDeck->MouseMove(pEvent, targetPos);
     }
 #endif
     _p_textInput->HandleEvent(pEvent, targetPos);
+    if (_p_KeyboardGfx != NULL){
+        _p_KeyboardGfx->HandleEvent(pEvent, targetPos);
+    }
     return NULL;
 }
 
@@ -457,6 +463,9 @@ LPErrInApp OptionsGfx::HandleIterate(bool& done) {
     // player name
     _p_textInput->DrawCtrl(_p_ShadowSrf);
     _p_btToggleKeyboard->DrawButton(_p_ShadowSrf);
+    if (_p_KeyboardGfx != NULL){
+        _p_KeyboardGfx->DrawCtrl(_p_ShadowSrf);
+    }
 
     // Combo Deck: Label and control
     STRING strDeckSelectTitle =
@@ -527,6 +536,10 @@ void OptionsGfx::ShowHideKeyboard() {
     TRACE_DEBUG("[ShowHideKeyboard] show keyboard \n");
     _p_KeyboardGfx = new KeyboardGfx();
     SDL_Rect rctKeyboard;
+    rctKeyboard.x = 2;
+    rctKeyboard.y = (_p_screen->h / 2) + 100;
+    rctKeyboard.w = _p_screen->w - 10;
+    rctKeyboard.h = (_p_screen->h / 2) - 100;
 
     ClickKeyboardCb cbKeyboard = prepareClickKeyboardCb();
     _p_KeyboardGfx->Show(&rctKeyboard, _p_screen,

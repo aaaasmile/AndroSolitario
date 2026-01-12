@@ -6,7 +6,7 @@
 KeyboardGfx::KeyboardGfx() {
     _p_keyboardSurface = NULL;
     _p_fontText = NULL;
-    _visibleState = VisbleState::INVISIBLE;
+    _visibleState = VisbleState::VISIBLE;
     _fncbKeyboardEvent.self = NULL;
     _fncbKeyboardEvent.tc = NULL;
 }
