@@ -534,9 +534,16 @@ void OptionsGfx::TextFromKeyboard(const char* text) {
             _p_textInput->SetText(currText);
         }
         return;
+    }else if (text[0] == '\n') {
+        if(_p_KeyboardGfx != NULL){
+            ShowHideKeyboard();
+            _p_textInput->SetHasFocus(false);
+        }
+        return;
     }
     std::string newText = currText + std::string(text);
     _p_textInput->SetText(newText);
+    _p_textInput->SetHasFocus(true);
 }
 
 void OptionsGfx::ShowHideKeyboard() {
