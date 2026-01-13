@@ -529,6 +529,8 @@ ClickKeyboardCb OptionsGfx::prepareClickKeyboardCb() {
 
 void OptionsGfx::TextFromKeyboard(const char* text) {
     std::string currText = _p_textInput->GetText();
+    //TRACE("[TextFromKeyboard] %s", text);
+
     if (text[0] == '\b') {
         if (!currText.empty()) {
             currText.pop_back();

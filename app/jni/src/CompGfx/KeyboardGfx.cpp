@@ -207,8 +207,12 @@ void KeyboardGfx::HandleEvent(SDL_Event* pEvent, const SDL_Point& targetPos) {
             case SDL_EVENT_MOUSE_BUTTON_UP:
                 _buttons[i]->MouseUp(pEvent, targetPos);
                 break;
+#if HASTOUCH
             case SDL_EVENT_FINGER_DOWN:
                 _buttons[i]->FingerDown(pEvent);
+                break;
+#endif
+            default:
                 break;
         }
     }
