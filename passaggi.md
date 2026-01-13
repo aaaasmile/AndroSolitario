@@ -61,6 +61,16 @@ Il problema si risolve impostando per la versione Android lo schermo in questo m
     _screenH = 1920;
 Nota che in WSL lo schermo è troppo grande.
 
+### Main e uso di callbacks
+L'uso dei callbacks anzichè della funzione main, ha un senso per quanto riguarda
+l'implementazione in wasm, che utilizza un meccanismo di polling. Queste sono le callback
+che bisogna implementare:
+SDL_AppInit, SDL_AppEvent, SDL_AppIterate, and SDL_AppQuit
+Nel file main.cpp uso anche (nota l'utilizzo di SDL_MAIN_USE_CALLBACKS):
+
+    #define SDL_MAIN_USE_CALLBACKS 1
+    #include <SDL3/SDL_main.h>
+
 ## Per Partire
 Nella finestra WSL UbuntuMinitoro vado nella directory ~/projects/AndroSolitario3 e lancio 
     
@@ -115,17 +125,6 @@ che non uso tipo wayland, devo poi ricostruire la directory build.
 Nota che il programma va a finire di dafult nella directory ./build/src. 
 Cambio la destinazione con set_target_properties in CMakeFiles.
 Gli asset li ho copiati con un post build command.
-
-### Main e uso di callbacks
-L'uso dei callbacks anzichè della funzione main, ha un senso per quanto riguarda
-l'implementazione in wasm, che utilizza un meccanismo di polling. Queste sono le callback
-che bisogna implementare:
-SDL_AppInit, SDL_AppEvent, SDL_AppIterate, and SDL_AppQuit
-Nel file main.cpp uso anche (nota l'utilizzo di SDL_MAIN_USE_CALLBACKS):
-
-    #define SDL_MAIN_USE_CALLBACKS 1
-    #include <SDL3/SDL_main.h>
-
 
 ## Compilazione con target Windows (MySys2)
 
