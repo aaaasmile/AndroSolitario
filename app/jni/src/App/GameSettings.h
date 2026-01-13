@@ -101,7 +101,7 @@ class GameSettings {
     bool _portraitNarrowMode = false;
     bool _portraitWideMode = false;
     bool _portraitDevMode = false;
-    GameTypeEnum _gameType;
+    GameTypeEnum _gameType = GameTypeEnum::Solitario;
 };
 
 typedef GameSettings* LPGameSettings;
