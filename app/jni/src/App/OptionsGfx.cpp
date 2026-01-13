@@ -313,6 +313,14 @@ LPErrInApp OptionsGfx::HandleEvent(SDL_Event* pEvent,
     if (pEvent->type == SDL_EVENT_QUIT) {
         _inProgress = false;
     }
+    if (_p_KeyboardGfx != NULL) {
+        _p_KeyboardGfx->HandleEvent(pEvent, targetPos);
+        if (pEvent->type == SDL_EVENT_MOUSE_BUTTON_UP) {
+            _p_btToggleKeyboard->MouseUp(pEvent, targetPos);
+        }
+        return NULL;
+    }
+
     if (pEvent->type == SDL_EVENT_KEY_DOWN) {
         if (pEvent->key.key == SDLK_RETURN) {
             if (!_p_textInput->GetHasFocus()) {
@@ -325,13 +333,6 @@ LPErrInApp OptionsGfx::HandleEvent(SDL_Event* pEvent,
             if (err)
                 return err;
         }
-    }
-    if (_p_KeyboardGfx != NULL) {
-        _p_KeyboardGfx->HandleEvent(pEvent, targetPos);
-        if (pEvent->type == SDL_EVENT_MOUSE_BUTTON_UP) {
-            _p_btToggleKeyboard->MouseUp(pEvent, targetPos);
-        }
-        return NULL;
     }
 #if HASTOUCH
     if (pEvent->type == SDL_EVENT_FINGER_DOWN) {
@@ -532,7 +533,6 @@ void OptionsGfx::TextFromKeyboard(const char* text) {
         if (!currText.empty()) {
             currText.pop_back();
             _p_textInput->SetText(currText);
-            _p_textInput->SetHasFocus(true);
         }
         return;
     } else if (text[0] == '\n') {
@@ -544,7 +544,6 @@ void OptionsGfx::TextFromKeyboard(const char* text) {
     }
     std::string newText = currText + std::string(text);
     _p_textInput->SetText(newText);
-    _p_textInput->SetHasFocus(true);
 }
 
 void OptionsGfx::ToggleScreenKeyboard() {
@@ -565,6 +564,7 @@ void OptionsGfx::ToggleScreenKeyboard() {
     ClickKeyboardCb cbKeyboard = prepareClickKeyboardCb();
     _p_KeyboardGfx->Show(&rctKeyboard, _p_screen,
                          _p_GameSettings->GetFontMedium(), cbKeyboard);
+    _p_textInput->SetHasFocus(true);
 }
 
 LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
