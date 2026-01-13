@@ -70,7 +70,7 @@ void fncBind_ButtonClicked(void* self, int iVal) {
             pOptionsGfx->OptionsEnd();
             break;
         case OptionsGfx::MYIDKYB:
-            pOptionsGfx->ShowHideKeyboard();
+            pOptionsGfx->ToggleScreenKeyboard();
             break;
         default:
             TRACE_DEBUG("Ignore bt key id %d \n", iVal);
@@ -326,7 +326,7 @@ LPErrInApp OptionsGfx::HandleEvent(SDL_Event* pEvent,
                 return err;
         }
     }
-    if (_p_KeyboardGfx != NULL){
+    if (_p_KeyboardGfx != NULL) {
         _p_KeyboardGfx->HandleEvent(pEvent, targetPos);
         if (pEvent->type == SDL_EVENT_MOUSE_BUTTON_UP) {
             _p_btToggleKeyboard->MouseUp(pEvent, targetPos);
@@ -367,7 +367,7 @@ LPErrInApp OptionsGfx::HandleEvent(SDL_Event* pEvent,
     }
 #endif
     _p_textInput->HandleEvent(pEvent, targetPos);
-    
+
     return NULL;
 }
 
@@ -468,7 +468,7 @@ LPErrInApp OptionsGfx::HandleIterate(bool& done) {
     // player name
     _p_textInput->DrawCtrl(_p_ShadowSrf);
     _p_btToggleKeyboard->DrawButton(_p_ShadowSrf);
-    
+
     // Combo Deck: Label and control
     STRING strDeckSelectTitle =
         pLanguages->GetStringId(Languages::ID_CHOOSEDECK);
@@ -488,7 +488,7 @@ LPErrInApp OptionsGfx::HandleIterate(bool& done) {
     _cardOnEachDeck[1][iCurrIndex].DrawCardPac(_p_ShadowSrf);
     _cardOnEachDeck[2][iCurrIndex].DrawCardPac(_p_ShadowSrf);
 
-    if (_p_KeyboardGfx != NULL){
+    if (_p_KeyboardGfx != NULL) {
         _p_KeyboardGfx->DrawCtrl(_p_ShadowSrf);
     }
 
@@ -497,7 +497,7 @@ LPErrInApp OptionsGfx::HandleIterate(bool& done) {
     (_fnUpdateScreen.tc)->UpdateScreen(_fnUpdateScreen.self, _p_screen);
 
     _p_textInput->Update();
-    
+
     if (!_inProgress) {
         // time to leave
         if (_p_ShadowSrf != NULL) {
@@ -532,11 +532,12 @@ void OptionsGfx::TextFromKeyboard(const char* text) {
         if (!currText.empty()) {
             currText.pop_back();
             _p_textInput->SetText(currText);
+            _p_textInput->SetHasFocus(true);
         }
         return;
-    }else if (text[0] == '\n') {
-        if(_p_KeyboardGfx != NULL){
-            ShowHideKeyboard();
+    } else if (text[0] == '\n') {
+        if (_p_KeyboardGfx != NULL) {
+            ToggleScreenKeyboard();
             _p_textInput->SetHasFocus(false);
         }
         return;
@@ -546,14 +547,14 @@ void OptionsGfx::TextFromKeyboard(const char* text) {
     _p_textInput->SetHasFocus(true);
 }
 
-void OptionsGfx::ShowHideKeyboard() {
+void OptionsGfx::ToggleScreenKeyboard() {
     if (_p_KeyboardGfx != NULL) {
-        TRACE_DEBUG("[ShowHideKeyboard] hide keyboard \n");
+        TRACE_DEBUG("[ToggleScreenKeyboard] hide keyboard \n");
         delete _p_KeyboardGfx;
         _p_KeyboardGfx = NULL;
         return;
     }
-    TRACE_DEBUG("[ShowHideKeyboard] show keyboard \n");
+    TRACE_DEBUG("[ToggleScreenKeyboard] show keyboard \n");
     _p_KeyboardGfx = new KeyboardGfx();
     SDL_Rect rctKeyboard;
     rctKeyboard.x = 2;

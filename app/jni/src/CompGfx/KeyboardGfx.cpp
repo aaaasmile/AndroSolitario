@@ -9,7 +9,7 @@ KeyboardGfx::KeyboardGfx() {
     _visibleState = VisbleState::VISIBLE;
     _fncbKeyboardEvent.self = NULL;
     _fncbKeyboardEvent.tc = NULL;
-    _isShifted = true; // Start with capitalized
+    _isShifted = true;
 }
 
 KeyboardGfx::~KeyboardGfx() {
@@ -34,7 +34,6 @@ ClickCb KeyboardGfx::prepClickCb() {
     static VClickCb const tc = {.Click = (&fncBind_OnButtonClick)};
     return (ClickCb){.tc = &tc, .self = this};
 }
-
 
 void KeyboardGfx::OnButtonClickImpl(int btID) {
     if (btID == ID_SHIFT) {
@@ -82,7 +81,7 @@ void KeyboardGfx::Show(SDL_Rect* pRect, SDL_Surface* pScreen, TTF_Font* pFont,
     _fncbKeyboardEvent = fncbClickEvent;
     _p_fontText = pFont;
     _rctCtrl = *pRect;
-    
+
     for (size_t i = 0; i < _buttons.size(); ++i) {
         delete _buttons[i];
     }
@@ -105,8 +104,8 @@ void KeyboardGfx::Show(SDL_Rect* pRect, SDL_Surface* pScreen, TTF_Font* pFont,
     int btnGap = 2;
 
     int maxKeysInRow = 10;
-    int btnW =
-        (_rctCtrl.w - (margin * 2) - (maxKeysInRow - 1) * btnGap) / maxKeysInRow;
+    int btnW = (_rctCtrl.w - (margin * 2) - (maxKeysInRow - 1) * btnGap) /
+               maxKeysInRow;
     int btnH = (_rctCtrl.h - (margin * 2) - (rowCount - 1) * btnGap) / rowCount;
 
     ClickCb clickCb = prepClickCb();
@@ -142,20 +141,28 @@ void KeyboardGfx::Show(SDL_Rect* pRect, SDL_Surface* pScreen, TTF_Font* pFont,
         int id;
         const char* label;
         int width;
-    } specialKeys[] = {
-        {ID_SHIFT, "Shift", wShift},
-        {ID_SPACE, "Space", wSpace},
-        {ID_BACKSPACE, "BS", wBS},
-        {ID_RETURN, "Ret", wRet}
-    };
+    } specialKeys[] = {{SpecialChar::ID_SHIFT, "Shift", wShift},
+                       {SpecialChar::ID_SPACE, "Space", wSpace},
+                       {SpecialChar::ID_BACKSPACE, "<-", wBS},
+                       {SpecialChar::ID_RETURN, "Ret", wRet}};
 
     int currentX = startX4;
+    GameSettings* pGameSettings = GameSettings::GetSettings();
     for (int i = 0; i < 4; ++i) {
         SDL_Rect btnRect = {currentX, startY4, specialKeys[i].width, btnH};
         ButtonGfx* pBtn = new ButtonGfx();
-        pBtn->Initialize(&btnRect, pScreen, pFont, specialKeys[i].id, clickCb);
+        if (specialKeys[i].id == SpecialChar::ID_BACKSPACE) {
+            std::string strSymbKeyb = "⌫";
+            pBtn->InitializeAsSymbol(&btnRect, pScreen,
+                                     pGameSettings->GetFontSymb(),
+                                     specialKeys[i].id, clickCb);
+            pBtn->SetButtonText(strSymbKeyb.c_str());
+        } else {
+            pBtn->Initialize(&btnRect, pScreen, pFont, specialKeys[i].id,
+                             clickCb);
+            pBtn->SetButtonText(specialKeys[i].label);
+        }
         pBtn->SetVisibleState(ButtonGfx::VisbleState::VISIBLE);
-        pBtn->SetButtonText(specialKeys[i].label);
         _buttons.push_back(pBtn);
         currentX += specialKeys[i].width + btnGap;
     }

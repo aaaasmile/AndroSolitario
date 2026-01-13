@@ -4,27 +4,30 @@
 #include <SDL3/SDL.h>
 #include <SDL3_ttf/SDL_ttf.h>
 
-#include "Traits.h"
-#include "WinTypeGlobal.h"
-#include "ButtonGfx.h"
 #include <vector>
 
-using namespace traits;
+#include "ButtonGfx.h"
+#include "Traits.h"
+#include "WinTypeGlobal.h"
 
-#define ID_SHIFT 1000
-#define ID_BACKSPACE 8
-#define ID_RETURN 13
-#define ID_SPACE 32
+using namespace traits;
 
 class KeyboardGfx {
    public:
     enum VisbleState { VISIBLE, INVISIBLE };
     enum MouseState { OUTSIDE, INSIDE };
+    enum SpecialChar {
+        ID_BACKSPACE = 8,
+        ID_RETURN = 13,
+        ID_SPACE = 32,
+        ID_SHIFT = 1000
+    };
 
     KeyboardGfx();
     ~KeyboardGfx();
 
-    void Show(SDL_Rect* pRect, SDL_Surface* pScreen, TTF_Font* pFont, ClickKeyboardCb& fncbClickEvent);
+    void Show(SDL_Rect* pRect, SDL_Surface* pScreen, TTF_Font* pFont,
+              ClickKeyboardCb& fncbClickEvent);
 
     void HandleEvent(SDL_Event* pEvent, const SDL_Point& targetPos);
     void DrawCtrl(SDL_Surface* pScreen);
@@ -43,7 +46,7 @@ class KeyboardGfx {
     VisbleState _visibleState;
     SDL_Rect _rctCtrl;
     ClickKeyboardCb _fncbKeyboardEvent;
-    
+
     std::vector<ButtonGfx*> _buttons;
     bool _isShifted;
 };

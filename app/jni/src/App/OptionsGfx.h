@@ -47,7 +47,7 @@ class OptionsGfx {
     void CheckboxMusicClicked(bool state);
     void Reset() { _inProgress = false; }
     bool IsOngoing() { return _inProgress; }
-    void ShowHideKeyboard();
+    void ToggleScreenKeyboard();
     void TextFromKeyboard(const char* text);
 
    private:
