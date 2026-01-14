@@ -158,9 +158,7 @@ AppGfx::AppGfx() {
     _p_GameSelector = new GameSelector();
 }
 
-AppGfx::~AppGfx() {
-    terminate();
-}
+AppGfx::~AppGfx() { terminate(); }
 
 LPErrInApp AppGfx::Init() {
     TRACE("Init App\n");

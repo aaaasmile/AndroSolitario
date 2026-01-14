@@ -653,7 +653,7 @@ In Antigravity il plugin che mi formatta il c++ è clangd. Questo però deve ess
 Nel mio caso, su windows, l'ho installato in msys2 nel terminal ucrt64. Il comando è:
 
     pacman -S mingw-w64-ucrt-x86_64-clang-tools-extra
-Nei setting quello che devo metter è il path completo di clangd, che nel mio è:
+Nei setting quello che devo mettere è il path completo di clangd, che nel mio è:
 
     C:\msys64\ucrt64\bin\clangd.exe
-
+Ho inserito il file .clang-format per avere una formattazione molto simile a quella che ho in visual code.
