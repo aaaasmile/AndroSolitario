@@ -11,3 +11,4 @@ app/jni/SDL_2_26_5
 *.Identifier
 app/jni/SDL_ttf/external
 synch_web_with_invido.sh
+.cache

@@ -17,7 +17,6 @@
 #include "Config.h"
 #include "Credits.h"
 #include "ErrorInfo.h"
-#include "Fading.h"
 #include "GameSelector.h"
 #include "GfxUtil.h"
 #include "HighScore.h"
@@ -159,7 +158,9 @@ AppGfx::AppGfx() {
     _p_GameSelector = new GameSelector();
 }
 
-AppGfx::~AppGfx() { terminate(); }
+AppGfx::~AppGfx() {
+    terminate();
+}
 
 LPErrInApp AppGfx::Init() {
     TRACE("Init App\n");
@@ -556,7 +557,7 @@ void fncBind_RenderTexture(void* self, SDL_Texture* pScreenTexture) {
     return pApp->RenderTexture(pScreenTexture);
 }
 
-LPErrInApp fncBind_SaveScore(void* self, int64_t score, int numCard){
+LPErrInApp fncBind_SaveScore(void* self, int64_t score, int numCard) {
     HighScore* pHighScore = (HighScore*)self;
     return pHighScore->SaveScore(score, numCard);
 }
@@ -576,9 +577,8 @@ UpdateScreenCb AppGfx::prepScreenUpdater() {
     return (UpdateScreenCb){.tc = &tc, .self = this};
 }
 
-UpdateHighScoreCb AppGfx::prepHighScoreCb(){
-    static VUpdateHighScoreCb const tc = {
-        .SaveScore = (&fncBind_SaveScore)};
+UpdateHighScoreCb AppGfx::prepHighScoreCb() {
+    static VUpdateHighScoreCb const tc = {.SaveScore = (&fncBind_SaveScore)};
     return (UpdateHighScoreCb){.tc = &tc, .self = _p_HighScore};
 }
 

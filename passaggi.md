@@ -647,3 +647,13 @@ All'interno del terminal di Visual Code posso compilare, installare e lanciare i
     adb shell am start -n org.libsdl.app/.SDLActivity
 Nota il comando source. Esso viene usato in quanto le variabili definite rimangono definite all'interno
 dello script.
+
+## Clangd
+In Antigravity il plugin che mi formatta il c++ è clangd. Questo però deve essere installato a parte.
+Nel mio caso, su windows, l'ho installato in msys2 nel terminal ucrt64. Il comando è:
+
+    pacman -S mingw-w64-ucrt-x86_64-clang-tools-extra
+Nei setting quello che devo metter è il path completo di clangd, che nel mio è:
+
+    C:\msys64\ucrt64\bin\clangd.exe
+
