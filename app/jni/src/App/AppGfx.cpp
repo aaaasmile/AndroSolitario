@@ -1,6 +1,7 @@
 #include "AppGfx.h"
 
 #include <SDL3_image/SDL_image.h>
+#include <SDL3_ttf/SDL_ttf.h>
 #include <fcntl.h>
 #include <limits.h>
 #include <stdlib.h>
@@ -17,6 +18,7 @@
 #include "Config.h"
 #include "Credits.h"
 #include "ErrorInfo.h"
+#include "GameHelp.h"
 #include "GameSelector.h"
 #include "GfxUtil.h"
 #include "HighScore.h"
@@ -24,8 +26,6 @@
 #include "MusicManager.h"
 #include "OptionsGfx.h"
 #include "WinTypeGlobal.h"
-
-static const char* g_lpszHelpFileName = DATA_PREFIX "solitario.pdf";
 
 static const char* g_lpszIconProgFile = DATA_PREFIX "images/icona_asso.bmp";
 static const char* g_lpszTitleFile = DATA_PREFIX "images/title.png";
@@ -156,6 +156,7 @@ AppGfx::AppGfx() {
     _p_OptGfx = new OptionsGfx();
     _p_HighScore = new HighScore();
     _p_GameSelector = new GameSelector();
+    _p_GameHelp = new GameHelp();
 }
 
 AppGfx::~AppGfx() { terminate(); }
@@ -468,6 +469,7 @@ void AppGfx::terminate() {
     delete _p_OptGfx;
     delete _p_GameSelector;
     delete _p_HighScore;
+    delete _p_GameHelp;
 
     SDL_ShowCursor();
 
@@ -852,22 +854,14 @@ LPErrInApp AppGfx::startGameLoop() {
 
 LPErrInApp AppGfx::showHelp() {
     TRACE("Show Help\n");
-    const char* cmd = NULL;
-    char cmdpath[PATH_MAX];
-#if PLATFORM_WINDOWS
-    cmd = "start";
-    snprintf(cmdpath, sizeof(cmdpath), "%s .\\%s", cmd, g_lpszHelpFileName);
-#elif PLATFORM_ANDROID
-    // TODO open the pdf file
-    TRACE_DEBUG("Wanna open file %s\n", g_lpszHelpFileName);
-#else
-    cmd = "zathura";
-    snprintf(cmdpath, sizeof(cmdpath), "%s ./%s", cmd, g_lpszHelpFileName);
-#endif
-#ifndef ANDROID
-    system(cmdpath);
-#endif
-    LeaveMenu();
+    if (_p_GameHelp->IsOngoing()) {
+        return ERR_UTIL::ErrorCreate("Help already started");
+    }
+
+    // Pass the screen updater so GameHelp can refresh screen
+    UpdateScreenCb screenUpdater = prepScreenUpdater();
+    _p_GameHelp->Show(_p_Screen, screenUpdater);
+
     return NULL;
 }
 

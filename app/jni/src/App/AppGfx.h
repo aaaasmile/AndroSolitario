@@ -11,10 +11,10 @@
 #include <string>
 
 #include "ErrorInfo.h"
-//#include "GameGfx/SolitarioGfx.h"
+// #include "GameGfx/SolitarioGfx.h"
+#include "GameSettings.h"
 #include "Languages.h"
 #include "Traits.h"
-#include "GameSettings.h"
 #include "WinTypeGlobal.h"
 
 class MusicManager;
@@ -23,6 +23,7 @@ class MenuMgr;
 class CreditsView;
 class OptionsGfx;
 class GameSelector;
+class GameHelp;
 
 using namespace traits;
 
@@ -40,7 +41,7 @@ class AppGfx {
     }
     void ParseCmdLine(int argc, char* argv[], SDL_AppResult& res);
     LPErrInApp LeaveMenu();
-    LPErrInApp EnterMenu(MenuItemEnum menuItem); 
+    LPErrInApp EnterMenu(MenuItemEnum menuItem);
     LPErrInApp SettingsChanged(bool backGroundChanged, bool languageChanged);
     LPErrInApp ChangeSceneBackground(SDL_Surface** ppSceneBackground);
     void UpdateScreen(SDL_Surface* pScreen);
@@ -60,7 +61,8 @@ class AppGfx {
     LPErrInApp showGeneralOptions();
     void backToMenuRootWithMusic();
     void backToMenuRootSameMusic();
-    void transformMouseToTarget(int windowX, int windowY, SDL_Point* pTargetPos);
+    void transformMouseToTarget(int windowX, int windowY,
+                                SDL_Point* pTargetPos);
 
     MenuDelegator prepMenuDelegator();
     OptionDelegator prepOptionDelegator();
@@ -78,13 +80,14 @@ class AppGfx {
     SDL_Window* _p_Window;
     SDL_Renderer* _p_sdlRenderer;
     GameSettings* _p_GameSettings;
-    //SolitarioGfx* _p_SolitarioGfx;
+    // SolitarioGfx* _p_SolitarioGfx;
     GameSelector* _p_GameSelector;
     MusicManager* _p_MusicManager;
     HighScore* _p_HighScore;
     MenuMgr* _p_MenuMgr;
     CreditsView* _p_CreditsView;
     OptionsGfx* _p_OptGfx;
+    GameHelp* _p_GameHelp;
 
     int _Bpp;
     bool _fullScreen;

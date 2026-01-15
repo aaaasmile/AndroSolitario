@@ -26,6 +26,7 @@ set(SOURCES App/MusicManager.cpp
             App/HighScore.cpp
             App/CurrentTime.cpp
             App/GameSelector.cpp
+            App/GameHelp.cpp
             CompGfx/LabelLinkGfx.cpp
             CompGfx/ButtonGfx.cpp
             CompGfx/CheckBoxGfx.cpp
