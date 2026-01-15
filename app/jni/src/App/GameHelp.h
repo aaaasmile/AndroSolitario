@@ -15,7 +15,7 @@ class GameSettings;
 class ButtonGfx;
 
 enum class HelpItemType { TEXT, IMAGE, NEW_LINE, PARAGRAPH_BREAK };
-enum PageNav { NEXT, PREV };
+enum PageNav { NEXT, PREV, HOME };
 
 struct HelpItem {
     HelpItemType type;
@@ -39,6 +39,7 @@ class GameHelp {
     bool IsOngoing() { return _isShown; }
     void NextPage();
     void PrevPage();
+    void HomePage();
 
    private:
     void buildPages();
@@ -58,6 +59,7 @@ class GameHelp {
     bool _mouseDownRec = false;
     ButtonGfx* _p_buttonNext = NULL;
     ButtonGfx* _p_buttonPrev = NULL;
+    ButtonGfx* _p_buttonHome = NULL;
 
     // Layout constants
     const int MARGIN_X = 20;

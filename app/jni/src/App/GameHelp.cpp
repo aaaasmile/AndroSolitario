@@ -18,13 +18,16 @@ GameHelp::GameHelp() {
     _isShown = false;
     _p_buttonNext = NULL;
     _p_buttonPrev = NULL;
+    _p_buttonHome = NULL;
 }
 
 GameHelp::~GameHelp() {
+    if (_p_buttonNext != NULL)
+        delete _p_buttonNext;
     if (_p_buttonPrev != NULL)
         delete _p_buttonPrev;
-    if (_p_buttonPrev != NULL)
-        delete _p_buttonPrev;
+    if (_p_buttonHome != NULL)
+        delete _p_buttonHome;
 }
 
 LPErrInApp GameHelp::Show(SDL_Surface* pScreen,
@@ -51,8 +54,8 @@ LPErrInApp GameHelp::Show(SDL_Surface* pScreen,
     rctBt1.y = pScreen->h - offsetBtY - rctBt1.h;
     std::string ico = "⏭";
     _p_buttonNext->InitializeAsSymbol(&rctBt1, pScreen,
-                              _p_GameSettings->GetFontSymb(), PageNav::NEXT,
-                              cbBtClicked);
+                                      _p_GameSettings->GetFontSymb(),
+                                      PageNav::NEXT, cbBtClicked);
     _p_buttonNext->SetButtonText(ico.c_str());
     _p_buttonNext->SetVisibleState(ButtonGfx::VISIBLE);
 
@@ -64,10 +67,23 @@ LPErrInApp GameHelp::Show(SDL_Surface* pScreen,
     rctBt1.x = offsetX;
     ico = "⏮";
     _p_buttonPrev->InitializeAsSymbol(&rctBt1, pScreen,
-                              _p_GameSettings->GetFontSymb(), PageNav::PREV,
-                              cbBtClicked);
+                                      _p_GameSettings->GetFontSymb(),
+                                      PageNav::PREV, cbBtClicked);
     _p_buttonPrev->SetButtonText(ico.c_str());
     _p_buttonPrev->SetVisibleState(ButtonGfx::VISIBLE);
+
+    // Button Home
+    if (_p_buttonHome != NULL) {
+        delete _p_buttonHome;
+    }
+    _p_buttonHome = new ButtonGfx();
+    rctBt1.x = (pScreen->w - rctBt1.w) / 2;
+    ico = "△";
+    _p_buttonHome->InitializeAsSymbol(&rctBt1, pScreen,
+                                      _p_GameSettings->GetFontSymb(),
+                                      PageNav::HOME, cbBtClicked);
+    _p_buttonHome->SetButtonText(ico.c_str());
+    _p_buttonHome->SetVisibleState(ButtonGfx::VISIBLE);
 
     return NULL;
 }
@@ -81,6 +97,9 @@ static void fncBind_ButtonClicked(void* self, int iVal) {
             break;
         case PageNav::PREV:
             pGameHelp->PrevPage();
+            break;
+        case PageNav::HOME:
+            pGameHelp->HomePage();
             break;
         default:
             TRACE_DEBUG("Ignore bt key id %d \n", iVal);
@@ -113,6 +132,12 @@ void GameHelp::PrevPage() {
         _currentPageIndex--;
     }
 }
+
+void GameHelp::HomePage() {
+    TRACE_DEBUG("HomePage\n");
+    _isShown = false;
+}
+
 
 void GameHelp::buildPages() {
     TRACE_DEBUG("[buildPages] for help");
@@ -186,6 +211,7 @@ LPErrInApp GameHelp::HandleEvent(SDL_Event* pEvent,
     if (pEvent->type == SDL_EVENT_FINGER_DOWN) {
         _p_buttonNext->FingerDown(pEvent);
         _p_buttonPrev->FingerDown(pEvent);
+        _p_buttonHome->FingerDown(pEvent);
     }
 #endif
 #if HASMOUSE
@@ -196,11 +222,13 @@ LPErrInApp GameHelp::HandleEvent(SDL_Event* pEvent,
         if (_mouseDownRec) {
             _p_buttonNext->MouseUp(pEvent, targetPos);
             _p_buttonPrev->MouseUp(pEvent, targetPos);
+            _p_buttonHome->MouseUp(pEvent, targetPos);
         }
     }
     if (pEvent->type == SDL_EVENT_MOUSE_MOTION) {
         _p_buttonNext->MouseMove(pEvent, targetPos);
         _p_buttonPrev->MouseMove(pEvent, targetPos);
+        _p_buttonHome->MouseMove(pEvent, targetPos);
     }
 #endif
     return NULL;
@@ -208,26 +236,26 @@ LPErrInApp GameHelp::HandleEvent(SDL_Event* pEvent,
 
 LPErrInApp GameHelp::HandleIterate(bool& done) {
     done = !_isShown;
-    if (done){
+    if (done) {
         TRACE_DEBUG("[GameHelp - HandleIterate] done \n");
         _p_buttonNext->SetVisibleState(ButtonGfx::INVISIBLE);
         _p_buttonPrev->SetVisibleState(ButtonGfx::INVISIBLE);
+        _p_buttonHome->SetVisibleState(ButtonGfx::INVISIBLE);
         return NULL;
     }
-        
+
     // Clear background
     SDL_Rect rect = {0, 0, _p_Screen->w, _p_Screen->h};
-    SDL_FillSurfaceRect(
-        _p_Screen, &rect,
-        SDL_MapRGB(SDL_GetPixelFormatDetails(_p_Screen->format), NULL, 0, 50,
-                   0)); 
+    SDL_FillSurfaceRect(_p_Screen, &rect,
+                        SDL_MapRGB(SDL_GetPixelFormatDetails(_p_Screen->format),
+                                   NULL, 0, 50, 0));
 
     renderCurrentPage();
 
     _p_buttonNext->DrawButton(_p_Screen);
     _p_buttonPrev->DrawButton(_p_Screen);
+    _p_buttonHome->DrawButton(_p_Screen);
 
-    
     if (_fnUpdateScreen.tc != NULL) {
         _fnUpdateScreen.tc->UpdateScreen(_fnUpdateScreen.self, _p_Screen);
     }
