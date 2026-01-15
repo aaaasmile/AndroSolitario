@@ -5,54 +5,117 @@
 #include <sstream>
 
 #include "AppGfx.h"
+#include "CompGfx/ButtonGfx.h"
 #include "Config.h"
 #include "GameSettings.h"
 #include "GfxUtil.h"
 #include "Languages.h"
 
-
 GameHelp::GameHelp() {
     _p_Screen = NULL;
     _p_GameSettings = NULL;
     _currentPageIndex = 0;
-    _isInitialized = false;
     _isShown = false;
+    _p_buttonNext = NULL;
+    _p_buttonPrev = NULL;
 }
 
 GameHelp::~GameHelp() {
-}
-
-LPErrInApp GameHelp::Init() {
-    _p_GameSettings = GameSettings::GetSettings();
-    if (!_isInitialized) {
-        buildPages();
-        _isInitialized = true;
-    }
-    return NULL;
-}
-
-void GameHelp::Reset() {
-    _isShown = false;
-    _currentPageIndex = 0;
-}
-
-bool GameHelp::IsOngoing() {
-    return _isShown;
+    if (_p_buttonPrev != NULL)
+        delete _p_buttonPrev;
+    if (_p_buttonPrev != NULL)
+        delete _p_buttonPrev;
 }
 
 LPErrInApp GameHelp::Show(SDL_Surface* pScreen,
                           traits::UpdateScreenCb& fnUpdateScreen) {
+    _p_GameSettings = GameSettings::GetSettings();
+    TRACE("Show Help for %s", _p_GameSettings->GameName.c_str());
     _p_Screen = pScreen;
     _fnUpdateScreen = fnUpdateScreen;
-    if (!_isInitialized) {
-        Init();
-    }
+    buildPages();
     _currentPageIndex = 0;
     _isShown = true;
+    ClickCb cbBtClicked = prepClickCb();
+    // Button Next
+    if (_p_buttonNext != NULL) {
+        delete _p_buttonNext;
+    }
+    _p_buttonNext = new ButtonGfx();
+    SDL_Rect rctBt1;
+    rctBt1.w = 120;
+    rctBt1.h = 34;
+    int offsetBtY = 30;
+    int offsetX = 20;
+    rctBt1.x = (pScreen->w - rctBt1.w) - offsetX;
+    rctBt1.y = pScreen->h - offsetBtY - rctBt1.h;
+    std::string ico = "⏭";
+    _p_buttonNext->InitializeAsSymbol(&rctBt1, pScreen,
+                              _p_GameSettings->GetFontSymb(), PageNav::NEXT,
+                              cbBtClicked);
+    _p_buttonNext->SetButtonText(ico.c_str());
+    _p_buttonNext->SetVisibleState(ButtonGfx::VISIBLE);
+
+    // Button Prev
+    if (_p_buttonPrev != NULL) {
+        delete _p_buttonPrev;
+    }
+    _p_buttonPrev = new ButtonGfx();
+    rctBt1.x = offsetX;
+    ico = "⏮";
+    _p_buttonPrev->InitializeAsSymbol(&rctBt1, pScreen,
+                              _p_GameSettings->GetFontSymb(), PageNav::PREV,
+                              cbBtClicked);
+    _p_buttonPrev->SetButtonText(ico.c_str());
+    _p_buttonPrev->SetVisibleState(ButtonGfx::VISIBLE);
+
     return NULL;
 }
 
+// Prepare the Click() trait
+static void fncBind_ButtonClicked(void* self, int iVal) {
+    GameHelp* pGameHelp = (GameHelp*)self;
+    switch (iVal) {
+        case PageNav::NEXT:
+            pGameHelp->NextPage();
+            break;
+        case PageNav::PREV:
+            pGameHelp->PrevPage();
+            break;
+        default:
+            TRACE_DEBUG("Ignore bt key id %d \n", iVal);
+            break;
+    }
+}
+
+ClickCb GameHelp::prepClickCb() {
+#ifndef _MSC_VER
+    static VClickCb const tc = {.Click = (&fncBind_ButtonClicked)};
+
+    return (ClickCb){.tc = &tc, .self = this};
+#else
+    static VClickCb const tc = {(&fncBind_ButtonClicked)};
+    ClickCb cb = {&tc, this};
+    return cb;
+#endif
+}
+
+void GameHelp::NextPage() {
+    TRACE_DEBUG("NextPage of %d \n", _currentPageIndex);
+    if (_currentPageIndex < _pages.size() - 1) {
+        _currentPageIndex++;
+    }
+}
+
+void GameHelp::PrevPage() {
+    TRACE_DEBUG("PrevPage of %d \n", _currentPageIndex);
+    if (_currentPageIndex > 0) {
+        _currentPageIndex--;
+    }
+}
+
 void GameHelp::buildPages() {
+    TRACE_DEBUG("[buildPages] for help");
     _pages.clear();
 
     // Page 1
@@ -109,7 +172,8 @@ void GameHelp::buildPages() {
     _pages.push_back(page3);
 }
 
-LPErrInApp GameHelp::HandleEvent(SDL_Event* pEvent) {
+LPErrInApp GameHelp::HandleEvent(SDL_Event* pEvent,
+                                 const SDL_Point& targetPos) {
     if (!_isShown)
         return NULL;
 
@@ -117,78 +181,53 @@ LPErrInApp GameHelp::HandleEvent(SDL_Event* pEvent) {
         if (pEvent->key.key == SDLK_ESCAPE) {
             _isShown = false;
         }
-    } else if (pEvent->type == SDL_EVENT_MOUSE_BUTTON_DOWN ||
-               pEvent->type == SDL_EVENT_FINGER_DOWN) {
-        int x, y;
-        if (pEvent->type == SDL_EVENT_FINGER_DOWN) {
-            // Finger coordinates are normalized 0-1
-            // For simplicity, let's rely on the transformed logic in AppGfx or
-            // simple basic assumption if not transformed But actually AppGfx
-            // handles transformation before passing? No, MainLoopEvent passes
-            // raw event except maybe mouse motion coords Let's use simple
-            // logic: if bottom right -> Next, if bottom left -> Close
-            x = (int)(pEvent->tfinger.x * _p_GameSettings->GetScreenWidth());
-            y = (int)(pEvent->tfinger.y * _p_GameSettings->GetScreenHeight());
-        } else {
-            x = pEvent->button.x;
-            y = pEvent->button.y;
-        }
-
-        // Check for click regions
-        int w = _p_GameSettings->GetScreenWidth();
-        int h = _p_GameSettings->GetScreenHeight();
-
-        // NEXT button zone (Bottom Right)
-        if (x > w - 150 && y > h - 60) {
-            if (_currentPageIndex < _pages.size() - 1) {
-                _currentPageIndex++;
-            } else {
-                _isShown = false;  // Close on last page next? or stay? Let's
-                                   // close on last page
-            }
-        }
-        // BACK/CLOSE button zone (Bottom Left)
-        else if (x < 150 && y > h - 60) {
-            if (_currentPageIndex > 0) {
-                _currentPageIndex--;
-            } else {
-                _isShown = false;
-            }
+    }
+#if HASTOUCH
+    if (pEvent->type == SDL_EVENT_FINGER_DOWN) {
+        _p_buttonNext->FingerDown(pEvent);
+        _p_buttonPrev->FingerDown(pEvent);
+    }
+#endif
+#if HASMOUSE
+    if (pEvent->type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
+        _mouseDownRec = true;
+    }
+    if (pEvent->type == SDL_EVENT_MOUSE_BUTTON_UP) {
+        if (_mouseDownRec) {
+            _p_buttonNext->MouseUp(pEvent, targetPos);
+            _p_buttonPrev->MouseUp(pEvent, targetPos);
         }
     }
+    if (pEvent->type == SDL_EVENT_MOUSE_MOTION) {
+        _p_buttonNext->MouseMove(pEvent, targetPos);
+        _p_buttonPrev->MouseMove(pEvent, targetPos);
+    }
+#endif
     return NULL;
 }
 
 LPErrInApp GameHelp::HandleIterate(bool& done) {
     done = !_isShown;
-    if (done)
+    if (done){
+        TRACE_DEBUG("[GameHelp - HandleIterate] done \n");
+        _p_buttonNext->SetVisibleState(ButtonGfx::INVISIBLE);
+        _p_buttonPrev->SetVisibleState(ButtonGfx::INVISIBLE);
         return NULL;
-
+    }
+        
     // Clear background
     SDL_Rect rect = {0, 0, _p_Screen->w, _p_Screen->h};
     SDL_FillSurfaceRect(
         _p_Screen, &rect,
         SDL_MapRGB(SDL_GetPixelFormatDetails(_p_Screen->format), NULL, 0, 50,
-                   0));  // Dark Greenish background
+                   0)); 
 
     renderCurrentPage();
 
-    // Draw Buttons
-    TTF_Font* pFont = _p_GameSettings->GetFontAriblk();
-    int h = _p_Screen->h;
-    int w = _p_Screen->w;
+    _p_buttonNext->DrawButton(_p_Screen);
+    _p_buttonPrev->DrawButton(_p_Screen);
 
-    // Next Button
-    std::string nextText =
-        (_currentPageIndex < _pages.size() - 1) ? "NEXT >" : "CLOSE";
-    GFX_UTIL::DrawString(_p_Screen, nextText.c_str(), w - 120, h - 40,
-                         GFX_UTIL_COLOR::Orange, pFont);
-
-    // Prev/Close Button
-    std::string prevText = (_currentPageIndex > 0) ? "< PREV" : "CLOSE";
-    GFX_UTIL::DrawString(_p_Screen, prevText.c_str(), 20, h - 40,
-                         GFX_UTIL_COLOR::Orange, pFont);
-
+    
     if (_fnUpdateScreen.tc != NULL) {
         _fnUpdateScreen.tc->UpdateScreen(_fnUpdateScreen.self, _p_Screen);
     }
@@ -196,21 +235,23 @@ LPErrInApp GameHelp::HandleIterate(bool& done) {
     return NULL;
 }
 
-void GameHelp::renderCurrentPage() {
+LPErrInApp GameHelp::renderCurrentPage() {
     if (_currentPageIndex < 0 || _currentPageIndex >= _pages.size())
-        return;
+        return NULL;
 
     HelpPage& page = _pages[_currentPageIndex];
     TTF_Font* pFontTitle = _p_GameSettings->GetFontMedium();
 
-    // Draw Title
-    GFX_UTIL::DrawString(_p_Screen, page.title.c_str(), MARGIN_X, 20,
-                         GFX_UTIL_COLOR::White, pFontTitle);
+    LPErrInApp err =
+        GFX_UTIL::DrawString(_p_Screen, page.title.c_str(), MARGIN_X, 20,
+                             GFX_UTIL_COLOR::White, pFontTitle);
+    if (err != NULL)
+        return err;
 
-    drawPageContent();
+    return drawPageContent();
 }
 
-void GameHelp::drawPageContent() {
+LPErrInApp GameHelp::drawPageContent() {
     HelpPage& page = _pages[_currentPageIndex];
     int y = MARGIN_TOP;
     int w = _p_Screen->w;  // Use screen width or settings width?
@@ -219,62 +260,62 @@ void GameHelp::drawPageContent() {
     for (const auto& item : page.items) {
         if (item.type == HelpItemType::TEXT) {
             drawJustifiedText(item.text, y, MARGIN_X, rightMargin);
-            // Estimate height increase? drawJustifiedText needs to return new Y
-            // or we pass Y by reference For simplicity, let's start with
-            // calculating height inside. But wait, drawJustifiedText needs to
-            // update Y. I'll update the function signature in my mind to pass Y
-            // by ref.
         } else if (item.type == HelpItemType::IMAGE) {
+            // TODO Draw the image created in Build Page
             // Load and draw image
-            std::string fullPath = GAMESET::GetExeAppFolder();
-            if (fullPath.back() != '/' && fullPath.back() != '\\')
-                fullPath += "/";
-            fullPath += item.imagePath;
+            // std::string fullPath = GAMESET::GetExeAppFolder();
+            // if (fullPath.back() != '/' && fullPath.back() != '\\')
+            //     fullPath += "/";
+            // fullPath += item.imagePath;
 
-            // Use DATA_PREFIX if needed, but item.imagePath can be relative to
-            // asset root AppGfx uses DATA_PREFIX for g_lpszImageSplash. Let's
-            // assume item.imagePath includes "images/..."
+            // // Use DATA_PREFIX if needed, but item.imagePath can be relative
+            // to
+            // // asset root AppGfx uses DATA_PREFIX for g_lpszImageSplash.
+            // Let's
+            // // assume item.imagePath includes "images/..."
 
-            // SDL_IOStream* src = SDL_IOFromFile(fullPath.c_str(), "rb"); //
-            // Logic similar to AppGfx load Simplification: Try full path with
-            // DATA_PREFIX
-            std::string dataPath = std::string(DATA_PREFIX) + item.imagePath;
-            SDL_Surface* pImg = IMG_Load(dataPath.c_str());
-            if (pImg) {
-                SDL_Rect dest = {MARGIN_X, y, pImg->w, pImg->h};
-                // Scale if too big?
-                if (dest.w > rightMargin - MARGIN_X) {
-                    // Simple clip or nothing.
-                    // Let's center it?
-                    dest.x = (w - pImg->w) / 2;
-                } else {
-                    dest.x = MARGIN_X;
-                }
-                SDL_BlitSurface(pImg, NULL, _p_Screen, &dest);
-                y += pImg->h + 10;
-                SDL_DestroySurface(pImg);
-            } else {
-                // Try just item path
-                pImg = IMG_Load(item.imagePath.c_str());
-                if (pImg) {
-                    SDL_Rect dest = {MARGIN_X, y, pImg->w, pImg->h};
-                    SDL_BlitSurface(pImg, NULL, _p_Screen, &dest);
-                    y += pImg->h + 10;
-                    SDL_DestroySurface(pImg);
-                }
-            }
+            // // SDL_IOStream* src = SDL_IOFromFile(fullPath.c_str(), "rb"); //
+            // // Logic similar to AppGfx load Simplification: Try full path
+            // with
+            // // DATA_PREFIX
+            // std::string dataPath = std::string(DATA_PREFIX) + item.imagePath;
+            // SDL_Surface* pImg = IMG_Load(dataPath.c_str());
+            // if (pImg) {
+            //     SDL_Rect dest = {MARGIN_X, y, pImg->w, pImg->h};
+            //     // Scale if too big?
+            //     if (dest.w > rightMargin - MARGIN_X) {
+            //         // Simple clip or nothing.
+            //         // Let's center it?
+            //         dest.x = (w - pImg->w) / 2;
+            //     } else {
+            //         dest.x = MARGIN_X;
+            //     }
+            //     SDL_BlitSurface(pImg, NULL, _p_Screen, &dest);
+            //     y += pImg->h + 10;
+            //     SDL_DestroySurface(pImg);
+            // } else {
+            //     // Try just item path
+            //     pImg = IMG_Load(item.imagePath.c_str());
+            //     if (pImg) {
+            //         SDL_Rect dest = {MARGIN_X, y, pImg->w, pImg->h};
+            //         SDL_BlitSurface(pImg, NULL, _p_Screen, &dest);
+            //         y += pImg->h + 10;
+            //         SDL_DestroySurface(pImg);
+            //     }
+            // }
         } else if (item.type == HelpItemType::NEW_LINE) {
             y += LINE_HEIGHT_FACTOR;
         } else if (item.type == HelpItemType::PARAGRAPH_BREAK) {
             y += LINE_HEIGHT_FACTOR * 1.5;
         }
     }
+    return NULL;
 }
 
-void GameHelp::drawJustifiedText(const std::string& text, int& y,
-                                 int leftMargin, int rightMargin) {
+LPErrInApp GameHelp::drawJustifiedText(const std::string& text, int& y,
+                                       int leftMargin, int rightMargin) {
     if (text.empty())
-        return;
+        return NULL;
 
     TTF_Font* pFont = _p_GameSettings->GetFontVera();
     std::stringstream ss(text);
@@ -290,11 +331,17 @@ void GameHelp::drawJustifiedText(const std::string& text, int& y,
     int currentLineWidth = 0;
     int spaceWidth = 0;
     int h;
-    TTF_GetStringSize(pFont, " ", 0, &spaceWidth, &h);
+    if (!TTF_GetStringSize(pFont, " ", 0, &spaceWidth, &h))
+        return ERR_UTIL::ErrorCreate(
+            "[drawJustifiedText] TTF_GetStringSize on space failed %s ",
+            SDL_GetError());
 
     for (size_t i = 0; i < words.size(); ++i) {
         int w, h_word;
-        TTF_GetStringSize(pFont, words[i].c_str(), 0, &w, &h_word);
+        if (!TTF_GetStringSize(pFont, words[i].c_str(), 0, &w, &h_word))
+            return ERR_UTIL::ErrorCreate(
+                "[drawJustifiedText] TTF_GetStringSize on word failed %s ",
+                SDL_GetError());
 
         if (currentLineWidth + w + (lineWords.empty() ? 0 : spaceWidth) <=
             maxLineWidth) {
@@ -320,7 +367,14 @@ void GameHelp::drawJustifiedText(const std::string& text, int& y,
                 GFX_UTIL::DrawString(_p_Screen, lineWords[j].c_str(), drawX, y,
                                      GFX_UTIL_COLOR::White, pFont);
                 int wordW;
-                TTF_GetStringSize(pFont, lineWords[j].c_str(), 0, &wordW, NULL);
+                if (TTF_GetStringSize(pFont, lineWords[j].c_str(), 0, &wordW,
+                                      NULL))
+                    return ERR_UTIL::ErrorCreate(
+                        "[drawJustifiedText] TTF_GetStringSize on lineWords - "
+                        "i "
+                        "failed "
+                        "%s ",
+                        SDL_GetError());
                 drawX += wordW;
 
                 if (j < lineWords.size() - 1) {
@@ -346,9 +400,16 @@ void GameHelp::drawJustifiedText(const std::string& text, int& y,
             GFX_UTIL::DrawString(_p_Screen, lineWords[j].c_str(), drawX, y,
                                  GFX_UTIL_COLOR::White, pFont);
             int wordW;
-            TTF_GetStringSize(pFont, lineWords[j].c_str(), 0, &wordW, NULL);
+            if (!TTF_GetStringSize(pFont, lineWords[j].c_str(), 0, &wordW,
+                                   NULL))
+                return ERR_UTIL::ErrorCreate(
+                    "[drawJustifiedText] TTF_GetStringSize on lineWords - j "
+                    "failed %s ",
+                    SDL_GetError());
             drawX += wordW + spaceWidth;
         }
         y += LINE_HEIGHT_FACTOR;
     }
+
+    return NULL;
 }

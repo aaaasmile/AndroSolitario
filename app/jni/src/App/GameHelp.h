@@ -12,19 +12,15 @@
 using namespace traits;
 
 class GameSettings;
-// class UpdateScreenCb; // Removed, relying on Traits.h
+class ButtonGfx;
 
-enum class HelpItemType {
-    TEXT,
-    IMAGE,
-    NEW_LINE,
-    PARAGRAPH_BREAK
-};
+enum class HelpItemType { TEXT, IMAGE, NEW_LINE, PARAGRAPH_BREAK };
+enum PageNav { NEXT, PREV };
 
 struct HelpItem {
     HelpItemType type;
     std::string text;
-    std::string imagePath;  // Relative path
+    std::string imagePath;
 };
 
 struct HelpPage {
@@ -37,19 +33,20 @@ class GameHelp {
     GameHelp();
     ~GameHelp();
 
-    LPErrInApp Init();
     LPErrInApp Show(SDL_Surface* pScreen, UpdateScreenCb& fnUpdateScreen);
-    LPErrInApp HandleEvent(SDL_Event* pEvent);
+    LPErrInApp HandleEvent(SDL_Event* pEvent, const SDL_Point& targetPos);
     LPErrInApp HandleIterate(bool& done);
-    bool IsOngoing();
-    void Reset();
+    bool IsOngoing() { return _isShown; }
+    void NextPage();
+    void PrevPage();
 
    private:
     void buildPages();
-    void renderCurrentPage();
-    void drawJustifiedText(const std::string& text, int& y, int leftMargin,
-                           int rightMargin);
-    void drawPageContent();
+    ClickCb prepClickCb();
+    LPErrInApp renderCurrentPage();
+    LPErrInApp drawJustifiedText(const std::string& text, int& y,
+                                 int leftMargin, int rightMargin);
+    LPErrInApp drawPageContent();
 
    private:
     SDL_Surface* _p_Screen;
@@ -57,8 +54,10 @@ class GameHelp {
     UpdateScreenCb _fnUpdateScreen;
     std::vector<HelpPage> _pages;
     int _currentPageIndex;
-    bool _isInitialized;
-    bool _isShown;
+    bool _isShown = false;
+    bool _mouseDownRec = false;
+    ButtonGfx* _p_buttonNext = NULL;
+    ButtonGfx* _p_buttonPrev = NULL;
 
     // Layout constants
     const int MARGIN_X = 20;

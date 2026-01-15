@@ -11,7 +11,6 @@
 #include <string>
 
 #include "ErrorInfo.h"
-// #include "GameGfx/SolitarioGfx.h"
 #include "GameSettings.h"
 #include "Languages.h"
 #include "Traits.h"
@@ -80,7 +79,6 @@ class AppGfx {
     SDL_Window* _p_Window;
     SDL_Renderer* _p_sdlRenderer;
     GameSettings* _p_GameSettings;
-    // SolitarioGfx* _p_SolitarioGfx;
     GameSelector* _p_GameSelector;
     MusicManager* _p_MusicManager;
     HighScore* _p_HighScore;

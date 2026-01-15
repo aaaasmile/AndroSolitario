@@ -63,7 +63,7 @@ OptionsGfx::~OptionsGfx() {
 }
 
 // Prepare the Click() trait
-void fncBind_ButtonClicked(void* self, int iVal) {
+static void fncBind_ButtonClicked(void* self, int iVal) {
     OptionsGfx* pOptionsGfx = (OptionsGfx*)self;
     switch (iVal) {
         case OptionsGfx::MYIDOK:
@@ -91,7 +91,7 @@ ClickCb OptionsGfx::prepClickCb() {
 #endif
 }
 
-void fncBind_CheckboxMusicClicked(void* self, bool state) {
+static void fncBind_CheckboxMusicClicked(void* self, bool state) {
     OptionsGfx* pOptionsGfx = (OptionsGfx*)self;
     pOptionsGfx->CheckboxMusicClicked(state);
 }
@@ -510,7 +510,7 @@ LPErrInApp OptionsGfx::HandleIterate(bool& done) {
     return NULL;
 }
 
-void fncBind_KeyboardClick(void* self, const char* text) {
+static void fncBind_KeyboardClick(void* self, const char* text) {
     OptionsGfx* pOptionsGfx = (OptionsGfx*)self;
     pOptionsGfx->TextFromKeyboard(text);
 }

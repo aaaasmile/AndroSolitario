@@ -87,7 +87,7 @@ void SolitarioGfx::clearSurface() {
 
 // command buttons
 // -- quit --
-void fncBind_ButtonQuitClick(void* self, int val) {
+static void fncBind_ButtonQuitClick(void* self, int val) {
     SolitarioGfx* pApp = (SolitarioGfx*)self;
     pApp->BtQuitClick();
 }
@@ -98,7 +98,7 @@ ClickCb SolitarioGfx::prepClickQuitCb() {
 }
 
 // -- new game --
-void fncBind_ButtonNewGameClick(void* self, int val) {
+static void fncBind_ButtonNewGameClick(void* self, int val) {
     SolitarioGfx* pApp = (SolitarioGfx*)self;
     pApp->BtNewGameClick();
 }
@@ -109,7 +109,7 @@ ClickCb SolitarioGfx::prepClickNewGameCb() {
 }
 
 // -- sound on/off --
-void fncBind_ButtonToggleSoundClick(void* self, int val) {
+static void fncBind_ButtonToggleSoundClick(void* self, int val) {
     SolitarioGfx* pApp = (SolitarioGfx*)self;
     pApp->BtToggleSoundClick();
 }

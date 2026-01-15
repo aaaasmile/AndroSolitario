@@ -141,7 +141,6 @@ static ResolutionMgr g_ResolutionMgr;
 AppGfx::AppGfx() {
     _p_Window = NULL;
     _p_ScreenTexture = NULL;
-    //_p_SolitarioGfx = NULL;
     _fnGameGfxCb.self = NULL;
     _fnGameGfxCb.tc = NULL;
     _p_SceneBackground = NULL;
@@ -163,7 +162,6 @@ AppGfx::~AppGfx() { terminate(); }
 
 LPErrInApp AppGfx::Init() {
     TRACE("Init App\n");
-    //_p_GameSettings->GameName = "Solitario";
 #ifdef WIN32
     LPCSTR exeDirPath = GAMESET::GetExeAppFolder();
     TRACE("Exe directory is %s\n", exeDirPath);
@@ -493,11 +491,6 @@ void AppGfx::terminate() {
         _p_MenuMgr = NULL;
     }
 
-    // if (_p_SolitarioGfx != NULL) {
-    //     delete _p_SolitarioGfx;
-    //     _p_SolitarioGfx = NULL;
-    // }
-
     _p_GameSettings->TerminateMusicManager();
 
     SDL_DestroyWindow(_p_Window);
@@ -547,12 +540,12 @@ LPErrInApp fncBind_ChangeSceneBackground(void* self,
     return pApp->ChangeSceneBackground(ppSceneBackground);
 }
 
-void fncBind_UpdateScreen(void* self, SDL_Surface* pScreen) {
+static void fncBind_UpdateScreen(void* self, SDL_Surface* pScreen) {
     AppGfx* pApp = (AppGfx*)self;
     return pApp->UpdateScreen(pScreen);
 }
 
-void fncBind_RenderTexture(void* self, SDL_Texture* pScreenTexture) {
+static void fncBind_RenderTexture(void* self, SDL_Texture* pScreenTexture) {
     AppGfx* pApp = (AppGfx*)self;
     return pApp->RenderTexture(pScreenTexture);
 }
@@ -700,7 +693,6 @@ LPErrInApp AppGfx::MainLoopEvent(SDL_Event* pEvent, SDL_AppResult& res) {
             break;
 
         case MenuItemEnum::MENU_GAME:
-            // err = _p_SolitarioGfx->HandleEvent(pEvent, targetPos);
             err = (_fnGameGfxCb.tc)
                       ->HandleEvent(_fnGameGfxCb.self, pEvent, targetPos);
             if (err != NULL)
@@ -708,6 +700,9 @@ LPErrInApp AppGfx::MainLoopEvent(SDL_Event* pEvent, SDL_AppResult& res) {
             break;
 
         case MenuItemEnum::MENU_HELP:
+            err = _p_GameHelp->HandleEvent(pEvent, targetPos);
+            if (err != NULL)
+                return err;
             break;
 
         case MenuItemEnum::MENU_CREDITS:
@@ -771,7 +766,6 @@ LPErrInApp AppGfx::MainLoopIterate() {
             break;
 
         case MenuItemEnum::MENU_GAME:
-            // err = _p_SolitarioGfx->HandleIterate(done);
             err = (_fnGameGfxCb.tc)->HandleIterate(_fnGameGfxCb.self, done);
             if (err != NULL)
                 return err;
@@ -781,6 +775,12 @@ LPErrInApp AppGfx::MainLoopIterate() {
             break;
 
         case MenuItemEnum::MENU_HELP:
+            err = _p_GameHelp->HandleIterate(done);
+            if (err != NULL)
+                return err;
+            if (done) {
+                backToMenuRootWithMusic();
+            }
             break;
 
         case MenuItemEnum::MENU_CREDITS:
