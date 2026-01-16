@@ -419,7 +419,7 @@ LPErrInApp OptionsGfx::HandleIterate(bool& done) {
                        _rctOptBox.y + _rctOptBox.h + 2, GFX_UTIL_COLOR::Black);
     GFX_UTIL::DrawRect(_p_ShadowSrf, _rctOptBox.x, _rctOptBox.y,
                        _rctOptBox.x + _rctOptBox.w, _rctOptBox.y + _rctOptBox.h,
-                       _color);
+                       GFX_UTIL_COLOR::Gray);
 
     // header bar
     SDL_Rect rectHeader;

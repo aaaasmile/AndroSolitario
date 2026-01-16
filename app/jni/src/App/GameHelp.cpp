@@ -19,23 +19,41 @@ GameHelp::GameHelp() {
     _p_buttonNext = NULL;
     _p_buttonPrev = NULL;
     _p_buttonHome = NULL;
+    _p_ShadowSrf = NULL;
+    _p_surfTextBackground = NULL;
 }
 
 GameHelp::~GameHelp() {
-    if (_p_buttonNext != NULL)
+    if (_p_buttonNext != NULL) {
         delete _p_buttonNext;
-    if (_p_buttonPrev != NULL)
+        _p_buttonNext = NULL;
+    }
+    if (_p_buttonPrev != NULL) {
         delete _p_buttonPrev;
-    if (_p_buttonHome != NULL)
+        _p_buttonPrev = NULL;
+    }
+    if (_p_buttonHome != NULL) {
         delete _p_buttonHome;
+        _p_buttonHome = NULL;
+    }
+    if (_p_ShadowSrf != NULL) {
+        SDL_DestroySurface(_p_ShadowSrf);
+        _p_ShadowSrf = NULL;
+    }
+    if (_p_surfTextBackground != NULL) {
+        SDL_DestroySurface(_p_surfTextBackground);
+        _p_surfTextBackground = NULL;
+    }
 }
 
 LPErrInApp GameHelp::Show(SDL_Surface* pScreen,
-                          traits::UpdateScreenCb& fnUpdateScreen) {
+                          traits::UpdateScreenCb& fnUpdateScreen,
+                          SDL_Surface* pSceneBackground) {
     _p_GameSettings = GameSettings::GetSettings();
     TRACE("Show Help for %s", _p_GameSettings->GameName.c_str());
     _p_Screen = pScreen;
     _fnUpdateScreen = fnUpdateScreen;
+    _p_Scene_background = pSceneBackground;
     buildPages();
     _currentPageIndex = 0;
     _isShown = true;
@@ -85,6 +103,36 @@ LPErrInApp GameHelp::Show(SDL_Surface* pScreen,
     _p_buttonHome->SetButtonText(ico.c_str());
     _p_buttonHome->SetVisibleState(ButtonGfx::VISIBLE);
 
+    if (_p_ShadowSrf != NULL) {
+        SDL_DestroySurface(_p_ShadowSrf);
+    }
+    _p_ShadowSrf =
+        GFX_UTIL::SDL_CreateRGBSurface(pScreen->w, pScreen->h, 32, 0, 0, 0, 0);
+
+    _rctOptBox.x = 5;
+    _rctOptBox.y = 5;
+    _rctOptBox.w = pScreen->w - 10;
+    _rctOptBox.h = pScreen->h - 10;
+
+    if (_p_surfTextBackground != NULL) {
+        SDL_DestroySurface(_p_surfTextBackground);
+        _p_surfTextBackground = NULL;
+    }
+    _p_surfTextBackground = GFX_UTIL::SDL_CreateRGBSurface(
+        _rctOptBox.w, _rctOptBox.h, 32, 0, 0, 0, 0);
+    if (_p_surfTextBackground == NULL) {
+        return ERR_UTIL::ErrorCreate("_p_surfBar error: %s\n", SDL_GetError());
+    }
+
+    SDL_FillSurfaceRect(
+        _p_surfTextBackground, NULL,
+        SDL_MapRGB(SDL_GetPixelFormatDetails(_p_surfTextBackground->format),
+                   NULL, 10, 10, 10));
+
+    SDL_SetSurfaceBlendMode(_p_surfTextBackground, SDL_BLENDMODE_BLEND);
+    SDL_SetSurfaceAlphaMod(_p_surfTextBackground, 170);
+
+    _isDirty = true;
     return NULL;
 }
 
@@ -123,6 +171,7 @@ void GameHelp::NextPage() {
     TRACE_DEBUG("NextPage of %d \n", _currentPageIndex);
     if (_currentPageIndex < _pages.size() - 1) {
         _currentPageIndex++;
+        _isDirty = true;
     }
 }
 
@@ -130,6 +179,7 @@ void GameHelp::PrevPage() {
     TRACE_DEBUG("PrevPage of %d \n", _currentPageIndex);
     if (_currentPageIndex > 0) {
         _currentPageIndex--;
+        _isDirty = true;
     }
 }
 
@@ -137,7 +187,6 @@ void GameHelp::HomePage() {
     TRACE_DEBUG("HomePage\n");
     _isShown = false;
 }
-
 
 void GameHelp::buildPages() {
     TRACE_DEBUG("[buildPages] for help");
@@ -241,17 +290,18 @@ LPErrInApp GameHelp::HandleIterate(bool& done) {
         _p_buttonNext->SetVisibleState(ButtonGfx::INVISIBLE);
         _p_buttonPrev->SetVisibleState(ButtonGfx::INVISIBLE);
         _p_buttonHome->SetVisibleState(ButtonGfx::INVISIBLE);
+        if (_p_ShadowSrf != NULL) {
+            SDL_DestroySurface(_p_ShadowSrf);
+            _p_ShadowSrf = NULL;
+        }
         return NULL;
     }
 
-    // Clear background
-    SDL_Rect rect = {0, 0, _p_Screen->w, _p_Screen->h};
-    SDL_FillSurfaceRect(_p_Screen, &rect,
-                        SDL_MapRGB(SDL_GetPixelFormatDetails(_p_Screen->format),
-                                   NULL, 0, 50, 0));
+    LPErrInApp err = renderCurrentPage();
+    if (err != NULL)
+        return err;
 
-    renderCurrentPage();
-
+    SDL_BlitSurface(_p_ShadowSrf, NULL, _p_Screen, NULL);
     _p_buttonNext->DrawButton(_p_Screen);
     _p_buttonPrev->DrawButton(_p_Screen);
     _p_buttonHome->DrawButton(_p_Screen);
@@ -267,26 +317,71 @@ LPErrInApp GameHelp::renderCurrentPage() {
     if (_currentPageIndex < 0 || _currentPageIndex >= _pages.size())
         return NULL;
 
+    if (!_isDirty)
+        return NULL;
+    // build the _p_ShadowSrf only on text change
+
+    TRACE_DEBUG(
+        "[renderCurrentPage] rebuild the shadow surface with the page text \n");
+
+    SDL_Rect clipRect;
+    SDL_GetSurfaceClipRect(_p_ShadowSrf, &clipRect);
+    SDL_FillSurfaceRect(
+        _p_ShadowSrf, &clipRect,
+        SDL_MapRGBA(SDL_GetPixelFormatDetails(_p_ShadowSrf->format), NULL, 0, 0,
+                    0, 0));
+
+    //  center the background
+    SDL_Rect rctTarget;
+    rctTarget.x = (_p_ShadowSrf->w - _p_Scene_background->w) / 2;
+    rctTarget.y = (_p_ShadowSrf->h - _p_Scene_background->h) / 2;
+    rctTarget.w = _p_Scene_background->w;
+    rctTarget.h = _p_Scene_background->h;
+    SDL_BlitSurface(_p_Scene_background, NULL, _p_ShadowSrf, &rctTarget);
+
+    GFX_UTIL::DrawStaticSpriteEx(_p_ShadowSrf, 0, 0, _rctOptBox.w, _rctOptBox.h,
+                                 _rctOptBox.x, _rctOptBox.y,
+                                 _p_surfTextBackground);
+    // draw border
+    GFX_UTIL::DrawRect(_p_ShadowSrf, _rctOptBox.x - 1, _rctOptBox.y - 1,
+                       _rctOptBox.x + _rctOptBox.w + 1,
+                       _rctOptBox.y + _rctOptBox.h + 1, GFX_UTIL_COLOR::Gray);
+    GFX_UTIL::DrawRect(_p_ShadowSrf, _rctOptBox.x - 2, _rctOptBox.y - 2,
+                       _rctOptBox.x + _rctOptBox.w + 2,
+                       _rctOptBox.y + _rctOptBox.h + 2, GFX_UTIL_COLOR::Black);
+    GFX_UTIL::DrawRect(_p_ShadowSrf, _rctOptBox.x, _rctOptBox.y,
+                       _rctOptBox.x + _rctOptBox.w, _rctOptBox.y + _rctOptBox.h,
+                       GFX_UTIL_COLOR::Gray);
+
     HelpPage& page = _pages[_currentPageIndex];
 
-    LPErrInApp err =
-        GFX_UTIL::DrawString(_p_Screen, page.title.c_str(), MARGIN_X, 20,
-                             GFX_UTIL_COLOR::White, _p_GameSettings->GetFontAriblk());
+    LPErrInApp err = GFX_UTIL::DrawString(_p_ShadowSrf, page.title.c_str(),
+                                          MARGIN_X, 20,
+                                          GFX_UTIL_COLOR::White,
+                                          _p_GameSettings->GetFontAriblk());
     if (err != NULL)
         return err;
 
-    return drawPageContent();
+    err = drawPageContent();
+    if (err != NULL)
+        return err;
+
+    _isDirty = false;
+    return NULL;
 }
 
 LPErrInApp GameHelp::drawPageContent() {
     HelpPage& page = _pages[_currentPageIndex];
     int y = MARGIN_TOP;
-    int w = _p_Screen->w;  // Use screen width or settings width?
+    int w = _p_ShadowSrf->w;
     int rightMargin = w - MARGIN_X;
+    LPErrInApp err = NULL;
 
     for (const auto& item : page.items) {
         if (item.type == HelpItemType::TEXT) {
-            drawJustifiedText(item.text, y, MARGIN_X, rightMargin);
+            err = drawJustifiedText(item.text, y, MARGIN_X, rightMargin);
+            if (err != NULL)
+                return err;
         } else if (item.type == HelpItemType::IMAGE) {
             // TODO Draw the image created in Build Page
             // Load and draw image
@@ -382,20 +477,13 @@ LPErrInApp GameHelp::drawJustifiedText(const std::string& text, int& y,
             int gaps = lineWords.size() - 1;
             int extraSpacePerGap = (gaps > 0) ? totalSpaceNeeded / gaps : 0;
             int remainderSpace = (gaps > 0) ? totalSpaceNeeded % gaps : 0;
-
-            // Actually currentLineWidth includes normal spaces.
-            // We need to subtract them to distribute `totalSpaceNeeded` +
-            // `existingSpaces`. Wait, my logic of currentLineWidth included
-            // normal spaces. So `maxLineWidth - currentLineWidth` is purely
-            // EXTRA space.
-
             int drawX = leftMargin;
             for (size_t j = 0; j < lineWords.size(); ++j) {
-                GFX_UTIL::DrawString(_p_Screen, lineWords[j].c_str(), drawX, y,
-                                     GFX_UTIL_COLOR::White, pFont);
+                GFX_UTIL::DrawString(_p_ShadowSrf, lineWords[j].c_str(), drawX,
+                                     y, GFX_UTIL_COLOR::White, pFont);
                 int wordW;
                 if (!TTF_GetStringSize(pFont, lineWords[j].c_str(), 0, &wordW,
-                                      NULL))
+                                       NULL))
                     return ERR_UTIL::ErrorCreate(
                         "[drawJustifiedText] TTF_GetStringSize on lineWords - "
                         "i "
@@ -424,7 +512,7 @@ LPErrInApp GameHelp::drawJustifiedText(const std::string& text, int& y,
     if (!lineWords.empty()) {
         int drawX = leftMargin;
         for (size_t j = 0; j < lineWords.size(); ++j) {
-            GFX_UTIL::DrawString(_p_Screen, lineWords[j].c_str(), drawX, y,
+            GFX_UTIL::DrawString(_p_ShadowSrf, lineWords[j].c_str(), drawX, y,
                                  GFX_UTIL_COLOR::White, pFont);
             int wordW;
             if (!TTF_GetStringSize(pFont, lineWords[j].c_str(), 0, &wordW,

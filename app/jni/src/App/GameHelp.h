@@ -33,7 +33,8 @@ class GameHelp {
     GameHelp();
     ~GameHelp();
 
-    LPErrInApp Show(SDL_Surface* pScreen, UpdateScreenCb& fnUpdateScreen);
+    LPErrInApp Show(SDL_Surface* pScreen, UpdateScreenCb& fnUpdateScreen,
+                    SDL_Surface* pSceneBackground);
     LPErrInApp HandleEvent(SDL_Event* pEvent, const SDL_Point& targetPos);
     LPErrInApp HandleIterate(bool& done);
     bool IsOngoing() { return _isShown; }
@@ -51,15 +52,20 @@ class GameHelp {
 
    private:
     SDL_Surface* _p_Screen;
+    SDL_Surface* _p_ShadowSrf = NULL;
+    SDL_Surface* _p_Scene_background;
+    SDL_Surface* _p_surfTextBackground;
     GameSettings* _p_GameSettings;
     UpdateScreenCb _fnUpdateScreen;
     std::vector<HelpPage> _pages;
     int _currentPageIndex;
     bool _isShown = false;
+    bool _isDirty = false;
     bool _mouseDownRec = false;
     ButtonGfx* _p_buttonNext = NULL;
     ButtonGfx* _p_buttonPrev = NULL;
     ButtonGfx* _p_buttonHome = NULL;
+    SDL_Rect _rctOptBox;
 
     // Layout constants
     const int MARGIN_X = 20;

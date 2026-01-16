@@ -860,7 +860,7 @@ LPErrInApp AppGfx::showHelp() {
 
     // Pass the screen updater so GameHelp can refresh screen
     UpdateScreenCb screenUpdater = prepScreenUpdater();
-    _p_GameHelp->Show(_p_Screen, screenUpdater);
+    _p_GameHelp->Show(_p_Screen, screenUpdater, _p_SceneBackground);
 
     return NULL;
 }
