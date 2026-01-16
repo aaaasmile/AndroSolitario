@@ -394,7 +394,7 @@ LPErrInApp GameHelp::drawJustifiedText(const std::string& text, int& y,
                 GFX_UTIL::DrawString(_p_Screen, lineWords[j].c_str(), drawX, y,
                                      GFX_UTIL_COLOR::White, pFont);
                 int wordW;
-                if (TTF_GetStringSize(pFont, lineWords[j].c_str(), 0, &wordW,
+                if (!TTF_GetStringSize(pFont, lineWords[j].c_str(), 0, &wordW,
                                       NULL))
                     return ERR_UTIL::ErrorCreate(
                         "[drawJustifiedText] TTF_GetStringSize on lineWords - "
