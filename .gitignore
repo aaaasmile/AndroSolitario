@@ -12,3 +12,4 @@ app/jni/SDL_2_26_5
 app/jni/SDL_ttf/external
 synch_web_with_invido.sh
 .cache
+synch_webdebug_with_invido.sh
