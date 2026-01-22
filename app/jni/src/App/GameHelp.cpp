@@ -358,7 +358,7 @@ LPErrInApp GameHelp::renderCurrentPage() {
     LPErrInApp err = GFX_UTIL::DrawString(_p_ShadowSrf, page.title.c_str(),
                                           MARGIN_X, 20,
                                           GFX_UTIL_COLOR::White,
-                                          _p_GameSettings->GetFontAriblk());
+                                          _p_GameSettings->GetFontDjvBig());
     if (err != NULL)
         return err;
 
@@ -439,7 +439,7 @@ LPErrInApp GameHelp::drawJustifiedText(const std::string& text, int& y,
     if (text.empty())
         return NULL;
 
-    TTF_Font* pFont = _p_GameSettings->GetFontMedium();
+    TTF_Font* pFont = _p_GameSettings->GetFontDjvMedium();
     std::stringstream ss(text);
     std::string word;
     std::vector<std::string> words;

@@ -975,7 +975,7 @@ void AppGfx::updateScreenTexture() {
                  g_ResolutionMgr.targetWidth, g_ResolutionMgr.targetHeight,
                  g_ResolutionMgr.scale * 100.0f);
         GFX_UTIL::DrawString(_p_Screen, buffer, 10, 10, GFX_UTIL_COLOR::Red,
-                             _p_GameSettings->GetFontAriblk());
+                             _p_GameSettings->GetFontDjvBig());
     }
     SDL_UpdateTexture(_p_ScreenTexture, NULL, _p_Screen->pixels,
                       _p_Screen->pitch);

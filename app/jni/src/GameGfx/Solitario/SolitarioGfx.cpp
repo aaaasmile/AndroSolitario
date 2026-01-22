@@ -132,7 +132,7 @@ LPErrInApp SolitarioGfx::Initialize(SDL_Surface* pScreen,
     _fnUpdateHighScore = fnUpdateHighScore;
     _sceneBackgroundIsBlack =
         pGameSettings->BackgroundType == BackgroundTypeEnum::Black;
-    _p_FontBigText = pGameSettings->GetFontAriblk();
+    _p_FontBigText = pGameSettings->GetFontDjvBig();
     LPErrInApp err;
     _p_Screen = pScreen;
     _fnUpdateScreen = fnUpdateScreen;
@@ -1711,7 +1711,7 @@ void SolitarioGfx::showYesNoMsgBox(LPCSTR strText) {
     rctBox.x = (_p_Screen->w - rctBox.w) / 2;
 
     _p_MsgBox->ChangeAlpha(150);
-    _p_MsgBox->Initialize(&rctBox, _p_Screen, pGameSettings->GetFontMedium(),
+    _p_MsgBox->Initialize(&rctBox, _p_Screen, pGameSettings->GetFontDjvMedium(),
                           MesgBoxGfx::TY_MB_YES_NO, _fnUpdateScreen);
     SDL_Rect clipRect;
     SDL_GetSurfaceClipRect(_p_AlphaDisplay, &clipRect);
@@ -1745,7 +1745,7 @@ void SolitarioGfx::showOkMsgBox(LPCSTR strText) {
     rctBox.x = (_p_Screen->w - rctBox.w) / 2;
 
     _p_MsgBox->ChangeAlpha(150);
-    _p_MsgBox->Initialize(&rctBox, _p_Screen, pGameSettings->GetFontMedium(),
+    _p_MsgBox->Initialize(&rctBox, _p_Screen, pGameSettings->GetFontDjvMedium(),
                           MesgBoxGfx::TY_MBOK, _fnUpdateScreen);
 
     SDL_Rect clipRect;

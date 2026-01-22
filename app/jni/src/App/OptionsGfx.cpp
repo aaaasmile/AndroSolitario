@@ -133,8 +133,8 @@ LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen,
     _p_screen = pScreen;
     _optDlgt = optDlg;
     _p_MusicManager = _p_GameSettings->GetMusicManager();
-    _p_fontCtrl = _p_GameSettings->GetFontAriblk();
-    _p_fontText = _p_GameSettings->GetFontMedium();
+    _p_fontCtrl = _p_GameSettings->GetFontDjvBig();
+    _p_fontText = _p_GameSettings->GetFontDjvMedium();
     _fnUpdateScreen = fnUpdateScreen;
 
     _p_surfBar = GFX_UTIL::SDL_CreateRGBSurface(_rctOptBox.w, _rctOptBox.h, 32,
@@ -565,7 +565,7 @@ void OptionsGfx::ToggleScreenKeyboard() {
 
     ClickKeyboardCb cbKeyboard = prepareClickKeyboardCb();
     _p_KeyboardGfx->Show(&rctKeyboard, _p_screen,
-                         _p_GameSettings->GetFontMedium(), cbKeyboard);
+                         _p_GameSettings->GetFontDjvMedium(), cbKeyboard);
     _p_textInput->SetHasFocus(true);
 }
 

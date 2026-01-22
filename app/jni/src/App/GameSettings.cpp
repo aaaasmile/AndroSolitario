@@ -27,7 +27,6 @@ static char _exeRootDir[1024] = "";
 static char g_filepath[1024];
 
 static const char* g_lpszIniFontAriblkFname = DATA_PREFIX "font/ariblk.ttf";
-static const char* g_lpszIniFontVeraFname = DATA_PREFIX "font/vera.ttf";
 static const char* g_lpszFontSymbFname = DATA_PREFIX "font/notosans-sym.ttf";
 static const char* g_lpszFontDejFname = DATA_PREFIX "font/DejaVuSans.ttf";
 
@@ -266,30 +265,36 @@ LPErrInApp GameSettings::SaveSettings() {
 }
 
 LPErrInApp GameSettings::LoadFonts() {
-    TRACE_DEBUG("GameSettings::LoadFonts %s \n", g_lpszIniFontAriblkFname);
-    _p_fontAriblk = TTF_OpenFont(g_lpszIniFontAriblkFname, _fontBigSize);
-    if (_p_fontAriblk == NULL) {
+    TRACE_DEBUG("GameSettings::LoadFonts %s \n", g_lpszFontDejFname);
+    
+    _p_fontAblkBig = TTF_OpenFont(g_lpszIniFontAriblkFname, _fontBigSize);
+    if (_p_fontAblkBig == NULL) {
         return ERR_UTIL::ErrorCreate("Unable to load font %s, error: %s\n",
                                      g_lpszIniFontAriblkFname, SDL_GetError());
     }
-    TRACE_DEBUG("LoadFonts Ariblk OK \n");
-    _p_fontVera = TTF_OpenFont(g_lpszIniFontVeraFname, _fontSmallSize);
-    if (_p_fontVera == NULL) {
+    _p_fontDejBig = TTF_OpenFont(g_lpszFontDejFname, _fontBigSize);
+    if (_p_fontDejBig == NULL) {
         return ERR_UTIL::ErrorCreate("Unable to load font %s, error: %s\n",
-                                     g_lpszIniFontVeraFname, SDL_GetError());
+                                     g_lpszFontDejFname, SDL_GetError());
     }
-    _p_fontMedium = TTF_OpenFont(g_lpszIniFontVeraFname, _fontMediumSize);
+    TRACE_DEBUG("LoadFonts Ariblk OK \n");
+    _p_fontDejSmall = TTF_OpenFont(g_lpszFontDejFname, _fontSmallSize);
+    if (_p_fontDejSmall == NULL) {
+        return ERR_UTIL::ErrorCreate("Unable to load font %s, error: %s\n",
+                                     g_lpszFontDejFname, SDL_GetError());
+    }
+    _p_fontMedium = TTF_OpenFont(g_lpszFontDejFname, _fontMediumSize);
     if (_p_fontMedium == NULL) {
         return ERR_UTIL::ErrorCreate(
             "Unable to load medium font %s, error: %s\n",
-            g_lpszIniFontVeraFname, SDL_GetError());
+            g_lpszFontDejFname, SDL_GetError());
     }
     _p_fontSymb = TTF_OpenFont(g_lpszFontSymbFname, _fontSymSize);
     if (_p_fontSymb == NULL) {
         return ERR_UTIL::ErrorCreate("Unable to load font %s, error: %s\n",
                                      g_lpszFontSymbFname, SDL_GetError());
     }
-    _p_fontDejMedium= TTF_OpenFont(g_lpszFontSymbFname, _fontMediumSize);
+    _p_fontDejMedium= TTF_OpenFont(g_lpszFontDejFname, _fontMediumSize);
     if (_p_fontDejMedium == NULL) {
         return ERR_UTIL::ErrorCreate("Unable to load font %s, error: %s\n",
                                      g_lpszFontDejFname, SDL_GetError());
