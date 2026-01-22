@@ -23,10 +23,6 @@ void FadeAction::cleanUp() {
         SDL_DestroySurface(_p_surf_screen_copy);
         _p_surf_screen_copy = NULL;
     }
-    // if (_p_ScreenTexture != NULL) {
-    //     SDL_DestroyTexture(_p_ScreenTexture);
-    //     _p_ScreenTexture = NULL;
-    // }
 }
 
 // Fades the given surface in or out to the given screen within the given time
@@ -46,13 +42,10 @@ LPErrInApp FadeAction::Fade(SDL_Surface* pSurfScreen, SDL_Surface* pSurfImg,
     _fade_out = fadeOut;
     _p_surf_screen = pSurfScreen;
     _p_surf_img = pSurfImg;
-    //_p_sdlRenderer = p_sdlRenderer;
     _p_rctTarget = p_rctTarget;
     _p_surf_screen_copy = NULL;
 
-    // _p_ScreenTexture =
-    //     SDL_CreateTextureFromSurface(_p_sdlRenderer, _p_surf_screen);
-
+ 
     // Used when the Screen Surface equals the Image Surface
     // Used to calculate the steps to make a fade in the given time:
     // Uint64 ui_old_time, ui_curr_time, ui_time_ms;
@@ -120,10 +113,6 @@ void FadeAction::Iterate() {
             SDL_BlitSurface(_p_surf_img, NULL, _p_surf_screen, _p_rctTarget);
             SDL_SetSurfaceAlphaMod(_p_surf_black, (Uint8)_f_alpha);
             SDL_BlitSurface(_p_surf_black, NULL, _p_surf_screen, NULL);
-            // SDL_UpdateTexture(_p_ScreenTexture, NULL, _p_surf_screen->pixels,
-            //                   _p_surf_screen->pitch);
-            // SDL_RenderTexture(_p_sdlRenderer, _p_ScreenTexture, NULL, NULL);
-            // SDL_RenderPresent(_p_sdlRenderer);
             (_fnUpdateScreen.tc)->UpdateScreen(_fnUpdateScreen.self, _p_surf_screen);
             ui_curr_time = SDL_GetTicks();
 
@@ -139,10 +128,6 @@ void FadeAction::Iterate() {
             SDL_SetSurfaceAlphaMod(_p_surf_black, (Uint8)_f_alpha);
             SDL_BlitSurface(_p_surf_black, NULL, _p_surf_screen, NULL);
             ui_curr_time = SDL_GetTicks();
-            // SDL_UpdateTexture(_p_ScreenTexture, NULL, _p_surf_screen->pixels,
-            //                   _p_surf_screen->pitch);
-            // SDL_RenderTexture(_p_sdlRenderer, _p_ScreenTexture, NULL, NULL);
-            // SDL_RenderPresent(_p_sdlRenderer);
             (_fnUpdateScreen.tc)->UpdateScreen(_fnUpdateScreen.self, _p_surf_screen);
 
             ui_curr_time = SDL_GetTicks();
