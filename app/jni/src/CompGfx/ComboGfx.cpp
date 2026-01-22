@@ -3,8 +3,8 @@
 #include "GameSettings.h"
 #include "GfxUtil.h"
 
-static const char* LP_PLUS = "‹";
-static const char* LP_MINUS = "›";
+static const char* LP_PLUS = "←";
+static const char* LP_MINUS = "→";
 
 ComboGfx::ComboGfx() {
     _visibleState = INVISIBLE;

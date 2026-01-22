@@ -26,7 +26,7 @@ static char _settingsRootDir[1024] = "";
 static char _exeRootDir[1024] = "";
 static char g_filepath[1024];
 
-static const char* g_lpszIniFontAriblkFname = DATA_PREFIX "font/ariblk.ttf";
+static const char* g_lpszIniFontAriblkFname = DATA_PREFIX "font/DejaVuSans-Bold.ttf";
 static const char* g_lpszFontSymbFname = DATA_PREFIX "font/notosans-sym.ttf";
 static const char* g_lpszFontDejFname = DATA_PREFIX "font/DejaVuSans.ttf";
 
