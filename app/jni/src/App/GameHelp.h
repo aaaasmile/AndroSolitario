@@ -14,20 +14,6 @@ using namespace traits;
 class GameSettings;
 class ButtonGfx;
 
-enum class HelpItemType { TEXT, IMAGE, NEW_LINE, PARAGRAPH_BREAK };
-enum PageNav { NEXT, PREV, HOME };
-
-struct HelpItem {
-    HelpItemType type;
-    std::string text;
-    std::string imagePath;
-};
-
-struct HelpPage {
-    std::string title;
-    std::vector<HelpItem> items;
-};
-
 class GameHelp {
    public:
     GameHelp();

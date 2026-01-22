@@ -187,21 +187,21 @@ void GameHelp::buildPages() {
 
     // Page 1
     HelpPage page1;
-    page1.title = "Welcome to Solitario";
-    page1.items.push_back(
+    page1.Title = "Welcome to Solitario";
+    page1.Items.push_back(
         {HelpItemType::TEXT,
          "This collection of solitaire games is designed to bring you hours of "
          "fun and challenge using traditional Italian card decks.",
          ""});
-    page1.items.push_back({HelpItemType::PARAGRAPH_BREAK, "", ""});
-    page1.items.push_back({HelpItemType::TEXT,
+    page1.Items.push_back({HelpItemType::PARAGRAPH_BREAK, "", ""});
+    page1.Items.push_back({HelpItemType::TEXT,
                            "Use the mouse or touch screen to move cards. Drag "
                            "and drop is fully supported.",
                            ""});
-    page1.items.push_back({HelpItemType::NEW_LINE, "", ""});
-    page1.items.push_back({HelpItemType::IMAGE, "", "images/icona_asso.bmp"});
-    page1.items.push_back({HelpItemType::PARAGRAPH_BREAK, "", ""});
-    page1.items.push_back({HelpItemType::TEXT,
+    page1.Items.push_back({HelpItemType::NEW_LINE, "", ""});
+    page1.Items.push_back({HelpItemType::IMAGE, "", "images/icona_asso.bmp"});
+    page1.Items.push_back({HelpItemType::PARAGRAPH_BREAK, "", ""});
+    page1.Items.push_back({HelpItemType::TEXT,
                            "The game supports multiple regional decks like "
                            "Piacentine, Napoletane, and more.",
                            ""});
@@ -209,30 +209,30 @@ void GameHelp::buildPages() {
 
     // Page 2
     HelpPage page2;
-    page2.title = "Game Rules";
-    page2.items.push_back(
+    page2.Title = "Game Rules";
+    page2.Items.push_back(
         {HelpItemType::TEXT,
          "Objective: build up four foundations from Ace to King in each suit.",
          ""});
-    page2.items.push_back({HelpItemType::PARAGRAPH_BREAK, "", ""});
-    page2.items.push_back({HelpItemType::TEXT,
+    page2.Items.push_back({HelpItemType::PARAGRAPH_BREAK, "", ""});
+    page2.Items.push_back({HelpItemType::TEXT,
                            "Tableau piles can be built down by alternating "
                            "colors. Empty spots can be filled with a King.",
                            ""});
-    page2.items.push_back({HelpItemType::PARAGRAPH_BREAK, "", ""});
-    page2.items.push_back({HelpItemType::IMAGE, "",
+    page2.Items.push_back({HelpItemType::PARAGRAPH_BREAK, "", ""});
+    page2.Items.push_back({HelpItemType::IMAGE, "",
                            "images/commessaggio.jpg"});  // Example image reuse
     _pages.push_back(page2);
 
     // Page 3
     HelpPage page3;
-    page3.title = "Controls";
-    page3.items.push_back({HelpItemType::TEXT,
+    page3.Title = "Controls";
+    page3.Items.push_back({HelpItemType::TEXT,
                            "Double click on a card to automatically move it to "
                            "a foundation if valid.",
                            ""});
-    page3.items.push_back({HelpItemType::PARAGRAPH_BREAK, "", ""});
-    page3.items.push_back({HelpItemType::TEXT,
+    page3.Items.push_back({HelpItemType::PARAGRAPH_BREAK, "", ""});
+    page3.Items.push_back({HelpItemType::TEXT,
                            "Press 'Options' in the main menu to change "
                            "settings like background and language.",
                            ""});
@@ -348,7 +348,7 @@ LPErrInApp GameHelp::renderCurrentPage() {
 
     HelpPage& page = _pages[_currentPageIndex];
 
-    LPErrInApp err = GFX_UTIL::DrawString(_p_ShadowSrf, page.title.c_str(),
+    LPErrInApp err = GFX_UTIL::DrawString(_p_ShadowSrf, page.Title.c_str(),
                                           MARGIN_X, 20, GFX_UTIL_COLOR::White,
                                           _p_GameSettings->GetFontDjvBig());
     if (err != NULL)
@@ -369,12 +369,12 @@ LPErrInApp GameHelp::drawPageContent() {
     int rightMargin = w - MARGIN_X;
     LPErrInApp err = NULL;
 
-    for (const auto& item : page.items) {
-        if (item.type == HelpItemType::TEXT) {
-            err = drawJustifiedText(item.text, y, MARGIN_X, rightMargin);
+    for (const auto& item : page.Items) {
+        if (item.Type == HelpItemType::TEXT) {
+            err = drawJustifiedText(item.Text, y, MARGIN_X, rightMargin);
             if (err != NULL)
                 return err;
-        } else if (item.type == HelpItemType::IMAGE) {
+        } else if (item.Type == HelpItemType::IMAGE) {
             // TODO Draw the image created in Build Page
             // Load and draw image
             // std::string fullPath = GAMESET::GetExeAppFolder();
@@ -417,9 +417,9 @@ LPErrInApp GameHelp::drawPageContent() {
             //         SDL_DestroySurface(pImg);
             //     }
             // }
-        } else if (item.type == HelpItemType::NEW_LINE) {
+        } else if (item.Type == HelpItemType::NEW_LINE) {
             y += LINE_HEIGHT_FACTOR;
-        } else if (item.type == HelpItemType::PARAGRAPH_BREAK) {
+        } else if (item.Type == HelpItemType::PARAGRAPH_BREAK) {
             y += LINE_HEIGHT_FACTOR * 1.5;
         }
     }

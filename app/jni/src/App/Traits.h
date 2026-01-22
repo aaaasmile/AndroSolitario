@@ -5,6 +5,7 @@
 
 #include "ErrorInfo.h"
 #include "Languages.h"
+#include <vector>
 
 enum MenuItemEnum {
     MENU_GAME = 0,
@@ -15,6 +16,20 @@ enum MenuItemEnum {
     QUIT = 5,
     MENU_ROOT = 6,
     NOTHING = 99
+};
+
+enum class HelpItemType { TEXT, IMAGE, NEW_LINE, PARAGRAPH_BREAK };
+enum PageNav { NEXT, PREV, HOME };
+
+struct HelpItem {
+    HelpItemType Type;
+    std::string Text;
+    std::string ImagePath;
+};
+
+struct HelpPage {
+    std::string Title;
+    std::vector<HelpItem> Items;
 };
 
 namespace traits {
