@@ -197,7 +197,7 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen,
     _p_ScreenBackbuffer = GFX_UTIL::SDL_CreateRGBSurface(
         _p_Screen->w, _p_Screen->h, 32, 0, 0, 0, 0);
 
-    _p_fontAblkBig = pGameSettings->GetFontAblkBig();
+    _p_fontAblkBig = pGameSettings->GetFontDjvBoldBig();
     _p_fontDejSmall = pGameSettings->GetFontDjvSmall();
 
     _p_MenuBox = GFX_UTIL::SDL_CreateRGBSurface(

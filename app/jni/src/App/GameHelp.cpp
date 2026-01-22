@@ -88,7 +88,7 @@ LPErrInApp GameHelp::Show(SDL_Surface* pScreen,
                                       _p_GameSettings->GetFontSymb(),
                                       PageNav::PREV, cbBtClicked);
     _p_buttonPrev->SetButtonText(ico.c_str());
-    _p_buttonPrev->SetVisibleState(ButtonGfx::VISIBLE);
+    _p_buttonPrev->SetVisibleState(ButtonGfx::INVISIBLE);
 
     // Button Home
     if (_p_buttonHome != NULL) {
@@ -248,6 +248,16 @@ LPErrInApp GameHelp::HandleEvent(SDL_Event* pEvent,
         if (pEvent->key.key == SDLK_ESCAPE) {
             _isShown = false;
         }
+        if (pEvent->key.key == SDLK_LEFT) {
+            PrevPage();
+        }
+        if (pEvent->key.key == SDLK_RIGHT) {
+            NextPage();
+        }
+        if (pEvent->key.key == SDLK_UP) {
+            _isShown = false;
+        }
+        return NULL;
     }
 #if HASTOUCH
     if (pEvent->type == SDL_EVENT_FINGER_DOWN) {
@@ -288,6 +298,16 @@ LPErrInApp GameHelp::HandleIterate(bool& done) {
             _p_ShadowSrf = NULL;
         }
         return NULL;
+    }
+    if (_currentPageIndex > 0) {
+        _p_buttonPrev->SetVisibleState(ButtonGfx::VISIBLE);
+    } else {
+        _p_buttonPrev->SetVisibleState(ButtonGfx::INVISIBLE);
+    }
+    if (_currentPageIndex < _pages.size() - 1) {
+        _p_buttonNext->SetVisibleState(ButtonGfx::VISIBLE);
+    } else {
+        _p_buttonNext->SetVisibleState(ButtonGfx::INVISIBLE);
     }
 
     LPErrInApp err = renderCurrentPage();
@@ -350,7 +370,7 @@ LPErrInApp GameHelp::renderCurrentPage() {
 
     LPErrInApp err = GFX_UTIL::DrawString(_p_ShadowSrf, page.Title.c_str(),
                                           MARGIN_X, 20, GFX_UTIL_COLOR::White,
-                                          _p_GameSettings->GetFontDjvBig());
+                                          _p_GameSettings->GetFontDjvBoldBig());
     if (err != NULL)
         return err;
 

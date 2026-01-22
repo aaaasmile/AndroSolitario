@@ -51,7 +51,7 @@ class GameSettings {
         _fontSymSize = 36;
     }
     TTF_Font* GetFontDjvBig() { return _p_fontDejBig; }
-    TTF_Font* GetFontAblkBig() { return _p_fontAblkBig; }
+    TTF_Font* GetFontDjvBoldBig() { return _p_fontAblkBig; }
     TTF_Font* GetFontDjvMedium() { return _p_fontDejMedium; }
     TTF_Font* GetFontDjvSmall() { return _p_fontDejSmall; }
     TTF_Font* GetFontSymb() { return _p_fontSymb; }
