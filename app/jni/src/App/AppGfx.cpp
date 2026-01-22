@@ -25,7 +25,7 @@
 #include "MenuMgr.h"
 #include "MusicManager.h"
 #include "OptionsGfx.h"
-#include "WinTypeGlobal.h"
+#include "TypeGlobal.h"
 
 static const char* g_lpszIconProgFile = DATA_PREFIX "images/icona_asso.bmp";
 static const char* g_lpszTitleFile = DATA_PREFIX "images/title.png";

@@ -10,7 +10,7 @@
 #include <SDL3_ttf/SDL_ttf.h>
 
 #include "ErrorInfo.h"
-#include "WinTypeGlobal.h"
+#include "TypeGlobal.h"
 
 class LabelGfx {
 public:

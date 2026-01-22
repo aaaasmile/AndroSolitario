@@ -9,7 +9,7 @@
 
 #include "ErrorInfo.h"
 #include "Traits.h"
-#include "WinTypeGlobal.h"
+#include "TypeGlobal.h"
 
 using namespace traits;
 

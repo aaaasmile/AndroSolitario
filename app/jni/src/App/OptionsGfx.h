@@ -10,7 +10,7 @@
 #include "ErrorInfo.h"
 #include "GameSettings.h"
 #include "Traits.h"
-#include "WinTypeGlobal.h"
+#include "TypeGlobal.h"
 
 class ButtonGfx;
 class Languages;

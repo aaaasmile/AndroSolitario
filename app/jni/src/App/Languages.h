@@ -9,7 +9,7 @@ public:
         LANG_ITA = 0,
         LANG_DIAL_BREDA,
         LANG_ENG,
-        TOT_LANG  // it mus be  always on the last place
+        TOT_LANG 
     };
     enum eStringID {
         ID_START = 0,
@@ -79,7 +79,7 @@ public:
         ON,
         OFF,
         PLEASE_ENTER_NAME,
-        TOT_STRINGS  // it must be always on the last place
+        TOT_STRINGS
     };
 
 public:

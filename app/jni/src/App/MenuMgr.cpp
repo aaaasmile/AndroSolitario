@@ -14,7 +14,7 @@
 #include "GameSettings.h"
 #include "GfxUtil.h"
 #include "MusicManager.h"
-#include "WinTypeGlobal.h"
+#include "TypeGlobal.h"
 
 static const char* g_lpszMsgUrl = "Go to invido.it";
 static const char* g_lpszVersion = VERSION;

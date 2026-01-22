@@ -15,7 +15,7 @@ class FadeAction {
     LPErrInApp Fade(
         SDL_Surface* pSurfScreen, SDL_Surface* pSurfImg, Uint32 uiSeconds,
         bool fadeOut,
-        UpdateScreenCb& fnUpdateScreen,  // SDL_Renderer* p_sdlRenderer,
+        UpdateScreenCb& fnUpdateScreen,
         SDL_Rect* p_rctTarget);
 
     void InstantFade(SDL_Surface* p_surf_screen);
@@ -34,8 +34,6 @@ class FadeAction {
     SDL_Surface* _p_surf_screen;
     SDL_Surface* _p_surf_img;
     SDL_Surface* _p_surf_black;
-    //SDL_Texture* _p_ScreenTexture;
-    //SDL_Renderer* _p_sdlRenderer;
     UpdateScreenCb _fnUpdateScreen;
     SDL_Surface* _p_surf_screen_copy;
     SDL_Rect* _p_rctTarget;

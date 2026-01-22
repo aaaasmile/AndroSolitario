@@ -7,7 +7,7 @@
 #include <SDL3/SDL.h>
 #include <SDL3_ttf/SDL_ttf.h>
 
-#include "WinTypeGlobal.h"
+#include "TypeGlobal.h"
 
 class TextInputGfx {
    public:

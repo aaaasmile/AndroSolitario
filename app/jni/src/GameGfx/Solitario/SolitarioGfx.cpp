@@ -11,7 +11,7 @@
 #include "Fading.h"
 #include "GfxUtil.h"
 #include "MusicManager.h"
-#include "WinTypeGlobal.h"
+#include "TypeGlobal.h"
 
 // card graphics
 int g_CardWidth = 0;

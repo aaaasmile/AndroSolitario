@@ -9,7 +9,7 @@
 #include "GameSettings.h"
 #include "Languages.h"
 #include "Traits.h"
-#include "WinTypeGlobal.h"
+#include "TypeGlobal.h"
 
 using namespace traits;
 class ButtonGfx;

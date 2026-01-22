@@ -2,7 +2,7 @@
 
 #include <inttypes.h>
 
-#include "WinTypeGlobal.h"
+#include "TypeGlobal.h"
 
 static SDL_Surface* SDL_CreateRGBSurface(int width, int height, int depth,
                                          Uint32 Rmask, Uint32 Gmask,
