@@ -7,7 +7,7 @@
 
 #include "WinTypeGlobal.h"
 
-const char* g_lpszDeckDir = DATA_PREFIX "mazzi/";
+const char* g_lpszDeckDir = DATA_PREFIX "decks/";
 
 SDL_Color GFX_UTIL_COLOR::White = {255, 255, 255, 0};
 SDL_Color GFX_UTIL_COLOR::Gray = {128, 128, 128, 0};
