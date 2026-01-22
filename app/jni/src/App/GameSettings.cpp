@@ -6,12 +6,7 @@
 #include <sys/types.h>
 
 #include <algorithm>
-#ifdef _MSC_VER
-#include <direct.h>
-#include <io.h>
-#else
 #include <unistd.h>
-#endif
 
 #include "Config.h"
 #include "MusicManager.h"

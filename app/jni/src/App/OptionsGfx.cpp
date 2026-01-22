@@ -80,15 +80,8 @@ static void fncBind_ButtonClicked(void* self, int iVal) {
 
 // Buttons, ok, show keyboard
 ClickCb OptionsGfx::prepClickCb() {
-#ifndef _MSC_VER
     static VClickCb const tc = {.Click = (&fncBind_ButtonClicked)};
-
     return (ClickCb){.tc = &tc, .self = this};
-#else
-    static VClickCb const tc = {(&fncBind_ButtonClicked)};
-    ClickCb cb = {&tc, this};
-    return cb;
-#endif
 }
 
 static void fncBind_CheckboxMusicClicked(void* self, bool state) {
@@ -98,16 +91,9 @@ static void fncBind_CheckboxMusicClicked(void* self, bool state) {
 
 // Checkbox music
 CheckboxClickCb OptionsGfx::prepCheckBoxClickMusic() {
-#ifndef _MSC_VER
     static VCheckboxClickCb const tc = {.Click =
                                             (&fncBind_CheckboxMusicClicked)};
-
     return (CheckboxClickCb){.tc = &tc, .self = this};
-#else
-    static VCheckboxClickCb const tc = {(&fncBind_CheckboxMusicClicked)};
-    CheckboxClickCb cb = {&tc, this};
-    return cb;
-#endif
 }
 
 LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen,
@@ -516,20 +502,13 @@ static void fncBind_KeyboardClick(void* self, const char* text) {
 }
 
 ClickKeyboardCb OptionsGfx::prepareClickKeyboardCb() {
-#ifndef _MSC_VER
     static VClickKeyboardCb const tc = {.ClickKey = (&fncBind_KeyboardClick)};
-
     return (ClickKeyboardCb){.tc = &tc, .self = this};
-#else
-    static VClickKeyboardCb const tc = {(&fncBind_KeyboardClick)};
-    ClickKeyboardCb cb = {&tc, this};
-    return cb;
-#endif
 }
 
 void OptionsGfx::TextFromKeyboard(const char* text) {
     std::string currText = _p_textInput->GetText();
-    //TRACE("[TextFromKeyboard] %s", text);
+    // TRACE("[TextFromKeyboard] %s", text);
 
     if (text[0] == '\b') {
         if (!currText.empty()) {

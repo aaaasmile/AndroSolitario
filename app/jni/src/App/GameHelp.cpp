@@ -156,15 +156,8 @@ static void fncBind_ButtonClicked(void* self, int iVal) {
 }
 
 ClickCb GameHelp::prepClickCb() {
-#ifndef _MSC_VER
     static VClickCb const tc = {.Click = (&fncBind_ButtonClicked)};
-
     return (ClickCb){.tc = &tc, .self = this};
-#else
-    static VClickCb const tc = {(&fncBind_ButtonClicked)};
-    ClickCb cb = {&tc, this};
-    return cb;
-#endif
 }
 
 void GameHelp::NextPage() {
@@ -356,8 +349,7 @@ LPErrInApp GameHelp::renderCurrentPage() {
     HelpPage& page = _pages[_currentPageIndex];
 
     LPErrInApp err = GFX_UTIL::DrawString(_p_ShadowSrf, page.title.c_str(),
-                                          MARGIN_X, 20,
-                                          GFX_UTIL_COLOR::White,
+                                          MARGIN_X, 20, GFX_UTIL_COLOR::White,
                                           _p_GameSettings->GetFontDjvBig());
     if (err != NULL)
         return err;

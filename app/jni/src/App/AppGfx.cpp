@@ -8,12 +8,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <time.h>
-#ifdef _MSC_VER
-#include <direct.h>
-#include <io.h>
-#else
 #include <unistd.h>
-#endif
 
 #include "Config.h"
 #include "Credits.h"

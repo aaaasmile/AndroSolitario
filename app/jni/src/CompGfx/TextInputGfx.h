@@ -1,9 +1,6 @@
 #ifndef TEXTINPUTGFX__H
 #define TEXTINPUTGFX__H
 
-#if _MSC_VER > 1000
-#pragma once
-#endif
 #include <SDL3/SDL.h>
 #include <SDL3_ttf/SDL_ttf.h>
 

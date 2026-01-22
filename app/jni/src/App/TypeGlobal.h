@@ -1,12 +1,6 @@
 #ifndef _WINTYPEGLOBAL__H_
 #define _WINTYPEGLOBAL__H_
 
-#if _MSC_VER > 1000
-#pragma warning(disable : 4786)
-#pragma warning(disable : 4996)
-#include <windows.h>
-#endif
-
 #include <stdarg.h>
 
 #include <string>
