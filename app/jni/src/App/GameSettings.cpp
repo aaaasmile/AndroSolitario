@@ -29,6 +29,7 @@ static char g_filepath[1024];
 static const char* g_lpszIniFontAriblkFname = DATA_PREFIX "font/ariblk.ttf";
 static const char* g_lpszIniFontVeraFname = DATA_PREFIX "font/vera.ttf";
 static const char* g_lpszFontSymbFname = DATA_PREFIX "font/notosans-sym.ttf";
+static const char* g_lpszFontDejFname = DATA_PREFIX "font/DejaVuSans.ttf";
 
 LPGameSettings GameSettings::GetSettings() {
     if (_p_GameSettings == NULL) {
@@ -287,6 +288,11 @@ LPErrInApp GameSettings::LoadFonts() {
     if (_p_fontSymb == NULL) {
         return ERR_UTIL::ErrorCreate("Unable to load font %s, error: %s\n",
                                      g_lpszFontSymbFname, SDL_GetError());
+    }
+    _p_fontDejMedium= TTF_OpenFont(g_lpszFontSymbFname, _fontMediumSize);
+    if (_p_fontDejMedium == NULL) {
+        return ERR_UTIL::ErrorCreate("Unable to load font %s, error: %s\n",
+                                     g_lpszFontDejFname, SDL_GetError());
     }
     return NULL;
 }

@@ -54,6 +54,7 @@ class GameSettings {
     TTF_Font* GetFontVera() { return _p_fontVera; }
     TTF_Font* GetFontMedium() { return _p_fontMedium; }
     TTF_Font* GetFontSymb() { return _p_fontSymb; }
+    TTF_Font* GetFontDjvMedium(){return _p_fontDejMedium; }
 
     Languages* GetLanguageMan();
     void SetCurrentLang();
@@ -95,6 +96,7 @@ class GameSettings {
     TTF_Font* _p_fontMedium;
     TTF_Font* _p_fontAriblk;
     TTF_Font* _p_fontSymb;
+    TTF_Font* _p_fontDejMedium;
     Languages* _p_Languages;
     MusicManager* _p_MusicManager;
     bool _portraitMode = false;
