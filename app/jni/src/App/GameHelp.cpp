@@ -9,7 +9,6 @@
 #include "Config.h"
 #include "GameSettings.h"
 #include "GfxUtil.h"
-#include "Languages.h"
 
 GameHelp::GameHelp() {
     _p_Screen = NULL;

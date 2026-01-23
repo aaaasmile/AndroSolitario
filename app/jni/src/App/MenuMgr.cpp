@@ -18,7 +18,6 @@
 
 static const char* g_lpszMsgUrl = "Go to invido.it";
 static const char* g_lpszVersion = VERSION;
-static const char* g_lpszIniFontVera = DATA_PREFIX "font/vera.ttf";
 
 static const SDL_Color g_color_on = {253, 252, 250};
 static const SDL_Color g_color_off = {128, 128, 128};
@@ -140,7 +139,7 @@ const char* MenuItemEnumToString(MenuItemEnum e) {
 MenuMgr::MenuMgr() {
     _p_fontAblkBig = 0;
     _p_fontDejSmall = 0;
-    _p_fontVeraUnderscore = 0;
+    _p_fontDejUnderscoreSmall = 0;
     _p_ScreenBackbuffer = 0;
     _focusedMenuItem = MenuItemEnum::MENU_GAME;
     _p_MenuBox = 0;
@@ -165,7 +164,7 @@ MenuMgr::~MenuMgr() {
 LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen,
                                UpdateScreenCb& fnUpdateScreen,
                                MenuDelegator& menuDelegator) {
-    if(pScreen == NULL){
+    if (pScreen == NULL) {
         return ERR_UTIL::ErrorCreate("Screen is not initialized\n");
     }
     _fnUpdateScreen = fnUpdateScreen;
@@ -175,7 +174,7 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen,
     _menuDlgt = menuDelegator;
     LPGameSettings pGameSettings = GameSettings::GetSettings();
     _p_Screen = pScreen;
-    
+
     SDL_Rect clipRect;
     SDL_GetSurfaceClipRect(_p_Screen, &clipRect);
     _screenW = clipRect.w;
@@ -185,7 +184,7 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen,
 
     _rctPanelRedBox.w = 500;
     _rctPanelRedBox.h = 560;
-    
+
     _rctPanelRedBox.x = (_screenW - _rctPanelRedBox.w) / 2;
     _rctPanelRedBox.y = (_screenH - _rctPanelRedBox.h) / 2;
     _box_X = _rctPanelRedBox.x;
@@ -210,14 +209,7 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen,
     SDL_SetSurfaceAlphaMod(_p_MenuBox, 120);
 
     // link to invido.it
-    _p_fontVeraUnderscore =
-        TTF_OpenFont(g_lpszIniFontVera, pGameSettings->GetSizeFontSmall());
-    if (_p_fontVeraUnderscore == 0) {
-        return ERR_UTIL::ErrorCreate(
-            "MenuMgr: Unable to load font %s, error: %s\n", g_lpszIniFontVera,
-            SDL_GetError());
-    }
-    TTF_SetFontStyle(_p_fontVeraUnderscore, TTF_STYLE_UNDERLINE);
+    _p_fontDejUnderscoreSmall = pGameSettings->GetFontDjvUnderscoreSmall();
     SDL_Rect rctBt1;
     rctBt1.h = 28;
     rctBt1.w = 150;
@@ -225,8 +217,8 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen,
     rctBt1.x = _p_Screen->w - rctBt1.w - 20;
     _p_homeUrl = new LabelLinkGfx();
     ClickCb cbNUll = ClickCb{.tc = NULL, .self = NULL};
-    _p_homeUrl->Initialize(&rctBt1, _p_ScreenBackbuffer, _p_fontVeraUnderscore,
-                           MYIDLABELURL, cbNUll);
+    _p_homeUrl->Initialize(&rctBt1, _p_ScreenBackbuffer,
+                           _p_fontDejUnderscoreSmall, MYIDLABELURL, cbNUll);
     _p_homeUrl->SetState(LabelLinkGfx::INVISIBLE);
     _p_homeUrl->SetUrl(PACKAGE_URL);
     _p_homeUrl->SetWindowText(g_lpszMsgUrl);
@@ -444,7 +436,8 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     return NULL;
 }
 
-LPErrInApp MenuMgr::HandleRootMenuEvent(SDL_Event* pEvent, const SDL_Point& targetPos) {
+LPErrInApp MenuMgr::HandleRootMenuEvent(SDL_Event* pEvent,
+                                        const SDL_Point& targetPos) {
     LPErrInApp err;
     // TRACE_DEBUG("Ignore mouse events: %b", ignoreMouseEvent);
     if (pEvent->type == SDL_EVENT_QUIT) {
