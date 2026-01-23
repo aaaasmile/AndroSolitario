@@ -104,13 +104,139 @@ void fncBind_GetHelpPagesSolitarioENG(void* self,
 
 void fncBind_GetHelpPagesSolitarioITA(void* self,
                                       std::vector<HelpPage>& pages) {
-    TRACE_DEBUG("[fncBind_GetHelpPages] build pages for Solitario ENG");
+    TRACE_DEBUG("[fncBind_GetHelpPages] build pages for Solitario ITA");
     pages.clear();
 
+    // Page 1: Benvenuto & Layout
     HelpPage page1;
-    page1.Title = "Benvenuto nel Solitario con le carte da Briscola";
-
+    page1.Title = "Benvenuto in Solitario";
+    page1.Items.push_back(
+        {HelpItemType::TEXT,
+         "Questo è il classico gioco del Solitario con le carte da Briscola.",
+         ""});
+    page1.Items.push_back({HelpItemType::PARAGRAPH_BREAK, "", ""});
+    page1.Items.push_back({HelpItemType::TEXT,
+                           "Il tavolo di gioco si suddivide in tre sezioni: il "
+                           "basamento degli Assi, le pile di carte e il mazzo "
+                           "delle carte restanti.",
+                           ""});
+    page1.Items.push_back({HelpItemType::NEW_LINE, "", ""});
+    page1.Items.push_back({HelpItemType::IMAGE, "", "images/ingame.png"});
     pages.push_back(page1);
+
+    // Page 2: Comandi
+    HelpPage page2;
+    page2.Title = "Comandi di gioco";
+    page2.Items.push_back({HelpItemType::TEXT,
+                           "Il Solitario si gioca con il mouse o con il touch "
+                           "screen. Con la tastiera è possibile:",
+                           ""});
+    page2.Items.push_back({HelpItemType::NEW_LINE, "", ""});
+    page2.Items.push_back(
+        {HelpItemType::TEXT, "- Iniziare una nuova partita (tasto N)", ""});
+    page2.Items.push_back(
+        {HelpItemType::TEXT, "- Uscire dal gioco (tasto Escape)", ""});
+    page2.Items.push_back({HelpItemType::PARAGRAPH_BREAK, "", ""});
+    page2.Items.push_back({HelpItemType::TEXT,
+                           "Il tasto destro (o doppio tap) invia "
+                           "automaticamente una carta sul basamento.",
+                           ""});
+    pages.push_back(page2);
+
+    // Page 3: Scopo del gioco
+    HelpPage page3;
+    page3.Title = "Scopo del gioco";
+    page3.Items.push_back({HelpItemType::TEXT,
+                           "Il gioco termina quando le quattro pile in alto a "
+                           "destra contengono tutte le carte ordinate per "
+                           "seme, dall'Asso fino al Re.",
+                           ""});
+    page3.Items.push_back({HelpItemType::NEW_LINE, "", ""});
+    page3.Items.push_back({HelpItemType::IMAGE, "", "images/fine.png"});
+    pages.push_back(page3);
+
+    // Page 4: Movimenti (Colore)
+    HelpPage page4;
+    page4.Title = "Movimenti (Colore)";
+    page4.Items.push_back({HelpItemType::TEXT,
+                           "Una carta può essere spostata sopra un'altra di "
+                           "un'altra pila se i semi sono di colore diverso.",
+                           ""});
+    page4.Items.push_back({HelpItemType::PARAGRAPH_BREAK, "", ""});
+    page4.Items.push_back({HelpItemType::TEXT,
+                           "Spade e Bastoni sono semi NERI, mentre Coppe e "
+                           "Denari sono semi ROSSI.",
+                           ""});
+    page4.Items.push_back({HelpItemType::PARAGRAPH_BREAK, "", ""});
+    page4.Items.push_back({HelpItemType::TEXT,
+                           "Un seme rosso va messo sopra un seme nero e "
+                           "viceversa (alternanza di colore).",
+                           ""});
+    pages.push_back(page4);
+
+    // Page 5: Movimenti (Rango & Tarocco)
+    HelpPage page5;
+    page5.Title = "Movimenti (Rango)";
+    page5.Items.push_back({HelpItemType::TEXT,
+                           "L'ordine deve essere decrescente. Esempio: sotto "
+                           "un Fante ci va un Sette, sotto un Re un Cavallo.",
+                           ""});
+    page5.Items.push_back({HelpItemType::PARAGRAPH_BREAK, "", ""});
+    page5.Items.push_back({HelpItemType::TEXT,
+                           "Col mazzo del Tarocco, l'ordine è: Re, Donna, "
+                           "Cavallo, Fante, Dieci... fino all'Asso.",
+                           ""});
+    page5.Items.push_back({HelpItemType::PARAGRAPH_BREAK, "", ""});
+    page5.Items.push_back({HelpItemType::TEXT,
+                           "Solo un Re può essere spostato in uno spazio vuoto "
+                           "sul basamento delle pile.",
+                           ""});
+    pages.push_back(page5);
+
+    // Page 6: Basamento & Mazzo
+    HelpPage page6;
+    page6.Title = "Basamento e Mazzo";
+    page6.Items.push_back({HelpItemType::TEXT,
+                           "Quando scopri un Asso, mettilo nel basamento in "
+                           "alto a destra. Poi prosegui con Due, Tre...",
+                           ""});
+    page6.Items.push_back({HelpItemType::IMAGE, "", "images/basamento.png"});
+    page6.Items.push_back({HelpItemType::PARAGRAPH_BREAK, "", ""});
+    page6.Items.push_back({HelpItemType::TEXT,
+                           "Se sei bloccato, usa il mazzo di supporto. Usalo "
+                           "con cautela: il punteggio cala ad ogni giro!",
+                           ""});
+    page6.Items.push_back({HelpItemType::IMAGE, "", "images/mazzo.png"});
+    pages.push_back(page6);
+
+    // Page 7: Punteggio
+    HelpPage page7;
+    page7.Title = "Punteggio";
+    page7.Items.push_back({HelpItemType::TEXT, "Punteggio Virtuoso:", ""});
+    page7.Items.push_back({HelpItemType::TEXT, " - Carta sul tavolo: +45", ""});
+    page7.Items.push_back({HelpItemType::TEXT, " - Carta girata: +25", ""});
+    page7.Items.push_back(
+        {HelpItemType::TEXT, " - Carta su base assi: +60", ""});
+    page7.Items.push_back({HelpItemType::PARAGRAPH_BREAK, "", ""});
+    page7.Items.push_back({HelpItemType::TEXT, "Penalità:", ""});
+    page7.Items.push_back({HelpItemType::TEXT, " - Ogni secondo: -1", ""});
+    page7.Items.push_back(
+        {HelpItemType::TEXT, " - Dalla base al tavolo: -75", ""});
+    page7.Items.push_back({HelpItemType::TEXT, " - Mazzo rigirato: -175", ""});
+    pages.push_back(page7);
+
+    // Page 8: Bonus finale
+    HelpPage page8;
+    page8.Title = "Bonus Finale";
+    page8.Items.push_back(
+        {HelpItemType::TEXT, "Se vinci, ricevi un bonus calcolato come:", ""});
+    page8.Items.push_back({HelpItemType::PARAGRAPH_BREAK, "", ""});
+    page8.Items.push_back(
+        {HelpItemType::TEXT, "Bonus = 2 * Punti - (10 * Secondi)", ""});
+    page8.Items.push_back({HelpItemType::PARAGRAPH_BREAK, "", ""});
+    page8.Items.push_back(
+        {HelpItemType::TEXT, "Il punteggio finale sarà: Bonus + Punti", ""});
+    pages.push_back(page8);
 }
 
 LPErrInApp fncBind_Show(void* self) {
