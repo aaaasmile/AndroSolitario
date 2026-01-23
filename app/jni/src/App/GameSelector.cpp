@@ -100,6 +100,189 @@ void fncBind_GetHelpPagesSolitarioENG(void* self,
                            "settings like background and language.",
                            ""});
     pages.push_back(page3);
+
+    // Page 4: Tarocco Piemontese (Intro)
+    HelpPage page4;
+    page4.Title = "Tarocco Piemontese";
+    page4.Items.push_back({HelpItemType::TEXT,
+                           "Among the various decks supported, there is the "
+                           "splendid Tarocco Piemontese.",
+                           ""});
+    page4.Items.push_back({HelpItemType::PARAGRAPH_BREAK, "", ""});
+    page4.Items.push_back({HelpItemType::TEXT,
+                           "It is a deck of 78 cards (56 suited and 22 "
+                           "Triumphs). In this game, it allows for higher "
+                           "scores than the standard 40-card deck.",
+                           ""});
+    page4.Items.push_back({HelpItemType::NEW_LINE, "", ""});
+    page4.Items.push_back({HelpItemType::IMAGE, "", "images/tarocco.png"});
+    pages.push_back(page4);
+
+    // Page 5: Suits and Deck
+    HelpPage page5;
+    page5.Title = "Suits and Deck";
+    page5.Items.push_back({HelpItemType::TEXT, "Suits translation:", ""});
+    page5.Items.push_back(
+        {HelpItemType::TEXT, " - Spade: Swords (Spades)", ""});
+    page5.Items.push_back({HelpItemType::TEXT, " - Coppe: Cups (Hearts)", ""});
+    page5.Items.push_back(
+        {HelpItemType::TEXT, " - Denari: Coins (Diamonds)", ""});
+    page5.Items.push_back(
+        {HelpItemType::TEXT, " - Bastoni: Batons (Clubs)", ""});
+    page5.Items.push_back({HelpItemType::PARAGRAPH_BREAK, "", ""});
+    page5.Items.push_back(
+        {HelpItemType::TEXT,
+         "In the modern French Tarot, suited cards are Piques, "
+         "Coeurs, Carreaux, and Trèfles.",
+         ""});
+    pages.push_back(page5);
+
+    // Page 6: Terminology and Mottos
+    HelpPage page6;
+    page6.Title = "Terminology and Mottos";
+    page6.Items.push_back({HelpItemType::TEXT,
+                           "The Aces feature Latin mottos such as 'Carpe diem' "
+                           "and 'Gutta cavat lapidem'.",
+                           ""});
+    page6.Items.push_back({HelpItemType::PARAGRAPH_BREAK, "", ""});
+    page6.Items.push_back({HelpItemType::TEXT,
+                           "Chitarrella, an 18th-century author, described "
+                           "the suits as: Mucro, cuppa, nummus, and baculus.",
+                           ""});
+    pages.push_back(page6);
+
+    // Page 7: Deck Details
+    HelpPage page7;
+    page7.Title = "Deck Details";
+    page7.Items.push_back(
+        {HelpItemType::TEXT,
+         "The Fool (numbered 0) is shown catching a butterfly.", ""});
+    page7.Items.push_back({HelpItemType::PARAGRAPH_BREAK, "", ""});
+    page7.Items.push_back({HelpItemType::TEXT,
+                           "The Devil (Triumph 15) features ironic pulling "
+                           "faces with their tongues out.",
+                           ""});
+    page7.Items.push_back({HelpItemType::PARAGRAPH_BREAK, "", ""});
+    page7.Items.push_back({HelpItemType::TEXT,
+                           "Swords are often curved like sabres, while "
+                           "Batons are straight like maces.",
+                           ""});
+    pages.push_back(page7);
+
+    // Page 8: History and Meanings
+    HelpPage page8;
+    page8.Title = "History and Meanings";
+    page8.Items.push_back({HelpItemType::TEXT,
+                           "In the 15th Century, it was called Ludus "
+                           "Triumphorum (Game of Triumphs).",
+                           ""});
+    page8.Items.push_back({HelpItemType::PARAGRAPH_BREAK, "", ""});
+    page8.Items.push_back({HelpItemType::TEXT,
+                           "The word 'Trump' (Trumpf) comes from the Italian "
+                           "'Trionfi'. 'Tarot' comes from 'Tarocco'.",
+                           ""});
+    page8.Items.push_back({HelpItemType::PARAGRAPH_BREAK, "", ""});
+    page8.Items.push_back({HelpItemType::TEXT,
+                           "The first Triumph is 'Il Bagatto', representing "
+                           "a magician or conjurer.",
+                           ""});
+    pages.push_back(page8);
+
+    // Page 9: Triumphs (2-13)
+    HelpPage page9;
+    page9.Title = "Triumphs (Civil & Life)";
+    page9.Items.push_back(
+        {HelpItemType::TEXT, "2: The Empress | 3: The Emperor", ""});
+    page9.Items.push_back(
+        {HelpItemType::TEXT, "4: The Popess  | 5: The Pope", ""});
+    page9.Items.push_back({HelpItemType::NEW_LINE, "", ""});
+    page9.Items.push_back({HelpItemType::TEXT, "6: Temperance  | 7: Love", ""});
+    page9.Items.push_back(
+        {HelpItemType::TEXT, "8: The Chariot | 9: Strength", ""});
+    page9.Items.push_back(
+        {HelpItemType::TEXT, "10: Fortune    | 11: Time", ""});
+    page9.Items.push_back(
+        {HelpItemType::TEXT, "12: The Hanged | 13: Death", ""});
+    pages.push_back(page9);
+
+    // Page 10: Triumphs (Afterlife)
+    HelpPage page10;
+    page10.Title = "Triumphs (Afterlife)";
+    page10.Items.push_back(
+        {HelpItemType::TEXT, "14: The Devil  | 15: Lightning", ""});
+    page10.Items.push_back(
+        {HelpItemType::TEXT, "16: The Star   | 17: The Moon", ""});
+    page10.Items.push_back(
+        {HelpItemType::TEXT, "18: The Sun    | 19: Judgement", ""});
+    page10.Items.push_back(
+        {HelpItemType::TEXT, "20: Justice    | 21: The World", ""});
+    page10.Items.push_back({HelpItemType::NEW_LINE, "", ""});
+    page10.Items.push_back({HelpItemType::TEXT, "22/0: The Fool (Matto)", ""});
+    pages.push_back(page10);
+
+    // Page 11: Game Rules (4 players)
+    HelpPage page11;
+    page11.Title = "Game Rules (Multiplayer)";
+    page11.Items.push_back({HelpItemType::TEXT,
+                            "Traditionally played by 4 players in teams "
+                            "(2 against 2).",
+                            ""});
+    page11.Items.push_back({HelpItemType::PARAGRAPH_BREAK, "", ""});
+    page11.Items.push_back({HelpItemType::TEXT,
+                            "The dealer gives 19 cards each and discards 2 "
+                            "(excluding Kings and Triumphs).",
+                            ""});
+    page11.Items.push_back({HelpItemType::PARAGRAPH_BREAK, "", ""});
+    page11.Items.push_back({HelpItemType::TEXT,
+                            "The session usually consists of 12 games, so "
+                            "everyone plays together once.",
+                            ""});
+    pages.push_back(page11);
+
+    // Page 12: Suit Ranking
+    HelpPage page12;
+    page12.Title = "Suit Ranking";
+    page12.Items.push_back(
+        {HelpItemType::TEXT, "Long Suits (Swords/Batons):", ""});
+    page12.Items.push_back(
+        {HelpItemType::TEXT, "K, Q, C, J, 10, 9, 8... to Ace.", ""});
+    page12.Items.push_back({HelpItemType::PARAGRAPH_BREAK, "", ""});
+    page12.Items.push_back(
+        {HelpItemType::TEXT, "Short Suits (Coins/Cups):", ""});
+    page12.Items.push_back(
+        {HelpItemType::TEXT, "K, Q, C, J, Ace, 2, 3... up to 10.", ""});
+    page12.Items.push_back({HelpItemType::PARAGRAPH_BREAK, "", ""});
+    page12.Items.push_back({HelpItemType::TEXT,
+                            "Note: backwards ranking for numeral cards "
+                            "in short suits!",
+                            ""});
+    pages.push_back(page12);
+
+    // Page 13: Scoring (Tricks)
+    HelpPage page13;
+    page13.Title = "Scoring (Tricks)";
+    page13.Items.push_back({HelpItemType::TEXT,
+                            "1 point per trick. Bonus points for honors:", ""});
+    page13.Items.push_back(
+        {HelpItemType::TEXT, " - King/Matto/20/1: 4 points", ""});
+    page13.Items.push_back({HelpItemType::TEXT, " - Queen: 3 points", ""});
+    page13.Items.push_back({HelpItemType::TEXT, " - Cavallo: 2 points", ""});
+    page13.Items.push_back({HelpItemType::TEXT, " - Jack: 1 point", ""});
+    pages.push_back(page13);
+
+    // Page 14: Final Scoring
+    HelpPage page14;
+    page14.Title = "Final Scoring";
+    page14.Items.push_back({HelpItemType::TEXT,
+                            "The total points in a game are 72. Average "
+                            "for a team is 36 points.",
+                            ""});
+    page14.Items.push_back({HelpItemType::PARAGRAPH_BREAK, "", ""});
+    page14.Items.push_back({HelpItemType::TEXT,
+                            "The Lightning has become the Tower, and Time "
+                            "has become the Hermit in newer decks.",
+                            ""});
+    pages.push_back(page14);
 }
 
 void fncBind_GetHelpPagesSolitarioITA(void* self,
