@@ -20,7 +20,8 @@ class GameHelp {
     ~GameHelp();
 
     LPErrInApp Show(SDL_Surface* pScreen, UpdateScreenCb& fnUpdateScreen,
-                    SDL_Surface* pSceneBackground);
+                    SDL_Surface* pSceneBackground,
+                    GameHelpPagesCb& fnHelpPages);
     LPErrInApp HandleEvent(SDL_Event* pEvent, const SDL_Point& targetPos);
     LPErrInApp HandleIterate(bool& done);
     bool IsOngoing() { return _isShown; }
@@ -43,6 +44,7 @@ class GameHelp {
     SDL_Surface* _p_surfTextBackground;
     GameSettings* _p_GameSettings;
     UpdateScreenCb _fnUpdateScreen;
+    GameHelpPagesCb _fnHelpPages;
     std::vector<HelpPage> _pages;
     int _currentPageIndex;
     bool _isShown = false;

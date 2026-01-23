@@ -47,12 +47,14 @@ GameHelp::~GameHelp() {
 
 LPErrInApp GameHelp::Show(SDL_Surface* pScreen,
                           traits::UpdateScreenCb& fnUpdateScreen,
-                          SDL_Surface* pSceneBackground) {
+                          SDL_Surface* pSceneBackground,
+                          GameHelpPagesCb& fnHelpPages) {
     _p_GameSettings = GameSettings::GetSettings();
     TRACE("Show Help for %s", _p_GameSettings->GameName.c_str());
     _p_Screen = pScreen;
     _fnUpdateScreen = fnUpdateScreen;
     _p_Scene_background = pSceneBackground;
+    _fnHelpPages = fnHelpPages;
     buildPages();
     _currentPageIndex = 0;
     _isShown = true;
@@ -184,58 +186,9 @@ void GameHelp::buildPages() {
     TRACE_DEBUG("[buildPages] for help");
     _pages.clear();
 
-    // Page 1
-    HelpPage page1;
-    page1.Title = "Welcome to Solitario";
-    page1.Items.push_back(
-        {HelpItemType::TEXT,
-         "This collection of solitaire games is designed to bring you hours of "
-         "fun and challenge using traditional Italian card decks.",
-         ""});
-    page1.Items.push_back({HelpItemType::PARAGRAPH_BREAK, "", ""});
-    page1.Items.push_back({HelpItemType::TEXT,
-                           "Use the mouse or touch screen to move cards. Drag "
-                           "and drop is fully supported.",
-                           ""});
-    page1.Items.push_back({HelpItemType::NEW_LINE, "", ""});
-    page1.Items.push_back({HelpItemType::IMAGE, "", "images/icona_asso.bmp"});
-    page1.Items.push_back({HelpItemType::PARAGRAPH_BREAK, "", ""});
-    page1.Items.push_back({HelpItemType::TEXT,
-                           "The game supports multiple regional decks like "
-                           "Piacentine, Napoletane, and more.",
-                           ""});
-    _pages.push_back(page1);
-
-    // Page 2
-    HelpPage page2;
-    page2.Title = "Game Rules";
-    page2.Items.push_back(
-        {HelpItemType::TEXT,
-         "Objective: build up four foundations from Ace to King in each suit.",
-         ""});
-    page2.Items.push_back({HelpItemType::PARAGRAPH_BREAK, "", ""});
-    page2.Items.push_back({HelpItemType::TEXT,
-                           "Tableau piles can be built down by alternating "
-                           "colors. Empty spots can be filled with a King.",
-                           ""});
-    page2.Items.push_back({HelpItemType::PARAGRAPH_BREAK, "", ""});
-    page2.Items.push_back({HelpItemType::IMAGE, "",
-                           "images/commessaggio.jpg"});  // Example image reuse
-    _pages.push_back(page2);
-
-    // Page 3
-    HelpPage page3;
-    page3.Title = "Controls";
-    page3.Items.push_back({HelpItemType::TEXT,
-                           "Double click on a card to automatically move it to "
-                           "a foundation if valid.",
-                           ""});
-    page3.Items.push_back({HelpItemType::PARAGRAPH_BREAK, "", ""});
-    page3.Items.push_back({HelpItemType::TEXT,
-                           "Press 'Options' in the main menu to change "
-                           "settings like background and language.",
-                           ""});
-    _pages.push_back(page3);
+    if (_fnHelpPages.tc != NULL) {
+        _fnHelpPages.tc->GetHelpPages(_fnHelpPages.self, _pages);
+    }
 }
 
 LPErrInApp GameHelp::HandleEvent(SDL_Event* pEvent,

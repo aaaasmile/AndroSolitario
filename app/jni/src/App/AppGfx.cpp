@@ -855,7 +855,9 @@ LPErrInApp AppGfx::showHelp() {
 
     // Pass the screen updater so GameHelp can refresh screen
     UpdateScreenCb screenUpdater = prepScreenUpdater();
-    _p_GameHelp->Show(_p_Screen, screenUpdater, _p_SceneBackground);
+    GameHelpPagesCb helpPagesCb = _p_GameSelector->PrepareGameHelpPages();
+    _p_GameHelp->Show(_p_Screen, screenUpdater, _p_SceneBackground,
+                      helpPagesCb);
 
     return NULL;
 }
