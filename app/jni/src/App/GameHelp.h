@@ -13,6 +13,7 @@ using namespace traits;
 
 class GameSettings;
 class ButtonGfx;
+class MusicManager;
 
 class GameHelp {
    public:
@@ -43,6 +44,7 @@ class GameHelp {
     SDL_Surface* _p_Scene_background;
     SDL_Surface* _p_surfTextBackground;
     GameSettings* _p_GameSettings;
+    MusicManager* _p_MusicManager;
     UpdateScreenCb _fnUpdateScreen;
     GameHelpPagesCb _fnHelpPages;
     std::vector<HelpPage> _pages;

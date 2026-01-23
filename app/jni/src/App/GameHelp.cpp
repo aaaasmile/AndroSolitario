@@ -9,6 +9,8 @@
 #include "Config.h"
 #include "GameSettings.h"
 #include "GfxUtil.h"
+#include "MusicManager.h"
+
 
 GameHelp::GameHelp() {
     _p_Screen = NULL;
@@ -55,6 +57,9 @@ LPErrInApp GameHelp::Show(SDL_Surface* pScreen,
     _fnUpdateScreen = fnUpdateScreen;
     _p_Scene_background = pSceneBackground;
     _fnHelpPages = fnHelpPages;
+    _p_MusicManager = _p_GameSettings->GetMusicManager();
+    _p_MusicManager->PlayMusic(MusicManager::MUSIC_CREDITS_SND,
+                               MusicManager::LOOP_ON);
     buildPages();
     _currentPageIndex = 0;
     _isShown = true;

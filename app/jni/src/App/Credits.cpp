@@ -8,6 +8,7 @@
 #include "Fading.h"
 #include "GameSettings.h"
 #include "MusicManager.h"
+#include "TypeGlobal.h"
 
 char const* credit_text[] = {
     "-SOLITARIO", /* '-' at beginning makes highlighted: */
@@ -145,9 +146,7 @@ CreditsView::CreditsView() {
     _fnUpdateScreen.self = NULL;
 }
 
-CreditsView::~CreditsView() {
-    delete _p_FadeAction;
-}
+CreditsView::~CreditsView() { delete _p_FadeAction; }
 
 LPErrInApp CreditsView::HandleEvent(SDL_Event* pEvent) {
     if (_state != CreditsView::IN_PROGRESS) {
@@ -212,8 +211,8 @@ LPErrInApp CreditsView::HandleIterate(bool& done) {
 
     if (_state == CreditsView::IN_PROGRESS) {
         Uint64 now_time = SDL_GetTicks();
-        if (_lastUpTimestamp + 30 > now_time){
-            //TRACE_DEBUG("Ignore iteration because too fast \n");
+        if (_lastUpTimestamp + 30 > now_time) {
+            // TRACE_DEBUG("Ignore iteration because too fast \n");
             return NULL;
         }
         _lastUpTimestamp = now_time;
@@ -286,7 +285,7 @@ LPErrInApp CreditsView::HandleIterate(bool& done) {
 }
 
 void CreditsView::Show(SDL_Surface* pScreen, SDL_Surface* pSurfTitle,
-              UpdateScreenCb& fnUpdateScreen) {
+                       UpdateScreenCb& fnUpdateScreen) {
     _fnUpdateScreen = fnUpdateScreen;
     _p_surfScreen = pScreen;
     _p_SurfTitle = pSurfTitle;

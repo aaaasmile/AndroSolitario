@@ -852,6 +852,9 @@ LPErrInApp AppGfx::showHelp() {
     if (_p_GameHelp->IsOngoing()) {
         return ERR_UTIL::ErrorCreate("Help already started");
     }
+    if (_p_MusicManager->IsPlayingMusic()) {
+        _p_MusicManager->StopMusic(600);
+    }
 
     // Pass the screen updater so GameHelp can refresh screen
     UpdateScreenCb screenUpdater = prepScreenUpdater();
