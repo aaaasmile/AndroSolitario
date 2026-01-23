@@ -126,7 +126,7 @@ Nota che il programma va a finire di dafult nella directory ./build/src.
 Cambio la destinazione con set_target_properties in CMakeFiles.
 Gli asset li ho copiati con un post build command.
 
-## Compilazione con target Windows (MySys2)
+## Compilazione con target Windows (MySys2) con Visual Studio Code (C/C++ extension)
 
     rm -r build
     cmake -S app/jni/ -B build  -DSDL_WAYLAND=OFF
@@ -148,6 +148,20 @@ Per far partire il programma:
 I vari files, compresi i logs, vanno a finire in C:\Users\igor\.solitario030002
 
 Nota che in Windows le librerie die SDL sono tutte Dll.
+
+## Compilazione con target Windows (MySys2) con Antigravity (extension clangd)
+Il software usa l'extension clangd che è molto diversa da quella di Visual Studio Code.
+I comandi da usare sono:
+
+    rm -r build
+    cmake -S app/jni/ -B build  -DSDL_WAYLAND=OFF -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+    cmake --build build
+    cd build 
+    .\solitario.exe
+    ninja
+Nota che -DCMAKE_EXPORT_COMPILE_COMMANDS=ON è fondamentale per l'estension clangd in quanto non 
+usa configurazioni come quelle descritte in c_cpp_properties.json, ma deve essere dentro la directory build.
+
 
 ### Creare una versione Windows (release setup)
 Per la versione release, bisogna prima creare il target release:
