@@ -1396,6 +1396,10 @@ LPErrInApp SolitarioGfx::HandleEvent(SDL_Event* pEvent,
                 TRACE_DEBUG("[SolitarioGfx - event] animation victory\n");
                 _state = eState::START_VICTORY;
             }
+            if (pEvent->key.key == SDLK_N) {
+                TRACE_DEBUG("[SolitarioGfx - event] ask for a new game\n");
+                _state = eState::ASK_FOR_NEW_GAME;
+            }
             break;
 #if HASTOUCH
         case SDL_EVENT_FINGER_DOWN:
@@ -1527,6 +1531,11 @@ LPErrInApp SolitarioGfx::HandleIterate(bool& done) {
             _state = SolitarioGfx::IN_GAME;
             singleTapOrLeftClick(_ptLast);
         }
+    }
+    if (_state == SolitarioGfx::ASK_FOR_NEW_GAME) {
+        _state = SolitarioGfx::IN_GAME;
+        BtNewGameClick();
+        return NULL;
     }
 
     if (_state == SolitarioGfx::WAIT_FOR_FADING) {

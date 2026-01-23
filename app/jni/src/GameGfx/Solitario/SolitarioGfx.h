@@ -63,6 +63,7 @@ class SolitarioGfx {
         NEW_CARD_VICTORY,
         IN_CARD_VICTORY,
         SHOW_SCORE,
+        ASK_FOR_NEW_GAME,
         DO_NEWGAME,
         IN_MSGBOX,
         IN_ZOOM,
