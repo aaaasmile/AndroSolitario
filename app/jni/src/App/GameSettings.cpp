@@ -262,8 +262,8 @@ LPErrInApp GameSettings::SaveSettings() {
 LPErrInApp GameSettings::LoadFonts() {
     TRACE_DEBUG("GameSettings::LoadFonts %s \n", g_lpszFontDejFname);
 
-    _p_fontAblkBig = TTF_OpenFont(g_lpszIniFontAriblkFname, _fontBigSize);
-    if (_p_fontAblkBig == NULL) {
+    _p_fontDejBoldBig = TTF_OpenFont(g_lpszIniFontAriblkFname, _fontBigSize);
+    if (_p_fontDejBoldBig == NULL) {
         return ERR_UTIL::ErrorCreate("Unable to load font %s, error: %s\n",
                                      g_lpszIniFontAriblkFname, SDL_GetError());
     }

@@ -51,7 +51,7 @@ class GameSettings {
         _fontSymSize = 36;
     }
     TTF_Font* GetFontDjvBig() { return _p_fontDejBig; }
-    TTF_Font* GetFontDjvBoldBig() { return _p_fontAblkBig; }
+    TTF_Font* GetFontDjvBoldBig() { return _p_fontDejBoldBig; }
     TTF_Font* GetFontDjvMedium() { return _p_fontDejMedium; }
     TTF_Font* GetFontDjvSmall() { return _p_fontDejSmall; }
     TTF_Font* GetFontDjvUnderscoreSmall() { return _p_fontDejUnderscoreSmall; }
@@ -97,7 +97,7 @@ class GameSettings {
     TTF_Font* _p_fontDejUnderscoreSmall;
     TTF_Font* _p_fontMedium;
     TTF_Font* _p_fontDejBig;
-    TTF_Font* _p_fontAblkBig;
+    TTF_Font* _p_fontDejBoldBig;
     TTF_Font* _p_fontSymb;
     TTF_Font* _p_fontDejMedium;
     Languages* _p_Languages;

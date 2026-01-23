@@ -38,7 +38,7 @@ class MenuMgr {
 
    private:
     MenuDelegator _menuDlgt;
-    TTF_Font* _p_fontAblkBig;
+    TTF_Font* _p_fontDejBoldBig;
     TTF_Font* _p_fontDejSmall;
     TTF_Font* _p_fontDejUnderscoreSmall;
     SDL_Surface* _p_Screen;

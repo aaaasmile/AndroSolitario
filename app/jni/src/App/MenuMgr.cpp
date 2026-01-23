@@ -137,7 +137,7 @@ const char* MenuItemEnumToString(MenuItemEnum e) {
 
 ////////////////////
 MenuMgr::MenuMgr() {
-    _p_fontAblkBig = 0;
+    _p_fontDejBoldBig = 0;
     _p_fontDejSmall = 0;
     _p_fontDejUnderscoreSmall = 0;
     _p_ScreenBackbuffer = 0;
@@ -196,7 +196,7 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen,
     _p_ScreenBackbuffer = GFX_UTIL::SDL_CreateRGBSurface(
         _p_Screen->w, _p_Screen->h, 32, 0, 0, 0, 0);
 
-    _p_fontAblkBig = pGameSettings->GetFontDjvBoldBig();
+    _p_fontDejBoldBig = pGameSettings->GetFontDjvBoldBig();
     _p_fontDejSmall = pGameSettings->GetFontDjvSmall();
 
     _p_MenuBox = GFX_UTIL::SDL_CreateRGBSurface(
@@ -299,7 +299,7 @@ LPErrInApp MenuMgr::drawStaticScene() {
     err = drawMenuText(
         _p_ScreenBackbuffer,
         pLanguages->GetStringId(Languages::ID_WELCOMETITLEBAR).c_str(),
-        _box_X + bar_x, _box_Y + bar_y - hbar / 2, color, _p_fontAblkBig);
+        _box_X + bar_x, _box_Y + bar_y - hbar / 2, color, _p_fontDejBoldBig);
     _hBar = hbar;
     return err;
 }
@@ -326,7 +326,7 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     int currY = _box_Y + offsetY + 30;
     err = drawMenuText(_p_ScreenBackbuffer,
                        pLanguages->GetStringId(Languages::ID_START).c_str(),
-                       _box_X + offsetX, currY, color, _p_fontAblkBig);
+                       _box_X + offsetX, currY, color, _p_fontDejBoldBig);
     if (err != NULL) {
         return err;
     }
@@ -347,7 +347,7 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     err =
         drawMenuText(_p_ScreenBackbuffer,
                      pLanguages->GetStringId(Languages::ID_MEN_OPTIONS).c_str(),
-                     _box_X + offsetX, currY, color, _p_fontAblkBig);
+                     _box_X + offsetX, currY, color, _p_fontDejBoldBig);
     if (err != NULL) {
         return err;
     }
@@ -365,7 +365,7 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     }
     err = drawMenuText(_p_ScreenBackbuffer,
                        pLanguages->GetStringId(Languages::ID_CREDITS).c_str(),
-                       _box_X + offsetX, currY, color, _p_fontAblkBig);
+                       _box_X + offsetX, currY, color, _p_fontDejBoldBig);
     if (err != NULL) {
         return err;
     }
@@ -386,7 +386,7 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     }
     err = drawMenuText(_p_ScreenBackbuffer,
                        pLanguages->GetStringId(Languages::ID_MN_HELP).c_str(),
-                       _box_X + offsetX, currY, color, _p_fontAblkBig);
+                       _box_X + offsetX, currY, color, _p_fontDejBoldBig);
     if (err != NULL) {
         return err;
     }
@@ -405,7 +405,7 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     }
     err = drawMenuText(_p_ScreenBackbuffer,
                        pLanguages->GetStringId(Languages::ID_HIGHSCORE).c_str(),
-                       _box_X + offsetX, currY, color, _p_fontAblkBig);
+                       _box_X + offsetX, currY, color, _p_fontDejBoldBig);
     if (err != NULL) {
         return err;
     }
@@ -426,7 +426,7 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     }
     err = drawMenuText(_p_ScreenBackbuffer,
                        pLanguages->GetStringId(Languages::ID_EXIT).c_str(),
-                       _box_X + offsetX, lastY, color, _p_fontAblkBig);
+                       _box_X + offsetX, lastY, color, _p_fontDejBoldBig);
     if (err != NULL) {
         return err;
     }
