@@ -31,9 +31,10 @@ class GameHelp {
     void HomePage();
 
    private:
-    void buildPages();
+    LPErrInApp buildPages();
+    void cleanUpPages();
     ClickCb prepClickCb();
-    LPErrInApp renderCurrentPage();
+    LPErrInApp renderTextImgCurrentPage();
     LPErrInApp drawJustifiedText(const std::string& text, int& y,
                                  int leftMargin, int rightMargin);
     LPErrInApp drawPageContent();

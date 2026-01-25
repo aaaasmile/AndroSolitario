@@ -11,7 +11,6 @@
 #include "GfxUtil.h"
 #include "MusicManager.h"
 
-
 GameHelp::GameHelp() {
     _p_Screen = NULL;
     _p_GameSettings = NULL;
@@ -25,6 +24,7 @@ GameHelp::GameHelp() {
 }
 
 GameHelp::~GameHelp() {
+    cleanUpPages();
     if (_p_buttonNext != NULL) {
         delete _p_buttonNext;
         _p_buttonNext = NULL;
@@ -60,7 +60,10 @@ LPErrInApp GameHelp::Show(SDL_Surface* pScreen,
     _p_MusicManager = _p_GameSettings->GetMusicManager();
     _p_MusicManager->PlayMusic(MusicManager::MUSIC_CREDITS_SND,
                                MusicManager::LOOP_ON);
-    buildPages();
+    LPErrInApp err = buildPages();
+    if (err != NULL) {
+        return err;
+    }
     _currentPageIndex = 0;
     _isShown = true;
     ClickCb cbBtClicked = prepClickCb();
@@ -187,13 +190,39 @@ void GameHelp::HomePage() {
     _isShown = false;
 }
 
-void GameHelp::buildPages() {
+LPErrInApp GameHelp::buildPages() {
     TRACE_DEBUG("[buildPages] for help");
-    _pages.clear();
+    cleanUpPages();
 
     if (_fnHelpPages.tc != NULL) {
         _fnHelpPages.tc->GetHelpPages(_fnHelpPages.self, _pages);
+        for (auto& page : _pages) {
+            for (auto& item : page.Items) {
+                if (item.Type == HelpItemType::IMAGE) {
+                    std::string full_path =
+                        std::string(DATA_PREFIX) + item.ImagePath;
+                    item.pSurface = IMG_Load(full_path.c_str());
+                    if (item.pSurface == NULL) {
+                        return ERR_UTIL::ErrorCreate(
+                            "[buildPages] image error on %s",
+                            full_path.c_str());
+                    }
+                }
+            }
+        }
     }
+    return NULL;
+}
+
+void GameHelp::cleanUpPages() {
+    for (auto& page : _pages) {
+        for (auto& item : page.Items) {
+            if (item.pSurface == NULL) {
+                SDL_DestroySurface(item.pSurface);
+            }
+        }
+    }
+    _pages.clear();
 }
 
 LPErrInApp GameHelp::HandleEvent(SDL_Event* pEvent,
@@ -250,10 +279,6 @@ LPErrInApp GameHelp::HandleIterate(bool& done) {
         _p_buttonNext->SetVisibleState(ButtonGfx::INVISIBLE);
         _p_buttonPrev->SetVisibleState(ButtonGfx::INVISIBLE);
         _p_buttonHome->SetVisibleState(ButtonGfx::INVISIBLE);
-        if (_p_ShadowSrf != NULL) {
-            SDL_DestroySurface(_p_ShadowSrf);
-            _p_ShadowSrf = NULL;
-        }
         return NULL;
     }
     if (_currentPageIndex > 0) {
@@ -267,7 +292,7 @@ LPErrInApp GameHelp::HandleIterate(bool& done) {
         _p_buttonNext->SetVisibleState(ButtonGfx::INVISIBLE);
     }
 
-    LPErrInApp err = renderCurrentPage();
+    LPErrInApp err = renderTextImgCurrentPage();
     if (err != NULL)
         return err;
 
@@ -283,7 +308,7 @@ LPErrInApp GameHelp::HandleIterate(bool& done) {
     return NULL;
 }
 
-LPErrInApp GameHelp::renderCurrentPage() {
+LPErrInApp GameHelp::renderTextImgCurrentPage() {
     if (_currentPageIndex < 0 || _currentPageIndex >= _pages.size())
         return NULL;
 
@@ -352,48 +377,20 @@ LPErrInApp GameHelp::drawPageContent() {
             if (err != NULL)
                 return err;
         } else if (item.Type == HelpItemType::IMAGE) {
-            // TODO Draw the image created in Build Page
-            // Load and draw image
-            // std::string fullPath = GAMESET::GetExeAppFolder();
-            // if (fullPath.back() != '/' && fullPath.back() != '\\')
-            //     fullPath += "/";
-            // fullPath += item.imagePath;
-
-            // // Use DATA_PREFIX if needed, but item.imagePath can be relative
-            // to
-            // // asset root AppGfx uses DATA_PREFIX for g_lpszImageSplash.
-            // Let's
-            // // assume item.imagePath includes "images/..."
-
-            // // SDL_IOStream* src = SDL_IOFromFile(fullPath.c_str(), "rb"); //
-            // // Logic similar to AppGfx load Simplification: Try full path
-            // with
-            // // DATA_PREFIX
-            // std::string dataPath = std::string(DATA_PREFIX) + item.imagePath;
-            // SDL_Surface* pImg = IMG_Load(dataPath.c_str());
-            // if (pImg) {
-            //     SDL_Rect dest = {MARGIN_X, y, pImg->w, pImg->h};
-            //     // Scale if too big?
-            //     if (dest.w > rightMargin - MARGIN_X) {
-            //         // Simple clip or nothing.
-            //         // Let's center it?
-            //         dest.x = (w - pImg->w) / 2;
-            //     } else {
-            //         dest.x = MARGIN_X;
-            //     }
-            //     SDL_BlitSurface(pImg, NULL, _p_Screen, &dest);
-            //     y += pImg->h + 10;
-            //     SDL_DestroySurface(pImg);
-            // } else {
-            //     // Try just item path
-            //     pImg = IMG_Load(item.imagePath.c_str());
-            //     if (pImg) {
-            //         SDL_Rect dest = {MARGIN_X, y, pImg->w, pImg->h};
-            //         SDL_BlitSurface(pImg, NULL, _p_Screen, &dest);
-            //         y += pImg->h + 10;
-            //         SDL_DestroySurface(pImg);
-            //     }
-            // }
+            SDL_Surface* pImg = item.pSurface;
+            if (pImg) {
+                SDL_Rect dest = {MARGIN_X, y, pImg->w, pImg->h};
+                // Scale if too big?
+                if (dest.w > rightMargin - MARGIN_X) {
+                    // Simple clip or nothing.
+                    // Let's center it?
+                    dest.x = (w - pImg->w) / 2;
+                } else {
+                    dest.x = MARGIN_X;
+                }
+                SDL_BlitSurface(pImg, NULL, _p_ShadowSrf, &dest);
+                y += pImg->h + 10;
+            }
         } else if (item.Type == HelpItemType::NEW_LINE) {
             y += LINE_HEIGHT_FACTOR;
         } else if (item.Type == HelpItemType::PARAGRAPH_BREAK) {

@@ -65,7 +65,7 @@ void fncBind_GetHelpPagesSolitarioENG(void* self,
                            "and drop is fully supported.",
                            ""});
     page1.Items.push_back({HelpItemType::NEW_LINE, "", ""});
-    page1.Items.push_back({HelpItemType::IMAGE, "", "images/icona_asso.bmp"});
+    page1.Items.push_back({HelpItemType::IMAGE, "", "images/sol_ingame.png"});
     page1.Items.push_back({HelpItemType::PARAGRAPH_BREAK, "", ""});
     page1.Items.push_back({HelpItemType::TEXT,
                            "The game supports multiple regional decks like "
@@ -85,7 +85,7 @@ void fncBind_GetHelpPagesSolitarioENG(void* self,
                            "colors. Empty spots can be filled with a King.",
                            ""});
     page2.Items.push_back({HelpItemType::PARAGRAPH_BREAK, "", ""});
-    page2.Items.push_back({HelpItemType::IMAGE, "", "images/commessaggio.jpg"});
+    page2.Items.push_back({HelpItemType::IMAGE, "", "images/sol_basamento.png"});
     pages.push_back(page2);
 
     HelpPage page3;
@@ -115,7 +115,7 @@ void fncBind_GetHelpPagesSolitarioENG(void* self,
                            "scores than the standard 40-card deck.",
                            ""});
     page4.Items.push_back({HelpItemType::NEW_LINE, "", ""});
-    page4.Items.push_back({HelpItemType::IMAGE, "", "images/tarocco.png"});
+    page4.Items.push_back({HelpItemType::IMAGE, "", "images/sol_tarocco.png"});
     pages.push_back(page4);
 
     // Page 5: Suits and Deck
@@ -304,7 +304,7 @@ void fncBind_GetHelpPagesSolitarioITA(void* self,
                            "delle carte restanti.",
                            ""});
     page1.Items.push_back({HelpItemType::NEW_LINE, "", ""});
-    page1.Items.push_back({HelpItemType::IMAGE, "", "images/ingame.png"});
+    page1.Items.push_back({HelpItemType::IMAGE, "", "images/sol_ingame.png"});
     pages.push_back(page1);
 
     // Page 2: Comandi
@@ -335,7 +335,7 @@ void fncBind_GetHelpPagesSolitarioITA(void* self,
                            "seme, dall'Asso fino al Re.",
                            ""});
     page3.Items.push_back({HelpItemType::NEW_LINE, "", ""});
-    page3.Items.push_back({HelpItemType::IMAGE, "", "images/fine.png"});
+    page3.Items.push_back({HelpItemType::IMAGE, "", "images/sol_fine.png"});
     pages.push_back(page3);
 
     // Page 4: Movimenti (Colore)
@@ -383,13 +383,13 @@ void fncBind_GetHelpPagesSolitarioITA(void* self,
                            "Quando scopri un Asso, mettilo nel basamento in "
                            "alto a destra. Poi prosegui con Due, Tre...",
                            ""});
-    page6.Items.push_back({HelpItemType::IMAGE, "", "images/basamento.png"});
+    page6.Items.push_back({HelpItemType::IMAGE, "", "images/sol_basamento.png"});
     page6.Items.push_back({HelpItemType::PARAGRAPH_BREAK, "", ""});
     page6.Items.push_back({HelpItemType::TEXT,
                            "Se sei bloccato, usa il mazzo di supporto. Usalo "
                            "con cautela: il punteggio cala ad ogni giro!",
                            ""});
-    page6.Items.push_back({HelpItemType::IMAGE, "", "images/mazzo.png"});
+    page6.Items.push_back({HelpItemType::IMAGE, "", "images/sol_mazzo.png"});
     pages.push_back(page6);
 
     // Page 7: Punteggio

@@ -25,6 +25,7 @@ struct HelpItem {
     HelpItemType Type;
     std::string Text;
     std::string ImagePath;
+    SDL_Surface *pSurface;
 };
 
 struct HelpPage {

@@ -823,18 +823,12 @@ LPErrInApp AppGfx::startGameLoop() {
     }
 
     LPErrInApp err;
-    // if (_p_SolitarioGfx != NULL) {
-    //     delete _p_SolitarioGfx;
-    // }
-    //_p_SolitarioGfx = new SolitarioGfx();
     _fnGameGfxCb = _p_GameSelector->PrepGameGfx();
     if (_fnGameGfxCb.tc == NULL || _fnGameGfxCb.self == NULL) {
         return ERR_UTIL::ErrorCreate("[startGameLoop] unable to get game Gfx");
     }
 
     UpdateScreenCb screenUpdater = prepScreenUpdater();
-    // err = _p_SolitarioGfx->Initialize(_p_Screen, screenUpdater, _p_Window,
-    //                                   _p_SceneBackground, _p_HighScore);
     UpdateHighScoreCb highScoreCb = prepHighScoreCb();
 
     err = (_fnGameGfxCb.tc)
@@ -844,7 +838,6 @@ LPErrInApp AppGfx::startGameLoop() {
         return err;
     err = (_fnGameGfxCb.tc)->Show(_fnGameGfxCb.self);
     return err;
-    // return _p_SolitarioGfx->Show();
 }
 
 LPErrInApp AppGfx::showHelp() {
@@ -859,8 +852,11 @@ LPErrInApp AppGfx::showHelp() {
     // Pass the screen updater so GameHelp can refresh screen
     UpdateScreenCb screenUpdater = prepScreenUpdater();
     GameHelpPagesCb helpPagesCb = _p_GameSelector->PrepareGameHelpPages();
-    _p_GameHelp->Show(_p_Screen, screenUpdater, _p_SceneBackground,
+    LPErrInApp err = _p_GameHelp->Show(_p_Screen, screenUpdater, _p_SceneBackground,
                       helpPagesCb);
+    if (err != NULL){
+        return err;
+    }
 
     return NULL;
 }
