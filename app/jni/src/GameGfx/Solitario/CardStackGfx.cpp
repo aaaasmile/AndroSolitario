@@ -1,5 +1,5 @@
 #include "CardStackGfx.h"
-#include "WinTypeGlobal.h"
+#include "TypeGlobal.h"
 
 LPErrInApp CardStackGfx::NewDeck(DeckType& deckType, int widthEmpty,
                                  int heightEmpty) {

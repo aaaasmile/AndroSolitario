@@ -2,7 +2,7 @@
 #define _CURRTIME_H
 
 #include <cstdint>
-#include "WinTypeGlobal.h"
+#include "TypeGlobal.h"
 
 class CurrentTime {
 public:

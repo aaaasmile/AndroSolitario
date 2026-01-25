@@ -201,14 +201,6 @@ void TraceService::flashTheEntry() {
                 m_pICustomTracer->Trace(strEntry.c_str());
             }
             break;
-#ifdef _MSC_VER
-        case OT_MSVDEBUGGER:
-            strEntry =
-                m_mtxEntryTraceDetails[m_iLastChannelUsed][m_iLastEntryUsed]
-                    .ToString();
-            ::OutputDebugString(strEntry.c_str());
-            break;
-#endif
         default:
             break;
     }

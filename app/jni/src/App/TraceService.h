@@ -1,7 +1,7 @@
 #include <fstream>
 #include <iostream>
 
-#include "WinTypeGlobal.h"
+#include "TypeGlobal.h"
 
 #ifndef TRACESERVICE__H___
 #define TRACESERVICE__H___

@@ -4,13 +4,8 @@
 #include <string>
 
 class Languages {
-public:
-    enum eLangId {
-        LANG_ITA = 0,
-        LANG_DIAL_BREDA,
-        LANG_ENG,
-        TOT_LANG  // it mus be  always on the last place
-    };
+   public:
+    enum eLangId { LANG_ITA = 0, LANG_DIAL_BREDA, LANG_ENG, TOT_LANG };
     enum eStringID {
         ID_START = 0,
         ID_LANGUAGESEL,
@@ -79,16 +74,17 @@ public:
         ON,
         OFF,
         PLEASE_ENTER_NAME,
-        TOT_STRINGS  // it must be always on the last place
+        TOT_STRINGS
     };
 
-public:
+   public:
     Languages();
     void SetLang(eLangId eVal) { _eLangid = eVal; }
+    eLangId GetLang() { return _eLangid; }
     std::string GetStringId(eStringID eId);
     const char* GetCStringId(eStringID eId);
 
-private:
+   private:
     eLangId _eLangid;
     std::string _mtxLangString[TOT_LANG][TOT_STRINGS];
 };

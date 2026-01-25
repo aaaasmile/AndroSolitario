@@ -5,7 +5,7 @@
 #include <SDL3_ttf/SDL_ttf.h>
 
 #include "Traits.h"
-#include "WinTypeGlobal.h"
+#include "TypeGlobal.h"
 
 using namespace traits;
 class GameSettings;

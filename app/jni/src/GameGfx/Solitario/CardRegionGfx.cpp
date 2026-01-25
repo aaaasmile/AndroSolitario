@@ -1,6 +1,6 @@
 #include "CardRegionGfx.h"
 
-#include "WinTypeGlobal.h"
+#include "TypeGlobal.h"
 
 void CardRegionGfx::InitCardCoords() {
     if (_internalStack.IsEmpty())

@@ -3,6 +3,7 @@
 #include <SDL3/SDL.h>
 
 #include "GameSettings.h"
+#include "TypeGlobal.h"
 
 static const char* lpszaSound_filenames[MusicManager::NUM_OF_SOUNDS] = {
     DATA_PREFIX "music/wolmer-invido.ogg", DATA_PREFIX "music/watermusic.ogg",
@@ -13,10 +14,10 @@ static const char* lpszaEffects_filenames[MusicManager::NUM_OF_WAV] = {
 
 MusicManager::MusicManager() {
     for (int i = 0; i < NUM_OF_SOUNDS; i++) {
-        _p_Musics[i] = 0;
+        _p_Musics[i] = NULL;
     }
     for (int j = 0; j < NUM_OF_WAV; j++) {
-        _p_MusicsWav[j] = 0;
+        _p_MusicsWav[j] = NULL;
     }
     _currentMusicID = 0;
     _currentLoop = LOOP_ON;

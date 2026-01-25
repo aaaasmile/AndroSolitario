@@ -3,8 +3,9 @@
 
 #include <SDL3_ttf/SDL_ttf.h>
 
+#include <vector>
+
 #include "ErrorInfo.h"
-#include "Languages.h"
 
 enum MenuItemEnum {
     MENU_GAME = 0,
@@ -15,6 +16,21 @@ enum MenuItemEnum {
     QUIT = 5,
     MENU_ROOT = 6,
     NOTHING = 99
+};
+
+enum class HelpItemType { TEXT, IMAGE, NEW_LINE, PARAGRAPH_BREAK };
+enum PageNav { NEXT, PREV, HOME };
+
+struct HelpItem {
+    HelpItemType Type;
+    std::string Text;
+    std::string ImagePath;
+    SDL_Surface *pSurface;
+};
+
+struct HelpPage {
+    std::string Title;
+    std::vector<HelpItem> Items;
 };
 
 namespace traits {
@@ -93,6 +109,16 @@ typedef struct {
     void* self;
 } UpdateHighScoreCb, *LPUpdateHighScoreCb;
 
+// trait for GameHelp pages
+typedef struct {
+    void (*const GetHelpPages)(void* self, std::vector<HelpPage>& pages);
+} VGameHelpPagesCb, *LPVGameHelpPagesCb;
+
+typedef struct {
+    VGameHelpPagesCb const* tc;
+    void* self;
+} GameHelpPagesCb, *LPGameHelpPagesCb;
+
 // trait for GameGfx
 typedef struct {
     LPErrInApp (*const HandleEvent)(void* self, SDL_Event* pEvent,
@@ -100,7 +126,8 @@ typedef struct {
     LPErrInApp (*const HandleIterate)(void* self, bool& done);
     LPErrInApp (*const Initialize)(void* self, SDL_Surface* pScreen,
                                    UpdateScreenCb& fnUpdateScreen,
-                                   SDL_Window* pWindow, SDL_Surface* pSceneBackground,
+                                   SDL_Window* pWindow,
+                                   SDL_Surface* pSceneBackground,
                                    UpdateHighScoreCb& fnHighScore);
     LPErrInApp (*const Show)(void* self);
 } VGameGfxCb, *LPVGameGfxCb;

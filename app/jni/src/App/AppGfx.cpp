@@ -1,31 +1,26 @@
 #include "AppGfx.h"
 
 #include <SDL3_image/SDL_image.h>
+#include <SDL3_ttf/SDL_ttf.h>
 #include <fcntl.h>
 #include <limits.h>
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <time.h>
-#ifdef _MSC_VER
-#include <direct.h>
-#include <io.h>
-#else
 #include <unistd.h>
-#endif
 
 #include "Config.h"
 #include "Credits.h"
 #include "ErrorInfo.h"
+#include "GameHelp.h"
 #include "GameSelector.h"
 #include "GfxUtil.h"
 #include "HighScore.h"
 #include "MenuMgr.h"
 #include "MusicManager.h"
 #include "OptionsGfx.h"
-#include "WinTypeGlobal.h"
-
-static const char* g_lpszHelpFileName = DATA_PREFIX "solitario.pdf";
+#include "TypeGlobal.h"
 
 static const char* g_lpszIconProgFile = DATA_PREFIX "images/icona_asso.bmp";
 static const char* g_lpszTitleFile = DATA_PREFIX "images/title.png";
@@ -141,7 +136,6 @@ static ResolutionMgr g_ResolutionMgr;
 AppGfx::AppGfx() {
     _p_Window = NULL;
     _p_ScreenTexture = NULL;
-    //_p_SolitarioGfx = NULL;
     _fnGameGfxCb.self = NULL;
     _fnGameGfxCb.tc = NULL;
     _p_SceneBackground = NULL;
@@ -156,13 +150,13 @@ AppGfx::AppGfx() {
     _p_OptGfx = new OptionsGfx();
     _p_HighScore = new HighScore();
     _p_GameSelector = new GameSelector();
+    _p_GameHelp = new GameHelp();
 }
 
 AppGfx::~AppGfx() { terminate(); }
 
 LPErrInApp AppGfx::Init() {
     TRACE("Init App\n");
-    //_p_GameSettings->GameName = "Solitario";
 #ifdef WIN32
     LPCSTR exeDirPath = GAMESET::GetExeAppFolder();
     TRACE("Exe directory is %s\n", exeDirPath);
@@ -468,6 +462,7 @@ void AppGfx::terminate() {
     delete _p_OptGfx;
     delete _p_GameSelector;
     delete _p_HighScore;
+    delete _p_GameHelp;
 
     SDL_ShowCursor();
 
@@ -490,11 +485,6 @@ void AppGfx::terminate() {
         delete _p_MenuMgr;
         _p_MenuMgr = NULL;
     }
-
-    // if (_p_SolitarioGfx != NULL) {
-    //     delete _p_SolitarioGfx;
-    //     _p_SolitarioGfx = NULL;
-    // }
 
     _p_GameSettings->TerminateMusicManager();
 
@@ -545,12 +535,12 @@ LPErrInApp fncBind_ChangeSceneBackground(void* self,
     return pApp->ChangeSceneBackground(ppSceneBackground);
 }
 
-void fncBind_UpdateScreen(void* self, SDL_Surface* pScreen) {
+static void fncBind_UpdateScreen(void* self, SDL_Surface* pScreen) {
     AppGfx* pApp = (AppGfx*)self;
     return pApp->UpdateScreen(pScreen);
 }
 
-void fncBind_RenderTexture(void* self, SDL_Texture* pScreenTexture) {
+static void fncBind_RenderTexture(void* self, SDL_Texture* pScreenTexture) {
     AppGfx* pApp = (AppGfx*)self;
     return pApp->RenderTexture(pScreenTexture);
 }
@@ -698,7 +688,6 @@ LPErrInApp AppGfx::MainLoopEvent(SDL_Event* pEvent, SDL_AppResult& res) {
             break;
 
         case MenuItemEnum::MENU_GAME:
-            // err = _p_SolitarioGfx->HandleEvent(pEvent, targetPos);
             err = (_fnGameGfxCb.tc)
                       ->HandleEvent(_fnGameGfxCb.self, pEvent, targetPos);
             if (err != NULL)
@@ -706,6 +695,9 @@ LPErrInApp AppGfx::MainLoopEvent(SDL_Event* pEvent, SDL_AppResult& res) {
             break;
 
         case MenuItemEnum::MENU_HELP:
+            err = _p_GameHelp->HandleEvent(pEvent, targetPos);
+            if (err != NULL)
+                return err;
             break;
 
         case MenuItemEnum::MENU_CREDITS:
@@ -769,7 +761,6 @@ LPErrInApp AppGfx::MainLoopIterate() {
             break;
 
         case MenuItemEnum::MENU_GAME:
-            // err = _p_SolitarioGfx->HandleIterate(done);
             err = (_fnGameGfxCb.tc)->HandleIterate(_fnGameGfxCb.self, done);
             if (err != NULL)
                 return err;
@@ -779,6 +770,12 @@ LPErrInApp AppGfx::MainLoopIterate() {
             break;
 
         case MenuItemEnum::MENU_HELP:
+            err = _p_GameHelp->HandleIterate(done);
+            if (err != NULL)
+                return err;
+            if (done) {
+                backToMenuRootWithMusic();
+            }
             break;
 
         case MenuItemEnum::MENU_CREDITS:
@@ -826,18 +823,12 @@ LPErrInApp AppGfx::startGameLoop() {
     }
 
     LPErrInApp err;
-    // if (_p_SolitarioGfx != NULL) {
-    //     delete _p_SolitarioGfx;
-    // }
-    //_p_SolitarioGfx = new SolitarioGfx();
     _fnGameGfxCb = _p_GameSelector->PrepGameGfx();
     if (_fnGameGfxCb.tc == NULL || _fnGameGfxCb.self == NULL) {
         return ERR_UTIL::ErrorCreate("[startGameLoop] unable to get game Gfx");
     }
 
     UpdateScreenCb screenUpdater = prepScreenUpdater();
-    // err = _p_SolitarioGfx->Initialize(_p_Screen, screenUpdater, _p_Window,
-    //                                   _p_SceneBackground, _p_HighScore);
     UpdateHighScoreCb highScoreCb = prepHighScoreCb();
 
     err = (_fnGameGfxCb.tc)
@@ -847,27 +838,26 @@ LPErrInApp AppGfx::startGameLoop() {
         return err;
     err = (_fnGameGfxCb.tc)->Show(_fnGameGfxCb.self);
     return err;
-    // return _p_SolitarioGfx->Show();
 }
 
 LPErrInApp AppGfx::showHelp() {
     TRACE("Show Help\n");
-    const char* cmd = NULL;
-    char cmdpath[PATH_MAX];
-#if PLATFORM_WINDOWS
-    cmd = "start";
-    snprintf(cmdpath, sizeof(cmdpath), "%s .\\%s", cmd, g_lpszHelpFileName);
-#elif PLATFORM_ANDROID
-    // TODO open the pdf file
-    TRACE_DEBUG("Wanna open file %s\n", g_lpszHelpFileName);
-#else
-    cmd = "zathura";
-    snprintf(cmdpath, sizeof(cmdpath), "%s ./%s", cmd, g_lpszHelpFileName);
-#endif
-#ifndef ANDROID
-    system(cmdpath);
-#endif
-    LeaveMenu();
+    if (_p_GameHelp->IsOngoing()) {
+        return ERR_UTIL::ErrorCreate("Help already started");
+    }
+    if (_p_MusicManager->IsPlayingMusic()) {
+        _p_MusicManager->StopMusic(600);
+    }
+
+    // Pass the screen updater so GameHelp can refresh screen
+    UpdateScreenCb screenUpdater = prepScreenUpdater();
+    GameHelpPagesCb helpPagesCb = _p_GameSelector->PrepareGameHelpPages();
+    LPErrInApp err = _p_GameHelp->Show(_p_Screen, screenUpdater, _p_SceneBackground,
+                      helpPagesCb);
+    if (err != NULL){
+        return err;
+    }
+
     return NULL;
 }
 
@@ -981,7 +971,7 @@ void AppGfx::updateScreenTexture() {
                  g_ResolutionMgr.targetWidth, g_ResolutionMgr.targetHeight,
                  g_ResolutionMgr.scale * 100.0f);
         GFX_UTIL::DrawString(_p_Screen, buffer, 10, 10, GFX_UTIL_COLOR::Red,
-                             _p_GameSettings->GetFontAriblk());
+                             _p_GameSettings->GetFontDjvBig());
     }
     SDL_UpdateTexture(_p_ScreenTexture, NULL, _p_Screen->pixels,
                       _p_Screen->pitch);

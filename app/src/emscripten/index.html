@@ -4,8 +4,9 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta name="description" content="Il gioco del Solitario con le carte da Briscola">
-  <title>Solitario SDL</title>
+  <meta name="description"
+    content="Gioca a Solitario online gratis direttamente dal browser. Nessun download richiesto. Versione veloce, semplice e gratuita su Invido.it.">
+  <title>Solitario Online Gratis - Gioca dal Browser | Invido</title>
   <style>
     body {
       font-family: arial;
@@ -125,10 +126,51 @@
       height: 20px;
       width: 300px;
     }
+
+    .lang-switcher {
+      display: flex;
+      gap: 5px;
+      margin: 2px;
+    }
+
+    .lang-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background: #f0f0f0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .lang-btn:hover {
+      background: #e0e0e0;
+    }
+
+    .lang-btn.active {
+      background: #4CAF50;
+      color: white;
+      border-color: #45a049;
+    }
   </style>
 </head>
 
 <body>
+  <div class="lang-switcher">
+    <button class="lang-btn" data-lang="it">
+      <img src="https://flagcdn.com/w20/it.png" alt="Italiano" width="20" height="15">
+      IT
+    </button>
+    <button class="lang-btn" data-lang="en">
+      <img src="https://flagcdn.com/w20/gb.png" alt="English" width="20" height="15">
+      EN
+    </button>
+    <button class="info-btn" id="info-btn">
+      Info
+    </button>
+  </div>
   <div class="spinner" id='spinner'></div>
   <div class="emscripten" id="status">Downloading...</div>
 
@@ -140,6 +182,7 @@
     <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" tabindex=-1></canvas>
   </div>
   <div class="emscripten" id="info"></div>
+  <div class="emscripten"><a href="\pages\solitario">Solitario</a></div>
   <script type='text/javascript'>
     var statusElement = document.getElementById('status');
     var progressElement = document.getElementById('progress');
@@ -192,7 +235,13 @@
           progressElement.value = null;
           progressElement.max = null;
           progressElement.hidden = true;
-          if (!text) spinnerElement.style.display = 'none';
+          if (!text) {
+            spinnerElement.style.display = 'none';
+            statusElement.style.display = 'none';
+            statusElement.hidden = true;
+            infoEle.style.display = 'none';
+            infoEle.hidden = true;
+          }
         }
         statusElement.innerHTML = text;
       },
@@ -227,7 +276,25 @@
         if (text) console.error('[post-exception status] ' + text);
       };
     };
+    const langButtons = document.querySelectorAll('.lang-btn');
+    langButtons.forEach(button => {
+      button.addEventListener('click', function () {
+        Module.setLanguage(this.dataset.lang);
+      });
+    });
+    const infoButton = document.getElementById('info-btn');
+    infoButton.addEventListener('click', function () {
+      console.log('toggle info');
+      if (infoEle.hidden){
+        infoEle.style.display = '';
+        infoEle.hidden = false;
+      }else{
+        infoEle.style.display = 'none';
+        infoEle.hidden = true;
+      }
+    });
   </script>
-  <script async type="text/javascript" src="solitario_3.0.10.js?v=310"></script>
+  <script async type="text/javascript" src="solitario_3.0.11.js?v=311"></script>
 </body>
+
 </html>

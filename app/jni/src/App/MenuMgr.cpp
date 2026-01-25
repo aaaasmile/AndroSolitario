@@ -14,11 +14,10 @@
 #include "GameSettings.h"
 #include "GfxUtil.h"
 #include "MusicManager.h"
-#include "WinTypeGlobal.h"
+#include "TypeGlobal.h"
 
 static const char* g_lpszMsgUrl = "Go to invido.it";
 static const char* g_lpszVersion = VERSION;
-static const char* g_lpszIniFontVera = DATA_PREFIX "font/vera.ttf";
 
 static const SDL_Color g_color_on = {253, 252, 250};
 static const SDL_Color g_color_off = {128, 128, 128};
@@ -138,9 +137,9 @@ const char* MenuItemEnumToString(MenuItemEnum e) {
 
 ////////////////////
 MenuMgr::MenuMgr() {
-    _p_fontAriblk = 0;
-    _p_fontVera = 0;
-    _p_fontVeraUnderscore = 0;
+    _p_fontDejBoldBig = 0;
+    _p_fontDejSmall = 0;
+    _p_fontDejUnderscoreSmall = 0;
     _p_ScreenBackbuffer = 0;
     _focusedMenuItem = MenuItemEnum::MENU_GAME;
     _p_MenuBox = 0;
@@ -165,7 +164,7 @@ MenuMgr::~MenuMgr() {
 LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen,
                                UpdateScreenCb& fnUpdateScreen,
                                MenuDelegator& menuDelegator) {
-    if(pScreen == NULL){
+    if (pScreen == NULL) {
         return ERR_UTIL::ErrorCreate("Screen is not initialized\n");
     }
     _fnUpdateScreen = fnUpdateScreen;
@@ -175,7 +174,7 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen,
     _menuDlgt = menuDelegator;
     LPGameSettings pGameSettings = GameSettings::GetSettings();
     _p_Screen = pScreen;
-    
+
     SDL_Rect clipRect;
     SDL_GetSurfaceClipRect(_p_Screen, &clipRect);
     _screenW = clipRect.w;
@@ -185,7 +184,7 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen,
 
     _rctPanelRedBox.w = 500;
     _rctPanelRedBox.h = 560;
-    
+
     _rctPanelRedBox.x = (_screenW - _rctPanelRedBox.w) / 2;
     _rctPanelRedBox.y = (_screenH - _rctPanelRedBox.h) / 2;
     _box_X = _rctPanelRedBox.x;
@@ -197,8 +196,8 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen,
     _p_ScreenBackbuffer = GFX_UTIL::SDL_CreateRGBSurface(
         _p_Screen->w, _p_Screen->h, 32, 0, 0, 0, 0);
 
-    _p_fontAriblk = pGameSettings->GetFontAriblk();
-    _p_fontVera = pGameSettings->GetFontVera();
+    _p_fontDejBoldBig = pGameSettings->GetFontDjvBoldBig();
+    _p_fontDejSmall = pGameSettings->GetFontDjvSmall();
 
     _p_MenuBox = GFX_UTIL::SDL_CreateRGBSurface(
         _rctPanelRedBox.w, _rctPanelRedBox.h, 32, 0, 0, 0, 0);
@@ -210,14 +209,7 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen,
     SDL_SetSurfaceAlphaMod(_p_MenuBox, 120);
 
     // link to invido.it
-    _p_fontVeraUnderscore =
-        TTF_OpenFont(g_lpszIniFontVera, pGameSettings->GetSizeFontSmall());
-    if (_p_fontVeraUnderscore == 0) {
-        return ERR_UTIL::ErrorCreate(
-            "MenuMgr: Unable to load font %s, error: %s\n", g_lpszIniFontVera,
-            SDL_GetError());
-    }
-    TTF_SetFontStyle(_p_fontVeraUnderscore, TTF_STYLE_UNDERLINE);
+    _p_fontDejUnderscoreSmall = pGameSettings->GetFontDjvUnderscoreSmall();
     SDL_Rect rctBt1;
     rctBt1.h = 28;
     rctBt1.w = 150;
@@ -225,8 +217,8 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen,
     rctBt1.x = _p_Screen->w - rctBt1.w - 20;
     _p_homeUrl = new LabelLinkGfx();
     ClickCb cbNUll = ClickCb{.tc = NULL, .self = NULL};
-    _p_homeUrl->Initialize(&rctBt1, _p_ScreenBackbuffer, _p_fontVeraUnderscore,
-                           MYIDLABELURL, cbNUll);
+    _p_homeUrl->Initialize(&rctBt1, _p_ScreenBackbuffer,
+                           _p_fontDejUnderscoreSmall, MYIDLABELURL, cbNUll);
     _p_homeUrl->SetState(LabelLinkGfx::INVISIBLE);
     _p_homeUrl->SetUrl(PACKAGE_URL);
     _p_homeUrl->SetWindowText(g_lpszMsgUrl);
@@ -237,7 +229,7 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen,
     rctBt1.w = 150;
     rctBt1.y = _p_homeUrl->PosY() - 20;
     rctBt1.x = _p_homeUrl->PosX();
-    _p_LabelVersion->Initialize(&rctBt1, _p_ScreenBackbuffer, _p_fontVera);
+    _p_LabelVersion->Initialize(&rctBt1, _p_ScreenBackbuffer, _p_fontDejSmall);
     _p_LabelVersion->SetState(LabelGfx::INVISIBLE);
     _p_LabelVersion->SetWindowText(g_lpszVersion);
 
@@ -307,7 +299,7 @@ LPErrInApp MenuMgr::drawStaticScene() {
     err = drawMenuText(
         _p_ScreenBackbuffer,
         pLanguages->GetStringId(Languages::ID_WELCOMETITLEBAR).c_str(),
-        _box_X + bar_x, _box_Y + bar_y - hbar / 2, color, _p_fontAriblk);
+        _box_X + bar_x, _box_Y + bar_y - hbar / 2, color, _p_fontDejBoldBig);
     _hBar = hbar;
     return err;
 }
@@ -334,7 +326,7 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     int currY = _box_Y + offsetY + 30;
     err = drawMenuText(_p_ScreenBackbuffer,
                        pLanguages->GetStringId(Languages::ID_START).c_str(),
-                       _box_X + offsetX, currY, color, _p_fontAriblk);
+                       _box_X + offsetX, currY, color, _p_fontDejBoldBig);
     if (err != NULL) {
         return err;
     }
@@ -355,7 +347,7 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     err =
         drawMenuText(_p_ScreenBackbuffer,
                      pLanguages->GetStringId(Languages::ID_MEN_OPTIONS).c_str(),
-                     _box_X + offsetX, currY, color, _p_fontAriblk);
+                     _box_X + offsetX, currY, color, _p_fontDejBoldBig);
     if (err != NULL) {
         return err;
     }
@@ -373,7 +365,7 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     }
     err = drawMenuText(_p_ScreenBackbuffer,
                        pLanguages->GetStringId(Languages::ID_CREDITS).c_str(),
-                       _box_X + offsetX, currY, color, _p_fontAriblk);
+                       _box_X + offsetX, currY, color, _p_fontDejBoldBig);
     if (err != NULL) {
         return err;
     }
@@ -384,7 +376,6 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     g_MenuItemBoxes.drawBorder(2, _p_ScreenBackbuffer);
 
     // Help
-#if HASHELPMENU
     currY += morePlaceY;
     currY = currY + intraOffset;
     if (_focusedMenuItem != MenuItemEnum::MENU_HELP) {
@@ -394,14 +385,14 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     }
     err = drawMenuText(_p_ScreenBackbuffer,
                        pLanguages->GetStringId(Languages::ID_MN_HELP).c_str(),
-                       _box_X + offsetX, currY, color, _p_fontAriblk);
+                       _box_X + offsetX, currY, color, _p_fontDejBoldBig);
     if (err != NULL) {
         return err;
     }
+    
     endY = currY + morePlaceY + offsetY;
     g_MenuItemBoxes.SetYInPos(3, endY);
     g_MenuItemBoxes.drawBorder(3, _p_ScreenBackbuffer);
-#endif
 
     // highscore
     currY += morePlaceY;
@@ -413,7 +404,7 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     }
     err = drawMenuText(_p_ScreenBackbuffer,
                        pLanguages->GetStringId(Languages::ID_HIGHSCORE).c_str(),
-                       _box_X + offsetX, currY, color, _p_fontAriblk);
+                       _box_X + offsetX, currY, color, _p_fontDejBoldBig);
     if (err != NULL) {
         return err;
     }
@@ -434,7 +425,7 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     }
     err = drawMenuText(_p_ScreenBackbuffer,
                        pLanguages->GetStringId(Languages::ID_EXIT).c_str(),
-                       _box_X + offsetX, lastY, color, _p_fontAriblk);
+                       _box_X + offsetX, lastY, color, _p_fontDejBoldBig);
     if (err != NULL) {
         return err;
     }
@@ -444,7 +435,8 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     return NULL;
 }
 
-LPErrInApp MenuMgr::HandleRootMenuEvent(SDL_Event* pEvent, const SDL_Point& targetPos) {
+LPErrInApp MenuMgr::HandleRootMenuEvent(SDL_Event* pEvent,
+                                        const SDL_Point& targetPos) {
     LPErrInApp err;
     // TRACE_DEBUG("Ignore mouse events: %b", ignoreMouseEvent);
     if (pEvent->type == SDL_EVENT_QUIT) {
@@ -602,13 +594,8 @@ MenuItemEnum previousMenu(MenuItemEnum currMenu) {
             return MenuItemEnum::MENU_OPTIONS;
         case MenuItemEnum::MENU_HELP:
             return MenuItemEnum::MENU_CREDITS;
-#if HASHELPMENU
         case MenuItemEnum::MENU_HIGHSCORE:
             return MenuItemEnum::MENU_HELP;
-#else
-        case MenuItemEnum::MENU_HIGHSCORE:
-            return MenuItemEnum::MENU_CREDITS;
-#endif
         case MenuItemEnum::QUIT:
             return MenuItemEnum::MENU_HIGHSCORE;
 #if HASQUITMENU
@@ -630,13 +617,8 @@ MenuItemEnum nextMenu(MenuItemEnum currMenu) {
             return MenuItemEnum::MENU_OPTIONS;
         case MenuItemEnum::MENU_OPTIONS:
             return MenuItemEnum::MENU_CREDITS;
-#if HASHELPMENU
         case MenuItemEnum::MENU_CREDITS:
             return MenuItemEnum::MENU_HELP;
-#else
-        case MenuItemEnum::MENU_CREDITS:
-            return MenuItemEnum::MENU_HIGHSCORE;
-#endif
         case MenuItemEnum::MENU_HELP:
             return MenuItemEnum::MENU_HIGHSCORE;
 #if HASQUITMENU

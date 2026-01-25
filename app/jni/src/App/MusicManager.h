@@ -4,7 +4,6 @@
 #include <SDL3_mixer/SDL_mixer.h>
 
 #include "ErrorInfo.h"
-#include "WinTypeGlobal.h"
 
 class MusicManager {
    public:

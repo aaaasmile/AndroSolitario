@@ -24,7 +24,7 @@ KeyboardGfx::~KeyboardGfx() {
     }
 }
 
-void fncBind_OnButtonClick(void* self, int btID) {
+static void fncBind_OnButtonClick(void* self, int btID) {
     KeyboardGfx* pKeyboard = (KeyboardGfx*)self;
     pKeyboard->OnButtonClickImpl(btID);
 }

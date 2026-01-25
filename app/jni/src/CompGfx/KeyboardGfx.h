@@ -8,7 +8,7 @@
 
 #include "ButtonGfx.h"
 #include "Traits.h"
-#include "WinTypeGlobal.h"
+#include "TypeGlobal.h"
 
 using namespace traits;
 
@@ -41,8 +41,6 @@ class KeyboardGfx {
 
     SDL_Surface* _p_keyboardSurface;
     TTF_Font* _p_fontText;
-    bool _mouseIsDown;
-    MouseState _mouseState;
     VisbleState _visibleState;
     SDL_Rect _rctCtrl;
     ClickKeyboardCb _fncbKeyboardEvent;

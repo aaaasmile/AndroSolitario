@@ -50,9 +50,11 @@ class GameSettings {
         _fontBigSize = 46;
         _fontSymSize = 36;
     }
-    TTF_Font* GetFontAriblk() { return _p_fontAriblk; }
-    TTF_Font* GetFontVera() { return _p_fontVera; }
-    TTF_Font* GetFontMedium() { return _p_fontMedium; }
+    TTF_Font* GetFontDjvBig() { return _p_fontDejBig; }
+    TTF_Font* GetFontDjvBoldBig() { return _p_fontDejBoldBig; }
+    TTF_Font* GetFontDjvMedium() { return _p_fontDejMedium; }
+    TTF_Font* GetFontDjvSmall() { return _p_fontDejSmall; }
+    TTF_Font* GetFontDjvUnderscoreSmall() { return _p_fontDejUnderscoreSmall; }
     TTF_Font* GetFontSymb() { return _p_fontSymb; }
 
     Languages* GetLanguageMan();
@@ -91,10 +93,13 @@ class GameSettings {
     int _fontMediumSize = 18;
     int _fontBigSize = 22;
     int _fontSymSize = 24;
-    TTF_Font* _p_fontVera;
+    TTF_Font* _p_fontDejSmall;
+    TTF_Font* _p_fontDejUnderscoreSmall;
     TTF_Font* _p_fontMedium;
-    TTF_Font* _p_fontAriblk;
+    TTF_Font* _p_fontDejBig;
+    TTF_Font* _p_fontDejBoldBig;
     TTF_Font* _p_fontSymb;
+    TTF_Font* _p_fontDejMedium;
     Languages* _p_Languages;
     MusicManager* _p_MusicManager;
     bool _portraitMode = false;

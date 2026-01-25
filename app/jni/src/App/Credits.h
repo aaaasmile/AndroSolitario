@@ -33,8 +33,6 @@ class CreditsView {
     bool _ignoreMouseEvent;
     GameSettings* _p_GameSettings;
     MusicManager* _p_MusicManager;
-    //SDL_Texture* _p_ScreenTexture;
-    //SDL_Renderer* _p_sdlRenderer;
     UpdateScreenCb _fnUpdateScreen;
     SDL_Surface* _p_surfScreen;
     SDL_Surface* _p_SurfTitle;

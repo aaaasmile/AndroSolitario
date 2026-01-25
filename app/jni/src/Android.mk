@@ -16,7 +16,7 @@ ANDRO_SPEC_PATH := ./Android
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/$(SDL_PATH)/include \
                     $(LOCAL_PATH)/$(SDLIMAGE_PATH) \
                     $(LOCAL_PATH)/$(SDLMIXER_PATH)/include \
-                    $(LOCAL_PATH)/$(SDLTTF_PATH) \
+                    $(LOCAL_PATH)/$(SDLTTF_PATH)/include \
                     $(LOCAL_PATH)/$(APP_PATH) \
                     $(LOCAL_PATH)/$(COMPGFX_PATH) \
                     $(LOCAL_PATH)/$(GAMEGFX_PATH) \
@@ -42,6 +42,7 @@ LOCAL_SRC_FILES := $(APP_PATH)/Main.cpp \
             $(APP_PATH)/OptionsGfx.cpp \
             $(APP_PATH)/TraceService.cpp \
             $(APP_PATH)/HighScore.cpp \
+            $(APP_PATH)/GameHelp.cpp \
             $(APP_PATH)/GameSelector.cpp \
             $(COMPGFX_PATH)/LabelLinkGfx.cpp \
             $(COMPGFX_PATH)/ButtonGfx.cpp \

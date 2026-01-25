@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(solitario VERSION 3.0.10 LANGUAGES C CXX)
+project(solitario VERSION 3.0.11 LANGUAGES C CXX)
 
 # Don't mistake osx for unix
 if(UNIX AND NOT ANDROID AND NOT APPLE AND NOT RISCOS)
@@ -26,6 +26,7 @@ set(SOURCES App/MusicManager.cpp
             App/HighScore.cpp
             App/CurrentTime.cpp
             App/GameSelector.cpp
+            App/GameHelp.cpp
             CompGfx/LabelLinkGfx.cpp
             CompGfx/ButtonGfx.cpp
             CompGfx/CheckBoxGfx.cpp
@@ -174,6 +175,7 @@ else()
         # note the SHELL syntax for the -s parameter
         target_link_options(${PROJECT_NAME} PRIVATE
             -O3
+            --bind
             "SHELL:-s ASSERTIONS=0"
             "SHELL:-s GL_ASSERTIONS=0"
             "SHELL:-s GL_DEBUG=0"
@@ -188,7 +190,7 @@ else()
         target_compile_definitions(${PROJECT_NAME} PRIVATE TRACEINSERVICE _DEBUG)
         target_compile_options(${PROJECT_NAME} PRIVATE $<$<NOT:$<C_COMPILER_ID:MSVC>>:-Wunused -g -O0>)
         set_target_properties(${PROJECT_NAME} PROPERTIES
-          LINK_FLAGS "--preload-file=${CMAKE_CURRENT_SOURCE_DIR}/../../src/main/assets@/data -s ALLOW_MEMORY_GROWTH=1"
+          LINK_FLAGS "--preload-file=${CMAKE_CURRENT_SOURCE_DIR}/../../src/main/assets@/data --bind -s ALLOW_MEMORY_GROWTH=1"
         )
       endif()
       # Add any Emscripten-specific configurations here

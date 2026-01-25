@@ -7,14 +7,14 @@ using namespace traits;
 
 class SolitarioGfx;
 
-class GameSelector{
-public:
+class GameSelector {
+   public:
     GameSelector();
     ~GameSelector();
     GameGfxCb PrepGameGfx();
-    
+    GameHelpPagesCb PrepareGameHelpPages();
 
-private:
+   private:
     SolitarioGfx* _p_SolitarioGfx;
 };
 

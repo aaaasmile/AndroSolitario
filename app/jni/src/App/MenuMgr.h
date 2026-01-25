@@ -1,10 +1,6 @@
 #ifndef MENU_MGR__H
 #define MENU_MGR__H
 
-#if _MSC_VER > 1000
-#pragma once
-#endif
-
 #include <SDL3/SDL.h>
 #include <SDL3_ttf/SDL_ttf.h>
 
@@ -27,7 +23,8 @@ class MenuMgr {
     virtual ~MenuMgr();
     LPErrInApp Initialize(SDL_Surface* pScreen, UpdateScreenCb& fnUpdateScreen,
                           MenuDelegator& menuDelegator);
-    LPErrInApp HandleRootMenuEvent(SDL_Event* pEvent, const SDL_Point& targetPos);
+    LPErrInApp HandleRootMenuEvent(SDL_Event* pEvent,
+                                   const SDL_Point& targetPos);
     LPErrInApp HandleRootMenuIterate();
     void SetBackground(SDL_Surface* pVal) { _p_SceneBackground = pVal; }
 
@@ -41,9 +38,9 @@ class MenuMgr {
 
    private:
     MenuDelegator _menuDlgt;
-    TTF_Font* _p_fontAriblk;
-    TTF_Font* _p_fontVera;
-    TTF_Font* _p_fontVeraUnderscore;
+    TTF_Font* _p_fontDejBoldBig;
+    TTF_Font* _p_fontDejSmall;
+    TTF_Font* _p_fontDejUnderscoreSmall;
     SDL_Surface* _p_Screen;
     SDL_Surface* _p_ScreenBackbuffer;
     SDL_Surface* _p_MenuBox;

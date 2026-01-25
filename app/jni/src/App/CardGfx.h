@@ -7,7 +7,7 @@
 
 #include "DeckType.h"
 #include "ErrorInfo.h"
-#include "WinTypeGlobal.h"
+#include "TypeGlobal.h"
 
 enum eSUIT { BASTONI = 0, COPPE = 1, DENARI = 2, SPADE = 3 };
 

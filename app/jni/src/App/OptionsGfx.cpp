@@ -63,7 +63,7 @@ OptionsGfx::~OptionsGfx() {
 }
 
 // Prepare the Click() trait
-void fncBind_ButtonClicked(void* self, int iVal) {
+static void fncBind_ButtonClicked(void* self, int iVal) {
     OptionsGfx* pOptionsGfx = (OptionsGfx*)self;
     switch (iVal) {
         case OptionsGfx::MYIDOK:
@@ -80,34 +80,20 @@ void fncBind_ButtonClicked(void* self, int iVal) {
 
 // Buttons, ok, show keyboard
 ClickCb OptionsGfx::prepClickCb() {
-#ifndef _MSC_VER
     static VClickCb const tc = {.Click = (&fncBind_ButtonClicked)};
-
     return (ClickCb){.tc = &tc, .self = this};
-#else
-    static VClickCb const tc = {(&fncBind_ButtonClicked)};
-    ClickCb cb = {&tc, this};
-    return cb;
-#endif
 }
 
-void fncBind_CheckboxMusicClicked(void* self, bool state) {
+static void fncBind_CheckboxMusicClicked(void* self, bool state) {
     OptionsGfx* pOptionsGfx = (OptionsGfx*)self;
     pOptionsGfx->CheckboxMusicClicked(state);
 }
 
 // Checkbox music
 CheckboxClickCb OptionsGfx::prepCheckBoxClickMusic() {
-#ifndef _MSC_VER
     static VCheckboxClickCb const tc = {.Click =
                                             (&fncBind_CheckboxMusicClicked)};
-
     return (CheckboxClickCb){.tc = &tc, .self = this};
-#else
-    static VCheckboxClickCb const tc = {(&fncBind_CheckboxMusicClicked)};
-    CheckboxClickCb cb = {&tc, this};
-    return cb;
-#endif
 }
 
 LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen,
@@ -133,8 +119,8 @@ LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen,
     _p_screen = pScreen;
     _optDlgt = optDlg;
     _p_MusicManager = _p_GameSettings->GetMusicManager();
-    _p_fontCtrl = _p_GameSettings->GetFontAriblk();
-    _p_fontText = _p_GameSettings->GetFontMedium();
+    _p_fontCtrl = _p_GameSettings->GetFontDjvBig();
+    _p_fontText = _p_GameSettings->GetFontDjvMedium();
     _fnUpdateScreen = fnUpdateScreen;
 
     _p_surfBar = GFX_UTIL::SDL_CreateRGBSurface(_rctOptBox.w, _rctOptBox.h, 32,
@@ -419,7 +405,7 @@ LPErrInApp OptionsGfx::HandleIterate(bool& done) {
                        _rctOptBox.y + _rctOptBox.h + 2, GFX_UTIL_COLOR::Black);
     GFX_UTIL::DrawRect(_p_ShadowSrf, _rctOptBox.x, _rctOptBox.y,
                        _rctOptBox.x + _rctOptBox.w, _rctOptBox.y + _rctOptBox.h,
-                       _color);
+                       GFX_UTIL_COLOR::Gray);
 
     // header bar
     SDL_Rect rectHeader;
@@ -510,26 +496,19 @@ LPErrInApp OptionsGfx::HandleIterate(bool& done) {
     return NULL;
 }
 
-void fncBind_KeyboardClick(void* self, const char* text) {
+static void fncBind_KeyboardClick(void* self, const char* text) {
     OptionsGfx* pOptionsGfx = (OptionsGfx*)self;
     pOptionsGfx->TextFromKeyboard(text);
 }
 
 ClickKeyboardCb OptionsGfx::prepareClickKeyboardCb() {
-#ifndef _MSC_VER
     static VClickKeyboardCb const tc = {.ClickKey = (&fncBind_KeyboardClick)};
-
     return (ClickKeyboardCb){.tc = &tc, .self = this};
-#else
-    static VClickKeyboardCb const tc = {(&fncBind_KeyboardClick)};
-    ClickKeyboardCb cb = {&tc, this};
-    return cb;
-#endif
 }
 
 void OptionsGfx::TextFromKeyboard(const char* text) {
     std::string currText = _p_textInput->GetText();
-    //TRACE("[TextFromKeyboard] %s", text);
+    // TRACE("[TextFromKeyboard] %s", text);
 
     if (text[0] == '\b') {
         if (!currText.empty()) {
@@ -565,7 +544,7 @@ void OptionsGfx::ToggleScreenKeyboard() {
 
     ClickKeyboardCb cbKeyboard = prepareClickKeyboardCb();
     _p_KeyboardGfx->Show(&rctKeyboard, _p_screen,
-                         _p_GameSettings->GetFontMedium(), cbKeyboard);
+                         _p_GameSettings->GetFontDjvMedium(), cbKeyboard);
     _p_textInput->SetHasFocus(true);
 }
 

@@ -10,7 +10,7 @@
 #include "ErrorInfo.h"
 #include "GameSettings.h"
 #include "Traits.h"
-#include "WinTypeGlobal.h"
+#include "TypeGlobal.h"
 
 class ButtonGfx;
 class Languages;
@@ -64,7 +64,6 @@ class OptionsGfx {
     SDL_Surface* _p_screen;
     TTF_Font* _p_fontText;
     TTF_Font* _p_fontCtrl;
-    SDL_Color _color;
     ButtonGfx* _p_buttonOK;
     ButtonGfx* _p_btToggleKeyboard;
     STRING _headerText;

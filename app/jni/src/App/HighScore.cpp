@@ -8,7 +8,7 @@
 #include "GameSettings.h"
 #include "GfxUtil.h"
 #include "MusicManager.h"
-#include "WinTypeGlobal.h"
+#include "TypeGlobal.h"
 
 #if PLATFORM_EMS
 #include <emscripten.h>
@@ -324,8 +324,8 @@ LPErrInApp HighScore::HandleIterate(bool& done) {
         char buff[256];
         xOff = 0;
         yOff = 0;
-        TTF_Font* pFont = _p_GameSettings->GetFontAriblk();
-        TTF_Font* pFont2 = _p_GameSettings->GetFontVera();
+        TTF_Font* pFont = _p_GameSettings->GetFontDjvBig();
+        TTF_Font* pFont2 = _p_GameSettings->GetFontDjvSmall();
         LPLanguages pLanguages = _p_GameSettings->GetLanguageMan();
 
         xOff += ax;

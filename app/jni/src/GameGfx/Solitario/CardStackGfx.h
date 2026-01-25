@@ -42,9 +42,12 @@ class CardStackGfx {
     }
     LPCardGfx Last() { return _vct_lpCardGfx[_vct_lpCardGfx.size() - 1]; }
     LPCardGfx Item(int ix) {
-        SDL_assert(_vct_lpCardGfx.size() > ix);
+        if (ix >= _vct_lpCardGfx.size()){
+            return NULL;
+        }
         return _vct_lpCardGfx[ix];
     }
+
 
    private:
     std::vector<LPCardGfx> _vct_lpCardGfx;

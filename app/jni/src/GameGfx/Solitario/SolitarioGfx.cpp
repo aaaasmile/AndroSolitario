@@ -11,7 +11,7 @@
 #include "Fading.h"
 #include "GfxUtil.h"
 #include "MusicManager.h"
-#include "WinTypeGlobal.h"
+#include "TypeGlobal.h"
 
 // card graphics
 int g_CardWidth = 0;
@@ -87,7 +87,7 @@ void SolitarioGfx::clearSurface() {
 
 // command buttons
 // -- quit --
-void fncBind_ButtonQuitClick(void* self, int val) {
+static void fncBind_ButtonQuitClick(void* self, int val) {
     SolitarioGfx* pApp = (SolitarioGfx*)self;
     pApp->BtQuitClick();
 }
@@ -98,7 +98,7 @@ ClickCb SolitarioGfx::prepClickQuitCb() {
 }
 
 // -- new game --
-void fncBind_ButtonNewGameClick(void* self, int val) {
+static void fncBind_ButtonNewGameClick(void* self, int val) {
     SolitarioGfx* pApp = (SolitarioGfx*)self;
     pApp->BtNewGameClick();
 }
@@ -109,7 +109,7 @@ ClickCb SolitarioGfx::prepClickNewGameCb() {
 }
 
 // -- sound on/off --
-void fncBind_ButtonToggleSoundClick(void* self, int val) {
+static void fncBind_ButtonToggleSoundClick(void* self, int val) {
     SolitarioGfx* pApp = (SolitarioGfx*)self;
     pApp->BtToggleSoundClick();
 }
@@ -132,7 +132,7 @@ LPErrInApp SolitarioGfx::Initialize(SDL_Surface* pScreen,
     _fnUpdateHighScore = fnUpdateHighScore;
     _sceneBackgroundIsBlack =
         pGameSettings->BackgroundType == BackgroundTypeEnum::Black;
-    _p_FontBigText = pGameSettings->GetFontAriblk();
+    _p_FontBigText = pGameSettings->GetFontDjvBig();
     LPErrInApp err;
     _p_Screen = pScreen;
     _fnUpdateScreen = fnUpdateScreen;
@@ -500,9 +500,15 @@ LPCardRegionGfx SolitarioGfx::DoDrop(LPCardRegionGfx pDestRegion) {
         default:
             pCard = pDestStack->Item(pDestStack->Size() - _dragStack.Size());
     }
-
     _dragStack.Clear();
 
+    if(pCard == NULL){
+        TRACE_DEBUG("DoDrop - WARN return on card NULL \n");
+        DrawStaticScene();
+        _statePrev = _state;
+        _state = SolitarioGfx::IN_ZOOM_TERMINATED;
+        return pBestRegion;
+    }
     if (_dragPileInfo.x == pCard->X() && _dragPileInfo.y == pCard->Y()) {
         TRACE_DEBUG("DoDrop -  return on no movement \n");
         DrawStaticScene();
@@ -1396,6 +1402,10 @@ LPErrInApp SolitarioGfx::HandleEvent(SDL_Event* pEvent,
                 TRACE_DEBUG("[SolitarioGfx - event] animation victory\n");
                 _state = eState::START_VICTORY;
             }
+            if (pEvent->key.key == SDLK_N) {
+                TRACE_DEBUG("[SolitarioGfx - event] ask for a new game\n");
+                _state = eState::ASK_FOR_NEW_GAME;
+            }
             break;
 #if HASTOUCH
         case SDL_EVENT_FINGER_DOWN:
@@ -1527,6 +1537,11 @@ LPErrInApp SolitarioGfx::HandleIterate(bool& done) {
             _state = SolitarioGfx::IN_GAME;
             singleTapOrLeftClick(_ptLast);
         }
+    }
+    if (_state == SolitarioGfx::ASK_FOR_NEW_GAME) {
+        _state = SolitarioGfx::IN_GAME;
+        BtNewGameClick();
+        return NULL;
     }
 
     if (_state == SolitarioGfx::WAIT_FOR_FADING) {
@@ -1711,7 +1726,7 @@ void SolitarioGfx::showYesNoMsgBox(LPCSTR strText) {
     rctBox.x = (_p_Screen->w - rctBox.w) / 2;
 
     _p_MsgBox->ChangeAlpha(150);
-    _p_MsgBox->Initialize(&rctBox, _p_Screen, pGameSettings->GetFontMedium(),
+    _p_MsgBox->Initialize(&rctBox, _p_Screen, pGameSettings->GetFontDjvMedium(),
                           MesgBoxGfx::TY_MB_YES_NO, _fnUpdateScreen);
     SDL_Rect clipRect;
     SDL_GetSurfaceClipRect(_p_AlphaDisplay, &clipRect);
@@ -1745,7 +1760,7 @@ void SolitarioGfx::showOkMsgBox(LPCSTR strText) {
     rctBox.x = (_p_Screen->w - rctBox.w) / 2;
 
     _p_MsgBox->ChangeAlpha(150);
-    _p_MsgBox->Initialize(&rctBox, _p_Screen, pGameSettings->GetFontMedium(),
+    _p_MsgBox->Initialize(&rctBox, _p_Screen, pGameSettings->GetFontDjvMedium(),
                           MesgBoxGfx::TY_MBOK, _fnUpdateScreen);
 
     SDL_Rect clipRect;

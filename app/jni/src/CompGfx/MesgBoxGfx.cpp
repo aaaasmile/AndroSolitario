@@ -95,7 +95,7 @@ LPErrInApp MesgBoxGfx::Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
     return NULL;
 }
 
-void fncBind_ButCmdClicked(void* self, int btID) {
+static void fncBind_ButCmdClicked(void* self, int btID) {
     MesgBoxGfx* pMsgBox = (MesgBoxGfx*)self;
     pMsgBox->ButCmdClicked(btID);
 }

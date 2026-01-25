@@ -3,8 +3,8 @@
 #include "GameSettings.h"
 #include "GfxUtil.h"
 
-static const char* LP_PLUS = "+";
-static const char* LP_MINUS = "-";
+static const char* LP_PLUS = "←";
+static const char* LP_MINUS = "→";
 
 ComboGfx::ComboGfx() {
     _visibleState = INVISIBLE;
@@ -244,7 +244,7 @@ void ComboGfx::DrawButton(SDL_Surface* pScreen) {
                              _p_fontText);
 
         // draw text upper box
-        TTF_GetStringSize(_p_fontText, LP_PLUS, 0, &tx, &ty);
+        TTF_GetStringSize(_p_GameSettings->GetFontDjvMedium(), LP_PLUS, 0, &tx, &ty);
 
         xOffset = (_rctBoxUp.w - tx) / 2;
         if (xOffset < 0) {
@@ -260,10 +260,10 @@ void ComboGfx::DrawButton(SDL_Surface* pScreen) {
             _color = GFX_UTIL_COLOR::White;
         }
         GFX_UTIL::DrawString(pScreen, LP_PLUS, _rctBoxUp.x + xOffset,
-                             _rctBoxUp.y + yOffset, _color, _p_fontText);
+                             _rctBoxUp.y + yOffset, _color, _p_GameSettings->GetFontDjvMedium());
 
         // draw text down box
-        TTF_GetStringSize(_p_fontText, LP_MINUS, 0, &tx, &ty);
+        TTF_GetStringSize(_p_GameSettings->GetFontDjvMedium(), LP_MINUS, 0, &tx, &ty);
 
         xOffset = (_rctBoxDown.w - tx) / 2;
         if (xOffset < 0) {
@@ -275,7 +275,7 @@ void ComboGfx::DrawButton(SDL_Surface* pScreen) {
             _color = GFX_UTIL_COLOR::White;
         }
         GFX_UTIL::DrawString(pScreen, LP_MINUS, _rctBoxDown.x + xOffset,
-                             _rctBoxDown.y + yOffset, _color, _p_fontText);
+                             _rctBoxDown.y + yOffset, _color, _p_GameSettings->GetFontDjvMedium());
 
         // draw borders
         GFX_UTIL::DrawRect(pScreen, _rctCtrl.x - 1, _rctCtrl.y - 1,

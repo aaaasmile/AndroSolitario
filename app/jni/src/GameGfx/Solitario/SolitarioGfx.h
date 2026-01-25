@@ -9,7 +9,7 @@
 #include "GameSettings.h"
 #include "Languages.h"
 #include "Traits.h"
-#include "WinTypeGlobal.h"
+#include "TypeGlobal.h"
 
 using namespace traits;
 class ButtonGfx;
@@ -63,6 +63,7 @@ class SolitarioGfx {
         NEW_CARD_VICTORY,
         IN_CARD_VICTORY,
         SHOW_SCORE,
+        ASK_FOR_NEW_GAME,
         DO_NEWGAME,
         IN_MSGBOX,
         IN_ZOOM,

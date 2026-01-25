@@ -1,6 +1,18 @@
 #include "LabelLinkGfx.h"
 
+#include "Config.h"
 #include "GfxUtil.h"
+
+#if PLATFORM_EMS
+#include <emscripten.h>
+
+void navigateTo(const char* url) { 
+    char buffer[1024];
+    sprintf(buffer, "window.open('%s', '_blank');", url); 
+    emscripten_run_script(buffer);
+}
+
+#endif
 
 LabelLinkGfx::LabelLinkGfx() {
     _stateGfx = INVISIBLE;
@@ -88,6 +100,9 @@ void LabelLinkGfx::MouseUp(SDL_Event* pEvent, const SDL_Point& targetPos) {
                 snprintf(cmdpath, sizeof(cmdpath), "%s %s", cmd, _url.c_str());
                 system(cmdpath);
 #endif
+#if PLATFORM_EMS
+                navigateTo(_url.c_str());
+#endif
             }
         }
     }
@@ -104,7 +119,7 @@ void LabelLinkGfx::Draw(SDL_Surface* pScreen) {
             } else {
                 _color = GFX_UTIL_COLOR::Orange;
             }
-           
+
             int tx, ty;
             TTF_GetStringSize(_p_FontText, _ctrlText.c_str(), 0, &tx, &ty);
             int iXOffSet = (_rctCtrl.w - tx) / 2;

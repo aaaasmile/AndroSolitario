@@ -2,7 +2,7 @@
 #define _CCOMBOGFX_H__
 
 #include "Traits.h"
-#include "WinTypeGlobal.h"
+#include "TypeGlobal.h"
 
 using namespace traits;
 class GameSettings;

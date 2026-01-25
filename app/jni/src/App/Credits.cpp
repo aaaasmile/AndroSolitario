@@ -8,6 +8,7 @@
 #include "Fading.h"
 #include "GameSettings.h"
 #include "MusicManager.h"
+#include "TypeGlobal.h"
 
 char const* credit_text[] = {
     "-SOLITARIO", /* '-' at beginning makes highlighted: */
@@ -136,10 +137,8 @@ CreditsView::CreditsView() {
     _line = 0;
     _lastUpTimestamp = 0;
     _state = CreditsView::READY_TO_START;
-    //_p_sdlRenderer = NULL;
     _p_surfScreen = NULL;
     _p_SurfTitle = NULL;
-    //_p_ScreenTexture = NULL;
     _p_GameSettings = NULL;
     _p_MusicManager = NULL;
     _p_FadeAction = new FadeAction();
@@ -147,13 +146,7 @@ CreditsView::CreditsView() {
     _fnUpdateScreen.self = NULL;
 }
 
-CreditsView::~CreditsView() {
-    delete _p_FadeAction;
-    // if (_p_ScreenTexture != NULL) {
-    //     SDL_DestroyTexture(_p_ScreenTexture);
-    //     _p_ScreenTexture = NULL;
-    // }
-}
+CreditsView::~CreditsView() { delete _p_FadeAction; }
 
 LPErrInApp CreditsView::HandleEvent(SDL_Event* pEvent) {
     if (_state != CreditsView::IN_PROGRESS) {
@@ -200,11 +193,6 @@ LPErrInApp CreditsView::HandleIterate(bool& done) {
         TRACE_DEBUG("[CreditsView] State init\n");
         _line = 0;
         _scroll = 0;
-        // if (_p_ScreenTexture != NULL) {
-        //     SDL_DestroyTexture(_p_ScreenTexture);
-        // }
-        // _p_ScreenTexture =
-        //     SDL_CreateTextureFromSurface(_p_sdlRenderer, _p_surfScreen);
         if (!_ignoreMouseEvent) {
             _p_FadeAction->Fade(_p_surfScreen, _p_surfScreen, 2, true,
                                 //_p_sdlRenderer, NULL);
@@ -223,8 +211,8 @@ LPErrInApp CreditsView::HandleIterate(bool& done) {
 
     if (_state == CreditsView::IN_PROGRESS) {
         Uint64 now_time = SDL_GetTicks();
-        if (_lastUpTimestamp + 30 > now_time){
-            //TRACE_DEBUG("Ignore iteration because too fast \n");
+        if (_lastUpTimestamp + 30 > now_time) {
+            // TRACE_DEBUG("Ignore iteration because too fast \n");
             return NULL;
         }
         _lastUpTimestamp = now_time;
@@ -273,10 +261,6 @@ LPErrInApp CreditsView::HandleIterate(bool& done) {
                 }
             }
         }
-        // SDL_UpdateTexture(_p_ScreenTexture, NULL, _p_surfScreen->pixels,
-        //                   _p_surfScreen->pitch);
-        // SDL_RenderTexture(_p_sdlRenderer, _p_ScreenTexture, NULL, NULL);
-        // SDL_RenderPresent(_p_sdlRenderer);
         (_fnUpdateScreen.tc)->UpdateScreen(_fnUpdateScreen.self, _p_surfScreen);
     }
 
@@ -301,7 +285,7 @@ LPErrInApp CreditsView::HandleIterate(bool& done) {
 }
 
 void CreditsView::Show(SDL_Surface* pScreen, SDL_Surface* pSurfTitle,
-              UpdateScreenCb& fnUpdateScreen) {
+                       UpdateScreenCb& fnUpdateScreen) {
     _fnUpdateScreen = fnUpdateScreen;
     _p_surfScreen = pScreen;
     _p_SurfTitle = pSurfTitle;
