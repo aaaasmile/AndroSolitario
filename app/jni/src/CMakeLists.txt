@@ -175,6 +175,7 @@ else()
         # note the SHELL syntax for the -s parameter
         target_link_options(${PROJECT_NAME} PRIVATE
             -O3
+            --bind
             "SHELL:-s ASSERTIONS=0"
             "SHELL:-s GL_ASSERTIONS=0"
             "SHELL:-s GL_DEBUG=0"

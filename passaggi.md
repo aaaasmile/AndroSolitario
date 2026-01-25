@@ -318,6 +318,11 @@ Il zarget wasm funziona nel browser e quidi gira su device che hanno il touch, i
 Se abilito mouse e touch ho gli stessi eventi ripetuti e questo l'app non li supporta (pensa al toggle della musica). 
 Quindi il target Emscripten viene compilato solo con il mouse che funziona decentementre anche su Android.
 
+### Emscripting cambio lingua da HTML
+In Gamesettings uso la funzione EMSCRIPTEN_KEEPALIVE setLanguage e EMSCRIPTEN_BINDINGS.
+In CmakeList.txt ho bisogno del flag --binding.
+In javascript chiamo la funzione con: Module.setLanguage(this.dataset.lang);
+
 ## Directory Scratch di questo progetto
 Voglio creare dei piccoli progetti per testare delle funzionalità singole.
 Per esempio cd scratch/test_font vorrei compilare il programma hello.c.
