@@ -500,6 +500,8 @@ LPCardRegionGfx SolitarioGfx::DoDrop(LPCardRegionGfx pDestRegion) {
         default:
             pCard = pDestStack->Item(pDestStack->Size() - _dragStack.Size());
     }
+    _dragStack.Clear();
+
     if(pCard == NULL){
         TRACE_DEBUG("DoDrop - WARN return on card NULL \n");
         DrawStaticScene();
@@ -507,9 +509,6 @@ LPCardRegionGfx SolitarioGfx::DoDrop(LPCardRegionGfx pDestRegion) {
         _state = SolitarioGfx::IN_ZOOM_TERMINATED;
         return pBestRegion;
     }
-
-    _dragStack.Clear();
-
     if (_dragPileInfo.x == pCard->X() && _dragPileInfo.y == pCard->Y()) {
         TRACE_DEBUG("DoDrop -  return on no movement \n");
         DrawStaticScene();
