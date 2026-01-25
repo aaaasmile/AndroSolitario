@@ -1,7 +1,7 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#define VERSION "Ver 3.0.10 20260113-00"
+#define VERSION "Ver 3.0.11 20260125-00"
 #define PACKAGE_URL "https://invido.it"
 #define AUTHOR "igorRun for Invido"
 
@@ -40,14 +40,6 @@
 #define HASQUITMENU 0  // Android usually uses system back button
 #else
 #define HASQUITMENU 1  // Enable on other platforms
-#endif
-#endif
-
-#ifndef HASHELPMENU
-#ifdef PLATFORM_ANDROID
-#define HASHELPMENU 0  // Android usually uses system back button
-#else
-#define HASHELPMENU 1  // Enable on other platforms
 #endif
 #endif
 

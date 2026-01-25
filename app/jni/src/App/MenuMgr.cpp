@@ -376,7 +376,6 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     g_MenuItemBoxes.drawBorder(2, _p_ScreenBackbuffer);
 
     // Help
-#if HASHELPMENU
     currY += morePlaceY;
     currY = currY + intraOffset;
     if (_focusedMenuItem != MenuItemEnum::MENU_HELP) {
@@ -390,10 +389,10 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     if (err != NULL) {
         return err;
     }
+    
     endY = currY + morePlaceY + offsetY;
     g_MenuItemBoxes.SetYInPos(3, endY);
     g_MenuItemBoxes.drawBorder(3, _p_ScreenBackbuffer);
-#endif
 
     // highscore
     currY += morePlaceY;
@@ -595,13 +594,8 @@ MenuItemEnum previousMenu(MenuItemEnum currMenu) {
             return MenuItemEnum::MENU_OPTIONS;
         case MenuItemEnum::MENU_HELP:
             return MenuItemEnum::MENU_CREDITS;
-#if HASHELPMENU
         case MenuItemEnum::MENU_HIGHSCORE:
             return MenuItemEnum::MENU_HELP;
-#else
-        case MenuItemEnum::MENU_HIGHSCORE:
-            return MenuItemEnum::MENU_CREDITS;
-#endif
         case MenuItemEnum::QUIT:
             return MenuItemEnum::MENU_HIGHSCORE;
 #if HASQUITMENU
@@ -623,13 +617,8 @@ MenuItemEnum nextMenu(MenuItemEnum currMenu) {
             return MenuItemEnum::MENU_OPTIONS;
         case MenuItemEnum::MENU_OPTIONS:
             return MenuItemEnum::MENU_CREDITS;
-#if HASHELPMENU
         case MenuItemEnum::MENU_CREDITS:
             return MenuItemEnum::MENU_HELP;
-#else
-        case MenuItemEnum::MENU_CREDITS:
-            return MenuItemEnum::MENU_HIGHSCORE;
-#endif
         case MenuItemEnum::MENU_HELP:
             return MenuItemEnum::MENU_HIGHSCORE;
 #if HASQUITMENU
