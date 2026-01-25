@@ -12,6 +12,24 @@
 
 #if PLATFORM_EMS
 #include <emscripten.h>
+#include <emscripten/bind.h>
+
+EMSCRIPTEN_KEEPALIVE
+void setLanguage(const std::string& languageCode) {
+    TRACE("[setLanguage] Language changed to: %s\n", languageCode.c_str());
+    LPGameSettings pGameSetting = GameSettings::GetSettings();
+    
+    if (languageCode.compare("it") == 0) {
+        pGameSetting->CurrentLanguage = Languages::eLangId::LANG_ITA;
+    } else if (languageCode.compare("en") == 0) {
+        pGameSetting->CurrentLanguage = Languages::eLangId::LANG_ENG;
+    }
+}
+
+EMSCRIPTEN_BINDINGS(my_module) {
+    emscripten::function("setLanguage", &setLanguage);
+}
+
 #endif
 
 static LPGameSettings _p_GameSettings = NULL;

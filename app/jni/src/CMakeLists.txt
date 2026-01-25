@@ -189,7 +189,7 @@ else()
         target_compile_definitions(${PROJECT_NAME} PRIVATE TRACEINSERVICE _DEBUG)
         target_compile_options(${PROJECT_NAME} PRIVATE $<$<NOT:$<C_COMPILER_ID:MSVC>>:-Wunused -g -O0>)
         set_target_properties(${PROJECT_NAME} PROPERTIES
-          LINK_FLAGS "--preload-file=${CMAKE_CURRENT_SOURCE_DIR}/../../src/main/assets@/data -s ALLOW_MEMORY_GROWTH=1"
+          LINK_FLAGS "--preload-file=${CMAKE_CURRENT_SOURCE_DIR}/../../src/main/assets@/data --bind -s ALLOW_MEMORY_GROWTH=1"
         )
       endif()
       # Add any Emscripten-specific configurations here
