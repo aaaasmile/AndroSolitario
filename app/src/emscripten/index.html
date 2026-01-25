@@ -167,6 +167,9 @@
       <img src="https://flagcdn.com/w20/gb.png" alt="English" width="20" height="15">
       EN
     </button>
+    <button class="info-btn" id="info-btn">
+      Info
+    </button>
   </div>
   <div class="spinner" id='spinner'></div>
   <div class="emscripten" id="status">Downloading...</div>
@@ -236,6 +239,8 @@
             spinnerElement.style.display = 'none';
             statusElement.style.display = 'none';
             statusElement.hidden = true;
+            infoEle.style.display = 'none';
+            infoEle.hidden = true;
           }
         }
         statusElement.innerHTML = text;
@@ -276,6 +281,17 @@
       button.addEventListener('click', function () {
         Module.setLanguage(this.dataset.lang);
       });
+    });
+    const infoButton = document.getElementById('info-btn');
+    infoButton.addEventListener('click', function () {
+      console.log('toggle info');
+      if (infoEle.hidden){
+        infoEle.style.display = '';
+        infoEle.hidden = false;
+      }else{
+        infoEle.style.display = 'none';
+        infoEle.hidden = true;
+      }
     });
   </script>
   <script async type="text/javascript" src="solitario_3.0.11.js?v=311"></script>
