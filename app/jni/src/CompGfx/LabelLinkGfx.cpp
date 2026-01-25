@@ -6,10 +6,11 @@
 #if PLATFORM_EMS
 #include <emscripten.h>
 
-EM_JS(void, js_navigate_to_url, (const char* url),
-      { window.location.href = UTF8ToString(url); });
-
-void navigateTo(const char* url) { js_navigate_to_url(url); }
+void navigateTo(const char* url) { 
+    char buffer[1024];
+    sprintf(buffer, "window.open('%s', '_blank');", url); 
+    emscripten_run_script(buffer);
+}
 
 #endif
 
