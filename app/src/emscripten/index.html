@@ -198,10 +198,6 @@
         console.log('Set Wide portrait mode argument');
         Module.arguments.push('--wideportrait');
       },
-      changeRuntimeLanguage: function (lang) {
-        console.log('Change the language to', lang);
-        
-      },
       print: (function () {
         return function (text) {
           if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
@@ -278,7 +274,7 @@
     const langButtons = document.querySelectorAll('.lang-btn');
     langButtons.forEach(button => {
       button.addEventListener('click', function () {
-        Module.changeRuntimeLanguage(this.dataset.lang);
+        Module.setLanguage(this.dataset.lang);
       });
     });
   </script>

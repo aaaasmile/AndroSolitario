@@ -18,11 +18,17 @@ EMSCRIPTEN_KEEPALIVE
 void setLanguage(const std::string& languageCode) {
     TRACE("[setLanguage] Language changed to: %s\n", languageCode.c_str());
     LPGameSettings pGameSetting = GameSettings::GetSettings();
-    
+    bool has_changed = false;
     if (languageCode.compare("it") == 0) {
+        has_changed = pGameSetting->CurrentLanguage != Languages::eLangId::LANG_ITA; 
         pGameSetting->CurrentLanguage = Languages::eLangId::LANG_ITA;
     } else if (languageCode.compare("en") == 0) {
+        has_changed = pGameSetting->CurrentLanguage != Languages::eLangId::LANG_ENG; 
         pGameSetting->CurrentLanguage = Languages::eLangId::LANG_ENG;
+    }
+    if (has_changed){
+        pGameSetting->SetCurrentLang();
+        pGameSetting->SaveSettings();
     }
 }
 
