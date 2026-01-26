@@ -342,10 +342,9 @@ LPErrInApp AppGfx::createWindow() {
         SDL_DestroySurface(_p_Screen);
         _p_Screen = NULL;
     }
+    flagwin = SDL_WINDOW_RESIZABLE;
     if (_fullScreen) {
-        flagwin = SDL_WINDOW_FULLSCREEN;
-    } else {
-        flagwin = SDL_WINDOW_RESIZABLE;
+        flagwin |= SDL_WINDOW_FULLSCREEN;
     }
 #ifdef ANDROID
     flagwin = SDL_WINDOW_FULLSCREEN;
