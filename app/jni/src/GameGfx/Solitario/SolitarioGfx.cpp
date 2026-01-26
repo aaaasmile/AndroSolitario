@@ -374,12 +374,10 @@ LPErrInApp SolitarioGfx::InitDrag(LPCardStackGfx pCargoStack, int x, int y,
 
     if (pCargoStack == NULL) {
         if (_p_selectedCardRegion->IsEmpty()) {
-            _state = SolitarioGfx::INITDRAG_AFTER;
             return NULL;
         }
         int idx = _p_selectedCardRegion->GetClickedCard(x, y);
         if (idx == -1) {
-            _state = SolitarioGfx::INITDRAG_AFTER;
             return NULL;  // no card found
         }
         int dm = _p_selectedCardRegion->GetDragMode();

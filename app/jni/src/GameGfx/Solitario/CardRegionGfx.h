@@ -19,30 +19,29 @@ const unsigned int CRD_DODRAG = (1 << 3);  // card region can/cannot be dragged
 const unsigned int CRD_DODROP = (1 << 4);  // card region (doesn't)accept drops
 // Accept/Drop flags
 const unsigned int CRD_DONOTHING = 0;
-const unsigned int CRD_DOALL =
-    (1 << 0);  // true:accept anything					false:check other flags
+const unsigned int CRD_DOALL = (1 << 0);     // true:accept anything
+                                             // false:check other flags
 const unsigned int CRD_DOSINGLE = (1 << 1);  // true:accept only single cards
                                              // false:accept any cardstack size
 const unsigned int CRD_DOOPCOLOR =
-    (1 << 2);  // true:accept only opposite colored		false:check next 2 flags
+    (1 << 2);  // true:accept only opposite colored		false:check next
+               // 2 flags
 const unsigned int CRD_DOHIGHER = (1 << 5);  // true:accept higher valued
                                              // false:don't accept higher valued
 const unsigned int CRD_DOLOWER = (1 << 6);   // true:accept lower valued
                                              // false:don't accept lower valued
 const unsigned int CRD_DOHIGHERBY1 =
-    (1 << 7);  // true:accept 1 rank higher				false:don't accept
-               // higher valued
+    (1 << 7);  // true:accept 1 rank higher false:don't accept higher valued
 const unsigned int CRD_DOLOWERBY1 =
-    (1 << 8);  // true:accept 1 rank lower				false:don't accept lower
-               // valued
+    (1 << 8);  // true:accept 1 rank lower
+               // false:don't accept lower valued
 const unsigned int CRD_DOSUIT =
     (1 << 10);  // true:accept only cards of same suit	false:accept any suit
 // On empty stacks, used in most solitaire games
-const unsigned int CRD_DOACE =
-    (1
-     << 11);  // true:accept only aces					false:don't accept ace
-const unsigned int CRD_DOKING =
-    (1 << 12);  // true:accept only kings				false:don't accept king
+const unsigned int CRD_DOACE = (1 << 11);   // true:accept only aces
+                                            // false:don't accept ace
+const unsigned int CRD_DOKING = (1 << 12);  // true:accept only kings
+                                            // false:don't accept king
 
 enum RegionType {
     RT_DECKSTOCK = 0,  // Mazzo coperto che la carte restanti (1)
@@ -55,10 +54,10 @@ enum RegionType {
 };
 
 class CardRegionGfx {
-public:
+   public:
     CardRegionGfx(RegionType rt, unsigned int attribs, unsigned int amode,
                   int dmode, int symbol, int x, int y, int xoff, int yoff,
-                  DeckType &deckType, int width, int height)
+                  DeckType& deckType, int width, int height)
         : _regionTypeid(rt),
           _attributes(attribs),
           _acceptMode(amode),
@@ -84,9 +83,18 @@ public:
     }
 
     void SetCardFaceUp(bool bVal, int idx) {
-        _internalStack.Item(idx)->SetFaceUp(bVal);
+        LPCardGfx pCard = _internalStack.Item(idx);
+        if (pCard != NULL) {
+            pCard->SetFaceUp(bVal);
+        }
     }
-    bool IsCardFaceUp(int idx) { return _internalStack.Item(idx)->IsFaceUp(); }
+    bool IsCardFaceUp(int idx) {
+        LPCardGfx pCard = _internalStack.Item(idx);
+        if (pCard != NULL) {
+            return pCard->IsFaceUp();
+        }
+        return false;
+    }
 
     int GetDragMode() const { return _dragMode; }
 
@@ -140,7 +148,7 @@ public:
     int GetSavedSize() { return _savedSize; }
     void SaveSize() { _savedSize = _internalStack.Size(); }
 
-private:
+   private:
     RegionType _regionTypeid;
     unsigned int _attributes;
     CardStackGfx _internalStack;
@@ -157,6 +165,6 @@ private:
     int _savedSize;
 };
 
-typedef CardRegionGfx *LPCardRegionGfx;
+typedef CardRegionGfx* LPCardRegionGfx;
 
 #endif

@@ -10,7 +10,6 @@
 #include "DeckType.h"
 #include "ErrorInfo.h"
 
-
 class CardStackGfx {
    public:
     LPErrInApp NewDeck(DeckType& deckType, int widthEmpty, int heightEmpty);
@@ -39,9 +38,14 @@ class CardStackGfx {
         SDL_assert(_vct_lpCardGfx.size() > 0);
         return _vct_lpCardGfx[0];
     }
-    LPCardGfx Last() { return _vct_lpCardGfx[_vct_lpCardGfx.size() - 1]; }
+    LPCardGfx Last() {
+        if (_vct_lpCardGfx.empty()) {
+            return NULL;
+        }
+        return _vct_lpCardGfx[_vct_lpCardGfx.size() - 1];
+    }
     LPCardGfx Item(int ix) {
-        if (ix >= _vct_lpCardGfx.size()) {
+        if (ix < 0 || ix >= (int)_vct_lpCardGfx.size()) {
             return NULL;
         }
         return _vct_lpCardGfx[ix];

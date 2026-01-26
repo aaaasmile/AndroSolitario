@@ -3,7 +3,6 @@
 #include <algorithm>
 #include <random>
 
-
 LPErrInApp CardStackGfx::NewDeck(DeckType& deckType, int widthEmpty,
                                  int heightEmpty) {
     LPErrInApp err;
@@ -102,6 +101,9 @@ void CardStackGfx::InsertCard(int index, LPCardGfx card) {
 }
 
 int CardStackGfx::GetCardWherePointIsInside(int x, int y) {
+    if (_vct_lpCardGfx.empty())
+        return -1;
+
     int i = _vct_lpCardGfx.size() - 1;
 
     for (VI vi = _vct_lpCardGfx.end() - 1; vi >= _vct_lpCardGfx.begin(); --vi) {
@@ -115,10 +117,7 @@ int CardStackGfx::GetCardWherePointIsInside(int x, int y) {
 }
 
 LPCardGfx CardStackGfx::GetCard(int index) {
-    if (_vct_lpCardGfx.empty())
-        return NULL;
-
-    if (index >= _vct_lpCardGfx.size())
+    if (index < 0 || index >= (int)_vct_lpCardGfx.size())
         return NULL;
 
     VI vi = _vct_lpCardGfx.begin() + index;
