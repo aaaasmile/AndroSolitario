@@ -439,6 +439,16 @@ LPErrInApp fncBind_Show(void* self) {
     return ERR_UTIL::ErrorCreate("fncBind_Show without type");
 }
 
+LPErrInApp fncBind_OnResize(void* self, SDL_Surface* pScreen) {
+    GameSettings* pGameSettings = GameSettings::GetSettings();
+
+    if (pGameSettings->GetGameTypeGfx() == GameTypeEnum::Solitario) {
+        SolitarioGfx* pSolitarioGfx = (SolitarioGfx*)self;
+        return pSolitarioGfx->OnResize(pScreen);
+    }
+    return ERR_UTIL::ErrorCreate("fncBind_OnResize without type");
+}
+
 GameGfxCb GameSelector::PrepGameGfx() {
     GameSettings* pGameSettings = GameSettings::GetSettings();
     if (pGameSettings->GetGameTypeGfx() == GameTypeEnum::Solitario) {
@@ -449,7 +459,8 @@ GameGfxCb GameSelector::PrepGameGfx() {
         static VGameGfxCb const tc = {.HandleEvent = (&fncBind_HandleEvent),
                                       .HandleIterate = (&fncBind_HandleIterate),
                                       .Initialize = (&fncBind_Initialize),
-                                      .Show = (&fncBind_Show)};
+                                      .Show = (&fncBind_Show),
+                                      .OnResize = (&fncBind_OnResize)};
         return (GameGfxCb){.tc = &tc, .self = _p_SolitarioGfx};
     }
 

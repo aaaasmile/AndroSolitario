@@ -79,6 +79,7 @@ class SolitarioGfx {
     LPErrInApp Initialize(SDL_Surface* pScreen, UpdateScreenCb& fnUpdateScreen,
                           SDL_Window* pWindow, SDL_Surface* pSceneBackground,
                           UpdateHighScoreCb& fnUpdateHighScore);
+    LPErrInApp OnResize(SDL_Surface* pScreen);
     LPErrInApp HandleEvent(SDL_Event* pEvent, const SDL_Point& targetPos);
     LPErrInApp HandleIterate(bool& done);
     LPErrInApp Show();

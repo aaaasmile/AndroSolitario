@@ -25,7 +25,7 @@ struct HelpItem {
     HelpItemType Type;
     std::string Text;
     std::string ImagePath;
-    SDL_Surface *pSurface;
+    SDL_Surface* pSurface;
 };
 
 struct HelpPage {
@@ -130,6 +130,7 @@ typedef struct {
                                    SDL_Surface* pSceneBackground,
                                    UpdateHighScoreCb& fnHighScore);
     LPErrInApp (*const Show)(void* self);
+    LPErrInApp (*const OnResize)(void* self, SDL_Surface* pScreen);
 } VGameGfxCb, *LPVGameGfxCb;
 
 typedef struct {

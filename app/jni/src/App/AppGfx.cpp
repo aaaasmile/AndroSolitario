@@ -424,7 +424,16 @@ LPErrInApp AppGfx::selectLayout(int w, int h) {
             return NULL;
         }
     }
-    createScreenLayout();
+    LPErrInApp err = createScreenLayout();
+    if (err != NULL) {
+        return err;
+    }
+    if (_fnGameGfxCb.tc != NULL && _fnGameGfxCb.tc->OnResize != NULL) {
+        err = (_fnGameGfxCb.tc)->OnResize(_fnGameGfxCb.self, _p_Screen);
+        if (err != NULL) {
+            return err;
+        }
+    }
     return NULL;
 }
 

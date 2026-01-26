@@ -244,6 +244,31 @@ LPErrInApp SolitarioGfx::Initialize(SDL_Surface* pScreen,
     return NULL;
 }
 
+LPErrInApp SolitarioGfx::OnResize(SDL_Surface* pScreen) {
+    TRACE_DEBUG("SolitarioGfx::OnResize\n");
+    _p_Screen = pScreen;
+
+    if (_p_AlphaDisplay != NULL) {
+        SDL_DestroySurface(_p_AlphaDisplay);
+    }
+    _p_AlphaDisplay = GFX_UTIL::SDL_CreateRGBSurface(_p_Screen->w, _p_Screen->h,
+                                                     32, 0, 0, 0, 0);
+    if (_p_AlphaDisplay == NULL) {
+        return ERR_UTIL::ErrorCreate("Cannot recreate alpha display: %s\n",
+                                     SDL_GetError());
+    }
+
+    if (_p_ScreenBackbufferDrag != NULL) {
+        SDL_DestroySurface(_p_ScreenBackbufferDrag);
+    }
+    _p_ScreenBackbufferDrag = GFX_UTIL::SDL_CreateRGBSurface(
+        _p_Screen->w, _p_Screen->h, 32, 0, 0, 0, 0);
+
+    DrawStaticScene();
+
+    return NULL;
+}
+
 void SolitarioGfx::InitAllCoords() {
     for (regionVI vir = _cardRegionList.begin(); vir != _cardRegionList.end();
          ++vir) {
