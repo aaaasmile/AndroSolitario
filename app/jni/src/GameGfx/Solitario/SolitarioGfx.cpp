@@ -1711,6 +1711,9 @@ LPErrInApp SolitarioGfx::Show() {
     int yLine0 = 10;
     int yoffsetLine0 = 40;
     int yOverlapCard = 37;
+    if (pGameSettings->IsNarrowPortrait()) {
+        yOverlapCard = 42;
+    }
     int xOffsetIntraStack = 17;
     int xOffsetFaceUp = 25;
 
