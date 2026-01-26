@@ -306,6 +306,11 @@ void fncBind_GetHelpPagesSolitarioITA(void* self,
                            ""});
     page1.Items.push_back({HelpItemType::NEW_LINE, "", ""});
     page1.Items.push_back({HelpItemType::IMAGE, "", "images/sol_ingame.png"});
+    page1.Items.push_back({HelpItemType::NEW_LINE, "", ""});
+    page1.Items.push_back(
+        {HelpItemType::TEXT,
+         "Durante la partita, è possibile avere la modalità "
+         "Full Screen (tasto F oppure il pulsante in basso a destra)."});
     pages.push_back(page1);
 
     // Page 2: Comandi

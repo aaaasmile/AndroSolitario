@@ -1447,6 +1447,10 @@ LPErrInApp SolitarioGfx::HandleEvent(SDL_Event* pEvent,
                 TRACE_DEBUG("[SolitarioGfx - event] ask for a new game\n");
                 _state = eState::ASK_FOR_NEW_GAME;
             }
+            if (pEvent->key.key == SDLK_F) {
+                TRACE_DEBUG("[SolitarioGfx - event] toggle fullscreen\n");
+                BtToggleFullscreenClick();
+            }
             break;
 #if HASTOUCH
         case SDL_EVENT_FINGER_DOWN:
