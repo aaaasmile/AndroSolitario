@@ -1,7 +1,5 @@
 #include "CardRegionGfx.h"
 
-#include "TypeGlobal.h"
-
 void CardRegionGfx::InitCardCoords() {
     if (_internalStack.IsEmpty())
         return;
@@ -29,7 +27,8 @@ void CardRegionGfx::InitCardCoords() {
 //__________________________________________________________
 /*															|
 |  Imperfect, doesn't work well with diagonal, reversed,  	|
-|  and 3d stacks... Needs tweaking							|
+|  and 3d stacks... Needs tweaking
+|
 |_________________________________________________________*/
 
 bool CardRegionGfx::PtInStack(int x, int y) {

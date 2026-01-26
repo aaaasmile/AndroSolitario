@@ -191,8 +191,7 @@ LPErrInApp SolitarioGfx::Initialize(SDL_Surface* pScreen,
     int bth = 34;
     int btoffsetY = 70;
     int btintraX = 30;
-    int soundIntraX =
-        70;  // extra space for volume control (not yet implemented)
+    int soundIntraX = 70;
 
     int buttons_w = 2 * btw + btwSymb + 2 * btintraX + soundIntraX;
     int btposx = (_p_Screen->w - buttons_w) / 2;

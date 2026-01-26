@@ -6,7 +6,6 @@
 #include <stdlib.h>
 
 #include "AppGfx.h"
-#include "Config.h"
 #include "ErrorInfo.h"
 
 AppGfx* g_app = new AppGfx();
@@ -51,4 +50,3 @@ void SDL_AppQuit(void* appstate, SDL_AppResult result) {
     TRACE("SDL_AppQuit \n");
     delete g_app;
 }
-

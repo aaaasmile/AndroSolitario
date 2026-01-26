@@ -3,7 +3,6 @@
 #include <memory.h>
 #include <stdlib.h>
 
-#include "Config.h"
 #include "Fading.h"
 #include "GameSettings.h"
 #include "GfxUtil.h"

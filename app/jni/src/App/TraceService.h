@@ -1,5 +1,4 @@
 #include <fstream>
-#include <iostream>
 
 #include "TypeGlobal.h"
 
@@ -7,7 +6,7 @@
 #define TRACESERVICE__H___
 
 class I_GuiTracer {
-public:
+   public:
     I_GuiTracer() {}
     virtual void TraceData(const BYTE* pbyData, int nDataLen,
                            char* pTextComment) = 0;
@@ -15,14 +14,14 @@ public:
 };
 
 class EntryTraceDetail {
-public:
+   public:
     enum eType { TR_DEBUG = 0, TR_INFO = 1, TR_WARN = 2, TR_ERR = 3 };
 
-public:
+   public:
     void Reset();
     STRING ToString();
 
-public:
+   public:
     unsigned long m_ulTimeStamp;
     int m_iID;
     eType m_eTrType;
@@ -34,16 +33,16 @@ public:
 class TraceService {
     enum { NUM_OF_ENTRIES = 500, NUM_OF_CHANN = 3 };
 
-protected:
+   protected:
     TraceService();
 
-public:
+   public:
     static TraceService* Instance();
 
-private:
+   private:
     static TraceService* pinstance;
 
-public:
+   public:
     enum eOutType {
         OT_MEMORY,
         OT_STDOUT,
@@ -53,7 +52,7 @@ public:
         OT_MSVDEBUGGER
     };
 
-public:
+   public:
     ~TraceService();
     bool AddNewEntry(int iChannel, int iId, EntryTraceDetail::eType eValType,
                      LPCSTR lpszFileName, int iLineNr);
@@ -65,10 +64,10 @@ public:
     void SetOutputChannel(int iChannel, eOutType eVal, LPCSTR lpszFileName);
     void AddTrace(EntryTraceDetail::eType traceDet, LPCSTR lpszForm, ...);
 
-private:
+   private:
     void flashTheEntry();
 
-private:
+   private:
     EntryTraceDetail m_mtxEntryTraceDetails[NUM_OF_CHANN][NUM_OF_ENTRIES];
     bool m_abChannelMask[NUM_OF_CHANN];
     eOutType m_aeChannelOut[NUM_OF_CHANN];

@@ -4,13 +4,12 @@
 #include <SDL3/SDL.h>
 #include <SDL3_ttf/SDL_ttf.h>
 
-#include <vector>
-
 #include "CardGfx.h"
 #include "ErrorInfo.h"
 #include "GameSettings.h"
 #include "Traits.h"
 #include "TypeGlobal.h"
+
 
 class ButtonGfx;
 class Languages;
