@@ -1710,7 +1710,7 @@ LPErrInApp SolitarioGfx::Show() {
     int xLine0 = 35;
     int yLine0 = 10;
     int yoffsetLine0 = 40;
-    int yOverlapCard = 32;
+    int yOverlapCard = 37;
     int xOffsetIntraStack = 17;
     int xOffsetFaceUp = 25;
 
