@@ -7,7 +7,6 @@
 #include "CardRegionGfx.h"
 #include "ErrorInfo.h"
 #include "GameSettings.h"
-#include "Languages.h"
 #include "Traits.h"
 #include "TypeGlobal.h"
 
@@ -178,6 +177,7 @@ class SolitarioGfx {
     void BtQuitClick();
     void BtNewGameClick();
     void BtToggleSoundClick();
+    void BtToggleFullscreenClick();
     bool isInVictoryState();
     void clearAnimation();
 
@@ -205,6 +205,7 @@ class SolitarioGfx {
     ClickCb prepClickQuitCb();
     ClickCb prepClickNewGameCb();
     ClickCb prepClickToggleSoundCb();
+    ClickCb prepClickToggleFullscreenCb();
     LPErrInApp drawScore();
     void updateScoreOnAce(int sizeAce, int oldSizeAce);
     void updateScoreOnTurnOverFaceDown();
@@ -232,7 +233,6 @@ class SolitarioGfx {
     UpdateHighScoreCb _fnUpdateHighScore;
     SDL_Window* _p_Window;
     TTF_Font* _p_FontBigText;
-    // HighScore* _p_HighScore;
     MusicManager* _p_MusicManager;
 
     int _oldx;
@@ -248,6 +248,7 @@ class SolitarioGfx {
     ButtonGfx* _p_BtQuit;
     ButtonGfx* _p_BtNewGame;
     ButtonGfx* _p_BtToggleSound;
+    ButtonGfx* _p_BtToggleFullscreen;
     bool _sceneBackgroundIsBlack;
     int64_t _scoreGame;
     bool _scoreChanged;

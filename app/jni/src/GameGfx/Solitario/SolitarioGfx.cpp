@@ -25,6 +25,7 @@ extern const char* g_lpszDeckDir;
 const int MYIDQUIT = 0;
 const int MYIDNEWGAME = 1;
 const int MYIDTOGGLESOUND = 2;
+const int MYIDTOGGLEFULLSCREEN = 3;
 
 SolitarioGfx::SolitarioGfx() {
     _p_ScreenBackbufferDrag = NULL;
@@ -34,6 +35,7 @@ SolitarioGfx::SolitarioGfx() {
     _p_BtQuit = NULL;
     _p_BtNewGame = NULL;
     _p_BtToggleSound = NULL;
+    _p_BtToggleFullscreen = NULL;
     _p_AlphaDisplay = NULL;
     _p_MsgBox = NULL;
     _p_currentTime = new CurrentTime();
@@ -64,6 +66,10 @@ SolitarioGfx::~SolitarioGfx() {
     if (_p_BtToggleSound != NULL) {
         delete _p_BtToggleSound;
         _p_BtToggleSound = NULL;
+    }
+    if (_p_BtToggleFullscreen != NULL) {
+        delete _p_BtToggleFullscreen;
+        _p_BtToggleFullscreen = NULL;
     }
     delete _p_currentTime;
     delete _p_FadeAction;
@@ -116,6 +122,18 @@ static void fncBind_ButtonToggleSoundClick(void* self, int val) {
 
 ClickCb SolitarioGfx::prepClickToggleSoundCb() {
     static VClickCb const tc = {.Click = (&fncBind_ButtonToggleSoundClick)};
+    return (ClickCb){.tc = &tc, .self = this};
+}
+
+// -- fullscreen toggle --
+static void fncBind_ButtonToggleFullscreenClick(void* self, int val) {
+    SolitarioGfx* pApp = (SolitarioGfx*)self;
+    pApp->BtToggleFullscreenClick();
+}
+
+ClickCb SolitarioGfx::prepClickToggleFullscreenCb() {
+    static VClickCb const tc = {.Click =
+                                    (&fncBind_ButtonToggleFullscreenClick)};
     return (ClickCb){.tc = &tc, .self = this};
 }
 
@@ -208,6 +226,20 @@ LPErrInApp SolitarioGfx::Initialize(SDL_Surface* pScreen,
     _p_BtNewGame->Initialize(&rctBt1, _p_Screen, _p_FontBigText, MYIDNEWGAME,
                              cbBtNewGame);
     _p_BtNewGame->SetVisibleState(ButtonGfx::INVISIBLE);
+
+    // Fullscreen Toggle
+    rctBt1.x =
+        (rctBt1.x + rctBt1.w) + btintraX;  //_p_Screen->w - rctBt1.w - 10;
+    rctBt1.w = btwSymb;
+    rctBt1.h = bth;
+
+    // rctBt1.y = 10;
+    ClickCb cbBtToggleFullscreen = prepClickToggleFullscreenCb();
+    _p_BtToggleFullscreen = new ButtonGfx();
+    _p_BtToggleFullscreen->InitializeAsSymbol(
+        &rctBt1, _p_Screen, pGameSettings->GetFontSymb(), MYIDTOGGLEFULLSCREEN,
+        cbBtToggleFullscreen);
+    _p_BtToggleFullscreen->SetVisibleState(ButtonGfx::INVISIBLE);
 
     TRACE_DEBUG("Solitario initialized \n");
     return NULL;
@@ -502,7 +534,7 @@ LPCardRegionGfx SolitarioGfx::DoDrop(LPCardRegionGfx pDestRegion) {
     }
     _dragStack.Clear();
 
-    if(pCard == NULL){
+    if (pCard == NULL) {
         TRACE_DEBUG("DoDrop - WARN return on card NULL \n");
         DrawStaticScene();
         _statePrev = _state;
@@ -649,6 +681,7 @@ void SolitarioGfx::DrawStaticScene() {
     _p_BtNewGame->DrawButton(_p_Screen);
     _p_BtQuit->DrawButton(_p_Screen);
     _p_BtToggleSound->DrawButton(_p_Screen);
+    _p_BtToggleFullscreen->DrawButton(_p_Screen);
     _scoreChanged = true;
     drawScore();
 
@@ -985,6 +1018,7 @@ LPErrInApp SolitarioGfx::handleGameLoopFingerDownEvent(SDL_Event* pEvent) {
     _p_BtQuit->FingerDown(pEvent);
     _p_BtNewGame->FingerDown(pEvent);
     _p_BtToggleSound->FingerDown(pEvent);
+    _p_BtToggleFullscreen->FingerDown(pEvent);
 
     SDL_Point pt;
     LPGameSettings pGameSettings = GameSettings::GetSettings();
@@ -1264,7 +1298,8 @@ void SolitarioGfx::handleGameLoopMouseMoveEvent(SDL_Event* pEvent,
     }
     bool statusChanged = _p_BtNewGame->MouseMove(pEvent, targetPos);
     statusChanged = statusChanged || _p_BtQuit->MouseMove(pEvent, targetPos) ||
-                    _p_BtToggleSound->MouseMove(pEvent, targetPos);
+                    _p_BtToggleSound->MouseMove(pEvent, targetPos) ||
+                    _p_BtToggleFullscreen->MouseMove(pEvent, targetPos);
     if (statusChanged) {
         // TRACE_DEBUG("handleGameLoopMouseMoveEvent - status changed \n");
         DrawStaticScene();
@@ -1278,6 +1313,7 @@ LPErrInApp SolitarioGfx::handleGameLoopMouseUpEvent(
     _p_BtQuit->MouseUp(pEvent, targetPos);
     _p_BtNewGame->MouseUp(pEvent, targetPos);
     _p_BtToggleSound->MouseUp(pEvent, targetPos);
+    _p_BtToggleFullscreen->MouseUp(pEvent, targetPos);
     return endOfDragAndCheckForVictory();
 }
 
@@ -1395,7 +1431,13 @@ LPErrInApp SolitarioGfx::HandleEvent(SDL_Event* pEvent,
         case SDL_EVENT_KEY_DOWN:
             if (pEvent->key.key == SDLK_ESCAPE) {
                 TRACE_DEBUG("[SolitarioGfx - event] escape\n");
-                _state = eState::TERMINATED;
+                Uint32 flags = SDL_GetWindowFlags(_p_Window);
+                STRING strTextBt;
+                if (flags & SDL_WINDOW_FULLSCREEN) {
+                    BtToggleFullscreenClick();
+                } else {
+                    _state = eState::TERMINATED;
+                }
                 return NULL;
             }
             if (pEvent->key.key == SDLK_A) {
@@ -1652,6 +1694,16 @@ LPErrInApp SolitarioGfx::Show() {
         _p_BtToggleSound->SetVisibleState(ButtonGfx::VISIBLE);
     }
 
+    // button Toggle Fullscreen
+    Uint32 flags = SDL_GetWindowFlags(_p_Window);
+    if (flags & SDL_WINDOW_FULLSCREEN) {
+        strTextBt = "✕";
+    } else {
+        strTextBt = "🗖";
+    }
+    _p_BtToggleFullscreen->SetButtonText(strTextBt.c_str());
+    _p_BtToggleFullscreen->SetVisibleState(ButtonGfx::VISIBLE);
+
     int xLine0 = 35;
     int yLine0 = 10;
     int yoffsetLine0 = 40;
@@ -1814,6 +1866,21 @@ void SolitarioGfx::BtToggleSoundClick() {
         strTextBt = "🔇";
     }
     _p_BtToggleSound->SetButtonText(strTextBt.c_str());
+    DrawStaticScene();
+}
+
+void SolitarioGfx::BtToggleFullscreenClick() {
+    TRACE("Toggle Fullscreen with user button\n");
+    Uint32 flags = SDL_GetWindowFlags(_p_Window);
+    STRING strTextBt;
+    if (flags & SDL_WINDOW_FULLSCREEN) {
+        SDL_SetWindowFullscreen(_p_Window, false);
+        strTextBt = "🗖";
+    } else {
+        SDL_SetWindowFullscreen(_p_Window, true);
+        strTextBt = "✕";
+    }
+    _p_BtToggleFullscreen->SetButtonText(strTextBt.c_str());
     DrawStaticScene();
 }
 
