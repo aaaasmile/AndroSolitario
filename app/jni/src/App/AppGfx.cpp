@@ -388,6 +388,7 @@ LPErrInApp AppGfx::createWindow() {
             return err;
         }
     } else {
+        resolutionMgr_UpdateViewport(g_ResolutionMgr, w, h);
         _p_GameSettings->SetDisplaySize(g_ResolutionMgr.displayWidth,
                                         g_ResolutionMgr.displayHeight);
         err = createScreenLayout();
@@ -624,12 +625,6 @@ LPErrInApp AppGfx::EnterMenu(MenuItemEnum menuItem) {
 
 void AppGfx::transformMouseToTarget(int mouseX, int mouseY,
                                     SDL_Point* pTargetPos) {
-    if (g_ResolutionMgr.scale == 1.0) {
-        pTargetPos->x = mouseX;
-        pTargetPos->y = mouseY;
-        return;
-    }
-
     pTargetPos->x = -1;
     pTargetPos->y = -1;
 
@@ -852,9 +847,9 @@ LPErrInApp AppGfx::showHelp() {
     // Pass the screen updater so GameHelp can refresh screen
     UpdateScreenCb screenUpdater = prepScreenUpdater();
     GameHelpPagesCb helpPagesCb = _p_GameSelector->PrepareGameHelpPages();
-    LPErrInApp err = _p_GameHelp->Show(_p_Screen, screenUpdater, _p_SceneBackground,
-                      helpPagesCb);
-    if (err != NULL){
+    LPErrInApp err = _p_GameHelp->Show(_p_Screen, screenUpdater,
+                                       _p_SceneBackground, helpPagesCb);
+    if (err != NULL) {
         return err;
     }
 
@@ -946,20 +941,8 @@ void AppGfx::UpdateScreen(SDL_Surface* pScreen) {
 }
 
 void AppGfx::RenderTexture(SDL_Texture* pScreenTexture) {
-    if (g_ResolutionMgr.scale == 1.0) {
-        SDL_RenderTexture(_p_sdlRenderer, pScreenTexture, NULL, NULL);
-    } else {
-        SDL_FRect destRect = {
-            (g_ResolutionMgr.displayWidth -
-             g_ResolutionMgr.targetWidth * g_ResolutionMgr.scale) *
-                0.5f,
-            (g_ResolutionMgr.displayHeight -
-             g_ResolutionMgr.targetHeight * g_ResolutionMgr.scale) *
-                0.5f,
-            (float)g_ResolutionMgr.displayWidth,
-            (float)g_ResolutionMgr.displayHeight};
-        SDL_RenderTexture(_p_sdlRenderer, pScreenTexture, NULL, &destRect);
-    }
+    SDL_RenderTexture(_p_sdlRenderer, pScreenTexture, NULL,
+                      &g_ResolutionMgr.viewport);
 }
 
 void AppGfx::updateScreenTexture() {
