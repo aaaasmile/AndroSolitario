@@ -191,7 +191,7 @@ void GameHelp::HomePage() {
 }
 
 LPErrInApp GameHelp::buildPages() {
-    TRACE_DEBUG("[buildPages] for help");
+    TRACE_DEBUG("[buildPages] for help\n");
     cleanUpPages();
 
     if (_fnHelpPages.tc != NULL) {

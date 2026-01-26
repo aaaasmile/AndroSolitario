@@ -49,7 +49,7 @@ LPErrInApp fncBind_Initialize(void* self, SDL_Surface* pScreen,
 
 void fncBind_GetHelpPagesSolitarioENG(void* self,
                                       std::vector<HelpPage>& pages) {
-    TRACE_DEBUG("[fncBind_GetHelpPages] build pages for Solitario ENG");
+    TRACE_DEBUG("[fncBind_GetHelpPages] build pages for Solitario ENG\n");
     pages.clear();
 
     HelpPage page1;
@@ -85,7 +85,8 @@ void fncBind_GetHelpPagesSolitarioENG(void* self,
                            "colors. Empty spots can be filled with a King.",
                            ""});
     page2.Items.push_back({HelpItemType::PARAGRAPH_BREAK, "", ""});
-    page2.Items.push_back({HelpItemType::IMAGE, "", "images/sol_basamento.png"});
+    page2.Items.push_back(
+        {HelpItemType::IMAGE, "", "images/sol_basamento.png"});
     pages.push_back(page2);
 
     HelpPage page3;
@@ -287,7 +288,7 @@ void fncBind_GetHelpPagesSolitarioENG(void* self,
 
 void fncBind_GetHelpPagesSolitarioITA(void* self,
                                       std::vector<HelpPage>& pages) {
-    TRACE_DEBUG("[fncBind_GetHelpPages] build pages for Solitario ITA");
+    TRACE_DEBUG("[fncBind_GetHelpPages] build pages for Solitario ITA\n");
     pages.clear();
 
     // Page 1: Benvenuto & Layout
@@ -383,7 +384,8 @@ void fncBind_GetHelpPagesSolitarioITA(void* self,
                            "Quando scopri un Asso, mettilo nel basamento in "
                            "alto a destra. Poi prosegui con Due, Tre...",
                            ""});
-    page6.Items.push_back({HelpItemType::IMAGE, "", "images/sol_basamento.png"});
+    page6.Items.push_back(
+        {HelpItemType::IMAGE, "", "images/sol_basamento.png"});
     page6.Items.push_back({HelpItemType::PARAGRAPH_BREAK, "", ""});
     page6.Items.push_back({HelpItemType::TEXT,
                            "Se sei bloccato, usa il mazzo di supporto. Usalo "
