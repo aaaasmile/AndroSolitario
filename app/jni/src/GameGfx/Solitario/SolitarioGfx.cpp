@@ -870,15 +870,15 @@ LPErrInApp SolitarioGfx::DrawSymbolPac(int x, int y, int nSymbol,
 }
 
 typedef struct victoryInfo {
-    int rotation;
-    int id;
-    int x;
-    unsigned int y;
-    int xspeed;
-    int yspeed;
+    int rotation = 0;
+    int id = 0;
+    int x = 0;
+    int y = 0;
+    int xspeed = 0;
+    int yspeed = 0;
     int gravity = 1;
     float bounce = 0.8f;
-    int max_y;
+    int max_y = 0;
 }* LPvictoryInfo;
 static LPvictoryInfo g_pVict = NULL;
 
@@ -914,6 +914,10 @@ LPErrInApp SolitarioGfx::VictoryAnimation() {
     }
 
     if (_state == SolitarioGfx::NEW_CARD_VICTORY) {
+        if (g_pVict == NULL) {
+            _state = SolitarioGfx::IN_GAME;
+            return NULL;
+        }
         g_pVict->rotation = rand() % 2;
         g_pVict->id = rand() % _deckType.GetNumCards();
         g_pVict->x = rand() % _p_Screen->w;
@@ -928,6 +932,10 @@ LPErrInApp SolitarioGfx::VictoryAnimation() {
         _state = SolitarioGfx::IN_CARD_VICTORY;
     }
     if (_state == SolitarioGfx::IN_CARD_VICTORY) {
+        if (g_pVict == NULL) {
+            _state = SolitarioGfx::IN_GAME;
+            return NULL;
+        }
         g_pVict->yspeed = g_pVict->yspeed + g_pVict->gravity;
         g_pVict->x += g_pVict->xspeed;
         g_pVict->y += g_pVict->yspeed;
@@ -1006,6 +1014,7 @@ LPErrInApp SolitarioGfx::LoadSymbolsForPac() {
 LPErrInApp SolitarioGfx::newGame() {
     TRACE("[SolitarioGfx] newGame\n");
     LPErrInApp err;
+    clearAnimation();
     SetSymbol(DeckPile_Ix, CRD_OSYMBOL);
     CleanUpRegion();
     _p_currentTime->Reset();
@@ -1409,20 +1418,24 @@ LPErrInApp SolitarioGfx::HandleEvent(SDL_Event* pEvent,
     if (isInVictoryState()) {
         switch (pEvent->type) {
             case SDL_EVENT_QUIT:
+                clearAnimation();
                 _state = eState::SHOW_SCORE;
                 return NULL;
             case SDL_EVENT_KEY_DOWN:
                 if (pEvent->key.key == SDLK_ESCAPE ||
                     pEvent->key.key == SDLK_SPACE ||
                     pEvent->key.key == SDLK_RETURN) {
+                    clearAnimation();
                     _state = eState::SHOW_SCORE;
                     return NULL;
                 }
                 break;
             case SDL_EVENT_MOUSE_BUTTON_DOWN:
+                clearAnimation();
                 _state = eState::SHOW_SCORE;
                 return NULL;
             case SDL_EVENT_FINGER_DOWN:
+                clearAnimation();
                 _state = eState::SHOW_SCORE;
                 return NULL;
         }
