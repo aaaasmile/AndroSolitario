@@ -1545,6 +1545,22 @@ LPErrInApp SolitarioGfx::HandleEvent(SDL_Event* pEvent,
 
 LPErrInApp SolitarioGfx::HandleIterate(bool& done) {
     LPErrInApp err = NULL;
+    if (_state == SolitarioGfx::WAIT_FOR_FADING) {
+        if (_p_FadeAction->IsInProgress()) {
+            _p_FadeAction->Iterate();
+            return NULL;
+        }
+        TRACE_DEBUG(
+            "[SolitarioGfx - Iterate] - fade end, from %d to next state %d "
+            "\n",
+            _state, _stateAfter);
+        if (_state == _stateAfter) {
+            return ERR_UTIL::ErrorCreate(
+                "Next state could not be WAIT_FOR_FADING\n");
+        }
+        _state = _stateAfter;
+    }
+    
     if (_state == SolitarioGfx::READY_TO_START) {
         TRACE_DEBUG("[SolitarioGfx - Iterate] ready to start\n");
         DrawInitialScene();
@@ -1637,22 +1653,6 @@ LPErrInApp SolitarioGfx::HandleIterate(bool& done) {
         _state = SolitarioGfx::IN_GAME;
         BtNewGameClick();
         return NULL;
-    }
-
-    if (_state == SolitarioGfx::WAIT_FOR_FADING) {
-        if (_p_FadeAction->IsInProgress()) {
-            _p_FadeAction->Iterate();
-            return NULL;
-        }
-        TRACE_DEBUG(
-            "[SolitarioGfx - Iterate] - fade end, from %d to next state %d "
-            "\n",
-            _state, _stateAfter);
-        if (_state == _stateAfter) {
-            return ERR_UTIL::ErrorCreate(
-                "Next state could not be WAIT_FOR_FADING\n");
-        }
-        _state = _stateAfter;
     }
 
     if (_state == SolitarioGfx::FADING_OUT) {
