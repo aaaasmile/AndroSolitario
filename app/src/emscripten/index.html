@@ -188,6 +188,7 @@
     var progressElement = document.getElementById('progress');
     var spinnerElement = document.getElementById('spinner');
     var infoEle = document.getElementById('info');
+    localStorage.removeItem('err_msg')
 
     var Module = {
       preRun: [],
@@ -288,6 +289,10 @@
       if (infoEle.hidden){
         infoEle.style.display = '';
         infoEle.hidden = false;
+        const errMsg = localStorage.getItem('err_msg');
+        if (errMsg){
+          infoEle.textContent = errMsg;
+        }
       }else{
         infoEle.style.display = 'none';
         infoEle.hidden = true;

@@ -1572,7 +1572,7 @@ LPErrInApp SolitarioGfx::HandleIterate(bool& done) {
         InitDragContinueIterate();
         return NULL;
     }
-    if(_state == SolitarioGfx::DOING_DRAG){
+    if (_state == SolitarioGfx::DOING_DRAG) {
         doDragIterate();
         return NULL;
     }
@@ -1582,7 +1582,7 @@ LPErrInApp SolitarioGfx::HandleIterate(bool& done) {
     }
     if (_state == SolitarioGfx::IN_ZOOM_TERMINATED) {
         _state = _statePrev;
-        if(_isDirty){
+        if (_isDirty) {
             DrawStaticScene();
         }
         if (_continueLamdaCb != NULL) {
@@ -1605,7 +1605,7 @@ LPErrInApp SolitarioGfx::HandleIterate(bool& done) {
         }
         return NULL;
     }
-    if(_isDirty){
+    if (_isDirty) {
         DrawStaticScene();
         return NULL;
     }
