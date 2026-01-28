@@ -414,7 +414,7 @@ LPErrInApp SolitarioGfx::InitDrag(LPCardStackGfx pCargoStack, int x, int y,
     return NULL;
 }
 
-LPErrInApp SolitarioGfx::InitDragContinue() {
+LPErrInApp SolitarioGfx::InitDragContinueIterate() {
     if (_state == SolitarioGfx::INITDRAG_STEP1) {
         TRACE_DEBUG("[INITDRAG_STEP1]  DrawStaticScene \n");
         DrawStaticScene();
@@ -492,9 +492,9 @@ LPErrInApp SolitarioGfx::InitDragContinue() {
     return NULL;
 }
 
-void SolitarioGfx::DoDrag(int x, int y) {
+void SolitarioGfx::DoDragUpdate(int x, int y) {
     // TRACE_DEBUG(
-    //     "DoDrag (x=%d, y=%d) => drag_x=%d, drag_y=%d. old_x=%d,
+    //     "DoDragUpdate (x=%d, y=%d) => drag_x=%d, drag_y=%d. old_x=%d,
     //     old_y=%d\n", x, y, _dragPileInfo.x, _dragPileInfo.y, _oldx,
     //     _oldy);
 
@@ -509,7 +509,11 @@ void SolitarioGfx::DoDrag(int x, int y) {
 
     _oldx = x;
     _oldy = y;
+    _statePrev = _state;
+    _state = DOING_DRAG;
+}
 
+void SolitarioGfx::doDragIterate() {
     SDL_Rect dest = {0, 0, 0, 0};
     dest.x = _dragPileInfo.x;
     dest.y = _dragPileInfo.y;
@@ -523,10 +527,10 @@ void SolitarioGfx::DoDrag(int x, int y) {
     updateTextureAsFlipScreen();
 }
 
-LPCardRegionGfx SolitarioGfx::DoDrop() { return DoDrop(NULL); }
+LPCardRegionGfx SolitarioGfx::DoDropEvent() { return DoDropEvent(NULL); }
 
-LPCardRegionGfx SolitarioGfx::DoDrop(LPCardRegionGfx pDestRegion) {
-    TRACE_DEBUG("[DoDrop] -  start, PileInfo.x = %d, PileInfo.y \n",
+LPCardRegionGfx SolitarioGfx::DoDropEvent(LPCardRegionGfx pDestRegion) {
+    TRACE_DEBUG("[DoDropEvent] -  start, PileInfo.x = %d, PileInfo.y \n",
                 _dragPileInfo.x, _dragPileInfo.y);
     SDL_assert(_dragPileInfo.x >= -g_CardWidth);
     LPCardStackGfx pDestStack;
@@ -557,15 +561,15 @@ LPCardRegionGfx SolitarioGfx::DoDrop(LPCardRegionGfx pDestRegion) {
     _dragStack.Clear();
 
     if (pCard == NULL) {
-        TRACE_DEBUG("DoDrop - WARN return on card NULL \n");
-        DrawStaticScene();
+        TRACE_DEBUG("DoDropEvent - WARN return on card NULL \n");
+        _isDirty = true;
         _statePrev = _state;
         _state = SolitarioGfx::IN_ZOOM_TERMINATED;
         return pBestRegion;
     }
     if (_dragPileInfo.x == pCard->X() && _dragPileInfo.y == pCard->Y()) {
-        TRACE_DEBUG("DoDrop -  return on no movement \n");
-        DrawStaticScene();
+        TRACE_DEBUG("DoDropEvent -  return on no movement \n");
+        _isDirty = true;
         _statePrev = _state;
         _state = SolitarioGfx::IN_ZOOM_TERMINATED;
         return pBestRegion;  // when no movement
@@ -574,7 +578,7 @@ LPCardRegionGfx SolitarioGfx::DoDrop(LPCardRegionGfx pDestRegion) {
     zoomDropCardStart(&_dragPileInfo.x, &_dragPileInfo.y, pCard,
                       _dragPileInfo.width, _dragPileInfo.height);
 
-    // TRACE_DEBUG("DoDrop -  end \n");
+    // TRACE_DEBUG("DoDropEvent -  end \n");
     return pBestRegion;
 }
 
@@ -710,6 +714,7 @@ void SolitarioGfx::DrawStaticScene() {
     SDL_BlitSurface(_p_Screen, NULL, _p_ScreenBackbufferDrag, NULL);
 
     updateTextureAsFlipScreen();
+    _isDirty = false;
 }
 
 LPErrInApp SolitarioGfx::DrawInitialScene() {
@@ -895,7 +900,7 @@ bool SolitarioGfx::isInVictoryState() {
             _state == SolitarioGfx::NEW_CARD_VICTORY);
 }
 
-LPErrInApp SolitarioGfx::VictoryAnimation() {
+LPErrInApp SolitarioGfx::VictoryAnimationIterate() {
     if (!isInVictoryState()) {
         return ERR_UTIL::ErrorCreate(
             "[VictoryAnimation] called in worng state");
@@ -1085,7 +1090,7 @@ LPErrInApp SolitarioGfx::handleGameLoopFingerMotion(SDL_Event* pEvent) {
         SDL_Point pt;
         LPGameSettings pGameSettings = GameSettings::GetSettings();
         pGameSettings->GetTouchPoint(pEvent->tfinger, &pt);
-        DoDrag(pt.x, pt.y);
+        DoDragUpdate(pt.x, pt.y);
     }
     return NULL;
 }
@@ -1177,7 +1182,7 @@ LPErrInApp SolitarioGfx::doubleTapOrRightClick(SDL_Point& pt) {
 LPErrInApp SolitarioGfx::InitDragAfterFromDoubleTap() {
     TRACE_DEBUG("InitDragAfterFromDoubleTap \n");
 
-    DoDrop(_p_DropRegionForDrag);
+    DoDropEvent(_p_DropRegionForDrag);
     _continueLamdaCb = [this]() -> LPErrInApp {
         updateScoreOnAce(_p_DropRegionForDrag->Size(),
                          _p_DropRegionForDrag->GetSavedSize());
@@ -1205,7 +1210,7 @@ LPErrInApp SolitarioGfx::InitDragAfterFromSingleTapA() {
         TRACE_DEBUG(
             "!![InitDragAfterFromSingleTapA]!! dragging is over, force "
             "drop\n");
-        DoDrop();
+        DoDropEvent();
     }
     return NULL;
 }
@@ -1213,7 +1218,7 @@ LPErrInApp SolitarioGfx::InitDragAfterFromSingleTapA() {
 LPErrInApp SolitarioGfx::InitDragAfterFromSingleTapB() {
     TRACE_DEBUG("InitDragAfterFromSingleTapB \n");
 
-    DoDrop(GetRegion(eRegionIx::DeckPile_Ix));
+    DoDropEvent(GetRegion(eRegionIx::DeckPile_Ix));
     _continueLamdaCb = [this]() -> LPErrInApp {
         Reverse(eRegionIx::DeckPile_Ix);
         InitCardCoords(eRegionIx::DeckPile_Ix);
@@ -1232,7 +1237,7 @@ LPErrInApp SolitarioGfx::InitDragAfterFromSingleTapB() {
 LPErrInApp SolitarioGfx::InitDragAfterFromSingleTapC() {
     TRACE_DEBUG("InitDragAfterFromSingleTapC \n");
 
-    DoDrop(GetRegion(eRegionIx::DeckFaceUp));
+    DoDropEvent(GetRegion(eRegionIx::DeckFaceUp));
     _continueLamdaCb = [this]() -> LPErrInApp {
         if (_p_CardStackForDrag != NULL) {
             delete _p_CardStackForDrag;
@@ -1325,7 +1330,7 @@ void SolitarioGfx::handleGameLoopMouseMoveEvent(SDL_Event* pEvent,
                                                 const SDL_Point& targetPos) {
     if (pEvent->motion.state == SDL_BUTTON_MASK(1) && _startdrag) {
         // TRACE_DEBUG("handleGameLoopMouseMoveEvent - DoDrag trigger \n");
-        DoDrag(targetPos.x, targetPos.y);
+        DoDragUpdate(targetPos.x, targetPos.y);
     }
     bool statusChanged = _p_BtNewGame->MouseMove(pEvent, targetPos);
     statusChanged = statusChanged || _p_BtQuit->MouseMove(pEvent, targetPos) ||
@@ -1333,7 +1338,7 @@ void SolitarioGfx::handleGameLoopMouseMoveEvent(SDL_Event* pEvent,
                     _p_BtToggleFullscreen->MouseMove(pEvent, targetPos);
     if (statusChanged) {
         // TRACE_DEBUG("handleGameLoopMouseMoveEvent - status changed \n");
-        DrawStaticScene();
+        _isDirty = true;
     }
 }
 
@@ -1352,7 +1357,7 @@ LPErrInApp SolitarioGfx::endOfDragAndCheckForVictory() {
     if (_startdrag) {
         TRACE_DEBUG("endOfDrag -> end \n");
         _startdrag = false;
-        LPCardRegionGfx pDestReg = DoDrop();
+        LPCardRegionGfx pDestReg = DoDropEvent();
         _continueLamdaCb = [this, pDestReg]() -> LPErrInApp {
             SDL_SetWindowMouseGrab(_p_Window, false);
 
@@ -1367,7 +1372,7 @@ LPErrInApp SolitarioGfx::endOfDragAndCheckForVictory() {
                        pDestReg->RegionTypeId() == RegionType::RT_TABLEAU) {
                 updateBadScoreAceToTableu();
             }
-            LPErrInApp err = checkForVictory();
+            LPErrInApp err = checkForVictoryEvent();
             if (err != NULL) {
                 return err;
             }
@@ -1380,13 +1385,13 @@ LPErrInApp SolitarioGfx::endOfDragAndCheckForVictory() {
         };
     }
     SDL_ShowCursor();
-    return checkForVictory();
+    return checkForVictoryEvent();
 }
 
-LPErrInApp SolitarioGfx::checkForVictory() {
+LPErrInApp SolitarioGfx::checkForVictoryEvent() {
     if (IsRegionEmpty(DeckPile_Ix) && IsRegionEmpty(DeckFaceUp)) {
         SetSymbol(DeckPile_Ix, CRD_XSYMBOL);
-        DrawStaticScene();
+        _isDirty = true;
     }
     // victory
     LPErrInApp err;
@@ -1398,8 +1403,6 @@ LPErrInApp SolitarioGfx::checkForVictory() {
         TRACE_DEBUG("Victory \n");
         _p_currentTime->StopTimer();
         bonusScore();
-        DrawStaticScene();
-        // err = _p_HighScore->SaveScore(_scoreGame, _deckType.GetNumCards());
         err = (_fnUpdateHighScore.tc)
                   ->SaveScore(_fnUpdateHighScore.self, _scoreGame,
                               _deckType.GetNumCards());
@@ -1566,7 +1569,11 @@ LPErrInApp SolitarioGfx::HandleIterate(bool& done) {
         _state == SolitarioGfx::INITDRAG_STEP2 ||
         _state == SolitarioGfx::INITDRAG_AFTER) {
         // TRACE_DEBUG("[SolitarioGfx - Iterate] INITDRAG_%d \n", _state);
-        InitDragContinue();
+        InitDragContinueIterate();
+        return NULL;
+    }
+    if(_state == SolitarioGfx::DOING_DRAG){
+        doDragIterate();
         return NULL;
     }
 
@@ -1575,6 +1582,9 @@ LPErrInApp SolitarioGfx::HandleIterate(bool& done) {
     }
     if (_state == SolitarioGfx::IN_ZOOM_TERMINATED) {
         _state = _statePrev;
+        if(_isDirty){
+            DrawStaticScene();
+        }
         if (_continueLamdaCb != NULL) {
             TRACE_DEBUG(
                 "[SolitarioGfx - Iterate] run the callback after drop zoom "
@@ -1593,6 +1603,10 @@ LPErrInApp SolitarioGfx::HandleIterate(bool& done) {
                 "state %d) \n",
                 _state);
         }
+        return NULL;
+    }
+    if(_isDirty){
+        DrawStaticScene();
         return NULL;
     }
 
@@ -1654,7 +1668,7 @@ LPErrInApp SolitarioGfx::HandleIterate(bool& done) {
     }
 
     if (isInVictoryState()) {
-        return VictoryAnimation();
+        return VictoryAnimationIterate();
     }
 
     if (_state == SHOW_SCORE) {

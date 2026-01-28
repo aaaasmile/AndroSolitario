@@ -8,6 +8,7 @@
 #include "GfxUtil.h"
 #include "MusicManager.h"
 #include "TypeGlobal.h"
+#include "Config.h"
 
 #if PLATFORM_EMS
 #include <emscripten.h>
@@ -82,6 +83,7 @@ std::vector<std::string> splitString(const std::string& str, char delimiter) {
 
 LPErrInApp HighScore::Save() {
 #if PLATFORM_EMS
+    TRACE_DEBUG("[saveGameHighScore] save highscore in the browser storage \n");
     for (int k = 0; k < NUMOFSCORE; k++) {
         std::string kstr = std::to_string(k);
         std::string val = _scoreInfo[k].Name + ":" +
@@ -98,7 +100,7 @@ LPErrInApp HighScore::Save() {
     snprintf(g_filepath, sizeof(g_filepath), "%s/%s-score.bin",
              pGameSettings->SettingsDir.c_str(),
              pGameSettings->GameName.c_str());
-    TRACE("Save high score file %s\n", g_filepath);
+    TRACE("OS File system: Save high score in file %s\n", g_filepath);
 
     SDL_IOStream* dst = SDL_IOFromFile(g_filepath, "wb");
     if (dst == 0) {
@@ -164,6 +166,7 @@ LPErrInApp HighScore::SaveScore(int64_t score, int numCard) {
 
 LPErrInApp HighScore::Load() {
 #if PLATFORM_EMS
+    TRACE_DEBUG("[loadGameHighScore] from the browser storage \n");
     for (int k = 0; k < NUMOFSCORE; k++) {
         std::string kstr = std::to_string(k);
         std::string result = loadGameHighScore(kstr.c_str(), "");
@@ -192,7 +195,7 @@ LPErrInApp HighScore::Load() {
     snprintf(g_filepath, sizeof(g_filepath), "%s/%s-score.bin",
              pGameSettings->SettingsDir.c_str(),
              pGameSettings->GameName.c_str());
-    TRACE("Load high score file %s\n", g_filepath);
+    TRACE("OS File system: Load high score in file %s\n", g_filepath);
     SDL_IOStream* src = SDL_IOFromFile(g_filepath, "rb");
     if (src == 0) {
         TRACE("No score file found, ignore it and use default\n");

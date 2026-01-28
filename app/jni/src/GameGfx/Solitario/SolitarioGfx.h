@@ -58,6 +58,7 @@ class SolitarioGfx {
         INITDRAG_STEP1,
         INITDRAG_STEP2,
         INITDRAG_AFTER,
+        DOING_DRAG,
         START_VICTORY,
         NEW_CARD_VICTORY,
         IN_CARD_VICTORY,
@@ -100,16 +101,16 @@ class SolitarioGfx {
                         LPCardRegionGfx pSrcRegion);
     LPErrInApp InitDrag(LPCardStackGfx CargoStack, int x, int y,
                         bool& isInitDrag, LPCardRegionGfx pSrcRegion);
-    LPErrInApp InitDragContinue();
+    LPErrInApp InitDragContinueIterate();
     LPErrInApp InitDragAfterFromDoubleTap();
     LPErrInApp InitDragAfterFromSingleTapA();
     LPErrInApp InitDragAfterFromSingleTapB();
     LPErrInApp InitDragAfterFromSingleTapC();
 
-    void DoDrag(int x, int y);
+    void DoDragUpdate(int x, int y);
 
-    LPCardRegionGfx DoDrop();
-    LPCardRegionGfx DoDrop(LPCardRegionGfx pDestRegion);
+    LPCardRegionGfx DoDropEvent();
+    LPCardRegionGfx DoDropEvent(LPCardRegionGfx pDestRegion);
 
     LPCardRegionGfx FindDropRegion(int Id, LPCardGfx pCard);
     LPCardRegionGfx FindDropRegion(int Id, LPCardStackGfx pStack);
@@ -138,7 +139,7 @@ class SolitarioGfx {
     LPErrInApp DrawSymbol(int x, int y, int nSymbol, SDL_Surface* s);
     LPErrInApp DrawSymbolPac(int x, int y, int nSymbol, SDL_Surface* s);
 
-    LPErrInApp VictoryAnimation();
+    LPErrInApp VictoryAnimationIterate();
 
     LPErrInApp LoadCardPac();
     LPErrInApp LoadSymbolsForPac();
@@ -198,7 +199,7 @@ class SolitarioGfx {
     LPErrInApp singleTapOrLeftClick(SDL_Point& pt);
     LPErrInApp doubleTapOrRightClick(SDL_Point& pt);
     LPErrInApp endOfDragAndCheckForVictory();
-    LPErrInApp checkForVictory();
+    LPErrInApp checkForVictoryEvent();
     void handleGameLoopMouseMoveEvent(SDL_Event* pEvent,
                                       const SDL_Point& targetPos);
     LPErrInApp handleGameLoopMouseUpEvent(SDL_Event* pEvent,
@@ -219,6 +220,7 @@ class SolitarioGfx {
     void showYesNoMsgBox(LPCSTR strText);
     void showOkMsgBox(LPCSTR strText);
     LPErrInApp clickOnDeckStock(CardRegionGfx* pCardRegSrc);
+    void doDragIterate();
 
    private:
     CardStackGfx _dragStack;
@@ -270,6 +272,7 @@ class SolitarioGfx {
     LPCardStackGfx _p_CardStackForDrag;
     bool _isInitDrag;
     int _doubleTapWait;
+    bool _isDirty;
 };
 
 #endif
