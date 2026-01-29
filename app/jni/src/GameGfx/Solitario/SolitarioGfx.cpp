@@ -510,11 +510,7 @@ void SolitarioGfx::DoDragUpdate(int x, int y) {
 
     _oldx = x;
     _oldy = y;
-    _statePrev = _state;
-    _state = DOING_DRAG;
-}
 
-void SolitarioGfx::doDragIterate() {
     SDL_Rect dest = {0, 0, 0, 0};
     dest.x = _dragPileInfo.x;
     dest.y = _dragPileInfo.y;
@@ -563,14 +559,14 @@ LPCardRegionGfx SolitarioGfx::DoDropEvent(LPCardRegionGfx pDestRegion) {
 
     if (pCard == NULL) {
         TRACE_DEBUG("DoDropEvent - WARN return on card NULL \n");
-        _isDirty = true;
+        DrawStaticScene();
         _statePrev = _state;
         _state = SolitarioGfx::IN_ZOOM_TERMINATED;
         return pBestRegion;
     }
     if (_dragPileInfo.x == pCard->X() && _dragPileInfo.y == pCard->Y()) {
         TRACE_DEBUG("DoDropEvent -  return on no movement \n");
-        _isDirty = true;
+        DrawStaticScene();
         _statePrev = _state;
         _state = SolitarioGfx::IN_ZOOM_TERMINATED;
         return pBestRegion;  // when no movement
@@ -715,7 +711,6 @@ void SolitarioGfx::DrawStaticScene() {
     SDL_BlitSurface(_p_Screen, NULL, _p_ScreenBackbufferDrag, NULL);
 
     updateTextureAsFlipScreen();
-    _isDirty = false;
 }
 
 LPErrInApp SolitarioGfx::DrawInitialScene() {
@@ -1339,7 +1334,7 @@ void SolitarioGfx::handleGameLoopMouseMoveEvent(SDL_Event* pEvent,
                     _p_BtToggleFullscreen->MouseMove(pEvent, targetPos);
     if (statusChanged) {
         // TRACE_DEBUG("handleGameLoopMouseMoveEvent - status changed \n");
-        _isDirty = true;
+        DrawStaticScene();
     }
 }
 
@@ -1392,7 +1387,7 @@ LPErrInApp SolitarioGfx::endOfDragAndCheckForVictory() {
 LPErrInApp SolitarioGfx::checkForVictoryEvent() {
     if (IsRegionEmpty(DeckPile_Ix) && IsRegionEmpty(DeckFaceUp)) {
         SetSymbol(DeckPile_Ix, CRD_XSYMBOL);
-        _isDirty = true;
+        DrawStaticScene();
     }
     // victory
     LPErrInApp err;
@@ -1404,6 +1399,7 @@ LPErrInApp SolitarioGfx::checkForVictoryEvent() {
         TRACE_DEBUG("Victory \n");
         _p_currentTime->StopTimer();
         bonusScore();
+        DrawStaticScene();
         err = (_fnUpdateHighScore.tc)
                   ->SaveScore(_fnUpdateHighScore.self, _scoreGame,
                               _deckType.GetNumCards());
@@ -1589,19 +1585,12 @@ LPErrInApp SolitarioGfx::HandleIterate(bool& done) {
         InitDragContinueIterate();
         return NULL;
     }
-    if (_state == SolitarioGfx::DOING_DRAG) {
-        doDragIterate();
-        return NULL;
-    }
-
+    
     if (_state == SolitarioGfx::IN_ZOOM) {
         return zoomDropCardIterate();
     }
     if (_state == SolitarioGfx::IN_ZOOM_TERMINATED) {
         _state = _statePrev;
-        if (_isDirty) {
-            DrawStaticScene();
-        }
         if (_continueLamdaCb != NULL) {
             TRACE_DEBUG(
                 "[SolitarioGfx - Iterate] run the callback after drop zoom "
@@ -1622,11 +1611,7 @@ LPErrInApp SolitarioGfx::HandleIterate(bool& done) {
         }
         return NULL;
     }
-    if (_isDirty) {
-        DrawStaticScene();
-        return NULL;
-    }
-
+    
     if (_state == SolitarioGfx::IN_GAME) {
         if (_statePrev != _state) {
             DrawStaticScene();

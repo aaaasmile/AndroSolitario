@@ -58,7 +58,6 @@ class SolitarioGfx {
         INITDRAG_STEP1,
         INITDRAG_STEP2,
         INITDRAG_AFTER,
-        DOING_DRAG,
         START_VICTORY,
         NEW_CARD_VICTORY,
         IN_CARD_VICTORY,
@@ -220,8 +219,7 @@ class SolitarioGfx {
     void showYesNoMsgBox(LPCSTR strText);
     void showOkMsgBox(LPCSTR strText);
     LPErrInApp clickOnDeckStock(CardRegionGfx* pCardRegSrc);
-    void doDragIterate();
-
+    
    private:
     CardStackGfx _dragStack;
     DragPileInfo _dragPileInfo;
@@ -272,7 +270,6 @@ class SolitarioGfx {
     LPCardStackGfx _p_CardStackForDrag;
     bool _isInitDrag;
     int _doubleTapWait;
-    bool _isDirty;
 };
 
 #endif
