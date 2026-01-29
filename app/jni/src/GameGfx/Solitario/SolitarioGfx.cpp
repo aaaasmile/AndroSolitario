@@ -245,7 +245,7 @@ LPErrInApp SolitarioGfx::Initialize(SDL_Surface* pScreen,
 }
 
 LPErrInApp SolitarioGfx::OnResize(SDL_Surface* pScreen) {
-    TRACE_DEBUG("SolitarioGfx::OnResize\n");
+    TRACE_DEBUG("[SolitarioGfx::OnResize] screen w=%d, h=%d \n", _p_Screen->w, _p_Screen->h);
     _p_Screen = pScreen;
 
     if (_p_AlphaDisplay != NULL) {
@@ -265,6 +265,7 @@ LPErrInApp SolitarioGfx::OnResize(SDL_Surface* pScreen) {
         _p_Screen->w, _p_Screen->h, 32, 0, 0, 0, 0);
 
     DrawStaticScene();
+    //_isDirty = true;
 
     return NULL;
 }
@@ -1560,7 +1561,7 @@ LPErrInApp SolitarioGfx::HandleIterate(bool& done) {
         }
         _state = _stateAfter;
     }
-    
+
     if (_state == SolitarioGfx::READY_TO_START) {
         TRACE_DEBUG("[SolitarioGfx - Iterate] ready to start\n");
         DrawInitialScene();
@@ -1688,6 +1689,11 @@ LPErrInApp SolitarioGfx::HandleIterate(bool& done) {
         if (_p_MusicManager->IsPlayingMusic()) {
             _p_MusicManager->StopMusic(0);
         }
+        // Uint32 flags = SDL_GetWindowFlags(_p_Window);
+        // if (flags & SDL_WINDOW_FULLSCREEN) {
+        //     TRACE_DEBUG("[SolitarioGfx - Iterate] exit from full screen\n");
+        //     SDL_SetWindowFullscreen(_p_Window, false);
+        // }
         done = true;
     }
 

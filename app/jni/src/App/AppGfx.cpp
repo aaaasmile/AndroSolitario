@@ -41,11 +41,6 @@ static void resolutionMgr_UpdateViewport(ResolutionMgr& rm, int w, int h) {
     rm.displayWidth = w;
     rm.displayHeight = h;
 
-    TRACE_DEBUG(
-        "[UpdateViewport] Resize win, new width %d, height %d, using scale %f "
-        "\n",
-        w, h, rm.scale);
-
     float scaledWidth = rm.targetWidth * rm.scale;
     float scaledHeight = rm.targetHeight * rm.scale;
     // Centered X, Centered Y
@@ -53,6 +48,12 @@ static void resolutionMgr_UpdateViewport(ResolutionMgr& rm, int w, int h) {
     rm.viewport.y = (rm.displayHeight - scaledHeight) * 0.5f;
     rm.viewport.w = scaledWidth;
     rm.viewport.h = scaledHeight;
+
+    TRACE_DEBUG(
+        "[UpdateViewport] Resize win, new width %d, height %d, using scale %f, "
+        "viewport_w=%f, viewport_h=%f "
+        "\n",
+        w, h, rm.scale, rm.viewport.w, rm.viewport.h);
 }
 
 static void resolutionMgr_InitScaledPortraitDev(ResolutionMgr& rm) {
@@ -404,8 +405,8 @@ LPErrInApp AppGfx::selectLayout(int w, int h) {
     TRACE_DEBUG("[selectLayout] with w: %d, h: %d \n", w, h);
     // this function has issues, resize is ugly and mouse is not precise
 
-    int oldtargetHeight = g_ResolutionMgr.targetHeight;
-    int oldtargetWidth = g_ResolutionMgr.targetWidth;
+    //int oldtargetHeight = g_ResolutionMgr.targetHeight;
+    //int oldtargetWidth = g_ResolutionMgr.targetWidth;
     float aspect = (float)w / (float)h;
     if (aspect < 0.75f) {
         resolutionMgr_SetNarrowPortrait(g_ResolutionMgr, w, h);
@@ -418,12 +419,12 @@ LPErrInApp AppGfx::selectLayout(int w, int h) {
     _p_GameSettings->SetDisplaySize(g_ResolutionMgr.displayWidth,
                                     g_ResolutionMgr.displayHeight);
 
-    if (_p_Screen != NULL) {
-        if (g_ResolutionMgr.targetHeight == oldtargetHeight &&
-            oldtargetWidth == g_ResolutionMgr.targetWidth) {
-            return NULL;
-        }
-    }
+    // if (_p_Screen != NULL) {
+    //     if (g_ResolutionMgr.targetHeight == oldtargetHeight &&
+    //         oldtargetWidth == g_ResolutionMgr.targetWidth) {
+    //         return NULL;
+    //     }
+    // }
     LPErrInApp err = createScreenLayout();
     if (err != NULL) {
         return err;
@@ -462,7 +463,7 @@ LPErrInApp AppGfx::createScreenLayout() {
         return ERR_UTIL::ErrorCreate("Error SDL_CreateTexture: %s\n",
                                      SDL_GetError());
     }
-    TRACE_DEBUG("[createScreenLayout] - end \n");
+    //TRACE_DEBUG("[createScreenLayout] - end \n");
     return NULL;
 }
 
@@ -589,6 +590,8 @@ OptionDelegator AppGfx::prepOptionDelegator() {
 }
 
 LPErrInApp AppGfx::LeaveMenu() {
+    _fnGameGfxCb.self = NULL;
+    _fnGameGfxCb.tc = NULL;
     clearBackground();
     _histMenu.pop();
     return NULL;
@@ -661,6 +664,7 @@ LPErrInApp AppGfx::MainLoopEvent(SDL_Event* pEvent, SDL_AppResult& res) {
     LPErrInApp err;
     res = SDL_APP_CONTINUE;
     SDL_Point targetPos = {-1, -1};
+    int w, h;
 
     switch (pEvent->type) {
         case SDL_EVENT_MOUSE_MOTION: {
@@ -677,8 +681,32 @@ LPErrInApp AppGfx::MainLoopEvent(SDL_Event* pEvent, SDL_AppResult& res) {
         }
 
         case SDL_EVENT_WINDOW_RESIZED:
+            TRACE_DEBUG(
+                "[MainLoopEvent] Event: SDL_EVENT_WINDOW_RESIZED, w%d, h%d \n",
+                pEvent->window.data1, pEvent->window.data2);
             selectLayout(pEvent->window.data1, pEvent->window.data2);
             break;
+        case SDL_EVENT_WINDOW_LEAVE_FULLSCREEN:
+            //h = _p_GameSettings->GetSavedScreenHeight();
+            //w = _p_GameSettings->GetSavedScreenWidth();
+            SDL_GetWindowSize(_p_Window, &w, &h);
+            TRACE_DEBUG(
+                "[MainLoopEvent] Event SDL_EVENT_WINDOW_LEAVE_FULLSCREEN: w=%d, "
+                "h=%d\n",
+                w, h);
+
+            // err = selectLayout(w, h);
+            // if (err != NULL) {
+            //     return err;
+            // }
+            break;
+        // case SDL_EVENT_WINDOW_ENTER_FULLSCREEN:
+        //     TRACE_DEBUG(
+        //         "[MainLoopEvent]: enter full screen. Save display w=%d,
+        //         h=%d\n", _p_GameSettings->GetScreenWidth(),
+        //         _p_GameSettings->GetScreenHeight());
+        //     _p_GameSettings->SaveDisplaySize();
+        //     break;
         default:
             break;
     }
@@ -691,6 +719,10 @@ LPErrInApp AppGfx::MainLoopEvent(SDL_Event* pEvent, SDL_AppResult& res) {
             break;
 
         case MenuItemEnum::MENU_GAME:
+            if (_fnGameGfxCb.tc == NULL) {
+                return ERR_UTIL::ErrorCreate(
+                    "Gamegfx for HandleEvent not initialized");
+            }
             err = (_fnGameGfxCb.tc)
                       ->HandleEvent(_fnGameGfxCb.self, pEvent, targetPos);
             if (err != NULL)
@@ -764,6 +796,10 @@ LPErrInApp AppGfx::MainLoopIterate() {
             break;
 
         case MenuItemEnum::MENU_GAME:
+            if (_fnGameGfxCb.tc == NULL) {
+                return ERR_UTIL::ErrorCreate(
+                    "Gamegfx for HandleIterate not initialized");
+            }
             err = (_fnGameGfxCb.tc)->HandleIterate(_fnGameGfxCb.self, done);
             if (err != NULL)
                 return err;

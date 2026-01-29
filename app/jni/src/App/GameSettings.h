@@ -36,6 +36,9 @@ class GameSettings {
     LPErrInApp LoadFonts();
     void SetDisplaySize(int w, int h);
     void GetTouchPoint(SDL_TouchFingerEvent& tfinger, SDL_Point* pPoint);
+    void SaveDisplaySize() { _screenRectSaved = _screenRect; }
+    int GetSavedScreenHeight() { return _screenRectSaved.h; }
+    int GetSavedScreenWidth() { return _screenRectSaved.w; }
     int GetScreenHeight() { return _screenRect.h; }
     int GetScreenWidth() { return _screenRect.w; }
     int GetSizeFontSmall() { return _fontSmallSize; }
@@ -89,6 +92,7 @@ class GameSettings {
 
    private:
     SDL_Rect _screenRect = {0, 0, 0, 0};
+    SDL_Rect _screenRectSaved = {0, 0, 0, 0};
     int _fontSmallSize = 11;
     int _fontMediumSize = 18;
     int _fontBigSize = 22;
