@@ -9,7 +9,6 @@
 #include "ErrorInfo.h"
 #include "Traits.h"
 
-
 using namespace traits;
 
 class FadeAction;
@@ -46,6 +45,7 @@ class HighScore {
     LPErrInApp HandleIterate(bool& done);
     bool IsOngoing() { return (_state != READY_TO_START); }
     void Reset() { _state = READY_TO_START; }
+    void UpdateScreen(SDL_Surface* pScreen);
 
    private:
     ScoreInfo _scoreInfo[NUMOFSCORE];

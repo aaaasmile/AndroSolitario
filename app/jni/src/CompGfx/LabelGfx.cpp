@@ -19,6 +19,10 @@ LabelGfx::~LabelGfx() {
 void LabelGfx::Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
                           TTF_Font* pFont) {
     _rctCtrl = *pRect;
+    if (_p_Surf_Bar != NULL) {
+        SDL_DestroySurface(_p_Surf_Bar);
+        _p_Surf_Bar = NULL;
+    }
     _p_Surf_Bar =
         GFX_UTIL::SDL_CreateRGBSurface(_rctCtrl.w, _rctCtrl.h, 32, 0, 0, 0, 0);
 

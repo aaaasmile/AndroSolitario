@@ -3,12 +3,13 @@
 #include <memory.h>
 #include <stdlib.h>
 
+#include "Config.h"
 #include "Fading.h"
 #include "GameSettings.h"
 #include "GfxUtil.h"
 #include "MusicManager.h"
 #include "TypeGlobal.h"
-#include "Config.h"
+
 
 #if PLATFORM_EMS
 #include <emscripten.h>
@@ -431,4 +432,11 @@ LPErrInApp HighScore::Show(SDL_Surface* p_surf_screen, SDL_Surface* pSurfTitle,
         _p_GameSettings->InputType == InputTypeEnum::TouchWithoutMouse;
     _state = HighScore::INIT;
     return NULL;
+}
+
+void HighScore::UpdateScreen(SDL_Surface* pScreen) {
+    if (pScreen == NULL)
+        return;
+    TRACE("HighScore::UpdateScreen\n");
+    _p_surfScreen = pScreen;
 }

@@ -3,8 +3,9 @@
 
 #include <SDL3/SDL.h>
 
-#include "Traits.h"
 #include "ErrorInfo.h"
+#include "Traits.h"
+
 
 using namespace traits;
 
@@ -13,7 +14,14 @@ class GameSettings;
 class MusicManager;
 
 class CreditsView {
-    enum eState { READY_TO_START, WAIT_FOR_FADING, INIT, IN_PROGRESS, DONE, TERMINATED };
+    enum eState {
+        READY_TO_START,
+        WAIT_FOR_FADING,
+        INIT,
+        IN_PROGRESS,
+        DONE,
+        TERMINATED
+    };
 
    public:
     CreditsView();
@@ -21,6 +29,7 @@ class CreditsView {
 
     void Show(SDL_Surface* pScreen, SDL_Surface* pSurfTitle,
               UpdateScreenCb& fnUpdateScreen);
+    void UpdateScreen(SDL_Surface* pScreen);
     LPErrInApp HandleEvent(SDL_Event* pEvent);
     LPErrInApp HandleIterate(bool& done);
     bool IsOngoing() { return (_state != READY_TO_START); }

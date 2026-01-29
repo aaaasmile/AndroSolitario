@@ -10,7 +10,6 @@
 #include "Traits.h"
 #include "TypeGlobal.h"
 
-
 class ButtonGfx;
 class Languages;
 class CheckBoxGfx;
@@ -46,6 +45,8 @@ class OptionsGfx {
     void CheckboxMusicClicked(bool state);
     void Reset() { _inProgress = false; }
     bool IsOngoing() { return _inProgress; }
+    LPErrInApp UpdateScreen(SDL_Surface* pScreen,
+                            SDL_Surface* pScene_background);
     void ToggleScreenKeyboard();
     void TextFromKeyboard(const char* text);
 
@@ -91,6 +92,7 @@ class OptionsGfx {
     BackgroundTypeEnum _prevBackgroundType;
     std::string _prevName;
     KeyboardGfx* _p_KeyboardGfx;
+    SDL_Window* _p_Window;
 };
 
 #endif

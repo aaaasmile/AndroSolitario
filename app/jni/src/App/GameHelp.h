@@ -29,6 +29,7 @@ class GameHelp {
     void NextPage();
     void PrevPage();
     void HomePage();
+    void UpdateScreen(SDL_Surface* pScreen);
 
    private:
     LPErrInApp buildPages();

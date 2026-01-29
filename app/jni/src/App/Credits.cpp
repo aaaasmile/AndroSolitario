@@ -358,3 +358,10 @@ void CreditsView::draw_text(char const* str) {
         cur_x = cur_x + 18;
     }
 }
+
+void CreditsView::UpdateScreen(SDL_Surface* pScreen) {
+    if (pScreen == NULL)
+        return;
+    TRACE("CreditsView::UpdateScreen\n");
+    _p_surfScreen = pScreen;
+}

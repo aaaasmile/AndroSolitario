@@ -2,6 +2,7 @@
 
 #include <SDL3/SDL_endian.h>
 #include <SDL3_image/SDL_image.h>
+#include <_mingw_mac.h>
 
 #include "CompGfx/ButtonGfx.h"
 #include "CompGfx/CheckBoxGfx.h"
@@ -32,6 +33,10 @@ OptionsGfx::OptionsGfx() {
     _p_Scene_background = NULL;
     _p_btToggleKeyboard = NULL;
     _p_KeyboardGfx = NULL;
+    _p_Window = NULL;
+    for (int i = 0; i < eDeckType::NUM_OF_DECK; i++) {
+        _p_deckAll[i] = NULL;
+    }
 }
 
 OptionsGfx::~OptionsGfx() {
@@ -103,11 +108,56 @@ LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen,
     if (pScreen == NULL) {
         return ERR_UTIL::ErrorCreate("pScreen is null");
     }
-    if (_p_screen != NULL) {
-        if (pScreen->w == _p_screen->w && pScreen->h == _p_screen->h) {
-            return NULL;
+
+    // Clean up existing resources if re-initializing
+    _p_Window = pWindow;
+    if (_p_buttonOK != NULL) {
+        delete _p_buttonOK;
+        _p_buttonOK = NULL;
+    }
+    if (_p_btToggleKeyboard != NULL) {
+        delete _p_btToggleKeyboard;
+        _p_btToggleKeyboard = NULL;
+    }
+    if (_p_comboLang != NULL) {
+        delete _p_comboLang;
+        _p_comboLang = NULL;
+    }
+    if (_p_checkMusic != NULL) {
+        delete _p_checkMusic;
+        _p_checkMusic = NULL;
+    }
+    if (_p_comboBackground != NULL) {
+        delete _p_comboBackground;
+        _p_comboBackground = NULL;
+    }
+    if (_p_comboDeck != NULL) {
+        delete _p_comboDeck;
+        _p_comboDeck = NULL;
+    }
+    if (_p_textInput != NULL) {
+        delete _p_textInput;
+        _p_textInput = NULL;
+    }
+    if (_p_KeyboardGfx != NULL) {
+        delete _p_KeyboardGfx;
+        _p_KeyboardGfx = NULL;
+    }
+    if (_p_surfBar != NULL) {
+        SDL_DestroySurface(_p_surfBar);
+        _p_surfBar = NULL;
+    }
+    if (_p_ShadowSrf != NULL) {
+        SDL_DestroySurface(_p_ShadowSrf);
+        _p_ShadowSrf = NULL;
+    }
+    for (int i = 0; i < eDeckType::NUM_OF_DECK; i++) {
+        if (_p_deckAll[i] != NULL) {
+            SDL_DestroySurface(_p_deckAll[i]);
+            _p_deckAll[i] = NULL;
         }
     }
+    // end cleanup
 
     _rctOptBox.w = 600;
     _rctOptBox.h = 580;
@@ -551,10 +601,6 @@ void OptionsGfx::ToggleScreenKeyboard() {
 LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
                             STRING& strCaption) {
     TRACE_DEBUG("Options - Show\n");
-    if (_inProgress) {
-        return ERR_UTIL::ErrorCreate(
-            "Fade is already in progess, use iterate\n");
-    }
     _inProgress = true;
     _p_Scene_background = pScene_background;
     _headerText = strCaption;
@@ -606,6 +652,9 @@ LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
     }
     _p_ShadowSrf = GFX_UTIL::SDL_CreateRGBSurface(_p_screen->w, _p_screen->h,
                                                   32, 0, 0, 0, 0);
+    if (_p_ShadowSrf == NULL) {
+        return ERR_UTIL::ErrorCreate("Failed to create shadow surface\n");
+    }
 
     TRACE_DEBUG(
         "[TAROCK_PIEMONT] _p_ShadowSrf buffer format: %s, w: %d, h: %d\n",
@@ -720,4 +769,27 @@ void OptionsGfx::CheckboxMusicClicked(bool state) {
         _p_MusicManager->DisableMusic();
         TRACE_DEBUG("Disable music by option \n");
     }
+}
+
+LPErrInApp OptionsGfx::UpdateScreen(SDL_Surface* pScreen,
+                                    SDL_Surface* pScene_background) {
+    TRACE("OptionsGfx::UpdateScreen\n");
+    if (!_inProgress) {
+        return NULL;
+    }
+
+    if (pScreen == NULL) {
+        return ERR_UTIL::ErrorCreate("pScreen is NULL\n");
+    }
+
+    LPErrInApp err = Initialize(pScreen, _fnUpdateScreen, _optDlgt, _p_Window);
+    if (err != NULL) {
+        return err;
+    }
+    err = Show(pScene_background, _headerText);
+    if (err != NULL) {
+        return err;
+    }
+
+    return NULL;
 }

@@ -6,9 +6,9 @@
 #if PLATFORM_EMS
 #include <emscripten.h>
 
-void navigateTo(const char* url) { 
+void navigateTo(const char* url) {
     char buffer[1024];
-    sprintf(buffer, "window.open('%s', '_blank');", url); 
+    sprintf(buffer, "window.open('%s', '_blank');", url);
     emscripten_run_script(buffer);
 }
 
@@ -35,6 +35,10 @@ void LabelLinkGfx::Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
                               ClickCb& fncbClickEvent) {
     _fncbClickEvent = fncbClickEvent;
     _rctCtrl = *pRect;
+    if (_p_SurfBar != NULL) {
+        SDL_DestroySurface(_p_SurfBar);
+        _p_SurfBar = NULL;
+    }
     _p_SurfBar =
         GFX_UTIL::SDL_CreateRGBSurface(_rctCtrl.w, _rctCtrl.h, 32, 0, 0, 0, 0);
 

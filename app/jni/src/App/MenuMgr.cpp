@@ -167,6 +167,15 @@ LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen,
     if (pScreen == NULL) {
         return ERR_UTIL::ErrorCreate("Screen is not initialized\n");
     }
+
+    if (_p_ScreenBackbuffer != NULL) {
+        SDL_DestroySurface(_p_ScreenBackbuffer);
+        _p_ScreenBackbuffer = NULL;
+    }
+    delete _p_homeUrl;
+    _p_homeUrl = NULL;
+    delete _p_LabelVersion;
+    _p_LabelVersion = NULL;
     _fnUpdateScreen = fnUpdateScreen;
     if (_fnUpdateScreen.tc == NULL) {
         return ERR_UTIL::ErrorCreate("MenuMgr: update screen is not defined\n");
@@ -389,7 +398,7 @@ LPErrInApp MenuMgr::drawMenuTextList() {
     if (err != NULL) {
         return err;
     }
-    
+
     endY = currY + morePlaceY + offsetY;
     g_MenuItemBoxes.SetYInPos(3, endY);
     g_MenuItemBoxes.drawBorder(3, _p_ScreenBackbuffer);
@@ -636,4 +645,43 @@ MenuItemEnum nextMenu(MenuItemEnum currMenu) {
             return currMenu;
     }
     return currMenu;
+}
+
+void MenuMgr::UpdateScreen(SDL_Surface* pScreen) {
+    if (pScreen == NULL)
+        return;
+    TRACE("MenuMgr::UpdateScreen\n");
+    _p_Screen = pScreen;
+
+    SDL_Rect clipRect;
+    SDL_GetSurfaceClipRect(_p_Screen, &clipRect);
+    _screenW = clipRect.w;
+    _screenH = clipRect.h;
+
+    _rctPanelRedBox.x = (_screenW - _rctPanelRedBox.w) / 2;
+    _rctPanelRedBox.y = (_screenH - _rctPanelRedBox.h) / 2;
+    _box_X = _rctPanelRedBox.x;
+    _box_Y = _rctPanelRedBox.y;
+    g_MenuItemBoxes.SetBox(_rctPanelRedBox);
+
+    if (_p_ScreenBackbuffer != NULL) {
+        SDL_DestroySurface(_p_ScreenBackbuffer);
+    }
+    _p_ScreenBackbuffer = GFX_UTIL::SDL_CreateRGBSurface(
+        _p_Screen->w, _p_Screen->h, 32, 0, 0, 0, 0);
+
+    // Re-initialize labels because they depend on screen size/backbuffer
+    SDL_Rect rctBt1;
+    rctBt1.h = 28;
+    rctBt1.w = 150;
+    rctBt1.y = _p_Screen->h - rctBt1.h - 20;
+    rctBt1.x = _p_Screen->w - rctBt1.w - 20;
+
+    ClickCb cbNUll = ClickCb{.tc = NULL, .self = NULL};
+    _p_homeUrl->Initialize(&rctBt1, _p_ScreenBackbuffer,
+                           _p_fontDejUnderscoreSmall, MYIDLABELURL, cbNUll);
+
+    rctBt1.y = _p_homeUrl->PosY() - 20;
+    rctBt1.x = _p_homeUrl->PosX();
+    _p_LabelVersion->Initialize(&rctBt1, _p_ScreenBackbuffer, _p_fontDejSmall);
 }

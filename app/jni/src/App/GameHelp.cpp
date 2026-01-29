@@ -494,3 +494,41 @@ LPErrInApp GameHelp::drawJustifiedText(const std::string& text, int& y,
 
     return NULL;
 }
+void GameHelp::UpdateScreen(SDL_Surface* pScreen) {
+    if (pScreen == NULL)
+        return;
+    TRACE("GameHelp::UpdateScreen\n");
+    _p_Screen = pScreen;
+
+    if (_isShown) {
+        // if help is ongoing, we need to rebuild the shadow surface and
+        // text background
+        if (_p_ShadowSrf != NULL) {
+            SDL_DestroySurface(_p_ShadowSrf);
+        }
+        _p_ShadowSrf = GFX_UTIL::SDL_CreateRGBSurface(pScreen->w, pScreen->h,
+                                                      32, 0, 0, 0, 0);
+
+        _rctOptBox.x = 5;
+        _rctOptBox.y = 5;
+        _rctOptBox.w = pScreen->w - 10;
+        _rctOptBox.h = pScreen->h - 10;
+
+        if (_p_surfTextBackground != NULL) {
+            SDL_DestroySurface(_p_surfTextBackground);
+            _p_surfTextBackground = NULL;
+        }
+        _p_surfTextBackground = GFX_UTIL::SDL_CreateRGBSurface(
+            _rctOptBox.w, _rctOptBox.h, 32, 0, 0, 0, 0);
+
+        SDL_FillSurfaceRect(
+            _p_surfTextBackground, NULL,
+            SDL_MapRGB(SDL_GetPixelFormatDetails(_p_surfTextBackground->format),
+                       NULL, 10, 10, 10));
+
+        SDL_SetSurfaceBlendMode(_p_surfTextBackground, SDL_BLENDMODE_BLEND);
+        SDL_SetSurfaceAlphaMod(_p_surfTextBackground, 170);
+
+        _isDirty = true;
+    }
+}

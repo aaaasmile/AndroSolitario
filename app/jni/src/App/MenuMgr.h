@@ -27,6 +27,7 @@ class MenuMgr {
                                    const SDL_Point& targetPos);
     LPErrInApp HandleRootMenuIterate();
     void SetBackground(SDL_Surface* pVal) { _p_SceneBackground = pVal; }
+    void UpdateScreen(SDL_Surface* pScreen);
 
    private:
     LPErrInApp drawMenuText(SDL_Surface* psurf, const char* text, int x, int y,

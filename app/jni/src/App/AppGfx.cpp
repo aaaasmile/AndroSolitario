@@ -147,6 +147,7 @@ AppGfx::AppGfx() {
     _p_CreditTitle = NULL;
     _fullScreen = false;
     _p_GameSettings = GameSettings::GetSettings();
+    _p_MenuMgr = NULL;
     _p_CreditsView = new CreditsView();
     _p_OptGfx = new OptionsGfx();
     _p_HighScore = new HighScore();
@@ -266,13 +267,7 @@ LPErrInApp AppGfx::Init() {
     if (err != NULL) {
         return err;
     }
-    OptionDelegator optionDelegator = prepOptionDelegator();
 
-    err = _p_OptGfx->Initialize(_p_Screen, screenUpdater, optionDelegator,
-                                _p_Window);
-    if (err) {
-        return err;
-    }
     _lastMainLoopticks = SDL_GetTicks();
     return NULL;
 }
@@ -363,8 +358,10 @@ LPErrInApp AppGfx::createWindow() {
         resolutionMgr_InitLandscape(g_ResolutionMgr);
     }
 
-    TRACE("[createWindow] create window initially with width %d, height %d \n ",
-          g_ResolutionMgr.displayWidth, g_ResolutionMgr.displayHeight);
+    TRACE(
+        "[createWindow] create window initially with width %d, height %d "
+        "\n ",
+        g_ResolutionMgr.displayWidth, g_ResolutionMgr.displayHeight);
     _p_Window = SDL_CreateWindow(_p_GameSettings->GameName.c_str(),
                                  g_ResolutionMgr.displayWidth,
                                  g_ResolutionMgr.displayHeight, flagwin);
@@ -405,8 +402,8 @@ LPErrInApp AppGfx::selectLayout(int w, int h) {
     TRACE_DEBUG("[selectLayout] with w: %d, h: %d \n", w, h);
     // this function has issues, resize is ugly and mouse is not precise
 
-    //int oldtargetHeight = g_ResolutionMgr.targetHeight;
-    //int oldtargetWidth = g_ResolutionMgr.targetWidth;
+    // int oldtargetHeight = g_ResolutionMgr.targetHeight;
+    // int oldtargetWidth = g_ResolutionMgr.targetWidth;
     float aspect = (float)w / (float)h;
     if (aspect < 0.75f) {
         resolutionMgr_SetNarrowPortrait(g_ResolutionMgr, w, h);
@@ -463,7 +460,11 @@ LPErrInApp AppGfx::createScreenLayout() {
         return ERR_UTIL::ErrorCreate("Error SDL_CreateTexture: %s\n",
                                      SDL_GetError());
     }
-    //TRACE_DEBUG("[createScreenLayout] - end \n");
+    LPErrInApp err = updateComponentsScreen();
+    if (err != NULL) {
+        return err;
+    }
+    // TRACE_DEBUG("[createScreenLayout] - end \n");
     return NULL;
 }
 
@@ -682,16 +683,21 @@ LPErrInApp AppGfx::MainLoopEvent(SDL_Event* pEvent, SDL_AppResult& res) {
 
         case SDL_EVENT_WINDOW_RESIZED:
             TRACE_DEBUG(
-                "[MainLoopEvent] Event: SDL_EVENT_WINDOW_RESIZED, w%d, h%d \n",
+                "[MainLoopEvent] Event: SDL_EVENT_WINDOW_RESIZED, w%d, h%d "
+                "\n",
                 pEvent->window.data1, pEvent->window.data2);
-            selectLayout(pEvent->window.data1, pEvent->window.data2);
+            err = selectLayout(pEvent->window.data1, pEvent->window.data2);
+            if (err != NULL) {
+                return err;
+            }
             break;
         case SDL_EVENT_WINDOW_LEAVE_FULLSCREEN:
-            //h = _p_GameSettings->GetSavedScreenHeight();
-            //w = _p_GameSettings->GetSavedScreenWidth();
+            // h = _p_GameSettings->GetSavedScreenHeight();
+            // w = _p_GameSettings->GetSavedScreenWidth();
             SDL_GetWindowSize(_p_Window, &w, &h);
             TRACE_DEBUG(
-                "[MainLoopEvent] Event SDL_EVENT_WINDOW_LEAVE_FULLSCREEN: w=%d, "
+                "[MainLoopEvent] Event SDL_EVENT_WINDOW_LEAVE_FULLSCREEN: "
+                "w=%d, "
                 "h=%d\n",
                 w, h);
 
@@ -937,9 +943,17 @@ LPErrInApp AppGfx::showGeneralOptions() {
         return ERR_UTIL::ErrorCreate("General Options already started");
     }
 
+    UpdateScreenCb screenUpdater = prepScreenUpdater();
+    OptionDelegator optionDelegator = prepOptionDelegator();
+    LPErrInApp err = _p_OptGfx->Initialize(_p_Screen, screenUpdater,
+                                           optionDelegator, _p_Window);
+    if (err) {
+        return err;
+    }
+
     LPLanguages pLanguages = _p_GameSettings->GetLanguageMan();
     STRING caption = pLanguages->GetStringId(Languages::ID_MEN_OPTIONS);
-    LPErrInApp err = _p_OptGfx->Show(_p_SceneBackground, caption);
+    err = _p_OptGfx->Show(_p_SceneBackground, caption);
     if (err) {
         return err;
     }
@@ -1043,4 +1057,24 @@ void AppGfx::ParseCmdLine(int argc, char* argv[], SDL_AppResult& res) {
             TRACE("[ParseCmdLine] ignore unknown option: %s\n", argv[i]);
         }
     }
+}
+
+LPErrInApp AppGfx::updateComponentsScreen() {
+    TRACE("AppGfx::updateComponentsScreen\n");
+    LPErrInApp err = NULL;
+    if (_p_MenuMgr != NULL)
+        _p_MenuMgr->UpdateScreen(_p_Screen);
+    if (_p_HighScore != NULL)
+        _p_HighScore->UpdateScreen(_p_Screen);
+    if (_p_OptGfx != NULL) {
+        err = _p_OptGfx->UpdateScreen(_p_Screen, _p_SceneBackground);
+        if (err != NULL) {
+            return err;
+        }
+    }
+    if (_p_GameHelp != NULL)
+        _p_GameHelp->UpdateScreen(_p_Screen);
+    if (_p_CreditsView != NULL)
+        _p_CreditsView->UpdateScreen(_p_Screen);
+    return NULL;
 }
