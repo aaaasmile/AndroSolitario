@@ -2,7 +2,6 @@
 
 #include <SDL3/SDL_endian.h>
 #include <SDL3_image/SDL_image.h>
-#include <_mingw_mac.h>
 
 #include "CompGfx/ButtonGfx.h"
 #include "CompGfx/CheckBoxGfx.h"
