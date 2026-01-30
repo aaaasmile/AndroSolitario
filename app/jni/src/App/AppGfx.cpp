@@ -148,11 +148,11 @@ AppGfx::AppGfx() {
     _fullScreen = false;
     _p_GameSettings = GameSettings::GetSettings();
     _p_MenuMgr = NULL;
-    _p_CreditsView = new CreditsView();
+    _p_CreditsView = NULL;
     _p_OptGfx = new OptionsGfx();
-    _p_HighScore = new HighScore();
+    _p_HighScore = NULL;
     _p_GameSelector = new GameSelector();
-    _p_GameHelp = new GameHelp();
+    _p_GameHelp = NULL;
 }
 
 AppGfx::~AppGfx() { terminate(); }
@@ -192,7 +192,6 @@ LPErrInApp AppGfx::Init() {
     if (err != NULL) {
         return err;
     }
-    _p_HighScore->Load();
 
     _p_GameSettings->SetCurrentLang();
     Languages* pLanguages = _p_GameSettings->GetLanguageMan();
@@ -577,6 +576,10 @@ UpdateScreenCb AppGfx::prepScreenUpdater() {
 }
 
 UpdateHighScoreCb AppGfx::prepHighScoreCb() {
+    if (_p_HighScore == NULL) {
+        _p_HighScore = new HighScore();
+        _p_HighScore->Load();
+    }
     static VUpdateHighScoreCb const tc = {.SaveScore = (&fncBind_SaveScore)};
     return (UpdateHighScoreCb){.tc = &tc, .self = _p_HighScore};
 }
@@ -887,6 +890,9 @@ LPErrInApp AppGfx::startGameLoop() {
 
 LPErrInApp AppGfx::showHelp() {
     TRACE("Show Help\n");
+    if (_p_GameHelp == NULL) {
+        _p_GameHelp = new GameHelp();
+    }
     if (_p_GameHelp->IsOngoing()) {
         return ERR_UTIL::ErrorCreate("Help already started");
     }
@@ -908,12 +914,15 @@ LPErrInApp AppGfx::showHelp() {
 
 LPErrInApp AppGfx::showHighScore() {
     TRACE("Show HighScore\n");
+    if (_p_HighScore == NULL) {
+        _p_HighScore = new HighScore();
+        _p_HighScore->Load();
+    }
     if (_p_HighScore->IsOngoing()) {
         return ERR_UTIL::ErrorCreate("Credit already started");
     }
-    if (_p_HighScore->IsOngoing()) {
-        return NULL;
-    }
+    _p_HighScore->Reset();
+
     if (_p_MusicManager->IsPlayingMusic()) {
         _p_MusicManager->StopMusic(600);
     }
@@ -925,9 +934,13 @@ LPErrInApp AppGfx::showHighScore() {
 
 LPErrInApp AppGfx::showCredits() {
     TRACE("Show Credits\n");
+    if (_p_CreditsView == NULL) {
+        _p_CreditsView = new CreditsView();
+    }
     if (_p_CreditsView->IsOngoing()) {
         return ERR_UTIL::ErrorCreate("Credit already started");
     }
+    _p_CreditsView->Reset();
     if (_p_MusicManager->IsPlayingMusic()) {
         _p_MusicManager->StopMusic(600);
     }
@@ -965,8 +978,6 @@ void AppGfx::backToMenuRootWithMusic() {
     LeaveMenu();
     _p_MusicManager->PlayMusic(MusicManager::MUSIC_INIT_SND,
                                MusicManager::LOOP_ON);
-    _p_HighScore->Reset();
-    _p_CreditsView->Reset();
 }
 
 void AppGfx::backToMenuRootSameMusic() {
