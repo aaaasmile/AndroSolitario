@@ -2,7 +2,6 @@
 
 #include "ButtonGfx.h"
 #include "Config.h"
-#include "GameSettings.h"
 #include "GfxUtil.h"
 
 MesgBoxGfx::MesgBoxGfx(void) {
@@ -55,7 +54,7 @@ LPErrInApp MesgBoxGfx::Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
     int btw = 120;
     int bth = 28;
     int btoffsetY = 10;
-    
+
     if (_typeMsg == TY_MB_YES_NO) {
         int space2bt = 20;
         // button yes
@@ -120,7 +119,8 @@ void MesgBoxGfx::ButCmdClicked(int butID) {
     }
 }
 
-LPErrInApp MesgBoxGfx::HandleEvent(SDL_Event* pEvent, const SDL_Point& targetPos) {
+LPErrInApp MesgBoxGfx::HandleEvent(SDL_Event* pEvent,
+                                   const SDL_Point& targetPos) {
     if (pEvent->type == SDL_EVENT_KEY_DOWN) {
         if (pEvent->key.key == SDLK_RETURN) {
             if (_typeMsg == TY_MB_YES_NO) {

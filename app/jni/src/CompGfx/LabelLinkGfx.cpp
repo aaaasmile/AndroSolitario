@@ -33,6 +33,7 @@ LabelLinkGfx::~LabelLinkGfx() {
 void LabelLinkGfx::Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
                               TTF_Font* pFont, int iButID,
                               ClickCb& fncbClickEvent) {
+    TRACE_DEBUG("[LabelLinkGfx] Initialize\n");
     _fncbClickEvent = fncbClickEvent;
     _rctCtrl = *pRect;
     if (_p_SurfBar != NULL) {

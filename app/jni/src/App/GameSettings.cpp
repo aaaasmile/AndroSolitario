@@ -8,7 +8,6 @@
 
 #include "Config.h"
 #include "MusicManager.h"
-#include "TypeGlobal.h"
 
 #if PLATFORM_EMS
 #include <emscripten.h>
@@ -20,13 +19,15 @@ void setLanguage(const std::string& languageCode) {
     LPGameSettings pGameSetting = GameSettings::GetSettings();
     bool has_changed = false;
     if (languageCode.compare("it") == 0) {
-        has_changed = pGameSetting->CurrentLanguage != Languages::eLangId::LANG_ITA; 
+        has_changed =
+            pGameSetting->CurrentLanguage != Languages::eLangId::LANG_ITA;
         pGameSetting->CurrentLanguage = Languages::eLangId::LANG_ITA;
     } else if (languageCode.compare("en") == 0) {
-        has_changed = pGameSetting->CurrentLanguage != Languages::eLangId::LANG_ENG; 
+        has_changed =
+            pGameSetting->CurrentLanguage != Languages::eLangId::LANG_ENG;
         pGameSetting->CurrentLanguage = Languages::eLangId::LANG_ENG;
     }
-    if (has_changed){
+    if (has_changed) {
         pGameSetting->SetCurrentLang();
         pGameSetting->SaveSettings();
     }
