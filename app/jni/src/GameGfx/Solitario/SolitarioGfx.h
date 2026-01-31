@@ -124,11 +124,13 @@ class SolitarioGfx {
     LPErrInApp DrawCardStack(LPCardRegionGfx pcardRegion);
 
     LPErrInApp DrawCard(int x, int y, int nCdIndex);
-    LPErrInApp DrawCard(int x, int y, int nCdIndex, SDL_Surface* s);
-    LPErrInApp DrawCard(LPCardGfx pCard, SDL_Surface* s);
+    LPErrInApp DrawCard(int x, int y, int nCdIndex, SDL_Surface* s,
+                        float scaleFactor);
+    LPErrInApp DrawCard(LPCardGfx pCard, SDL_Surface* s, float scaleFactor);
 
-    LPErrInApp DrawCardPac(int x, int y, int nCdIndex, SDL_Surface* s);
-    LPErrInApp DrawCardPac(LPCardGfx pCard, SDL_Surface* s);
+    LPErrInApp DrawCardPac(int x, int y, int nCdIndex, SDL_Surface* s,
+                           float scaleFactor);
+    LPErrInApp DrawCardPac(LPCardGfx pCard, SDL_Surface* s, float scaleFactor);
 
     LPErrInApp DrawCardBack(int x, int y);
     LPErrInApp DrawCardBack(int x, int y, SDL_Surface* s, float scaleFactor);

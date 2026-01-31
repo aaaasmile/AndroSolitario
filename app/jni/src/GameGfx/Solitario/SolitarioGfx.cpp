@@ -773,19 +773,20 @@ LPCardRegionGfx SolitarioGfx::GetBestStack(int x, int y, int w, int h,
 }
 
 LPErrInApp SolitarioGfx::DrawCard(int x, int y, int nCdIndex) {
-    return DrawCard(x, y, nCdIndex, _p_Screen);
+    return DrawCard(x, y, nCdIndex, _p_Screen, 0.0);
 }
 
-LPErrInApp SolitarioGfx::DrawCard(int x, int y, int nCdIndex, SDL_Surface* s) {
+LPErrInApp SolitarioGfx::DrawCard(int x, int y, int nCdIndex, SDL_Surface* s,
+                                  float scaleFactor) {
     if (s == NULL) {
         return ERR_UTIL::ErrorCreate(
             "Draw a card on NULL surface. This is wrong");
     }
-    return DrawCardPac(x, y, nCdIndex, s);
+    return DrawCardPac(x, y, nCdIndex, s, scaleFactor);
 }
 
-LPErrInApp SolitarioGfx::DrawCardPac(int x, int y, int nCdIndex,
-                                     SDL_Surface* s) {
+LPErrInApp SolitarioGfx::DrawCardPac(int x, int y, int nCdIndex, SDL_Surface* s,
+                                     float scaleFactor) {
     if (nCdIndex < 0 || nCdIndex >= _deckType.GetNumCards())
         return ERR_UTIL::ErrorCreate("DrawCardPac %d index out of range",
                                      nCdIndex);
@@ -812,15 +813,17 @@ LPErrInApp SolitarioGfx::DrawCardPac(int x, int y, int nCdIndex,
     return NULL;
 }
 
-LPErrInApp SolitarioGfx::DrawCard(LPCardGfx pCard, SDL_Surface* s) {
+LPErrInApp SolitarioGfx::DrawCard(LPCardGfx pCard, SDL_Surface* s,
+                                  float scaleFactor) {
     if (s == NULL) {
         return ERR_UTIL::ErrorCreate("Error in draw card, surface is NULL\n");
     }
     // TRACE("Draw card ix = %d, suit = %s, rank %d, x,y %d,%d",
-    return DrawCardPac(pCard, s);
+    return DrawCardPac(pCard, s, scaleFactor);
 }
 
-LPErrInApp SolitarioGfx::DrawCardPac(LPCardGfx pCard, SDL_Surface* s) {
+LPErrInApp SolitarioGfx::DrawCardPac(LPCardGfx pCard, SDL_Surface* s,
+                                     float scaleFactor) {
     pCard->SetDeckSurface(_p_Deck);
 
     return pCard->DrawCardPac(s);

@@ -69,7 +69,8 @@ class CardRegionGfx {
           _yOffset(yoff),
           _deckType(deckType),
           _widthEmpty(width),
-          _heightEmpty(height) {}
+          _heightEmpty(height),
+          _scaleFactor(0.0f) {}
 
     ~CardRegionGfx() {}
 
@@ -99,6 +100,14 @@ class CardRegionGfx {
     int GetDragMode() const { return _dragMode; }
 
     void SetSymbol(int symbol) { _symbol = symbol; }
+    void SetDeckSurface(SDL_Surface* pSurface) {
+        _internalStack.SetDeckSurface(pSurface);
+    }
+    void SetScaleFactor(float factor) {
+        _scaleFactor = factor;
+        _internalStack.SetScaleFactor(factor);
+    }
+    float GetScaleFactor() { return _scaleFactor; }
 
     void SetAcceptMode(unsigned int mode) { _acceptMode = mode; }
     void SetAttributes(unsigned int attr) { _attributes = attr; }
@@ -163,6 +172,7 @@ class CardRegionGfx {
     unsigned int _acceptMode;
     DeckType _deckType;
     int _savedSize;
+    float _scaleFactor;
 };
 
 typedef CardRegionGfx* LPCardRegionGfx;

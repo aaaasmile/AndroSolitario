@@ -3,6 +3,12 @@
 #include <algorithm>
 #include <random>
 
+CardStackGfx::CardStackGfx() {
+    _widthEmpty = 0;
+    _heightEmpty = 0;
+    _scaleFactor = 0.0f;
+}
+
 LPErrInApp CardStackGfx::NewDeck(DeckType& deckType, int widthEmpty,
                                  int heightEmpty) {
     LPErrInApp err;
@@ -13,6 +19,7 @@ LPErrInApp CardStackGfx::NewDeck(DeckType& deckType, int widthEmpty,
         LPCardGfx pCard = new CardGfx();
         pCard->SetWidth(_widthEmpty);
         pCard->SetHeight(_heightEmpty);
+        pCard->SetScaleFactor(_scaleFactor);
         err = pCard->SetIdx(i, _deckType);
         if (err != NULL) {
             return err;
@@ -130,5 +137,20 @@ void CardStackGfx::SetCardsFaceUp(bool bval) {
     for (VI vi = _vct_lpCardGfx.begin(); vi != _vct_lpCardGfx.end(); ++vi) {
         LPCardGfx pCard = *vi;
         pCard->SetFaceUp(bval);
+    }
+}
+
+void CardStackGfx::SetDeckSurface(SDL_Surface* pSurface) {
+    for (VI vi = _vct_lpCardGfx.begin(); vi != _vct_lpCardGfx.end(); ++vi) {
+        LPCardGfx pCard = *vi;
+        pCard->SetDeckSurface(pSurface);
+    }
+}
+
+void CardStackGfx::SetScaleFactor(float factor) {
+    _scaleFactor = factor;
+    for (VI vi = _vct_lpCardGfx.begin(); vi != _vct_lpCardGfx.end(); ++vi) {
+        LPCardGfx pCard = *vi;
+        pCard->SetScaleFactor(factor);
     }
 }

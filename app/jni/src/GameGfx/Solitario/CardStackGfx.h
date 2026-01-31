@@ -12,6 +12,7 @@
 
 class CardStackGfx {
    public:
+    CardStackGfx();
     LPErrInApp NewDeck(DeckType& deckType, int widthEmpty, int heightEmpty);
     void Shuffle();
     void Clear() { _vct_lpCardGfx.clear(); }
@@ -34,6 +35,8 @@ class CardStackGfx {
     LPCardGfx GetCard(int index);
 
     void SetCardsFaceUp(bool bVal);
+    void SetDeckSurface(SDL_Surface* pSurface);
+    void SetScaleFactor(float factor);
     LPCardGfx First() {
         SDL_assert(_vct_lpCardGfx.size() > 0);
         return _vct_lpCardGfx[0];
@@ -56,6 +59,7 @@ class CardStackGfx {
     DeckType _deckType;
     int _widthEmpty;
     int _heightEmpty;
+    float _scaleFactor;
 };
 
 typedef CardStackGfx* LPCardStackGfx;

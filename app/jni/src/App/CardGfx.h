@@ -9,7 +9,6 @@
 #include "DeckType.h"
 #include "ErrorInfo.h"
 
-
 enum eSUIT { BASTONI = 0, COPPE = 1, DENARI = 2, SPADE = 3 };
 
 class CardGfx {
@@ -23,10 +22,18 @@ class CardGfx {
     bool IsRed() const { return !IsBlack(); }
     int X() { return _x; }
     int Y() { return _y; }
-    int Width() { return _width; }
+    int Width() {
+        if (_scaleFactor != 0.0)
+            return (int)(_width * _scaleFactor);
+        return _width;
+    }
     void SetWidth(int val) { _width = val; }
     void SetHeight(int val) { _height = val; }
-    int Height() { return _height; }
+    int Height() {
+        if (_scaleFactor != 0.0)
+            return (int)(_height * _scaleFactor);
+        return _height;
+    }
     void SetDeckSurface(SDL_Surface* pVal) { _pPacDeck = pVal; }
 
     bool IsFaceUp() const { return _faceUp; }
@@ -47,12 +54,15 @@ class CardGfx {
     bool PtInCard(int lx, int ly) {
         SDL_assert(_width != 0);
         SDL_assert(_height != 0);
-        if (lx >= _x && lx <= _width + _x && ly >= _y && ly <= _height + _y)
+        int w = Width();
+        int h = Height();
+        if (lx >= _x && lx <= w + _x && ly >= _y && ly <= h + _y)
             return true;
         else
             return false;
     }
     void SetScaleFactor(float factor) { _scaleFactor = factor; }
+    float ScaleFactor() { return _scaleFactor; }
 
    private:
     bool _faceUp;
