@@ -57,6 +57,7 @@ class OptionsGfx {
     void setBackgoundTypeInGameSettings();
     void setLanguageInGameSettings();
     void setControlLocalCaptions();
+    LPErrInApp initDeck(int comboOffsetX);
 
    private:
     SDL_Rect _rctOptBox;

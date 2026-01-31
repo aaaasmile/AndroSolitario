@@ -150,12 +150,6 @@ LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen,
         SDL_DestroySurface(_p_ShadowSrf);
         _p_ShadowSrf = NULL;
     }
-    for (int i = 0; i < eDeckType::NUM_OF_DECK; i++) {
-        if (_p_deckAll[i] != NULL) {
-            SDL_DestroySurface(_p_deckAll[i]);
-            _p_deckAll[i] = NULL;
-        }
-    }
     // end cleanup
 
     _rctOptBox.w = 600;
@@ -272,7 +266,11 @@ LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen,
                              _fnUpdateScreen, nullCb);
     _p_comboDeck->SetVisibleState(ComboGfx::INVISIBLE);
 
-    // init surfaces with all pac decks
+    // deck surface are not depending on pScreen
+    return initDeck(comboOffsetX);
+}
+
+LPErrInApp OptionsGfx::initDeck(int comboOffsetX) {
     Uint16 pac_w, pac_h;
     DeckType dt;
     LPErrInApp err;
@@ -295,8 +293,9 @@ LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen,
             return ERR_UTIL::ErrorCreate("Deck height is zero: %s\n",
                                          dt.GetDeckName().c_str());
         }
-        int x_pos = rctBt1.x;
-        int y_pos = rctBt1.y + rctBt1.h + 20;
+        int x_pos = _rctOptBox.x + comboOffsetX;
+        int y_pos = _p_comboDeck->PosY() + _p_comboDeck->Height() + 20;
+
         _cardOnEachDeck[0][i].SetIdx(9, dt);
         _cardOnEachDeck[0][i].SetWidth(ww);
         _cardOnEachDeck[0][i].SetHeight(hh);
@@ -322,10 +321,6 @@ LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen,
             TRACE_DEBUG("[TAROCK_PIEMONT] Deck format: %s, w: %d, h: %d\n",
                         SDL_GetPixelFormatName(surface->format), surface->w,
                         surface->h);
-            TRACE_DEBUG(
-                "[TAROCK_PIEMONT] pScreen buffer format: %s, w: %d, h: %d\n",
-                SDL_GetPixelFormatName(pScreen->format), pScreen->w,
-                pScreen->h);
             float factor = 0.7;
             for (int j = 0; j < 3; j++) {
                 _cardOnEachDeck[j][i].SetScaleFactor(factor);
