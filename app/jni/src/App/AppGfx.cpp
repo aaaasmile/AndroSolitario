@@ -401,8 +401,6 @@ LPErrInApp AppGfx::selectLayout(int w, int h) {
     TRACE_DEBUG("[selectLayout] with w: %d, h: %d \n", w, h);
     // this function has issues, resize is ugly and mouse is not precise
 
-    // int oldtargetHeight = g_ResolutionMgr.targetHeight;
-    // int oldtargetWidth = g_ResolutionMgr.targetWidth;
     float aspect = (float)w / (float)h;
     if (aspect < 0.75f) {
         resolutionMgr_SetNarrowPortrait(g_ResolutionMgr, w, h);
@@ -415,12 +413,6 @@ LPErrInApp AppGfx::selectLayout(int w, int h) {
     _p_GameSettings->SetDisplaySize(g_ResolutionMgr.displayWidth,
                                     g_ResolutionMgr.displayHeight);
 
-    // if (_p_Screen != NULL) {
-    //     if (g_ResolutionMgr.targetHeight == oldtargetHeight &&
-    //         oldtargetWidth == g_ResolutionMgr.targetWidth) {
-    //         return NULL;
-    //     }
-    // }
     LPErrInApp err = createScreenLayout();
     if (err != NULL) {
         return err;
@@ -695,27 +687,13 @@ LPErrInApp AppGfx::MainLoopEvent(SDL_Event* pEvent, SDL_AppResult& res) {
             }
             break;
         case SDL_EVENT_WINDOW_LEAVE_FULLSCREEN:
-            // h = _p_GameSettings->GetSavedScreenHeight();
-            // w = _p_GameSettings->GetSavedScreenWidth();
             SDL_GetWindowSize(_p_Window, &w, &h);
             TRACE_DEBUG(
                 "[MainLoopEvent] Event SDL_EVENT_WINDOW_LEAVE_FULLSCREEN: "
                 "w=%d, "
                 "h=%d\n",
                 w, h);
-
-            // err = selectLayout(w, h);
-            // if (err != NULL) {
-            //     return err;
-            // }
             break;
-        // case SDL_EVENT_WINDOW_ENTER_FULLSCREEN:
-        //     TRACE_DEBUG(
-        //         "[MainLoopEvent]: enter full screen. Save display w=%d,
-        //         h=%d\n", _p_GameSettings->GetScreenWidth(),
-        //         _p_GameSettings->GetScreenHeight());
-        //     _p_GameSettings->SaveDisplaySize();
-        //     break;
         default:
             break;
     }
@@ -1032,6 +1010,26 @@ void AppGfx::updateScreenTexture() {
     SDL_RenderPresent(_p_sdlRenderer);
 }
 
+LPErrInApp AppGfx::updateComponentsScreen() {
+    TRACE("AppGfx::updateComponentsScreen\n");
+    LPErrInApp err = NULL;
+    if (_p_MenuMgr != NULL)
+        _p_MenuMgr->UpdateScreen(_p_Screen);
+    if (_p_HighScore != NULL)
+        _p_HighScore->UpdateScreen(_p_Screen);
+    if (_p_OptGfx != NULL) {
+        err = _p_OptGfx->UpdateScreen(_p_Screen, _p_SceneBackground);
+        if (err != NULL) {
+            return err;
+        }
+    }
+    if (_p_GameHelp != NULL)
+        _p_GameHelp->UpdateScreen(_p_Screen);
+    if (_p_CreditsView != NULL)
+        _p_CreditsView->UpdateScreen(_p_Screen);
+    return NULL;
+}
+
 void AppGfx::ParseCmdLine(int argc, char* argv[], SDL_AppResult& res) {
     res = SDL_APP_CONTINUE;
     for (int i = 1; i < argc; i++) {
@@ -1068,24 +1066,4 @@ void AppGfx::ParseCmdLine(int argc, char* argv[], SDL_AppResult& res) {
             TRACE("[ParseCmdLine] ignore unknown option: %s\n", argv[i]);
         }
     }
-}
-
-LPErrInApp AppGfx::updateComponentsScreen() {
-    TRACE("AppGfx::updateComponentsScreen\n");
-    LPErrInApp err = NULL;
-    if (_p_MenuMgr != NULL)
-        _p_MenuMgr->UpdateScreen(_p_Screen);
-    if (_p_HighScore != NULL)
-        _p_HighScore->UpdateScreen(_p_Screen);
-    if (_p_OptGfx != NULL) {
-        err = _p_OptGfx->UpdateScreen(_p_Screen, _p_SceneBackground);
-        if (err != NULL) {
-            return err;
-        }
-    }
-    if (_p_GameHelp != NULL)
-        _p_GameHelp->UpdateScreen(_p_Screen);
-    if (_p_CreditsView != NULL)
-        _p_CreditsView->UpdateScreen(_p_Screen);
-    return NULL;
 }
