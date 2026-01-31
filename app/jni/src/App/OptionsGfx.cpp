@@ -277,6 +277,7 @@ LPErrInApp OptionsGfx::initDeck(int comboOffsetX) {
     LPErrInApp err;
     float factor = 0.7;
     if (_p_deckAll[0] != NULL) {
+        // update position only
         int x_pos = _rctOptBox.x + comboOffsetX;
         int y_pos = _p_comboDeck->PosY() + _p_comboDeck->Height() + 20;
         for (int i = 0; i < eDeckType::NUM_OF_DECK; i++) {
@@ -672,7 +673,7 @@ LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
     }
 
     TRACE_DEBUG(
-        "[TAROCK_PIEMONT] _p_ShadowSrf buffer format: %s, w: %d, h: %d\n",
+        "[OptionsGfx::Show] _p_ShadowSrf buffer format: %s, w: %d, h: %d\n",
         SDL_GetPixelFormatName(_p_ShadowSrf->format), _p_ShadowSrf->w,
         _p_ShadowSrf->h);
     return NULL;
