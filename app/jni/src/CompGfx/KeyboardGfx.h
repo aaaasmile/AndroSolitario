@@ -8,7 +8,6 @@
 
 #include "ButtonGfx.h"
 #include "Traits.h"
-#include "TypeGlobal.h"
 
 using namespace traits;
 

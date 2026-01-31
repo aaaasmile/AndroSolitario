@@ -4,7 +4,7 @@
 #include <SDL3/SDL.h>
 #include <SDL3_ttf/SDL_ttf.h>
 
-#include "TypeGlobal.h"
+#include <string>
 
 class TextInputGfx {
    public:
@@ -12,7 +12,8 @@ class TextInputGfx {
     TextInputGfx();
     ~TextInputGfx();
 
-    void Initialize(SDL_Rect* pRect, SDL_Surface* pScreen, TTF_Font* pFont, SDL_Window* pWindow);
+    void Initialize(SDL_Rect* pRect, SDL_Surface* pScreen, TTF_Font* pFont,
+                    SDL_Window* pWindow);
     const std::string& GetText() const { return _text; }
     void SetText(const std::string& newText) { _text = newText; }
     bool GetHasFocus() const { return _hasFocus; }

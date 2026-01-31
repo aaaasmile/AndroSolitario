@@ -247,7 +247,7 @@ LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen,
     rctBt1.x = _p_comboBackground->PosX();
     _p_textInput->Initialize(&rctBt1, pScreen, _p_fontText, pWindow);
 
-    // button keyboard
+    // button Toggle keyboard
     std::string strSymbKeyb = "⌨";
     SDL_Rect rctBtK;
     _p_btToggleKeyboard = new ButtonGfx();
