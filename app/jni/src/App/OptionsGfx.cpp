@@ -266,7 +266,8 @@ LPErrInApp OptionsGfx::Initialize(SDL_Surface* pScreen,
                              _fnUpdateScreen, nullCb);
     _p_comboDeck->SetVisibleState(ComboGfx::INVISIBLE);
 
-    // deck surface are not depending on pScreen
+    // deck surface are not depending on pScreen, but the position depends on
+    // pScreen
     return initDeck(comboOffsetX);
 }
 
@@ -274,6 +275,27 @@ LPErrInApp OptionsGfx::initDeck(int comboOffsetX) {
     Uint16 pac_w, pac_h;
     DeckType dt;
     LPErrInApp err;
+    float factor = 0.7;
+    if (_p_deckAll[0] != NULL) {
+        int x_pos = _rctOptBox.x + comboOffsetX;
+        int y_pos = _p_comboDeck->PosY() + _p_comboDeck->Height() + 20;
+        for (int i = 0; i < eDeckType::NUM_OF_DECK; i++) {
+            int ww = _cardOnEachDeck[0][i].Width();
+            err = dt.SetTypeIndex(i);
+            if (err != NULL) {
+                return err;
+            }
+            if (dt.GetType() == eDeckType::TAROCK_PIEMONT) {
+                ww = (int)ww * factor;
+            }
+            _cardOnEachDeck[0][i].SetCardLoc(x_pos, y_pos);
+            _cardOnEachDeck[1][i].SetCardLoc(
+                _cardOnEachDeck[0][i].X() + 10 + ww, y_pos);
+            _cardOnEachDeck[2][i].SetCardLoc(
+                _cardOnEachDeck[1][i].X() + 10 + ww, y_pos);
+        }
+        return NULL;
+    }
     for (int i = 0; i < eDeckType::NUM_OF_DECK; i++) {
         err = dt.SetTypeIndex(i);
         if (err != NULL) {
@@ -321,7 +343,6 @@ LPErrInApp OptionsGfx::initDeck(int comboOffsetX) {
             TRACE_DEBUG("[TAROCK_PIEMONT] Deck format: %s, w: %d, h: %d\n",
                         SDL_GetPixelFormatName(surface->format), surface->w,
                         surface->h);
-            float factor = 0.7;
             for (int j = 0; j < 3; j++) {
                 _cardOnEachDeck[j][i].SetScaleFactor(factor);
                 if (j > 0) {
