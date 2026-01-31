@@ -5,7 +5,7 @@
 
 #include <cmath>
 
-#include "TypeGlobal.h"
+#include "Config.h"
 
 const char* g_lpszDeckDir = DATA_PREFIX "decks/";
 
@@ -235,7 +235,7 @@ LPErrInApp GFX_UTIL::LoadCardPac(SDL_Surface** pp_Deck, DeckType& deckType,
     }
     SDL_ReadIO(src, description, 100);
     SDL_ReadU32LE(src, &timetag);
-    //TRACE_DEBUG("Timetag is %d\n", timetag);
+    // TRACE_DEBUG("Timetag is %d\n", timetag);
     SDL_ReadIO(src, &num_anims, 1);
     // width of the picture (pac of 4 cards)
     SDL_ReadU16LE(src, &w);

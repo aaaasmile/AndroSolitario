@@ -5,10 +5,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "Config.h"
 #include "Fading.h"
 #include "GameSettings.h"
 #include "MusicManager.h"
-#include "TypeGlobal.h"
+
 
 char const* credit_text[] = {
     "-SOLITARIO", /* '-' at beginning makes highlighted: */

@@ -8,8 +8,6 @@
 #include "GameSettings.h"
 #include "GfxUtil.h"
 #include "MusicManager.h"
-#include "TypeGlobal.h"
-
 
 #if PLATFORM_EMS
 #include <emscripten.h>

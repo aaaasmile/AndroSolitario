@@ -2,6 +2,7 @@
 
 #include <SDL3/SDL.h>
 
+#include "Config.h"
 #include "GameSettings.h"
 #include "TypeGlobal.h"
 

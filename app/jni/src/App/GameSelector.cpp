@@ -1,7 +1,9 @@
 #include "GameSelector.h"
 
+#include "Config.h"
 #include "GameGfx/Solitario/SolitarioGfx.h"
 #include "GameSettings.h"
+
 
 GameSelector::GameSelector() { _p_SolitarioGfx = NULL; }
 

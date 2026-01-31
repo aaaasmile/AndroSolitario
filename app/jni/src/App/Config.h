@@ -1,6 +1,10 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+#include <stdarg.h>
+
+#include <cstdio>
+
 #define VERSION "Ver 3.0.13 20260130-00"
 #define PACKAGE_URL "https://invido.it"
 #define AUTHOR "igorRun for Invido"
@@ -69,6 +73,56 @@
 
 #ifndef HASGOTLINK
 #define HASGOTLINK 1
+#endif
+
+#ifndef TRACE
+#ifdef TRACEINDEBUGGER
+inline void TRACE(const char* fmt, ...) {
+    char myBuff[512];
+    va_list args;
+    va_start(args, fmt);
+    int result = vsprintf(myBuff, fmt, args);
+    ::OutputDebugString(myBuff);
+}
+inline void TRACE_DEBUG(const char* fmt, ...) {}
+#else
+#ifdef TRACEINSERVICE
+extern void TraceInServiceINFO(char* myBuff);
+extern void TraceInServiceDEBUG(char* myBuff);
+inline void TRACE(const char* fmt, ...) {
+    char myBuff[1024];
+    va_list args;
+    va_start(args, fmt);
+    vsprintf(myBuff, fmt, args);
+    TraceInServiceINFO(myBuff);
+}
+#ifdef _DEBUG
+inline void TRACE_DEBUG(const char* fmt, ...) {
+    char myBuff[1024];
+    va_list args;
+    va_start(args, fmt);
+    vsprintf(myBuff, fmt, args);
+    TraceInServiceDEBUG(myBuff);
+}
+#else
+inline void TRACE_DEBUG(const char* fmt, ...) {}
+#endif
+#else
+#ifdef TRACEINSTD
+#include <stdio.h>
+inline void TRACE(const char* fmt, ...) {
+    char myBuff[1024];
+    va_list args;
+    va_start(args, fmt);
+    vsprintf(myBuff, fmt, args);
+    sprintf(stdout, myBuff);
+}
+#else
+inline void TRACE(const char* fmt, ...) {}
+#endif
+inline void TRACE_DEBUG(const char* fmt, ...) {}
+#endif
+#endif
 #endif
 
 #endif  // CONFIG_H

@@ -2,7 +2,7 @@
 
 #include <inttypes.h>
 
-#include "TypeGlobal.h"
+#include "Config.h"
 
 static SDL_Surface* SDL_CreateRGBSurface(int width, int height, int depth,
                                          Uint32 Rmask, Uint32 Gmask,
@@ -30,7 +30,7 @@ void FadeAction::cleanUp() {
 //  made first. We must do that because we are overwriting the Screen Surface.
 LPErrInApp FadeAction::Fade(SDL_Surface* pSurfScreen, SDL_Surface* pSurfImg,
                             Uint32 uiSeconds, bool fadeOut,
-                            //SDL_Renderer* p_sdlRenderer,
+                            // SDL_Renderer* p_sdlRenderer,
                             UpdateScreenCb& fnUpdateScreen,
                             SDL_Rect* p_rctTarget) {
     if (_inProgress) {
@@ -45,7 +45,6 @@ LPErrInApp FadeAction::Fade(SDL_Surface* pSurfScreen, SDL_Surface* pSurfImg,
     _p_rctTarget = p_rctTarget;
     _p_surf_screen_copy = NULL;
 
- 
     // Used when the Screen Surface equals the Image Surface
     // Used to calculate the steps to make a fade in the given time:
     // Uint64 ui_old_time, ui_curr_time, ui_time_ms;
@@ -95,7 +94,8 @@ LPErrInApp FadeAction::Fade(SDL_Surface* pSurfScreen, SDL_Surface* pSurfImg,
     _ui_old_time = SDL_GetTicks();
     //  Convert the given time in seconds into miliseconds.
     _ui_time_ms = uiSeconds * 1000;
-    TRACE_DEBUG("[Fade] Ticks initial %" PRIu64 ", end of fading %" PRIu64 ", fading out %d\n",
+    TRACE_DEBUG("[Fade] Ticks initial %" PRIu64 ", end of fading %" PRIu64
+                ", fading out %d\n",
                 _ui_old_time, _ui_time_ms, fadeOut);
     if (fadeOut) {
         _f_alpha = 0.0;
@@ -113,7 +113,8 @@ void FadeAction::Iterate() {
             SDL_BlitSurface(_p_surf_img, NULL, _p_surf_screen, _p_rctTarget);
             SDL_SetSurfaceAlphaMod(_p_surf_black, (Uint8)_f_alpha);
             SDL_BlitSurface(_p_surf_black, NULL, _p_surf_screen, NULL);
-            (_fnUpdateScreen.tc)->UpdateScreen(_fnUpdateScreen.self, _p_surf_screen);
+            (_fnUpdateScreen.tc)
+                ->UpdateScreen(_fnUpdateScreen.self, _p_surf_screen);
             ui_curr_time = SDL_GetTicks();
 
             _f_alpha +=
@@ -128,7 +129,8 @@ void FadeAction::Iterate() {
             SDL_SetSurfaceAlphaMod(_p_surf_black, (Uint8)_f_alpha);
             SDL_BlitSurface(_p_surf_black, NULL, _p_surf_screen, NULL);
             ui_curr_time = SDL_GetTicks();
-            (_fnUpdateScreen.tc)->UpdateScreen(_fnUpdateScreen.self, _p_surf_screen);
+            (_fnUpdateScreen.tc)
+                ->UpdateScreen(_fnUpdateScreen.self, _p_surf_screen);
 
             ui_curr_time = SDL_GetTicks();
             _f_alpha -=
