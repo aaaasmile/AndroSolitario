@@ -76,6 +76,14 @@ SolitarioGfx::~SolitarioGfx() {
         delete _p_MsgBox;
         _p_MsgBox = NULL;
     }
+    if (_p_Deck != NULL) {
+        SDL_DestroySurface(_p_Deck);
+        _p_Deck = NULL;
+    }
+    if (_p_Symbols != NULL) {
+        SDL_DestroySurface(_p_Symbols);
+        _p_Symbols = NULL;
+    }
 }
 
 void SolitarioGfx::clearSurface() {
@@ -215,7 +223,6 @@ LPErrInApp SolitarioGfx::OnResize(SDL_Surface* pScreen) {
     _p_ScreenBackbufferDrag = GFX_UTIL::SDL_CreateRGBSurface(
         _p_Screen->w, _p_Screen->h, 32, 0, 0, 0, 0);
 
-    // Re-initialize buttons
     initButtons();
 
     DrawStaticScene();
@@ -1687,11 +1694,6 @@ LPErrInApp SolitarioGfx::HandleIterate(bool& done) {
         if (_p_MusicManager->IsPlayingMusic()) {
             _p_MusicManager->StopMusic(0);
         }
-        // Uint32 flags = SDL_GetWindowFlags(_p_Window);
-        // if (flags & SDL_WINDOW_FULLSCREEN) {
-        //     TRACE_DEBUG("[SolitarioGfx - Iterate] exit from full screen\n");
-        //     SDL_SetWindowFullscreen(_p_Window, false);
-        // }
         done = true;
     }
 

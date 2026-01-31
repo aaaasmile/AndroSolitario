@@ -403,10 +403,14 @@ LPErrInApp AppGfx::selectLayout(int w, int h) {
     float aspect = (float)w / (float)h;
     if (aspect < 0.75f) {
         resolutionMgr_SetNarrowPortrait(g_ResolutionMgr, w, h);
+        _p_GameSettings->SetPortraitNarrowMode(true);
     } else if (aspect < 1.1f) {
         resolutionMgr_SetWidePortrait(g_ResolutionMgr, w, h);
+        _p_GameSettings->SetPortraitWideMode(true);
     } else {
         resolutionMgr_SetLandscape(g_ResolutionMgr, w, h);
+        _p_GameSettings->SetPortraitWideMode(false);
+        _p_GameSettings->SetPortraitNarrowMode(false);
     }
 
     _p_GameSettings->SetDisplaySize(g_ResolutionMgr.displayWidth,
