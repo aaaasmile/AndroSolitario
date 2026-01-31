@@ -10,7 +10,6 @@
 #include "GameSettings.h"
 #include "Traits.h"
 
-
 using namespace traits;
 class ButtonGfx;
 class CurrentTime;
@@ -132,12 +131,14 @@ class SolitarioGfx {
     LPErrInApp DrawCardPac(LPCardGfx pCard, SDL_Surface* s);
 
     LPErrInApp DrawCardBack(int x, int y);
-    LPErrInApp DrawCardBack(int x, int y, SDL_Surface* s);
-    LPErrInApp DrawCardBackPac(int x, int y, SDL_Surface* s);
+    LPErrInApp DrawCardBack(int x, int y, SDL_Surface* s, float scaleFactor);
+    LPErrInApp DrawCardBackPac(int x, int y, SDL_Surface* s, float scaleFactor);
 
     LPErrInApp DrawSymbol(int x, int y, int nSymbol);
-    LPErrInApp DrawSymbol(int x, int y, int nSymbol, SDL_Surface* s);
-    LPErrInApp DrawSymbolPac(int x, int y, int nSymbol, SDL_Surface* s);
+    LPErrInApp DrawSymbol(int x, int y, int nSymbol, SDL_Surface* s,
+                          float scaleFactor);
+    LPErrInApp DrawSymbolPac(int x, int y, int nSymbol, SDL_Surface* s,
+                             float scaleFactor);
 
     LPErrInApp VictoryAnimationIterate();
 

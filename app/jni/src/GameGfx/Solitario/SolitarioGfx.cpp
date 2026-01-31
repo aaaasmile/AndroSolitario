@@ -320,7 +320,8 @@ LPErrInApp SolitarioGfx::DrawCardStack(SDL_Surface* s,
         if (pCard->IsFaceUp()) {
             err = DrawCard(pCard, s);
         } else {
-            err = DrawCardBack(pCard->X(), pCard->Y(), s);
+            err = DrawCardBack(pCard->X(), pCard->Y(), s,
+                               pcardRegion->GetScaleFactor());
         }
         if (err != NULL) {
             return err;
@@ -826,19 +827,21 @@ LPErrInApp SolitarioGfx::DrawCardPac(LPCardGfx pCard, SDL_Surface* s) {
 }
 
 LPErrInApp SolitarioGfx::DrawCardBack(int x, int y) {
-    return DrawCardBack(x, y, _p_Screen);
+    return DrawCardBack(x, y, _p_Screen, 0.0);
 }
 
-LPErrInApp SolitarioGfx::DrawCardBack(int x, int y, SDL_Surface* s) {
+LPErrInApp SolitarioGfx::DrawCardBack(int x, int y, SDL_Surface* s,
+                                      float scaleFactor) {
     if (s == NULL) {
         return ERR_UTIL::ErrorCreate(
             "Error in DrawCardBack, surface is NULL\n");
     }
 
-    return DrawCardBackPac(x, y, s);
+    return DrawCardBackPac(x, y, s, scaleFactor);
 }
 
-LPErrInApp SolitarioGfx::DrawCardBackPac(int x, int y, SDL_Surface* s) {
+LPErrInApp SolitarioGfx::DrawCardBackPac(int x, int y, SDL_Surface* s,
+                                         float scaleFactor) {
     SDL_Rect dest, srcBack;
     dest.x = x;
     dest.y = y;
@@ -848,7 +851,16 @@ LPErrInApp SolitarioGfx::DrawCardBackPac(int x, int y, SDL_Surface* s) {
     srcBack.w = g_SymbolWidth;
     srcBack.h = g_SymbolHeight;
 
-    if (!SDL_BlitSurface(_p_Symbols, &srcBack, s, &dest)) {
+    if (scaleFactor != 0.0) {
+        dest.w = (int)(srcBack.w * scaleFactor);
+        dest.h = (int)(srcBack.h * scaleFactor);
+        if (!SDL_BlitSurfaceScaled(_p_Symbols, &srcBack, s, &dest,
+                                   SDL_SCALEMODE_NEAREST)) {
+            return ERR_UTIL::ErrorCreate(
+                "SDL_BlitSurfaceScaled in DrawSymbol error: %s\n",
+                SDL_GetError());
+        }
+    } else if (!SDL_BlitSurface(_p_Symbols, &srcBack, s, &dest)) {
         return ERR_UTIL::ErrorCreate(
             "SDL_BlitSurface in DrawCardBackPac error: %s\n", SDL_GetError());
     }
@@ -857,36 +869,49 @@ LPErrInApp SolitarioGfx::DrawCardBackPac(int x, int y, SDL_Surface* s) {
 }
 
 LPErrInApp SolitarioGfx::DrawSymbol(int x, int y, int nSymbol) {
-    return DrawSymbol(x, y, nSymbol, _p_Screen);
+    return DrawSymbol(x, y, nSymbol, _p_Screen, 0.0);
 }
 
-LPErrInApp SolitarioGfx::DrawSymbol(int x, int y, int nSymbol, SDL_Surface* s) {
+LPErrInApp SolitarioGfx::DrawSymbol(int x, int y, int nSymbol, SDL_Surface* s,
+                                    float scaleFactor) {
     if (nSymbol < 1) {
         return ERR_UTIL::ErrorCreate("Symbol index %d out of range", nSymbol);
     }
     if (nSymbol > 3)
         nSymbol = 3;
 
-    return DrawSymbolPac(x, y, nSymbol, s);
+    return DrawSymbolPac(x, y, nSymbol, s, scaleFactor);
 }
 
 LPErrInApp SolitarioGfx::DrawSymbolPac(int x, int y, int nSymbol,
-                                       SDL_Surface* s) {
-    SDL_Rect srcCard;
-    srcCard.x = nSymbol * g_SymbolWidth;
-    srcCard.y = 0;
-    srcCard.w = g_SymbolWidth;
-    srcCard.h = g_SymbolHeight;
+                                       SDL_Surface* s, float scaleFactor) {
+    if (nSymbol < 0 || nSymbol >= 4)
+        return ERR_UTIL::ErrorCreate("DrawSymbol %d index out of range",
+                                     nSymbol);
+
+    SDL_Rect srcSymb;
+    srcSymb.x = nSymbol * g_SymbolWidth;
+    srcSymb.y = 0;
+    srcSymb.w = g_SymbolWidth;
+    srcSymb.h = g_SymbolHeight;
 
     SDL_Rect dest;
     dest.x = x;
     dest.y = y;
 
-    if (!SDL_BlitSurface(_p_Symbols, &srcCard, s, &dest)) {
+    if (scaleFactor != 0.0) {
+        dest.w = (int)(srcSymb.w * scaleFactor);
+        dest.h = (int)(srcSymb.h * scaleFactor);
+        if (!SDL_BlitSurfaceScaled(_p_Symbols, &srcSymb, s, &dest,
+                                   SDL_SCALEMODE_NEAREST)) {
+            return ERR_UTIL::ErrorCreate(
+                "SDL_BlitSurfaceScaled in DrawSymbol error: %s\n",
+                SDL_GetError());
+        }
+    } else if (!SDL_BlitSurface(_p_Symbols, &srcSymb, s, &dest)) {
         return ERR_UTIL::ErrorCreate(
-            "SDL_BlitSurface in DrawSymbolPac error: %s\n", SDL_GetError());
+            "SDL_BlitSurface in DrawSymbol error: %s\n", SDL_GetError());
     }
-
     return NULL;
 }
 
@@ -1767,11 +1792,28 @@ LPErrInApp SolitarioGfx::Show() {
     int yLine0 = 10;
     int yoffsetLine0 = 40;
     int yOverlapCard = 37;
+    float scaleFactor = 0.0f;
+
     if (pGameSettings->IsNarrowPortrait()) {
         yOverlapCard = 42;
+        if (_deckType.GetType() == eDeckType::TAROCK_PIEMONT) {
+            scaleFactor = 0.75f;
+            xLine0 = 10;
+            yoffsetLine0 = 20;
+            yOverlapCard = 30;
+        }
     }
     int xOffsetIntraStack = 17;
     int xOffsetFaceUp = 25;
+
+    int cardWidth = g_CardWidth;
+    int cardHeight = g_CardHeight;
+    if (scaleFactor > 0.0f) {
+        cardWidth = (int)(g_CardWidth * scaleFactor);
+        cardHeight = (int)(g_CardHeight * scaleFactor);
+        xOffsetIntraStack = 10;
+        xOffsetFaceUp = 15;
+    }
 
     // index 0 (deck with face down)
     CreateRegion(RT_DECKSTOCK,           // ID
@@ -1789,8 +1831,8 @@ LPErrInApp SolitarioGfx::Show() {
                          CRD_DOKING,  // accept mode
                      CRD_DRAGFACEUP,  // drag mode
                      CRD_HSYMBOL,     // symbol
-                     (g_CardWidth * (i - 1)) + (i * xOffsetIntraStack),
-                     g_CardHeight + yoffsetLine0 + yLine0, 0,
+                     (cardWidth * (i - 1)) + (i * xOffsetIntraStack),
+                     cardHeight + yoffsetLine0 + yLine0, 0,
                      yOverlapCard);  // x, y, x offset, yoffset
     }
 
@@ -1800,7 +1842,7 @@ LPErrInApp SolitarioGfx::Show() {
                  CRD_DOALL,                                       // accept mode
                  CRD_DRAGTOP,                                     // drag mode
                  CRD_NSYMBOL,                                     // symbol
-                 xLine0 + g_CardWidth + xOffsetFaceUp, yLine0, 0,
+                 xLine0 + cardWidth + xOffsetFaceUp, yLine0, 0,
                  0);  // x, y, x offset, yoffset
 
     // index 9-12 (4 aces place on the top)
@@ -1812,8 +1854,16 @@ LPErrInApp SolitarioGfx::Show() {
                 CRD_DOSUIT,  // Accept mode
             CRD_DRAGTOP,     // drop mode
             CRD_HSYMBOL,     // symbol
-            (g_CardWidth * (i - 1)) + (i * xOffsetIntraStack), yLine0, 0,
+            (cardWidth * (i - 1)) + (i * xOffsetIntraStack), yLine0, 0,
             0);  // x, y, x offset, yoffset
+    }
+
+    if (scaleFactor > 0.0f) {
+        for (regionVI vir = _cardRegionList.begin();
+             vir != _cardRegionList.end(); ++vir) {
+            vir->SetScaleFactor(scaleFactor);
+            vir->SetDeckSurface(_p_Deck);
+        }
     }
 
     LPErrInApp err = newGame();
