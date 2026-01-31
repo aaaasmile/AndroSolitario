@@ -187,6 +187,7 @@ class SolitarioGfx {
     void zoomDropCardStart(int* pSx, int* pSy, LPCardGfx pCard, int width,
                            int height);
     LPErrInApp zoomDropCardIterate();
+    void initButtons();
     void setDeckType(DeckType& dt) { _deckType.CopyFrom(dt); }
     void clearSurface();
     LPErrInApp newGame();
@@ -219,7 +220,7 @@ class SolitarioGfx {
     void showYesNoMsgBox(LPCSTR strText);
     void showOkMsgBox(LPCSTR strText);
     LPErrInApp clickOnDeckStock(CardRegionGfx* pCardRegSrc);
-    
+
    private:
     CardStackGfx _dragStack;
     DragPileInfo _dragPileInfo;

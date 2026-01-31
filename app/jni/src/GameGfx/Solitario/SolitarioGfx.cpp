@@ -185,59 +185,10 @@ LPErrInApp SolitarioGfx::Initialize(SDL_Surface* pScreen,
         return ERR_UTIL::ErrorCreate("Only pac file supported");
     }
 
-    SDL_Rect rctBt1 = {0, 0, 0, 0};
-    int btw = 120;
-    int btwSymb = 60;
-    int bth = 34;
-    int btoffsetY = 70;
-    int btintraX = 30;
-    int soundIntraX = 70;
-
-    int buttons_w = 2 * btw + btwSymb + 2 * btintraX + soundIntraX;
-    int btposx = (_p_Screen->w - buttons_w) / 2;
-
-    // Sound Toggle
-    rctBt1.w = btwSymb;
-    rctBt1.h = bth;
-    rctBt1.x = btposx;
-    rctBt1.y = _p_Screen->h - btoffsetY;
-    ClickCb cbBtToggleSound = prepClickToggleSoundCb();
-    _p_BtToggleSound = new ButtonGfx();
-    _p_BtToggleSound->InitializeAsSymbol(&rctBt1, _p_Screen,
-                                         pGameSettings->GetFontSymb(),
-                                         MYIDTOGGLESOUND, cbBtToggleSound);
+    initButtons();
     _p_BtToggleSound->SetVisibleState(ButtonGfx::INVISIBLE);
-
-    // button Quit
-    ClickCb cbBtQuit = prepClickQuitCb();
-    _p_BtQuit = new ButtonGfx();
-    rctBt1.x = rctBt1.x + rctBt1.w + soundIntraX;
-    rctBt1.w = btw;
-    _p_BtQuit->Initialize(&rctBt1, _p_Screen, _p_FontBigText, MYIDQUIT,
-                          cbBtQuit);
     _p_BtQuit->SetVisibleState(ButtonGfx::INVISIBLE);
-
-    // button new game
-    ClickCb cbBtNewGame = prepClickNewGameCb();
-    _p_BtNewGame = new ButtonGfx();
-    rctBt1.x = rctBt1.x + rctBt1.w + btintraX;
-    rctBt1.w = btw;
-    _p_BtNewGame->Initialize(&rctBt1, _p_Screen, _p_FontBigText, MYIDNEWGAME,
-                             cbBtNewGame);
     _p_BtNewGame->SetVisibleState(ButtonGfx::INVISIBLE);
-
-    // Fullscreen Toggle
-    rctBt1.x =
-        (rctBt1.x + rctBt1.w) + btintraX;  //_p_Screen->w - rctBt1.w - 10;
-    rctBt1.w = btwSymb;
-    rctBt1.h = bth;
-
-    // rctBt1.y = 10;
-    ClickCb cbBtToggleFullscreen = prepClickToggleFullscreenCb();
-    _p_BtToggleFullscreen = new ButtonGfx();
-    _p_BtToggleFullscreen->InitializeAsSymbol(
-        &rctBt1, _p_Screen, pGameSettings->GetFontSymb(), MYIDTOGGLEFULLSCREEN,
-        cbBtToggleFullscreen);
     _p_BtToggleFullscreen->SetVisibleState(ButtonGfx::INVISIBLE);
 
     TRACE_DEBUG("Solitario initialized \n");
@@ -245,7 +196,8 @@ LPErrInApp SolitarioGfx::Initialize(SDL_Surface* pScreen,
 }
 
 LPErrInApp SolitarioGfx::OnResize(SDL_Surface* pScreen) {
-    TRACE_DEBUG("[SolitarioGfx::OnResize] screen w=%d, h=%d \n", _p_Screen->w, _p_Screen->h);
+    TRACE_DEBUG("[SolitarioGfx::OnResize] screen w=%d, h=%d \n", pScreen->w,
+                pScreen->h);
     _p_Screen = pScreen;
 
     if (_p_AlphaDisplay != NULL) {
@@ -264,10 +216,72 @@ LPErrInApp SolitarioGfx::OnResize(SDL_Surface* pScreen) {
     _p_ScreenBackbufferDrag = GFX_UTIL::SDL_CreateRGBSurface(
         _p_Screen->w, _p_Screen->h, 32, 0, 0, 0, 0);
 
+    // Re-initialize buttons
+    initButtons();
+
     DrawStaticScene();
-    //_isDirty = true;
 
     return NULL;
+}
+
+void SolitarioGfx::initButtons() {
+    SDL_Rect rctBt1 = {0, 0, 0, 0};
+    int btw = 120;
+    int btwSymb = 60;
+    int bth = 34;
+    int btoffsetY = 70;
+    int btintraX = 30;
+    int soundIntraX = 70;
+
+    int buttons_w = 2 * btw + btwSymb + 2 * btintraX + soundIntraX;
+    int btposx = (_p_Screen->w - buttons_w) / 2;
+
+    LPGameSettings pGameSettings = GameSettings::GetSettings();
+
+    // Sound Toggle
+    rctBt1.w = btwSymb;
+    rctBt1.h = bth;
+    rctBt1.x = btposx;
+    rctBt1.y = _p_Screen->h - btoffsetY;
+    if (_p_BtToggleSound == NULL) {
+        _p_BtToggleSound = new ButtonGfx();
+    }
+    ClickCb cbBtToggleSound = prepClickToggleSoundCb();
+    _p_BtToggleSound->InitializeAsSymbol(&rctBt1, _p_Screen,
+                                         pGameSettings->GetFontSymb(),
+                                         MYIDTOGGLESOUND, cbBtToggleSound);
+
+    // button Quit
+    if (_p_BtQuit == NULL) {
+        _p_BtQuit = new ButtonGfx();
+    }
+    ClickCb cbBtQuit = prepClickQuitCb();
+    rctBt1.x = rctBt1.x + rctBt1.w + soundIntraX;
+    rctBt1.w = btw;
+    _p_BtQuit->Initialize(&rctBt1, _p_Screen, _p_FontBigText, MYIDQUIT,
+                          cbBtQuit);
+
+    // button new game
+    if (_p_BtNewGame == NULL) {
+        _p_BtNewGame = new ButtonGfx();
+    }
+    ClickCb cbBtNewGame = prepClickNewGameCb();
+    rctBt1.x = rctBt1.x + rctBt1.w + btintraX;
+    rctBt1.w = btw;
+    _p_BtNewGame->Initialize(&rctBt1, _p_Screen, _p_FontBigText, MYIDNEWGAME,
+                             cbBtNewGame);
+
+    // Fullscreen Toggle
+    if (_p_BtToggleFullscreen == NULL) {
+        _p_BtToggleFullscreen = new ButtonGfx();
+    }
+    ClickCb cbBtToggleFullscreen = prepClickToggleFullscreenCb();
+    rctBt1.x = (rctBt1.x + rctBt1.w) + btintraX;
+    rctBt1.w = btwSymb;
+    rctBt1.h = bth;
+    _p_BtToggleFullscreen->InitializeAsSymbol(
+        &rctBt1, _p_Screen, pGameSettings->GetFontSymb(), MYIDTOGGLEFULLSCREEN,
+        cbBtToggleFullscreen);
 }
 
 void SolitarioGfx::InitAllCoords() {
@@ -1585,7 +1599,7 @@ LPErrInApp SolitarioGfx::HandleIterate(bool& done) {
         InitDragContinueIterate();
         return NULL;
     }
-    
+
     if (_state == SolitarioGfx::IN_ZOOM) {
         return zoomDropCardIterate();
     }
@@ -1611,7 +1625,7 @@ LPErrInApp SolitarioGfx::HandleIterate(bool& done) {
         }
         return NULL;
     }
-    
+
     if (_state == SolitarioGfx::IN_GAME) {
         if (_statePrev != _state) {
             DrawStaticScene();

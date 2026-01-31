@@ -36,6 +36,10 @@ void ButtonGfx::Initialize(SDL_Rect* pRect, SDL_Surface* pScreen,
     _fncbClickEvent = fncbClickEvent;
     _rctButton = *pRect;
 
+    if (_p_buttonSurface) {
+        SDL_DestroySurface(_p_buttonSurface);
+        _p_buttonSurface = NULL;
+    }
     _p_buttonSurface = GFX_UTIL::SDL_CreateRGBSurface(
         _rctButton.w, _rctButton.h, 32, 0, 0, 0, 0);
 
@@ -57,6 +61,10 @@ void ButtonGfx::InitializeAsSymbol(SDL_Rect* pRect, SDL_Surface* pScreen,
     _fncbClickEvent = fncbClickEvent;
     _rctButton = *pRect;
 
+    if (_p_buttonSurface) {
+        SDL_DestroySurface(_p_buttonSurface);
+        _p_buttonSurface = NULL;
+    }
     _p_buttonSurface = GFX_UTIL::SDL_CreateRGBSurface(
         _rctButton.w, _rctButton.h, 32, 0, 0, 0, 0);
 
@@ -159,9 +167,9 @@ void ButtonGfx::DrawButton(SDL_Surface* pScreen) {
         size_t len = 0;
         TTF_MeasureString(_p_fontText, _buttonText.c_str(), 1, _rctButton.w,
                           &tx, &len);
-        //TRACE_DEBUG("TTF_MeasureString is tx: %d ty: %d \n", tx, hh);
+        // TRACE_DEBUG("TTF_MeasureString is tx: %d ty: %d \n", tx, hh);
         tx += 5;
-        ty = 32; // fixed symbol height!
+        ty = 32;  // fixed symbol height!
     }
 
     int iXOffSet = (_rctButton.w - tx) / 2;
