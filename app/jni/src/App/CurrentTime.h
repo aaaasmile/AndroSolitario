@@ -2,10 +2,11 @@
 #define _CURRTIME_H
 
 #include <cstdint>
-#include "TypeGlobal.h"
+
+#include "Config.h"
 
 class CurrentTime {
-public:
+   public:
     CurrentTime() { Reset(); }
     STRING ToString();
     STRING ToStringMinSec();
@@ -15,7 +16,7 @@ public:
     uint64_t GetDeltaFromLastUpdate() { return _deltaSec; }
     void StopTimer() { _updateStopped = true; }
 
-private:
+   private:
     int _sec;
     int _min;
     int _hour;

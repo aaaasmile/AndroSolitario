@@ -1,8 +1,9 @@
 #ifndef _CCOMBOGFX_H__
 #define _CCOMBOGFX_H__
 
+#include "Config.h"
 #include "Traits.h"
-#include "TypeGlobal.h"
+
 
 using namespace traits;
 class GameSettings;

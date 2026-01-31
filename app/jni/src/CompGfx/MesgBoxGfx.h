@@ -5,11 +5,9 @@
 #include <SDL3/SDL.h>
 #include <SDL3_ttf/SDL_ttf.h>
 
-#include <vector>
-
+#include "Config.h"
 #include "ErrorInfo.h"
 #include "Traits.h"
-#include "TypeGlobal.h"
 
 using namespace traits;
 

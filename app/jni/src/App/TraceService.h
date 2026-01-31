@@ -1,6 +1,6 @@
 #include <fstream>
 
-#include "TypeGlobal.h"
+#include "Config.h"
 
 #ifndef TRACESERVICE__H___
 #define TRACESERVICE__H___

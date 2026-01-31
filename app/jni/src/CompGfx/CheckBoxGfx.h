@@ -4,8 +4,9 @@
 #include <SDL3/SDL.h>
 #include <SDL3_ttf/SDL_ttf.h>
 
+#include "Config.h"
 #include "Traits.h"
-#include "TypeGlobal.h"
+
 class GameSettings;
 
 using namespace traits;
@@ -24,8 +25,8 @@ class CheckBoxGfx {
     void Initialize(SDL_Rect* pRect, SDL_Surface* pScreen, TTF_Font* pFont,
                     int iButID, CheckboxClickCb& fncbClickEvent);
     void SetWindowText(LPCSTR strCaption) { _buttonText = strCaption; }
-    void MouseMove(SDL_Event* pEvent, const SDL_Point& targetPos, SDL_Surface* pScreen,
-                   SDL_Surface* pScene_background);
+    void MouseMove(SDL_Event* pEvent, const SDL_Point& targetPos,
+                   SDL_Surface* pScreen, SDL_Surface* pScene_background);
     void FingerDown(SDL_Event* pEvent);
     void MouseUp(SDL_Event* pEvent, const SDL_Point& targetPos);
     void DrawButton(SDL_Surface* pScreen);

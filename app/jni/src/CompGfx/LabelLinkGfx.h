@@ -4,13 +4,14 @@
 #include <SDL3/SDL.h>
 #include <SDL3_ttf/SDL_ttf.h>
 
+#include "Config.h"
 #include "Traits.h"
-#include "TypeGlobal.h"
+
 
 using namespace traits;
 
 class LabelLinkGfx {
-public:
+   public:
     enum eSate { VISIBLE, INVISIBLE, PRESSED };
 
     LabelLinkGfx();
@@ -28,7 +29,7 @@ public:
     int PosX() { return _rctCtrl.x; }
     int PosY() { return _rctCtrl.y; }
 
-protected:
+   protected:
     eSate _stateGfx;
     SDL_Rect _rctCtrl;
     STRING _ctrlText;

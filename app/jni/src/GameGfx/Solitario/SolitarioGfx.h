@@ -5,10 +5,11 @@
 #include <vector>
 
 #include "CardRegionGfx.h"
+#include "Config.h"
 #include "ErrorInfo.h"
 #include "GameSettings.h"
 #include "Traits.h"
-#include "TypeGlobal.h"
+
 
 using namespace traits;
 class ButtonGfx;

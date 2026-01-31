@@ -5,11 +5,10 @@
 #include <SDL3/SDL.h>
 #include <SDL3_ttf/SDL_ttf.h>
 
-#include "ErrorInfo.h"
-#include "TypeGlobal.h"
+#include "Config.h"
 
 class LabelGfx {
-public:
+   public:
     enum SateGfx { VISIBLE, INVISIBLE, PRESSED };
 
     LabelGfx();
@@ -21,7 +20,7 @@ public:
     void EnableWindow(bool bVal) { _isEnabled = bVal; }
     void SetState(SateGfx eVal);
 
-private:
+   private:
     SateGfx _StateGfx;
     SDL_Rect _rctCtrl;
     STRING _CtrlText;

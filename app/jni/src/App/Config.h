@@ -4,6 +4,8 @@
 #include <stdarg.h>
 
 #include <cstdio>
+#include <string>
+#include <vector>
 
 #define VERSION "Ver 3.0.13 20260130-00"
 #define PACKAGE_URL "https://invido.it"
@@ -123,6 +125,26 @@ inline void TRACE(const char* fmt, ...) {}
 inline void TRACE_DEBUG(const char* fmt, ...) {}
 #endif
 #endif
+#endif
+
+#ifndef BYTE
+typedef unsigned char BYTE;
+#endif
+
+#ifndef STRING
+typedef std::string STRING;
+#endif
+
+#ifndef LPCSTR
+typedef const char *LPCSTR, *PCSTR;
+#endif
+
+#ifndef VCT_STRING
+typedef std::vector<std::string> VCT_STRING;
+#endif
+
+#if USE_EMPTY_DATA_PREFIX
+#define DATA_PREFIX
 #endif
 
 #endif  // CONFIG_H

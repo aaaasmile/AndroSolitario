@@ -12,9 +12,7 @@
 
 #include "ErrorInfo.h"
 #include "GameSettings.h"
-#include "Languages.h"
 #include "Traits.h"
-#include "TypeGlobal.h"
 
 class MusicManager;
 class HighScore;

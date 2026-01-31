@@ -5,9 +5,10 @@
 
 #include <vector>
 
+#include "Config.h"
 #include "DeckType.h"
 #include "ErrorInfo.h"
-#include "TypeGlobal.h"
+
 
 enum eSUIT { BASTONI = 0, COPPE = 1, DENARI = 2, SPADE = 3 };
 

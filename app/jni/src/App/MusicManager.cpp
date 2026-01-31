@@ -4,7 +4,6 @@
 
 #include "Config.h"
 #include "GameSettings.h"
-#include "TypeGlobal.h"
 
 static const char* lpszaSound_filenames[MusicManager::NUM_OF_SOUNDS] = {
     DATA_PREFIX "music/wolmer-invido.ogg", DATA_PREFIX "music/watermusic.ogg",

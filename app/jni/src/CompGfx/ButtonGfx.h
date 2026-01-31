@@ -4,8 +4,9 @@
 #include <SDL3/SDL.h>
 #include <SDL3_ttf/SDL_ttf.h>
 
+#include "Config.h"
 #include "Traits.h"
-#include "TypeGlobal.h"
+
 
 using namespace traits;
 class GameSettings;
@@ -22,11 +23,9 @@ class ButtonGfx {
     void Initialize(SDL_Rect* pRect, SDL_Surface* pScreen, TTF_Font* pFont,
                     int iButID, ClickCb& fncbClickEvent);
     void InitializeAsSymbol(SDL_Rect* pRect, SDL_Surface* pScreen,
-                                       TTF_Font* pFont, int iButID,
-                                       ClickCb& fncbClickEvent);
-    void SetButtonText(LPCSTR text) {
-        _buttonText = text;
-    }
+                            TTF_Font* pFont, int iButID,
+                            ClickCb& fncbClickEvent);
+    void SetButtonText(LPCSTR text) { _buttonText = text; }
     bool MouseMove(SDL_Event* pEvent, const SDL_Point& targetPos);
     bool MouseUp(SDL_Event* pEvent, const SDL_Point& targetPos);
     bool MouseDown(SDL_Event* pEvent, const SDL_Point& targetPos);

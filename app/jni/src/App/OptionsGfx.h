@@ -5,10 +5,10 @@
 #include <SDL3_ttf/SDL_ttf.h>
 
 #include "CardGfx.h"
+#include "Config.h"
 #include "ErrorInfo.h"
 #include "GameSettings.h"
 #include "Traits.h"
-#include "TypeGlobal.h"
 
 class ButtonGfx;
 class Languages;
