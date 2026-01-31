@@ -125,22 +125,26 @@ class SolitarioGfx {
 
     LPErrInApp DrawCard(int x, int y, int nCdIndex);
     LPErrInApp DrawCard(int x, int y, int nCdIndex, SDL_Surface* s,
-                        float scaleFactor);
-    LPErrInApp DrawCard(LPCardGfx pCard, SDL_Surface* s, float scaleFactor);
+                        float scaleFactor = 0.0f);
+    LPErrInApp DrawCard(LPCardGfx pCard, SDL_Surface* s,
+                        float scaleFactor = 0.0f);
 
     LPErrInApp DrawCardPac(int x, int y, int nCdIndex, SDL_Surface* s,
-                           float scaleFactor);
-    LPErrInApp DrawCardPac(LPCardGfx pCard, SDL_Surface* s, float scaleFactor);
+                           float scaleFactor = 0.0f);
+    LPErrInApp DrawCardPac(LPCardGfx pCard, SDL_Surface* s,
+                           float scaleFactor = 0.0f);
 
     LPErrInApp DrawCardBack(int x, int y);
-    LPErrInApp DrawCardBack(int x, int y, SDL_Surface* s, float scaleFactor);
-    LPErrInApp DrawCardBackPac(int x, int y, SDL_Surface* s, float scaleFactor);
+    LPErrInApp DrawCardBack(int x, int y, SDL_Surface* s,
+                            float scaleFactor = 0.0f);
+    LPErrInApp DrawCardBackPac(int x, int y, SDL_Surface* s,
+                               float scaleFactor = 0.0f);
 
     LPErrInApp DrawSymbol(int x, int y, int nSymbol);
     LPErrInApp DrawSymbol(int x, int y, int nSymbol, SDL_Surface* s,
-                          float scaleFactor);
+                          float scaleFactor = 0.0f);
     LPErrInApp DrawSymbolPac(int x, int y, int nSymbol, SDL_Surface* s,
-                             float scaleFactor);
+                             float scaleFactor = 0.0f);
 
     LPErrInApp VictoryAnimationIterate();
 
@@ -275,6 +279,7 @@ class SolitarioGfx {
     LPCardStackGfx _p_CardStackForDrag;
     bool _isInitDrag;
     int _doubleTapWait;
+    float _scaleFactor;
 };
 
 #endif

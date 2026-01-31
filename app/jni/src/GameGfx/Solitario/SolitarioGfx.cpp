@@ -45,6 +45,7 @@ SolitarioGfx::SolitarioGfx() {
     _p_CardStackForDrag = NULL;
     _isInitDrag = false;
     _doubleTapWait = 300;
+    _scaleFactor = 0.0f;
     _lastUpTimestamp = 0;
     _fnUpdateScreen.tc = NULL;
     _fnUpdateScreen.self = NULL;
@@ -307,24 +308,27 @@ LPErrInApp SolitarioGfx::DrawCardStack(SDL_Surface* s,
     if (pcardRegion == NULL) {
         return ERR_UTIL::ErrorCreate("DrawCardStack region is NULL");
     }
-    // TRACE_DEBUG("Draw card stack %d, visible %d\n",
 
     LPErrInApp err;
     if (!pcardRegion->IsVisible())
         return NULL;
 
-    DrawSymbol(pcardRegion->X(), pcardRegion->Y(), pcardRegion->Symbol());
+    float scaleFactor = pcardRegion->GetScaleFactor();
 
-    for (int i = 0; i < pcardRegion->Size(); i++) {
-        LPCardGfx pCard = pcardRegion->Item(i);
-        if (pCard->IsFaceUp()) {
-            err = DrawCard(pCard, s);
-        } else {
-            err = DrawCardBack(pCard->X(), pCard->Y(), s,
-                               pcardRegion->GetScaleFactor());
-        }
-        if (err != NULL) {
-            return err;
+    if (pcardRegion->IsEmpty()) {
+        DrawSymbol(pcardRegion->X(), pcardRegion->Y(), pcardRegion->Symbol(), s,
+                   scaleFactor);
+    } else {
+        for (int i = 0; i < pcardRegion->Size(); i++) {
+            LPCardGfx pCard = pcardRegion->Item(i);
+            if (pCard->IsFaceUp()) {
+                err = DrawCard(pCard, s, scaleFactor);
+            } else {
+                err = DrawCardBack(pCard->X(), pCard->Y(), s, scaleFactor);
+            }
+            if (err != NULL) {
+                return err;
+            }
         }
     }
     return NULL;
@@ -452,6 +456,7 @@ LPErrInApp SolitarioGfx::InitDragContinueIterate() {
             _p_selectedCardRegion->GetxOffset(),
             _p_selectedCardRegion->GetyOffset(), _deckType, g_CardWidth,
             g_CardHeight);
+        dragRegion.SetScaleFactor(_scaleFactor);
 
         dragRegion.PushStack(&_dragStack);
 
@@ -496,8 +501,8 @@ LPErrInApp SolitarioGfx::InitDragContinueIterate() {
     }
     if (_state == SolitarioGfx::INITDRAG_AFTER) {
         updateTextureAsFlipScreen();
-        _state = SolitarioGfx::IN_GAME;  // ahead set beacause the callback can
-                                         // change the state
+        _state = SolitarioGfx::IN_GAME;  // ahead set beacause the callback
+                                         // can change the state
         if (_continueFnCb != NULL) {
             TRACE_DEBUG(
                 "[INITDRAG_AFTER] InitDrag - run the callback after \n");
@@ -536,8 +541,8 @@ void SolitarioGfx::DoDragUpdate(int x, int y) {
     dest.x = _dragPileInfo.x;
     dest.y = _dragPileInfo.y;
 
-    // Do full screen update (On modern hardware, clearing the full screen is
-    // cheap and almost always the right tradeoff.)
+    // Do full screen update (On modern hardware, clearing the full screen
+    // is cheap and almost always the right tradeoff.)
 
     SDL_BlitSurface(_p_ScreenBackbufferDrag, NULL, _p_Screen, NULL);
     SDL_BlitSurface(_p_Dragface, NULL, _p_Screen, &dest);
@@ -557,8 +562,9 @@ LPCardRegionGfx SolitarioGfx::DoDropEvent(LPCardRegionGfx pDestRegion) {
     if (pDestRegion != NULL)
         pBestRegion = pDestRegion;
     else
-        pBestRegion = GetBestStack(_dragPileInfo.x, _dragPileInfo.y,
-                                   g_CardWidth, g_CardHeight, &_dragStack);
+        pBestRegion =
+            GetBestStack(_dragPileInfo.x, _dragPileInfo.y, _dragPileInfo.width,
+                         _dragPileInfo.height, &_dragStack);
     if (pBestRegion == NULL)
         pBestRegion = _p_selectedCardRegion;  // drop go back to the source, no
                                               // stack found to recive the drag
@@ -660,12 +666,13 @@ LPErrInApp SolitarioGfx::zoomDropCardIterate() {
     *g_zoomInfo->pSx = px;
     *g_zoomInfo->pSy = py;
 
-    // we are moving the dropped pile to the final destination that could be far
-    // away the static scene is fixed into the _p_ScreenBackbufferDrag. To avoid
-    // the comet effect, the full display is updated no legacy rect optimization
+    // we are moving the dropped pile to the final destination that could be
+    // far away the static scene is fixed into the _p_ScreenBackbufferDrag.
+    // To avoid the comet effect, the full display is updated no legacy rect
+    // optimization
 
-    //  Do full screen update (On modern hardware, clearing the full screen is
-    //  cheap and almost always the right tradeoff.)
+    //  Do full screen update (On modern hardware, clearing the full screen
+    //  is cheap and almost always the right tradeoff.)
     SDL_BlitSurface(_p_ScreenBackbufferDrag, NULL, _p_Screen, NULL);
     SDL_BlitSurface(_p_Dragface, NULL, _p_Screen, &rcDrag);
 
@@ -678,8 +685,8 @@ LPErrInApp SolitarioGfx::zoomDropCardIterate() {
         _scoreChanged = true;
         DrawStaticScene();
         if (_p_Dragface != NULL) {
-            SDL_DestroySurface(_p_Dragface);  // was created in InitDrag, time
-                                              // to free it on drop end
+            SDL_DestroySurface(_p_Dragface);  // was created in InitDrag,
+                                              // time to free it on drop end
             _p_Dragface = NULL;
         }
         _state = SolitarioGfx::IN_ZOOM_TERMINATED;
@@ -704,8 +711,8 @@ LPCardRegionGfx SolitarioGfx::FindDropRegion(int id, LPCardStackGfx pStack) {
 
 void SolitarioGfx::DrawStaticScene() {
     // static scene is drawn directly into the screen.
-    // Then the screen is copied into the _p_ScreenBackbufferDrag for drag and
-    // drop
+    // Then the screen is copied into the _p_ScreenBackbufferDrag for drag
+    // and drop
     SDL_Rect clipRect;
     SDL_GetSurfaceClipRect(_p_Screen, &clipRect);
     SDL_FillSurfaceRect(_p_Screen, &clipRect,
@@ -805,10 +812,18 @@ LPErrInApp SolitarioGfx::DrawCardPac(int x, int y, int nCdIndex, SDL_Surface* s,
     dest.x = x;
     dest.y = y;
 
-    if (!SDL_BlitSurface(_p_Deck, &srcCard, s, &dest)) {
+    if (scaleFactor != 0.0f) {
+        dest.w = (int)(srcCard.w * scaleFactor);
+        dest.h = (int)(srcCard.h * scaleFactor);
+        if (!SDL_BlitSurfaceScaled(_p_Deck, &srcCard, s, &dest,
+                                   SDL_SCALEMODE_NEAREST)) {
+            return ERR_UTIL::ErrorCreate(
+                "SDL_BlitSurfaceScaled in DrawCardPac error: %s\n",
+                SDL_GetError());
+        }
+    } else if (!SDL_BlitSurface(_p_Deck, &srcCard, s, &dest)) {
         return ERR_UTIL::ErrorCreate(
-            "SDL_BlitSurface in DrawCardPac with Iterator error: %s\n",
-            SDL_GetError());
+            "SDL_BlitSurface in DrawCardPac error: %s\n", SDL_GetError());
     }
     return NULL;
 }
@@ -835,6 +850,7 @@ LPErrInApp SolitarioGfx::DrawCardBack(int x, int y) {
 
 LPErrInApp SolitarioGfx::DrawCardBack(int x, int y, SDL_Surface* s,
                                       float scaleFactor) {
+    TRACE_DEBUG("DrawCardBack x=%d, y=%d\n", x, y);
     if (s == NULL) {
         return ERR_UTIL::ErrorCreate(
             "Error in DrawCardBack, surface is NULL\n");
@@ -849,18 +865,19 @@ LPErrInApp SolitarioGfx::DrawCardBackPac(int x, int y, SDL_Surface* s,
     dest.x = x;
     dest.y = y;
 
+    // Card back is index 0 in the symbols pac
     srcBack.x = 0;
     srcBack.y = 0;
     srcBack.w = g_SymbolWidth;
     srcBack.h = g_SymbolHeight;
 
-    if (scaleFactor != 0.0) {
-        dest.w = (int)(srcBack.w * scaleFactor);
-        dest.h = (int)(srcBack.h * scaleFactor);
+    if (scaleFactor != 0.0f) {
+        dest.w = (int)(g_CardWidth * scaleFactor);
+        dest.h = (int)(g_CardHeight * scaleFactor);
         if (!SDL_BlitSurfaceScaled(_p_Symbols, &srcBack, s, &dest,
                                    SDL_SCALEMODE_NEAREST)) {
             return ERR_UTIL::ErrorCreate(
-                "SDL_BlitSurfaceScaled in DrawSymbol error: %s\n",
+                "SDL_BlitSurfaceScaled in DrawCardBackPac error: %s\n",
                 SDL_GetError());
         }
     } else if (!SDL_BlitSurface(_p_Symbols, &srcBack, s, &dest)) {
@@ -993,8 +1010,8 @@ LPErrInApp SolitarioGfx::VictoryAnimationIterate() {
             g_pVict->y = g_pVict->max_y - g_CardHeight;
             g_pVict->yspeed = int(-g_pVict->yspeed * g_pVict->bounce);
         }
-        LPErrInApp err =
-            DrawCard(g_pVict->x, g_pVict->y, g_pVict->id, _p_Screen);
+        LPErrInApp err = DrawCard(g_pVict->x, g_pVict->y, g_pVict->id,
+                                  _p_Screen, _scaleFactor);
         if (err != NULL) {
             return err;
         }
@@ -1143,8 +1160,8 @@ LPErrInApp SolitarioGfx::handleGameLoopMouseDownEvent(
     SDL_Event* pEvent, const SDL_Point& targetPos) {
     if (_startdrag) {
         TRACE_DEBUG(
-            "Ignore Mousedown because is drag ongoing. Wait for drag end with "
-            "mouse up \n");
+            "Ignore Mousedown because is drag ongoing. Wait for drag end "
+            "with mouse up \n");
         return NULL;
     }
     if (pEvent->button.button == SDL_BUTTON_LEFT) {
@@ -1759,6 +1776,8 @@ LPErrInApp SolitarioGfx::Show() {
     LPGameSettings pGameSettings = GameSettings::GetSettings();
     LPLanguages pLanguages = pGameSettings->GetLanguageMan();
 
+    _cardRegionList.clear();
+
     _p_MusicManager->PlayMusic(MusicManager::MUSIC_PLAY_SND,
                                MusicManager::eLoopType::LOOP_ON);
     // button Quit
@@ -1795,15 +1814,15 @@ LPErrInApp SolitarioGfx::Show() {
     int yLine0 = 10;
     int yoffsetLine0 = 40;
     int yOverlapCard = 37;
-    float scaleFactor = 0.0f;
+    _scaleFactor = 0.0f;
 
     if (pGameSettings->IsNarrowPortrait()) {
         yOverlapCard = 42;
         if (_deckType.GetType() == eDeckType::TAROCK_PIEMONT) {
-            scaleFactor = 0.75f;
-            xLine0 = 10;
-            yoffsetLine0 = 20;
-            yOverlapCard = 30;
+            _scaleFactor = 0.62f;
+            xLine0 = 3;
+            yoffsetLine0 = 15;
+            yOverlapCard = 22;
         }
     }
     int xOffsetIntraStack = 17;
@@ -1811,11 +1830,11 @@ LPErrInApp SolitarioGfx::Show() {
 
     int cardWidth = g_CardWidth;
     int cardHeight = g_CardHeight;
-    if (scaleFactor > 0.0f) {
-        cardWidth = (int)(g_CardWidth * scaleFactor);
-        cardHeight = (int)(g_CardHeight * scaleFactor);
-        xOffsetIntraStack = 10;
-        xOffsetFaceUp = 15;
+    if (_scaleFactor > 0.0f) {
+        cardWidth = (int)(g_CardWidth * _scaleFactor);
+        cardHeight = (int)(g_CardHeight * _scaleFactor);
+        xOffsetIntraStack = 6;
+        xOffsetFaceUp = 10;
     }
 
     // index 0 (deck with face down)
@@ -1861,10 +1880,10 @@ LPErrInApp SolitarioGfx::Show() {
             0);  // x, y, x offset, yoffset
     }
 
-    if (scaleFactor > 0.0f) {
+    if (_scaleFactor > 0.0f) {
         for (regionVI vir = _cardRegionList.begin();
              vir != _cardRegionList.end(); ++vir) {
-            vir->SetScaleFactor(scaleFactor);
+            vir->SetScaleFactor(_scaleFactor);
             vir->SetDeckSurface(_p_Deck);
         }
     }
