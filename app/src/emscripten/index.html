@@ -133,7 +133,8 @@
       margin: 2px;
     }
 
-    .lang-btn {
+    .lang-btn,
+    .other-btn {
       display: flex;
       align-items: center;
       gap: 6px;
@@ -145,11 +146,13 @@
       transition: all 0.2s;
     }
 
-    .lang-btn:hover {
+    .lang-btn:hover,
+    .other-btn:hover {
       background: #e0e0e0;
     }
 
-    .lang-btn.active {
+    .lang-btn.active,
+    .other-btn.active {
       background: #4CAF50;
       color: white;
       border-color: #45a049;
@@ -158,7 +161,7 @@
 </head>
 
 <body>
-  <div class="lang-switcher">
+  <div class="lang-switcher" id="btswitcher">
     <button class="lang-btn" data-lang="it">
       <img src="https://flagcdn.com/w20/it.png" alt="Italiano" width="20" height="15">
       IT
@@ -167,8 +170,19 @@
       <img src="https://flagcdn.com/w20/gb.png" alt="English" width="20" height="15">
       EN
     </button>
-    <button class="info-btn" id="info-btn">
+    <button class="other-btn" id="info-btn">
+      <img src="https://unpkg.com/feather-icons/dist/icons/info.svg" width="20" height="20" alt="info icon">
       Info
+    </button>
+    <button class="other-btn" id="fs-btn">
+      <img src="https://unpkg.com/feather-icons/dist/icons/maximize.svg" width="20" height="20"
+        alt="fullscreen/maximize icon">
+      FS
+    </button>
+    <button class="other-btn" id="hide-btn">
+      <img src="https://unpkg.com/feather-icons/dist/icons/eye-off.svg" width="20" height="20"
+        alt="hide/visibility off">
+      Hide
     </button>
   </div>
   <div class="spinner" id='spinner'></div>
@@ -182,7 +196,7 @@
     <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" tabindex=-1></canvas>
   </div>
   <div class="emscripten" id="info"></div>
-  <div class="emscripten"><a href="\pages\solitario">Solitario</a></div>
+  <div id="linkto" class="emscripten"><a href="\pages\solitario">Solitario</a></div>
   <script type='text/javascript'>
     var statusElement = document.getElementById('status');
     var progressElement = document.getElementById('progress');
@@ -256,9 +270,20 @@
 
     console.log('windows dim ', window.screen.width, window.screen.height);
     console.log('OuterScreen dim ', window.outerWidth, window.outerHeight);
+
+    const realWidth = window.screen.width * window.devicePixelRatio;
+    const realHeight = window.screen.height * window.devicePixelRatio;
+    const iframe = document.querySelector('iframe');
+    const containerWidth = iframe ? iframe.clientWidth * window.devicePixelRatio : realWidth;
+    const containerHeight = iframe ? iframe.clientHeight * window.devicePixelRatio : realHeight;
+
     const aspectScreen = window.screen.width / window.screen.height;
     const aspectOuterScreen = window.outerWidth / window.outerHeight;
     console.log("aspect ratio are: ", aspectScreen, aspectOuterScreen);
+
+    console.log('real width and height: ', realWidth, realHeight);
+    console.log('container width and height: ', containerWidth, containerHeight);
+
     let type = 'STD';
     if (aspectOuterScreen < 0.706) {
       Module.setNarrowPortraitMode();
@@ -283,17 +308,35 @@
         Module.setLanguage(this.dataset.lang);
       });
     });
+    const fullscreenButton = document.getElementById('fs-btn');
+    fullscreenButton.addEventListener('click', function () {
+      console.log('toggle full screen');
+      Module.toggleFullScreen();
+    });
+    const hideButton = document.getElementById('hide-btn');
+    hideButton.addEventListener('click', function () {
+      console.log('hide controls');
+      var div1 = document.getElementById('btswitcher');
+      var div2 = document.getElementById('info');
+      var div3 = document.getElementById('linkto');
+      div1.style.display = 'none';
+      div1.hidden = true;
+      div2.style.display = 'none';
+      div2.hidden = true;
+      div3.style.display = 'none';
+      div3.hidden = true;
+    });
     const infoButton = document.getElementById('info-btn');
     infoButton.addEventListener('click', function () {
       console.log('toggle info');
-      if (infoEle.hidden){
+      if (infoEle.hidden) {
         infoEle.style.display = '';
         infoEle.hidden = false;
         const errMsg = localStorage.getItem('err_msg');
-        if (errMsg){
+        if (errMsg) {
           infoEle.textContent = errMsg;
         }
-      }else{
+      } else {
         infoEle.style.display = 'none';
         infoEle.hidden = true;
       }

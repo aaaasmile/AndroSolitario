@@ -33,8 +33,24 @@ void setLanguage(const std::string& languageCode) {
     }
 }
 
+EMSCRIPTEN_KEEPALIVE
+void toggleFullScreen(){
+    TRACE("[setLanguage] toggleFullScreen \n");
+    LPGameSettings pGameSetting = GameSettings::GetSettings();
+    SDL_Window* pWindow = pGameSetting->GetWindow();
+    Uint32 flags = SDL_GetWindowFlags(pWindow);
+    if (flags & SDL_WINDOW_FULLSCREEN) {
+        TRACE("[setLanguage] exit full screen \n");
+        SDL_SetWindowFullscreen(pWindow, false);
+    } else {
+        TRACE("[setLanguage] enter FULL screen \n");
+        SDL_SetWindowFullscreen(pWindow, true);
+    }
+}
+
 EMSCRIPTEN_BINDINGS(my_module) {
     emscripten::function("setLanguage", &setLanguage);
+    emscripten::function("toggleFullScreen", &toggleFullScreen);
 }
 
 #endif

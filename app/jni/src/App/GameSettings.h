@@ -86,6 +86,8 @@ class GameSettings {
     bool IsDEVPortrait() { return _portraitDevMode; }
 
     GameTypeEnum GetGameTypeGfx() { return _gameType; };
+    SDL_Window* GetWindow() { return _p_Window; }
+    void SetWindow(SDL_Window* pwin) { _p_Window = pwin; }
 
    private:
     GameSettings();
@@ -112,6 +114,7 @@ class GameSettings {
     bool _portraitWideMode = false;
     bool _portraitDevMode = false;
     GameTypeEnum _gameType = GameTypeEnum::Solitario;
+    SDL_Window* _p_Window = NULL;
 };
 
 typedef GameSettings* LPGameSettings;

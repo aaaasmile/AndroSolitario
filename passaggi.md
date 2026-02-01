@@ -207,7 +207,12 @@ Per vedere la app nel browser, bisogna far partire il web server:
     python -m http.server
 
 Nel browser al link:
+
     http://localhost:8000/index.html
+
+Se vuoi testare la app wasm all'interno di un iframe (per is deployment su aaaasmile.itch.io), usa:
+
+    http://localhost:8000/frame.html
     
 Oppure con la libreria freetype che ho compilato a parte (non mi convince, ma istruttivo per includere altre librerie se sono necessarie) invece di usare la libreria freetype integrata con SDL_ttf:
 

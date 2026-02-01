@@ -368,6 +368,7 @@ LPErrInApp AppGfx::createWindow() {
         return ERR_UTIL::ErrorCreate("Error SDL_CreateWindow: %s\n",
                                      SDL_GetError());
     }
+    _p_GameSettings->SetWindow(_p_Window);
     _p_sdlRenderer = SDL_CreateRenderer(_p_Window, NULL);
     if (_p_sdlRenderer == NULL) {
         return ERR_UTIL::ErrorCreate("Cannot create renderer: %s\n",
@@ -430,7 +431,11 @@ LPErrInApp AppGfx::selectLayout(int w, int h) {
 }
 
 LPErrInApp AppGfx::createScreenLayout() {
-    TRACE_DEBUG("[createScreenLayout] create the Screen target \n");
+    TRACE_DEBUG(
+        "[createScreenLayout] create the Screen target with: w %d, h %d. "
+        "Display w: %d, h: %d \n",
+        g_ResolutionMgr.targetWidth, g_ResolutionMgr.targetHeight,
+        g_ResolutionMgr.displayWidth, g_ResolutionMgr.displayHeight);
 
     if (_p_Screen != NULL) {
         SDL_DestroySurface(_p_Screen);
