@@ -112,6 +112,10 @@ class CardRegionGfx {
     void SetAcceptMode(unsigned int mode) { _acceptMode = mode; }
     void SetAttributes(unsigned int attr) { _attributes = attr; }
     int GetAttributes() { return _attributes; }
+    void SetX(int x) { _xCoord = x; }
+    void SetY(int y) { _yCoord = y; }
+    void SetxOffset(int xoff) { _xOffset = xoff; }
+    void SetyOffset(int yoff) { _yOffset = yoff; }
 
     bool CanDrop(LPCardStackGfx stack);
 

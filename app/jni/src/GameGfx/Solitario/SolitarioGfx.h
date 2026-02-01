@@ -223,6 +223,7 @@ class SolitarioGfx {
     void updateBadScoreScoreOnTime();
     void updateBadScoreRedial();
     void updateBadScoreAceToTableu();
+    void repositionRegions();
     void clearScore();
     void bonusScore();
     void showYesNoMsgBox(LPCSTR strText);

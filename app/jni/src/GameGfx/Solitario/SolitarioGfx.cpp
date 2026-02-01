@@ -225,6 +225,7 @@ LPErrInApp SolitarioGfx::OnResize(SDL_Surface* pScreen) {
         _p_Screen->w, _p_Screen->h, 32, 0, 0, 0, 0);
 
     initButtons();
+    repositionRegions();
 
     DrawStaticScene();
 
@@ -1810,81 +1811,36 @@ LPErrInApp SolitarioGfx::Show() {
     _p_BtToggleFullscreen->SetButtonText(strTextBt.c_str());
     _p_BtToggleFullscreen->SetVisibleState(ButtonGfx::VISIBLE);
 
-    int xLine0 = 35;
-    int yLine0 = 10;
-    int yoffsetLine0 = 40;
-    int yOverlapCard = 37;
-    _scaleFactor = 0.0f;
-    int xOffsetIntraStack = 17;
-    int xOffsetFaceUp = 25;
-
-    if (pGameSettings->IsNarrowPortrait()) {
-        yLine0 = 30;
-        yOverlapCard = 42;
-        xOffsetIntraStack = 14;
-        if (_deckType.GetType() == eDeckType::TAROCK_PIEMONT) {
-            _scaleFactor = 0.75f;
-        }
-    }
-
-    int cardWidth = g_CardWidth;
-    int cardHeight = g_CardHeight;
-    if (_scaleFactor > 0.0f) {
-        cardWidth = (int)(g_CardWidth * _scaleFactor);
-        cardHeight = (int)(g_CardHeight * _scaleFactor);
-        xOffsetIntraStack = 6;
-        xOffsetFaceUp = 10;
-    }
-
     // index 0 (deck with face down)
-    CreateRegion(RT_DECKSTOCK,           // ID
-                 CRD_VISIBLE | CRD_3D,   // attributes
-                 CRD_DONOTHING,          // Accept mode
-                 CRD_DONOTHING,          // drag mode
-                 CRD_OSYMBOL,            // symbol
-                 xLine0, yLine0, 2, 2);  // x, y, x offset, yoffset
+    CreateRegion(RT_DECKSTOCK, CRD_VISIBLE | CRD_3D, CRD_DONOTHING,
+                 CRD_DONOTHING, CRD_OSYMBOL, 0, 0, 2, 2);
     // index 1-7
-    int i;
-    for (i = 1; i <= 7; i++) {
+    for (int i = 1; i <= 7; i++) {
         CreateRegion(RegionType::RT_TABLEAU,
-                     CRD_VISIBLE | CRD_DODRAG | CRD_DODROP,  // attributes
-                     CRD_DOOPCOLOR | CRD_DOLOWER | CRD_DOLOWERBY1 |
-                         CRD_DOKING,  // accept mode
-                     CRD_DRAGFACEUP,  // drag mode
-                     CRD_HSYMBOL,     // symbol
-                     (cardWidth * (i - 1)) + (i * xOffsetIntraStack),
-                     cardHeight + yoffsetLine0 + yLine0, 0,
-                     yOverlapCard);  // x, y, x offset, yoffset
+                     CRD_VISIBLE | CRD_DODRAG | CRD_DODROP,
+                     CRD_DOOPCOLOR | CRD_DOLOWER | CRD_DOLOWERBY1 | CRD_DOKING,
+                     CRD_DRAGFACEUP, CRD_HSYMBOL, 0, 0, 0, 0);
     }
 
     // index 8 (deck face up)
     CreateRegion(RegionType::RT_DECKSTOCK_FACEUP,
-                 CRD_VISIBLE | CRD_FACEUP | CRD_DODRAG | CRD_3D,  // Attributes
-                 CRD_DOALL,                                       // accept mode
-                 CRD_DRAGTOP,                                     // drag mode
-                 CRD_NSYMBOL,                                     // symbol
-                 xLine0 + cardWidth + xOffsetFaceUp, yLine0, 0,
-                 0);  // x, y, x offset, yoffset
+                 CRD_VISIBLE | CRD_FACEUP | CRD_DODRAG | CRD_3D, CRD_DOALL,
+                 CRD_DRAGTOP, CRD_NSYMBOL, 0, 0, 0, 0);
 
     // index 9-12 (4 aces place on the top)
-    for (i = 4; i <= 7; i++) {
-        CreateRegion(
-            RegionType::RT_ACE_FOUNDATION,
-            CRD_VISIBLE | CRD_3D | CRD_DODRAG | CRD_DODROP,  // Attributes
-            CRD_DOSINGLE | CRD_DOHIGHER | CRD_DOHIGHERBY1 | CRD_DOACE |
-                CRD_DOSUIT,  // Accept mode
-            CRD_DRAGTOP,     // drop mode
-            CRD_HSYMBOL,     // symbol
-            (cardWidth * (i - 1)) + (i * xOffsetIntraStack), yLine0, 0,
-            0);  // x, y, x offset, yoffset
+    for (int i = 4; i <= 7; i++) {
+        CreateRegion(RegionType::RT_ACE_FOUNDATION,
+                     CRD_VISIBLE | CRD_3D | CRD_DODRAG | CRD_DODROP,
+                     CRD_DOSINGLE | CRD_DOHIGHER | CRD_DOHIGHERBY1 | CRD_DOACE |
+                         CRD_DOSUIT,
+                     CRD_DRAGTOP, CRD_HSYMBOL, 0, 0, 0, 0);
     }
 
-    if (_scaleFactor > 0.0f) {
-        for (regionVI vir = _cardRegionList.begin();
-             vir != _cardRegionList.end(); ++vir) {
-            vir->SetScaleFactor(_scaleFactor);
-            vir->SetDeckSurface(_p_Deck);
-        }
+    repositionRegions();
+
+    for (regionVI vir = _cardRegionList.begin(); vir != _cardRegionList.end();
+         ++vir) {
+        vir->SetDeckSurface(_p_Deck);
     }
 
     LPErrInApp err = newGame();
@@ -2111,4 +2067,69 @@ void SolitarioGfx::bonusScore() {
         _scoreGame += bonus;
         _scoreChanged = true;
     }
+}
+void SolitarioGfx::repositionRegions() {
+    LPGameSettings pGameSettings = GameSettings::GetSettings();
+    int xLine0 = 35;
+    int yLine0 = 10;
+    int yoffsetLine0 = 40;
+    int yOverlapCard = 37;
+    _scaleFactor = 0.0f;
+    int xOffsetIntraStack = 17;
+    int xOffsetFaceUp = 25;
+
+    if (pGameSettings->IsNarrowPortrait()) {
+        yLine0 = 30;
+        yOverlapCard = 42;
+        xOffsetIntraStack = 14;
+        if (_deckType.GetType() == eDeckType::TAROCK_PIEMONT) {
+            _scaleFactor = 0.75f;
+        }
+    } else {
+        if (_deckType.GetType() == eDeckType::TAROCK_PIEMONT) {
+            yOverlapCard = 32;
+        }
+    }
+
+    int cardWidth = g_CardWidth;
+    int cardHeight = g_CardHeight;
+    if (_scaleFactor > 0.0f) {
+        cardWidth = (int)(g_CardWidth * _scaleFactor);
+        cardHeight = (int)(g_CardHeight * _scaleFactor);
+        xOffsetIntraStack = 6;
+        xOffsetFaceUp = 10;
+    }
+
+    if (_cardRegionList.size() < 13)
+        return;
+
+    // index 0 (deck with face down)
+    _cardRegionList[DeckPile_Ix].SetX(xLine0);
+    _cardRegionList[DeckPile_Ix].SetY(yLine0);
+    _cardRegionList[DeckPile_Ix].SetScaleFactor(_scaleFactor);
+
+    // index 1-7 (Tableaus)
+    for (int i = 1; i <= 7; i++) {
+        _cardRegionList[i].SetX((cardWidth * (i - 1)) +
+                                (i * xOffsetIntraStack));
+        _cardRegionList[i].SetY(cardHeight + yoffsetLine0 + yLine0);
+        _cardRegionList[i].SetScaleFactor(_scaleFactor);
+        _cardRegionList[i].SetyOffset(yOverlapCard);
+    }
+
+    // index 8 (deck face up)
+    _cardRegionList[DeckFaceUp].SetX(xLine0 + cardWidth + xOffsetFaceUp);
+    _cardRegionList[DeckFaceUp].SetY(yLine0);
+    _cardRegionList[DeckFaceUp].SetScaleFactor(_scaleFactor);
+
+    // index 9-12 (4 aces)
+    for (int i = 4; i <= 7; i++) {
+        int idx = i + 5;
+        _cardRegionList[idx].SetX((cardWidth * (i - 1)) +
+                                  (i * xOffsetIntraStack));
+        _cardRegionList[idx].SetY(yLine0);
+        _cardRegionList[idx].SetScaleFactor(_scaleFactor);
+    }
+
+    InitAllCoords();
 }
