@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 
-#define VERSION "Ver 3.0.13 20260201-00"
+#define VERSION "Ver 3.0.13 20260201-02"
 #define PACKAGE_URL "https://invido.it"
 #define AUTHOR "igorRun for Invido"
 

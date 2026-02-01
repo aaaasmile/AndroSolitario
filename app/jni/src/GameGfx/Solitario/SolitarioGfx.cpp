@@ -2086,6 +2086,13 @@ void SolitarioGfx::repositionRegions(bool initFaces) {
         if (_deckType.GetType() == eDeckType::TAROCK_PIEMONT) {
             _scaleFactor = 0.75f;
         }
+        if (_deckType.GetType() == eDeckType::TOSCANA ||
+            _deckType.GetType() == eDeckType::SICILIA ||
+            _deckType.GetType() == eDeckType::SARDEGNA ||
+            _deckType.GetType() == eDeckType::NAPOLI ||
+            _deckType.GetType() == eDeckType::GENOVA) {
+            xOffsetIntraStack = 10;
+        }
     } else {
         if (_deckType.GetType() == eDeckType::TAROCK_PIEMONT) {
             yOverlapCard = 32;
