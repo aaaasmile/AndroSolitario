@@ -70,6 +70,7 @@ class GameSettings {
     void SetPortraitDevMode(bool val) {
         _portraitDevMode = val;
         _portraitMode = val;
+        _portraitNarrowMode = val;
     }
     void SetPortraitNarrowMode(bool val) {
         _portraitNarrowMode = val;

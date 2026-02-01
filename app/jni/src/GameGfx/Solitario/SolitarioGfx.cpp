@@ -1815,18 +1815,17 @@ LPErrInApp SolitarioGfx::Show() {
     int yoffsetLine0 = 40;
     int yOverlapCard = 37;
     _scaleFactor = 0.0f;
-
-    if (pGameSettings->IsNarrowPortrait()) {
-        yOverlapCard = 42;
-        if (_deckType.GetType() == eDeckType::TAROCK_PIEMONT) {
-            _scaleFactor = 0.62f;
-            xLine0 = 3;
-            yoffsetLine0 = 15;
-            yOverlapCard = 22;
-        }
-    }
     int xOffsetIntraStack = 17;
     int xOffsetFaceUp = 25;
+
+    if (pGameSettings->IsNarrowPortrait()) {
+        yLine0 = 30;
+        yOverlapCard = 42;
+        xOffsetIntraStack = 14;
+        if (_deckType.GetType() == eDeckType::TAROCK_PIEMONT) {
+            _scaleFactor = 0.75f;
+        }
+    }
 
     int cardWidth = g_CardWidth;
     int cardHeight = g_CardHeight;
