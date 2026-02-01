@@ -92,7 +92,7 @@ class SolitarioGfx {
                       int yoffset);
     bool DeleteRegion(LPCardRegionGfx pRegion);
 
-    void InitAllCoords();
+    void InitAllCoords(bool initFaces);
 
     LPCardRegionGfx SelectRegionOnPoint(int x, int y);
 
@@ -223,7 +223,7 @@ class SolitarioGfx {
     void updateBadScoreScoreOnTime();
     void updateBadScoreRedial();
     void updateBadScoreAceToTableu();
-    void repositionRegions();
+    void repositionRegions(bool initFaces);
     void clearScore();
     void bonusScore();
     void showYesNoMsgBox(LPCSTR strText);

@@ -225,7 +225,7 @@ LPErrInApp SolitarioGfx::OnResize(SDL_Surface* pScreen) {
         _p_Screen->w, _p_Screen->h, 32, 0, 0, 0, 0);
 
     initButtons();
-    repositionRegions();
+    repositionRegions(false);
 
     DrawStaticScene();
 
@@ -292,11 +292,12 @@ void SolitarioGfx::initButtons() {
         cbBtToggleFullscreen);
 }
 
-void SolitarioGfx::InitAllCoords() {
+void SolitarioGfx::InitAllCoords(bool initFaces) {
     for (regionVI vir = _cardRegionList.begin(); vir != _cardRegionList.end();
          ++vir) {
         vir->InitCardCoords();
-        vir->InitCardFaces();
+        if (initFaces)
+            vir->InitCardFaces();
     }
 }
 
@@ -1101,7 +1102,7 @@ LPErrInApp SolitarioGfx::newGame() {
         delete pStack;
     }
 
-    InitAllCoords();
+    InitAllCoords(true);
 
     for (i = Found_Ix1; i <= Found_Ix7; i++) {
         SetCardFaceUp(i, true, RegionSize(i) - 1);
@@ -1836,7 +1837,7 @@ LPErrInApp SolitarioGfx::Show() {
                      CRD_DRAGTOP, CRD_HSYMBOL, 0, 0, 0, 0);
     }
 
-    repositionRegions();
+    repositionRegions(true);
 
     for (regionVI vir = _cardRegionList.begin(); vir != _cardRegionList.end();
          ++vir) {
@@ -2068,7 +2069,7 @@ void SolitarioGfx::bonusScore() {
         _scoreChanged = true;
     }
 }
-void SolitarioGfx::repositionRegions() {
+void SolitarioGfx::repositionRegions(bool initFaces) {
     LPGameSettings pGameSettings = GameSettings::GetSettings();
     int xLine0 = 35;
     int yLine0 = 10;
@@ -2131,5 +2132,5 @@ void SolitarioGfx::repositionRegions() {
         _cardRegionList[idx].SetScaleFactor(_scaleFactor);
     }
 
-    InitAllCoords();
+    InitAllCoords(initFaces);
 }
