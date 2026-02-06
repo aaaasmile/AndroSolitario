@@ -9,7 +9,7 @@
 ////////////////////////////////////////////////////////////////
 
 void Probality::SvilCombiHands(VCT_MAZZO& vct_Mazzo,
-                                MTX_HANDCOMBI& mtx_Result) {
+                               MTX_HANDCOMBI& mtx_Result) {
     long lNumCard = (long)vct_Mazzo.size();
     mtx_Result.clear();
 
@@ -33,7 +33,7 @@ void Probality::SvilCombiHands(VCT_MAZZO& vct_Mazzo,
     for (long lCurrRow = 0; lCurrRow < lNumCombi; lCurrRow++) {
         for (long j = 0; j < m_iCardOnHand; j++) {
             long lIndex = m_vctCounter[j];
-            ASSERT(lIndex < lNumCard && lIndex >= 0);
+            SDL_assert(lIndex < lNumCard && lIndex >= 0);
             vct_tmpRow[j] = vct_Mazzo[lIndex];
         }
 
@@ -60,8 +60,8 @@ void Probality::SvilCombiHands(VCT_MAZZO& vct_Mazzo,
         // aggiorna tutti gli indici
         for (; lChangeSubIndex > 0; lChangeSubIndex--) {
             j = m_iCardOnHand - lChangeSubIndex;
-            ASSERT(j - 1 >= 0);
-            ASSERT(m_vctCounter[j - 1] + 1 < lNumCard);
+            SDL_assert(j - 1 >= 0);
+            SDL_assert(m_vctCounter[j - 1] + 1 < lNumCard);
             m_vctCounter[j] = m_vctCounter[j - 1] + 1;
         }
     }

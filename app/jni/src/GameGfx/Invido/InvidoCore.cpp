@@ -1,8 +1,10 @@
 // InvidoCoreEngine.cpp
 
-#include "TraceService.h"
 #include "InvidoCore.h"
+
 #include "Mazzo.h"
+#include "TraceService.h"
+
 
 ////////////////////////////////////////////////////////////////
 // **********************   CINVIDOCORE CLASS *****************
@@ -59,8 +61,8 @@ void InvidoCore::Create(Player* pHmiPlayer, int iNumPlayers) {
 }
 
 bool InvidoCore::WhoWonsTheGame(Player** ppPlayer) {
-    ASSERT(ppPlayer);
-    ASSERT(0);
+    SDL_assert(ppPlayer);
+    SDL_assert(0);
 
     return TRUE;
 }
@@ -92,7 +94,7 @@ void InvidoCore::NewMatch() {
                     m_vctAlgPlayer[i]->ALG_SetOpponentIndex(1, 0);
                     m_vctAlgPlayer[i]->ALG_SetOpponentIndex(3, 1);
                 } else {
-                    ASSERT(0);
+                    SDL_assert(0);
                 }
             } else if (i == 1) {
                 if (m_lNumPlayers == 2) {
@@ -110,7 +112,7 @@ void InvidoCore::NewMatch() {
                 m_vctAlgPlayer[i]->ALG_SetOpponentIndex(0, 0);
                 m_vctAlgPlayer[i]->ALG_SetOpponentIndex(2, 1);
             } else {
-                ASSERT(0);
+                SDL_assert(0);
             }
         }
     }
@@ -123,7 +125,7 @@ void InvidoCore::NewMatch() {
 }
 
 bool InvidoCore::GetPlayerInPlaying(Player** ppPlayer) {
-    ASSERT(ppPlayer);
+    SDL_assert(ppPlayer);
 
     *ppPlayer = m_pPlHaveToPlay;
 
@@ -137,10 +139,10 @@ void InvidoCore::NextAction() {
 }
 
 CardSpec* InvidoCore::isCardInPlayerHand(int iPlayerIx,
-                                          const CARDINFO* pCardInfo) {
+                                         const CARDINFO* pCardInfo) {
     CardSpec* pCardSpecRes = NULL;
-    ASSERT(pCardInfo);
-    ASSERT(iPlayerIx >= 0 && iPlayerIx < MAX_NUM_PLAYER);
+    SDL_assert(pCardInfo);
+    SDL_assert(iPlayerIx >= 0 && iPlayerIx < MAX_NUM_PLAYER);
 
     CardSpec myCard;
     myCard.SetCardInfo(*pCardInfo);
@@ -165,8 +167,8 @@ void InvidoCore::resetCardInfoPlayers() {
 
 bool InvidoCore::resetCard(int iPlayerIx, CARDINFO* pCardInfo) {
     bool bRet = FALSE;
-    ASSERT(pCardInfo);
-    ASSERT(iPlayerIx >= 0 && iPlayerIx < MAX_NUM_PLAYER);
+    SDL_assert(pCardInfo);
+    SDL_assert(iPlayerIx >= 0 && iPlayerIx < MAX_NUM_PLAYER);
 
     CardSpec myCard;
     myCard.SetCardInfo(*pCardInfo);
@@ -207,7 +209,7 @@ void InvidoCore::Giocata_Start(long lPlayerIx) {
     // 3) distribuite cards
     for (int i = 0; i < m_lNumPlayers; i++) {
         int iIxCurrPLayer = aPlayerDeck[i];
-        ASSERT(iIxCurrPLayer >= 0 && iIxCurrPLayer < m_lNumPlayers);
+        SDL_assert(iIxCurrPLayer >= 0 && iIxCurrPLayer < m_lNumPlayers);
 
         Player* pCurrPlayer = m_PlayersOnTable.GetPlayerIndex(iIxCurrPLayer);
         CARDINFO CardArray[NUM_CARDS_HAND];
@@ -272,7 +274,7 @@ void InvidoCore::Giocata_AMonte() {
 }
 
 void InvidoCore::Player_VaVia(int iPlayerIx) {
-    // ASSERT(0);
+    // SDL_assert(0);
     m_MatchPoints.PlayerVaVia(iPlayerIx);
 
     m_Giocata.Update_Giocata(iPlayerIx, &m_MatchPoints);
@@ -327,11 +329,11 @@ void InvidoCore::AbandonGame(int iPlayerIx) {
 }
 
 void InvidoCore::NtyWaitingPlayer_Toplay(int iPlayerIx) {
-    ASSERT(m_pPlHaveToPlay);
-    ASSERT(iPlayerIx == m_pPlHaveToPlay->GetIndex());
+    SDL_assert(m_pPlHaveToPlay);
+    SDL_assert(iPlayerIx == m_pPlHaveToPlay->GetIndex());
 
     I_ALG_Player* pAlg = m_vctAlgPlayer[iPlayerIx];
-    ASSERT(pAlg);
+    SDL_assert(pAlg);
 
     // algorithm have to play
     pAlg->ALG_Play();
@@ -339,7 +341,7 @@ void InvidoCore::NtyWaitingPlayer_Toplay(int iPlayerIx) {
 
 void InvidoCore::NtyWaitingPlayer_ToResp(int iPlayerIx) {
     I_ALG_Player* pAlg = m_vctAlgPlayer[iPlayerIx];
-    ASSERT(pAlg);
+    SDL_assert(pAlg);
 
     pAlg->ALG_HaveToRespond();
 }
@@ -354,16 +356,16 @@ void InvidoCore::NtyPlayerSayBuiada(int iPlayerIx) {
 }
 
 void InvidoCore::RaiseError(const std::string& errorMsg) {
-    ASSERT(0);
+    SDL_assert(0);
     TRACE(const_cast<char*>(errorMsg.c_str()));
     TRACE("\n");
 }
 
 CardSpec* InvidoCore::checkValidCardPlayed(int iPlayerIx,
-                                            const CARDINFO* pCardInfo) {
+                                           const CARDINFO* pCardInfo) {
     CardSpec cardUndef;
     if (cardUndef.GetCardIndex() == pCardInfo->byIndex) {
-        ASSERT(0);
+        SDL_assert(0);
     }
 
     CardSpec* pCardplayed = isCardInPlayerHand(iPlayerIx, pCardInfo);
@@ -457,13 +459,12 @@ bool InvidoCore::Player_saySomething(int iPlayerIx, eSayPlayer eSay) {
 }
 
 void InvidoCore::GetAdmittedCommands(VCT_COMMANDS& vct_Commands,
-                                      int iPlayerIndex) {
+                                     int iPlayerIndex) {
     m_Mano.GetAdmittedCommands(vct_Commands, iPlayerIndex);
 }
 
 // GetMoreCommands
-void InvidoCore::GetMoreCommands(VCT_COMMANDS& vct_Commands,
-                                  int iPlayerIndex) {
+void InvidoCore::GetMoreCommands(VCT_COMMANDS& vct_Commands, int iPlayerIndex) {
     m_Mano.GetMoreCommands(vct_Commands, iPlayerIndex);
 }
 
@@ -477,7 +478,7 @@ void InvidoCore::NotifyScript(eScriptNotification eVal) {
 }
 
 void InvidoCore::NotifyScriptAlgorithm(int iPlayerIx,
-                                        eScriptNotification eVal) {
+                                       eScriptNotification eVal) {
     TRACE("Algorithm %d, %d\n", iPlayerIx, eVal);
 }
 
@@ -517,7 +518,7 @@ void InvidoCore::Script_MatchEnd() {
 }
 
 int InvidoCore::Script_CheckResult(int iTypeOfItem, int iParam1,
-                                    int iExpectedVal) {
+                                   int iExpectedVal) {
     int iRes = 0;
 
     return iRes;

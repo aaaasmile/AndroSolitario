@@ -4,10 +4,6 @@
 
 #include "PlayersOnTable.h"
 
-/////////////////////////////////////////////////////////////////////////////////////
-// *********************************     CPLAYERSONTABLE CLASS
-// *********************
-/////////////////////////////////////////////////////////////////////////////////////
 PlayersOnTable::PlayersOnTable() {
     m_lCurrent = 0;
     m_lNumPlayers = 0;
@@ -21,7 +17,7 @@ void PlayersOnTable::SetFirstOnTrick(long lIndex) {
         m_lCurrent = lIndex;
         m_lFirstOnTrick = lIndex;
     } else {
-        ASSERT(0);
+        SDL_assert(0);
     }
 }
 
@@ -31,7 +27,7 @@ void PlayersOnTable::SetFirstOnGiocata(long lIndex) {
         m_lFirstOnTrick = lIndex;
         m_lFirstOnGiocata = lIndex;
     } else {
-        ASSERT(0);
+        SDL_assert(0);
     }
 }
 
@@ -42,7 +38,7 @@ void PlayersOnTable::SetFirstOnMatch(long lIndex) {
         m_lFirstOnGiocata = lIndex;
         m_lFirstOnMatch = lIndex;
     } else {
-        ASSERT(0);
+        SDL_assert(0);
     }
 }
 
@@ -89,7 +85,7 @@ Player* PlayersOnTable::GetPlayerToPlay(eSwitchPLayer eVal) {
 Player* PlayersOnTable::GetPlayerIndex(long lIndex) {
     if (lIndex < (long)m_vctPlayers.size() && lIndex >= 0) {
     } else {
-        ASSERT(0);
+        SDL_assert(0);
     }
 
     return &m_vctPlayers[lIndex];
@@ -103,8 +99,8 @@ int PlayersOnTable::CalcDistance(int iPlayerRef, int iPlayerTmp) {
     int iTmp = iPlayerRef;
     int iDist = 0;
 
-    ASSERT(iPlayerTmp >= 0 && iPlayerTmp < m_lNumPlayers);
-    ASSERT(iPlayerRef >= 0 && iPlayerRef < m_lNumPlayers);
+    SDL_assert(iPlayerTmp >= 0 && iPlayerTmp < m_lNumPlayers);
+    SDL_assert(iPlayerRef >= 0 && iPlayerRef < m_lNumPlayers);
 
     bool bFound = FALSE;
     while (!bFound && iDist < m_lNumPlayers) {
@@ -118,12 +114,12 @@ int PlayersOnTable::CalcDistance(int iPlayerRef, int iPlayerTmp) {
             }
         }
     }
-    ASSERT(bFound);
+    SDL_assert(bFound);
     return iDist;
 }
 
 void PlayersOnTable::CalcCircleIndex(int* paPlayerDeck) {
-    ASSERT(paPlayerDeck);
+    SDL_assert(paPlayerDeck);
     paPlayerDeck[0] = m_lCurrent;
     int k = 1;
     while (k < m_lNumPlayers) {
@@ -150,7 +146,7 @@ bool PlayersOnTable::IsLevelPython() {
 }
 
 void PlayersOnTable::CalcCircleIndex_Cust(int* paPlayerDeck, int iPlayerIni) {
-    ASSERT(paPlayerDeck);
+    SDL_assert(paPlayerDeck);
 
     paPlayerDeck[0] = iPlayerIni;
     int k = 1;

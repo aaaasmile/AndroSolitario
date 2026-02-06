@@ -1,9 +1,9 @@
 // Player.cpp
 
-#include "AlgAdvancedPlayer.h"
-#include "AlgDummyPlayer.h"
 #include "Player.h"
 
+#include "AlgAdvancedPlayer.h"
+#include "AlgDummyPlayer.h"
 
 ////////////////////////////////////////////////////////////////
 //  *************************  PLAYER CLASS *******************
@@ -72,7 +72,7 @@ void Player::SetLevel(eGameLevel eNewLevel, I_ALG_Player* I_val) {
 
     switch (eNewLevel) {
         case BEGINNER:
-            ASSERT(0);
+            SDL_assert(0);
             break;
 
         case ADVANCED:
@@ -81,16 +81,16 @@ void Player::SetLevel(eGameLevel eNewLevel, I_ALG_Player* I_val) {
             break;
 
         case NIGHTMARE:
-            ASSERT(0);
+            SDL_assert(0);
             break;
 
         case SERVER_LEVEL:
         case HMI:
-            ASSERT(I_val);
+            SDL_assert(I_val);
             m_pIAlgorithm = I_val;
             break;
 
         default:
-            ASSERT(0);
+            SDL_assert(0);
     }
 }

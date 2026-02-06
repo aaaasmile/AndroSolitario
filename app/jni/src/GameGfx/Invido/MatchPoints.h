@@ -15,10 +15,9 @@
 #include <deque>
 
 #include "CardSpec.h"
-#include "InvidoInfoComm.h"
 #include "InvidoCoreEnv.h"
+#include "InvidoInfoComm.h"
 #include "win_type_global.h"
-
 
 class Mano;
 class ManoInfo {
@@ -111,7 +110,7 @@ class MatchPoints : public I_MatchScore {
             return FALSE;
     }
     virtual int GetPointsPlayer(int iPlayerIx) {
-        ASSERT(iPlayerIx >= 0 && iPlayerIx < MAX_NUM_PLAYER);
+        SDL_assert(iPlayerIx >= 0 && iPlayerIx < MAX_NUM_PLAYER);
         return m_vctPlayerPoints[iPlayerIx];
     }
     virtual int GetManoNum() { return m_iManoRound; }

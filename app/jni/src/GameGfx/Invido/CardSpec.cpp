@@ -53,7 +53,7 @@ void CardSpec::SetCardInfo(const CARDINFO& Card) {
 }
 
 void CardSpec::FillInfo(CARDINFO* pCardInfo) {
-    ASSERT(pCardInfo);
+    SDL_assert(pCardInfo);
     strncpy(pCardInfo->CardName, m_CardInfo.CardName, NUM_BYTE_NAME);
     pCardInfo->byIndex = m_CardInfo.byIndex;
     pCardInfo->eSuit = m_CardInfo.eSuit;
@@ -61,6 +61,5 @@ void CardSpec::FillInfo(CARDINFO* pCardInfo) {
 
 int CardSpec::GetPoints() {
     int ix = GetCardIndex();
-    ASSERT(ix >= 0 && ix < 40)
-    return g_PointsTable[ix];
+    SDL_assert(ix >= 0 && ix < 40) return g_PointsTable[ix];
 }

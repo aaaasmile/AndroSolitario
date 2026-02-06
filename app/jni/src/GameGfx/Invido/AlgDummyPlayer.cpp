@@ -4,11 +4,13 @@
 //
 //////////////////////////////////////////////////////////////////////
 
+#include "AlgDummyPlayer.h"
+
 #include <map>
 
 #include "TraceService.h"
-#include "AlgDummyPlayer.h"
 #include "win_type_global.h"
+
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -51,9 +53,9 @@ void AlgDummyPlayer::ALG_SetAssociateIndex(int iIndex) {}
 
 void AlgDummyPlayer::ALG_NewMatch(int iNumPlayer) {}
 
-void AlgDummyPlayer::ALG_NewGiocata(const CARDINFO* pCardArray,
-                                     int iNumOfCards, int iPlayerIx) {
-    ASSERT(iNumOfCards == NUM_CARDS_HAND);
+void AlgDummyPlayer::ALG_NewGiocata(const CARDINFO* pCardArray, int iNumOfCards,
+                                    int iPlayerIx) {
+    SDL_assert(iNumOfCards == NUM_CARDS_HAND);
     for (int i = 0; i < NUM_CARDS_HAND; i++) {
         m_vct_Cards_CPU[i].SetCardInfo(pCardArray[i]);
     }
@@ -72,11 +74,10 @@ void AlgDummyPlayer::ALG_NewGiocata(const CARDINFO* pCardArray,
     }
 }
 
-void AlgDummyPlayer::ALG_PlayerHasVadoDentro(int iPlayerIx) { ASSERT(0); }
+void AlgDummyPlayer::ALG_PlayerHasVadoDentro(int iPlayerIx) { SDL_assert(0); }
 
-void AlgDummyPlayer::ALG_PlayerHasPlayed(int iPlayerIx,
-                                          const CARDINFO* pCard) {
-    ASSERT(pCard);
+void AlgDummyPlayer::ALG_PlayerHasPlayed(int iPlayerIx, const CARDINFO* pCard) {
+    SDL_assert(pCard);
     if (iPlayerIx == m_iMyIndex) {
         CardSpec Card;
         CardSpec CardUndef;
@@ -90,7 +91,7 @@ void AlgDummyPlayer::ALG_PlayerHasPlayed(int iPlayerIx,
                 bFound = TRUE;
             }
         }
-        ASSERT(bFound);
+        SDL_assert(bFound);
         if (m_pTracer) {
             m_pTracer->AddSimpleTrace(3, "[TRALG]Player %d has played [%s]\n",
                                       iPlayerIx, Card.GetName());
@@ -119,7 +120,7 @@ void AlgDummyPlayer::ALG_Play() {
     if (iSayFiber >= 4) {
         // instead of play a card, say something
         VCT_COMMANDS vct_cmd;
-        ASSERT(m_pCoreGame);
+        SDL_assert(m_pCoreGame);
 
         m_pCoreGame->GetAdmittedCommands(vct_cmd, m_iMyIndex);
         size_t iNumCmds = vct_cmd.size();
@@ -147,7 +148,7 @@ void AlgDummyPlayer::ALG_Play() {
             }
             iLoops++;
         }
-        ASSERT(m_pCoreGame);
+        SDL_assert(m_pCoreGame);
         m_pCoreGame->Player_playCard(m_iMyIndex,
                                      m_vct_Cards_CPU[iCartaPos].GetCardInfo());
     }
@@ -204,7 +205,7 @@ void AlgDummyPlayer::ALG_Say() {
 
     size_t iRndIndex;
     VCT_COMMANDS vct_cmd;
-    ASSERT(m_pCoreGame);
+    SDL_assert(m_pCoreGame);
 
     m_pCoreGame->GetAdmittedCommands(vct_cmd, m_iMyIndex);
     size_t iNumCmds = vct_cmd.size();
@@ -214,7 +215,7 @@ void AlgDummyPlayer::ALG_Say() {
         m_pCoreGame->Player_saySomething(m_iMyIndex, vct_cmd[iRndIndex]);
 
     } else {
-        ASSERT(0);
+        SDL_assert(0);
     }
 }
 

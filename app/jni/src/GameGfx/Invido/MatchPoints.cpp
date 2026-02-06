@@ -4,8 +4,10 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#include "Mano.h"
 #include "MatchPoints.h"
+
+#include "Mano.h"
+
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -59,18 +61,19 @@ void MatchPoints::GiocataStart() {
 
 void MatchPoints::PlayerPlay(int iPlayerIx, CARDINFO* pCard) {
     CardSpec Card;
-    ASSERT(pCard);
+    SDL_assert(pCard);
     Card.SetCardInfo(*pCard);
-    ASSERT(m_iNumCardsPlayed < MAX_NUM_PLAYER && m_iNumCardsPlayed >= 0);
+    SDL_assert(m_iNumCardsPlayed < MAX_NUM_PLAYER && m_iNumCardsPlayed >= 0);
     m_vctCardPlayed[m_iNumCardsPlayed].iPlayerIx = iPlayerIx;
     m_vctCardPlayed[m_iNumCardsPlayed].cardSpec = Card;
     m_iNumCardsPlayed++;
 }
 
 void MatchPoints::ManoEnd() {
-    ASSERT(m_iNumCardsPlayed == m_iNumPlayers);
+    SDL_assert(m_iNumCardsPlayed == m_iNumPlayers);
     int iManoTerminatedIndex = m_iManoRound;
-    ASSERT(iManoTerminatedIndex >= 0 && iManoTerminatedIndex < NUM_CARDS_HAND);
+    SDL_assert(iManoTerminatedIndex >= 0 &&
+               iManoTerminatedIndex < NUM_CARDS_HAND);
     m_iManoRound++;
     // hand is terminated
     if (m_iNumPlayers == NUM_PLAY_INVIDO_2)  // consistency check
@@ -137,11 +140,11 @@ void MatchPoints::ManoEnd() {
                 m_iPlayerGiocataWin = iPlayer_1;
             } else {
                 // giocata winner must be already defined
-                ASSERT(m_iPlayerGiocataWin != NOT_VALID_INDEX);
+                SDL_assert(m_iPlayerGiocataWin != NOT_VALID_INDEX);
             }
         }
     } else {
-        ASSERT(0);
+        SDL_assert(0);
     }
     // reset info about mano
     m_iNumCardsPlayed = 0;
@@ -158,7 +161,7 @@ void MatchPoints::PlayerVaVia(int iPlayerIx) {
 
 void MatchPoints::GiocataEnd() {
     if (m_eIsGiocataEnd == GES_HAVE_WINNER) {
-        ASSERT(m_iPlayerGiocataWin != NOT_VALID_INDEX);
+        SDL_assert(m_iPlayerGiocataWin != NOT_VALID_INDEX);
         // update the score
         m_vctPlayerPoints[m_iPlayerGiocataWin] += m_eCurrentScore;
         m_vctGiocataInfo.push_back(
@@ -205,22 +208,22 @@ void MatchPoints::beginSpecialTurn() {
 }
 
 void MatchPoints::GetManoInfo(int iManoNum, int* piPlayerIx, bool* pbIsPlayed,
-                               bool* pbIsPata) {
-    ASSERT(pbIsPata);
-    ASSERT(pbIsPlayed);
-    ASSERT(piPlayerIx);
+                              bool* pbIsPata) {
+    SDL_assert(pbIsPata);
+    SDL_assert(pbIsPlayed);
+    SDL_assert(piPlayerIx);
     if (iManoNum >= 0 && iManoNum < NUM_CARDS_HAND) {
         *pbIsPata = m_ManoDetailInfo[iManoNum].bIsPata;
         *pbIsPlayed = m_ManoDetailInfo[iManoNum].bIsPlayed;
         *piPlayerIx = m_ManoDetailInfo[iManoNum].iPlayerIndex;
 
     } else {
-        ASSERT(0);
+        SDL_assert(0);
     }
 }
 
 void MatchPoints::GetGiocataInfo(int iNumGiocata, GiocataInfo* pGiocInfo) {
-    ASSERT(pGiocInfo);
+    SDL_assert(pGiocInfo);
     if (iNumGiocata >= 0 && iNumGiocata < (int)m_vctGiocataInfo.size()) {
         *pGiocInfo = m_vctGiocataInfo[iNumGiocata];
     }
@@ -228,7 +231,7 @@ void MatchPoints::GetGiocataInfo(int iNumGiocata, GiocataInfo* pGiocInfo) {
 
 void MatchPoints::ChangeCurrentScore(eGiocataScoreState eVal, int iPlayer) {
     if (eVal > 0) {
-        ASSERT(iPlayer != m_iPlayerChangeScore);
+        SDL_assert(iPlayer != m_iPlayerChangeScore);
     }
     m_eCurrentScore = eVal;
     m_iPlayerChangeScore = iPlayer;

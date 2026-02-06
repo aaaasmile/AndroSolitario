@@ -1,10 +1,12 @@
 // Mazzo.cpp
 
+#include "Mazzo.h"
+
 #include <win_type_global.h>
 
-#include "InvidoSettings.h"
 #include "InvidoCore.h"
-#include "Mazzo.h"
+#include "InvidoSettings.h"
+
 
 ////////////////////////////////////////////////////////////////
 //   *******************      Mazzo CLASS *********************
@@ -83,7 +85,7 @@ long Mazzo::PickNextCard(bool* pbEnd) {
 }
 
 bool Mazzo::PickNextCard(CardSpec* pRes) {
-    ASSERT(pRes);
+    SDL_assert(pRes);
 
     pRes->Reset();
     bool bValid = FALSE;

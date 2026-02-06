@@ -6,7 +6,6 @@
 #include "MatchPoints.h"
 #include "TraceService.h"
 
-
 static const char* stalpzActionName[10] = {
     "MANO_WAITPL_TOPLAY", "MANO_WAIPL_TORESP", "MANO_SAYBUIDA",
     "MANO_AMONTE",        "MANO_VADODENTRO",   "MANO_VADOVIA",
@@ -44,7 +43,7 @@ static eGiocataScoreState intToEScore(int iVal) {
             break;
 
         default:
-            ASSERT(0);
+            SDL_assert(0);
     }
     return eVal;
 }
@@ -159,7 +158,7 @@ void Mano::NextAction() {
 
     switch (Action.m_eNextAction) {
         case MANO_WAITPL_TOPLAY:
-            ASSERT(Action.m_vct_iArg.size() > 0);
+            SDL_assert(Action.m_vct_iArg.size() > 0);
             // may be m_eNextAction is modified
             m_pInvidoCore->NtyWaitingPlayer_Toplay(Action.m_vct_iArg[0]);
             if (m_pTracer->AddNewEntry(1, 2, EntryTraceDetail::TR_INFO,
@@ -175,7 +174,7 @@ void Mano::NextAction() {
         case MANO_VADODENTRO:
             // m_pInvidoCore->;
             //  TO DO
-            ASSERT(0);
+            SDL_assert(0);
             break;
 
         case MANO_VADOVIA:
@@ -208,7 +207,7 @@ void Mano::NextAction() {
             break;
 
         default:
-            ASSERT(0);
+            SDL_assert(0);
             break;
     }
 }
@@ -232,7 +231,7 @@ void Mano::NewMano(int iPlayerIx) {
     clearQuestions();
 
     if (m_eManoState == MNST_WAIT_NEW_MANO || m_eManoState == MNST_MANO_END) {
-        ASSERT(iPlayerIx >= 0 && iPlayerIx < m_iNumOfPlayers);
+        SDL_assert(iPlayerIx >= 0 && iPlayerIx < m_iNumOfPlayers);
         // set action
         add_Action(iPlayerIx, MANO_WAITPL_TOPLAY);
 
@@ -254,7 +253,7 @@ void Mano::NewMano(int iPlayerIx) {
 
     } else {
         m_pInvidoCore->RaiseError("Mano state not correct\n");
-        ASSERT(0);
+        SDL_assert(0);
     }
 }
 
@@ -315,7 +314,7 @@ bool Mano::Player_Play(int iPlayerIx, bool vadoDentro) {
                                        __LINE__))
                 m_pTracer->AddCommentToLastEntry(
                     "no question and no player state. Wrong state");
-            ASSERT(0);
+            SDL_assert(0);
         }
     }
 
@@ -366,7 +365,7 @@ bool Mano::Player_Say(int iPlayerIx, eSayPlayer eSay) {
     } else if (eSay == NO) {
         handle_CallNo(iPlayerIx);
     } else {
-        ASSERT(0);
+        SDL_assert(0);
     }
 
     return bRes;
@@ -421,13 +420,13 @@ void Mano::handle_ScoreCalled(int iPlayerIx, eSayPlayer eSay) {
                 // repeat trigger to restore the status before call
                 actionOnQuestion(PendTmp);
             } else {
-                ASSERT(0);
+                SDL_assert(0);
             }
         }
     } else if (get_LastPendQuest(PendQuesMonte)) {
         // if a question is pending, it could be only a monte
         // a monte pending question
-        ASSERT(PendQuesMonte.m_bIsAMonte);
+        SDL_assert(PendQuesMonte.m_bIsAMonte);
         if (iPlayerIx == m_iPlayerChangeScore) {
             // the same player can't increment the score
             // call not admitted
@@ -589,7 +588,7 @@ void Mano::actionOnQuestion(PendQuestion& PendQues) {
 }
 
 void Mano::actionWithoutQuestion() {
-    ASSERT(m_deqPendQuestion.size() == 0);
+    SDL_assert(m_deqPendQuestion.size() == 0);
     if (!IsPlayerOnCardPl()) {
         // status is not card playing, but responding
         // restore the old state playing
@@ -706,7 +705,7 @@ bool Mano::IsPlayerOnCardPl() {
 }
 
 eManoStatus Mano::nextTableState() {
-    ASSERT(m_deqTableState.size() > 0);
+    SDL_assert(m_deqTableState.size() > 0);
     eManoStatus eRetState = MNST_WAIT_NEW_MANO;
     if (m_deqTableState.size() > 0) {
         eRetState = m_deqTableState[0];
@@ -794,12 +793,12 @@ void Mano::GetAdmittedCommands(VCT_COMMANDS& vct_Commands, int iPlayerIndex) {
 
 bool Mano::nextAvailSayScore(eSayPlayer* peSayAvail) {
     bool bRet = TRUE;
-    ASSERT(peSayAvail);
+    SDL_assert(peSayAvail);
     eSayPlayer eTmp = AMONTE;
 
     // retrive current score
     MatchPoints* pMatchPoints = m_pInvidoCore->GetMatchPointsObj();
-    ASSERT(pMatchPoints);
+    SDL_assert(pMatchPoints);
     eGiocataScoreState eCurrScore = pMatchPoints->GetCurrScore();
 
     if (eCurrScore == SC_PARTIDA) {
@@ -827,7 +826,7 @@ bool Mano::nextAvailSayScore(eSayPlayer* peSayAvail) {
                 break;
 
             default:
-                ASSERT(0);
+                SDL_assert(0);
                 break;
         }
     }
@@ -838,7 +837,7 @@ bool Mano::nextAvailSayScore(eSayPlayer* peSayAvail) {
 bool Mano::isGiocataAMonte() {
     bool bRet = FALSE;
     MatchPoints* pMatchPoints = m_pInvidoCore->GetMatchPointsObj();
-    ASSERT(pMatchPoints);
+    SDL_assert(pMatchPoints);
     eGiocataScoreState eCurrScore = pMatchPoints->GetCurrScore();
     if (eCurrScore == SC_AMONTE || eCurrScore == SC_PATTA) {
         bRet = TRUE;

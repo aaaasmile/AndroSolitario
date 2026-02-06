@@ -3,10 +3,10 @@
 // Giocata.cpp
 
 #include "Giocata.h"
+
 #include "InvidoCore.h"
 #include "Mano.h"
 #include "MatchPoints.h"
-
 
 /////////////////////////////////////////////////////////////////////////////////////
 //   *******************  CGIOCATA CLASS ***************************************
@@ -29,7 +29,7 @@ void Giocata::NewGiocata(long lPlayerIx) {
         m_deqNextAction.push_back(Action);
     } else {
         m_pInvidoCore->RaiseError("Giocata state not right\n");
-        ASSERT(0);
+        SDL_assert(0);
     }
 }
 
@@ -45,7 +45,7 @@ void Giocata::NextAction() {
     switch (Action.m_eNextAction) {
         case GIOC_START:
             // gioca is started
-            ASSERT(Action.m_vct_lArg.size() > 0);
+            SDL_assert(Action.m_vct_lArg.size() > 0);
             m_pInvidoCore->Giocata_Start(Action.m_vct_lArg[0]);
             // mano state
             m_pMano->NewMano(Action.m_vct_lArg[0]);
@@ -62,15 +62,15 @@ void Giocata::NextAction() {
             break;
 
         default:
-            ASSERT(0);
+            SDL_assert(0);
             break;
     }
 }
 
 void Giocata::Update_Giocata(long lPlayerIx, I_MatchScore* pIScore) {
     // check mano
-    ASSERT(m_eGiocataStatus == GIOCATA_ONGOING);
-    ASSERT(pIScore);
+    SDL_assert(m_eGiocataStatus == GIOCATA_ONGOING);
+    SDL_assert(pIScore);
     ActionItemGio Action;
 
     if (pIScore->IsGiocatEnd()) {

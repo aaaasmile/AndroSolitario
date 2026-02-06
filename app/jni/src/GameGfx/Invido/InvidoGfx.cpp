@@ -1,24 +1,26 @@
 // InvidoGfx.cpp
 #pragma warning(disable : 4786)
 
+#include "InvidoGfx.h"
+
 #include <SDL_endian.h>
 #include <SDL_image.h>
 #include <stdio.h>
 #include <time.h>
 
 #include "AppGfx.h"
-#include "InvidoSettings.h"
-#include "Languages.h"
 #include "BalloonGfx.h"
 #include "ButtonGfx.h"
 #include "DelayNextAction.h"
-#include "InvidoGfx.h"
+#include "InvidoSettings.h"
+#include "Languages.h"
 #include "MesgBoxGfx.h"
 #include "MusicManager.h"
 #include "PopUpMenuGfx.h"
 #include "TipoDiMazzo.h"
 #include "gfx_util.h"
 #include "win_type_global.h"
+
 
 #define FPS (1000 / 30)
 
@@ -47,7 +49,7 @@ static InvidoGfx* g_stacInvidoGfx = 0;
 
 void fnEffectTer(int iCh) {
     // do something
-    ASSERT(g_stacInvidoGfx);
+    SDL_assert(g_stacInvidoGfx);
     g_stacInvidoGfx->NtfyTermEff(iCh);
 }
 
@@ -89,7 +91,7 @@ InvidoGfx::InvidoGfx(AppGfx* pApp) {
 InvidoGfx::~InvidoGfx() { cleanup(); }
 
 void InvidoGfx::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRender,
-                            SDL_Texture* pScreenTexture) {
+                           SDL_Texture* pScreenTexture) {
     m_psdlRenderer = pRender;
     m_pScreen = pScreen;
     m_pScreenTexture = pScreenTexture;
@@ -358,7 +360,7 @@ void InvidoGfx::renderCard(CardGfx* pCard) {
     } else if (pCard->State == CardGfx::CSW_ST_BACK) {
         pCard->DrawCardBack(m_pScreen);
     } else {
-        ASSERT(0);
+        SDL_assert(0);
     }
 }
 
@@ -381,7 +383,7 @@ void InvidoGfx::renderPlayerName(int iPlayerIx) {
         GFX_UTIL::DrawString(m_pScreen, txt_to_render, 315, m_pScreen->h - 31,
                              GFX_UTIL_COLOR::White, m_pFontText, true);
     } else {
-        ASSERT(0);
+        SDL_assert(0);
     }
 }
 
@@ -391,10 +393,10 @@ int InvidoGfx::initDeck() {
         loadCardPac();
     }
 
-    // use assert because if loadCardPac failed an exception is thrown
-    ASSERT(m_pDeck)
+    // use SDL_assert because if loadCardPac failed an exception is thrown
+    SDL_assert(m_pDeck)
 
-    m_SrcBack.x = 0;
+        m_SrcBack.x = 0;
     m_SrcBack.y = 0;
 
     m_SrcCard.y = 0;
@@ -884,7 +886,7 @@ int InvidoGfx::loadCardPac() {
 }
 
 int InvidoGfx::showYesNoMsgBox(LPCSTR strText) {
-    ASSERT(m_pAlphaDisplay);
+    SDL_assert(m_pAlphaDisplay);
 
     // prepare the size of the box
     MesgBoxGfx MsgBox;
@@ -958,8 +960,8 @@ void InvidoGfx::MatchLoop() {
                 case SDL_QUIT:
                     // user want to exit the match
                     // show a messagebox for confirm
-                    strTextTmp = m_pLangMgr->GetStringId(
-                        Languages::ID_MATCHENDQUESTION);
+                    strTextTmp =
+                        m_pLangMgr->GetStringId(Languages::ID_MATCHENDQUESTION);
                     if (showYesNoMsgBox(strTextTmp.c_str()) ==
                         MesgBoxGfx::MB_RES_YES) {
                         TRACE("Partita finita per scelta utente\n");
@@ -1072,13 +1074,13 @@ void InvidoGfx::handleMouseDownEvent(SDL_Event& event) {
 
 // showPopUpCallMenu
 void InvidoGfx::showPopUpCallMenu(CardSpec& cardClicked, int iX, int iY,
-                                   eSayPlayer* peSay) {
+                                  eSayPlayer* peSay) {
     TRACE("show popup menu\n");
-    ASSERT(peSay);
-    ASSERT(m_pAlphaDisplay);
+    SDL_assert(peSay);
+    SDL_assert(m_pAlphaDisplay);
     *peSay = NOTHING;
     VCT_COMMANDS vct_cmd;
-    ASSERT(m_pInvidoCore);
+    SDL_assert(m_pInvidoCore);
     m_pInvidoCore->GetMoreCommands(vct_cmd, m_PlayerGuiIndex);
     vct_cmd.push_back(NOTHING);
 
@@ -1212,7 +1214,7 @@ void InvidoGfx::showPlayerMarkup(int iPlayerIx) {
         dest.x = 350;
         dest.y = 50;
     } else {
-        ASSERT(0);
+        SDL_assert(0);
     }
     dest.w = m_pAnImages[IMG_TOCCA_PLAYER]->w;
     dest.h = m_pAnImages[IMG_TOCCA_PLAYER]->h;
@@ -1283,7 +1285,7 @@ void InvidoGfx::showPointsPlayer(int iPlayerIx, VCT_INT& vct_Points) {
                 }
                 iCaneliOnLine = 0;
             } else {
-                ASSERT(0);
+                SDL_assert(0);
             }
         } else if (iCurrPoint == 3) {
             // draw egg
@@ -1324,13 +1326,13 @@ void InvidoGfx::showPointsPlayer(int iPlayerIx, VCT_INT& vct_Points) {
             dest.h = m_pAnImages[IMG_UOVO]->h;
             SDL_BlitSurface(m_pAnImages[IMG_UOVO], NULL, m_pScreen, &dest);
         } else {
-            ASSERT(0);
+            SDL_assert(0);
         }
     }
 }
 
 void InvidoGfx::showManoScore(bool bIsPlayed, int iPlayerIx, bool bIsPata,
-                               int iManoNum) {
+                              int iManoNum) {
     SDL_Rect dest;
     SDL_Rect destOff;
     dest.x = 400 + 16 * iManoNum;
@@ -1345,7 +1347,7 @@ void InvidoGfx::showManoScore(bool bIsPlayed, int iPlayerIx, bool bIsPata,
         dest.y = iCooYB;
         destOff.y = iCooYA;
     } else {
-        ASSERT(0);
+        SDL_assert(0);
     }
     if (bIsPlayed) {
         // winner is ON
@@ -1383,7 +1385,7 @@ void InvidoGfx::showManoScore(bool bIsPlayed, int iPlayerIx, bool bIsPata,
 }
 
 void InvidoGfx::guiPlayerTurn(int iPlayer) {
-    ASSERT(m_pMatchPoints);
+    SDL_assert(m_pMatchPoints);
     m_bPlayerCanPlay = TRUE;
 
     m_iPlayerThatHaveMarkup = iPlayer;
@@ -1462,8 +1464,7 @@ void InvidoGfx::showCurrentScore() {
     eGiocataScoreState eCurrScore = m_pMatchPoints->GetCurrScore();
     STRING lpsNamePoints = m_MapPunti[eCurrScore];
     if (m_pMatchPoints->IsGiocataMonte()) {
-        lpsNamePoints =
-            m_pLangMgr->GetStringId(Languages::ID_S_AMONTE).c_str();
+        lpsNamePoints = m_pLangMgr->GetStringId(Languages::ID_S_AMONTE).c_str();
     }
     CHAR buffTmp[256];
     sprintf(buffTmp, "%s: %s",
@@ -1520,7 +1521,7 @@ void InvidoGfx::showCurrentScore() {
 
 void InvidoGfx::enableCmds() {
     VCT_COMMANDS vct_cmd;
-    ASSERT(m_pInvidoCore);
+    SDL_assert(m_pInvidoCore);
     m_pInvidoCore->GetAdmittedCommands(vct_cmd, m_PlayerGuiIndex);
 
     // reset button to default strings
@@ -1553,14 +1554,14 @@ void InvidoGfx::enableOnlyCmdButtons(size_t iNumButt) {
 }
 
 void InvidoGfx::setCmdButton(size_t iButtonIndex, eSayPlayer eSay,
-                              LPCSTR strCaption) {
+                             LPCSTR strCaption) {
     if (iButtonIndex >= 0 && iButtonIndex < NUMOFBUTTON) {
         m_pbtArrayCmd[iButtonIndex]->SetWindowText(strCaption);
         m_CmdDet[iButtonIndex] = eSay;
         m_pbtArrayCmd[iButtonIndex]->RedrawButton(
             m_pScreen, m_pScene_background, m_pScreenTexture);
     } else {
-        ASSERT(0);
+        SDL_assert(0);
     }
 }
 
@@ -1646,7 +1647,7 @@ void InvidoGfx::ALG_PlayerHasVadoDentro(int iPlayerIx) {
         Card.SetCardIndex(3);
         opponentHasPlayedCard(Card, TRUE);
     } else {
-        ASSERT(0);
+        SDL_assert(0);
     }
 }
 
@@ -1666,7 +1667,7 @@ void InvidoGfx::opponentHasPlayedCard(CardSpec& Card, bool vadoDentro) {
             bFound = true;
         }
     }
-    ASSERT(bFound);
+    SDL_assert(bFound);
     Player* pPlayer = m_pInvidoCore->GetPlayer(m_iOpponentIndex);
     TRACE("%s %s ha giocato %s\n", lpszCST_INFO, pPlayer->GetName(),
           Card.GetName());
@@ -1693,7 +1694,7 @@ void InvidoGfx::ALG_PlayerHasPlayed(int iPlayerIx, const CARDINFO* pCard) {
     Player* pPlayer = 0;
 
     m_pInvidoCore->GetPlayerInPlaying(&pPlayer);
-    ASSERT(pPlayer);
+    SDL_assert(pPlayer);
 
     if (pPlayer) {
         m_iPlayerThatHaveMarkup = pPlayer->GetIndex();
@@ -1717,9 +1718,9 @@ void InvidoGfx::ALG_PlayerHasPlayed(int iPlayerIx, const CARDINFO* pCard) {
         // min dealy before cpu play
         m_DelayAction.CheckPoint(600, DelayNextAction::NOCHANGE);
 
-        ASSERT(bFound);
+        SDL_assert(bFound);
     } else {
-        ASSERT(0);
+        SDL_assert(0);
     }
     if (bFound) {
         // card was played correctly
@@ -1729,11 +1730,11 @@ void InvidoGfx::ALG_PlayerHasPlayed(int iPlayerIx, const CARDINFO* pCard) {
 }
 
 void InvidoGfx::ALG_NewGiocata(const CARDINFO* pCardArray, int iNumOfCards,
-                                int iPlayerIx) {
+                               int iPlayerIx) {
     TRACE("ALG_NewGiocata\n");
     m_bPlayerCanPlay = FALSE;
 
-    ASSERT(iNumOfCards == NUM_CARDS_HAND);
+    SDL_assert(iNumOfCards == NUM_CARDS_HAND);
 
     // NOTE: to set cards is better to use pCardArray.
     // Cards of the opponent are not yet set, so we can't display it.
@@ -1763,7 +1764,7 @@ void InvidoGfx::ALG_NewGiocata(const CARDINFO* pCardArray, int iNumOfCards,
 }
 
 void InvidoGfx::ALG_ManoEnd(I_MatchScore* pScore) {
-    ASSERT(pScore);
+    SDL_assert(pScore);
     m_bPlayerCanPlay = FALSE;
 
     int iPlayerIx = pScore->GetManoWinner();

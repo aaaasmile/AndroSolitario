@@ -31,7 +31,7 @@ void PlayerStatistic::Reset() {
 }
 
 void PlayerStatistic::Clone(PlayerStatistic* pNew) {
-    ASSERT(pNew);
+    SDL_assert(pNew);
     pNew->lScore = lScore;
     pNew->lNumHand = lNumHand;
     pNew->lNumBrisc = lNumBrisc;

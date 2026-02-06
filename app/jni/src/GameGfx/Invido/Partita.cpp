@@ -1,10 +1,12 @@
 // Partita.cpp
 
+#include "Partita.h"
+
 #include "Giocata.h"
 #include "InvidoCore.h"
 #include "InvidoCoreEnv.h"
 #include "MatchPoints.h"
-#include "Partita.h"
+
 
 /////////////////////////////////////////////////////////////////////////////////////
 //   *******************  CPARTITA CLASS ***************************************
@@ -41,7 +43,7 @@ void Partita::NextAction() {
             break;
 
         default:
-            ASSERT(0);
+            SDL_assert(0);
             break;
     }
 
@@ -49,8 +51,8 @@ void Partita::NextAction() {
 }
 
 void Partita::Update_Partita(I_MatchScore* pIScore) {
-    ASSERT(pIScore);
-    ASSERT(m_PartitaState == PARTITA_ONGOING);
+    SDL_assert(pIScore);
+    SDL_assert(m_PartitaState == PARTITA_ONGOING);
 
     if (pIScore->IsMatchEnd()) {
         // match is ended
