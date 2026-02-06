@@ -1,9 +1,11 @@
 // Mano.cpp
 
-#include "TraceService.h"
-#include "InvidoCore.h"
 #include "Mano.h"
+
+#include "InvidoCore.h"
 #include "MatchPoints.h"
+#include "TraceService.h"
+
 
 static const char* stalpzActionName[10] = {
     "MANO_WAITPL_TOPLAY", "MANO_WAIPL_TORESP", "MANO_SAYBUIDA",
@@ -63,11 +65,6 @@ void PendQuestion::operator=(const PendQuestion& r) {
     m_iPlayerIx = r.m_iPlayerIx;
 }
 
-/////////////////////////////////////////////////////////////////////////////////////
-//   *******************  CMANO CLASS ***************************************
-/////////////////////////////////////////////////////////////////////////////////////
-
-//! constructor
 Mano::Mano() {
     m_pInvidoCore = NULL;
     m_pGiocata = NULL;
@@ -720,8 +717,8 @@ eManoStatus Mano::nextTableState() {
 }
 
 void Mano::CommandWithPendingQuestion(PendQuestion& PendQues,
-                                       VCT_COMMANDS& vct_Commands,
-                                       int iPlayerIndex) {
+                                      VCT_COMMANDS& vct_Commands,
+                                      int iPlayerIndex) {
     if (iPlayerIndex == PendQues.m_iPlayerIx) {
         // if pending question is from the same player,
         // he can say anything

@@ -15,26 +15,15 @@
 class InvidoCore;
 class Giocata;
 class MatchPoints;
-
-//! enum action type
 enum eFN_MANOACTION {
-    //! wait player to play
     MANO_WAITPL_TOPLAY = 0,
-    //! wait to respond
     MANO_WAIPL_TORESP,
-    //! say something not correct
     MANO_SAYBUIDA,
-    //! go a monte
     MANO_AMONTE,
-    //! action vado dentro
     MANO_VADODENTRO,
-    //! action vado via
     MANO_VADOVIA,
-    //! mano is terminated
     MANO_END,
-    //! mano change score
     MANO_CHANGESCORE,
-    //! no action
     MANO_NO_ACTION
 };
 
@@ -48,8 +37,6 @@ typedef std::map<eGiocataScoreState, eGiocataScoreState> MAP_SCORE_SCORENEXT;
 typedef std::deque<eManoStatus> DEQ_TABLESTATE;
 
 //////////////////////////////////////////////////////////////////////
-
-//! class PendQuestion
 /** pendi question information
  */
 class PendQuestion {
@@ -64,15 +51,9 @@ class PendQuestion {
         m_eScore = eSc;
         m_iPlayerIx = iPl;
     }
-
-    //! assignement operator
     void operator=(const PendQuestion& r);
-
-    //! score of the pending call
     eGiocataScoreState m_eScore;
-    //! flag of a monte question
     bool m_bIsAMonte;
-    //! player index of the call
     int m_iPlayerIx;
 };
 
@@ -83,17 +64,13 @@ typedef std::deque<PendQuestion> DEQ_PENDQUESTION;
 #ifndef VCT_INT
 typedef std::vector<int> VCT_INT;
 #endif
-
-//! class ActionItem
 /** action item in the queue
  */
 class ActionItem {
    public:
-    //! constructor
     ActionItem() { m_eNextAction = MANO_NO_ACTION; }
 
     eFN_MANOACTION m_eNextAction;
-    //! argument list for action calls
     VCT_INT m_vct_iArg;
 };
 
@@ -104,8 +81,6 @@ class TraceService;
 /////////////////////////////////////////////////////////////////////////////////////
 //   *******************  CMANO CLASS ***************************************
 /////////////////////////////////////////////////////////////////////////////////////
-
-//! class Mano
 /**
 Class Mano to manage when 2 players play a card
 */
@@ -115,27 +90,19 @@ class Mano {
     void SetCore(InvidoCore* pVal) { m_pInvidoCore = pVal; }
     void SetGiocata(Giocata* pVal) { m_pGiocata = pVal; }
     void SetScore(MatchPoints* pVal) { m_pScore = pVal; }
-    //! start a new mano
     void NewMano(int iPlayerIx);
-    //! on mano player say something
     bool Player_Say(int iPlayerIx, eSayPlayer eSay);
     // player play a card
     bool Player_Play(int iPlayerIx, bool vadoDentro);
-    //! reset a mano
     void Reset();
-    //! next action
     void NextAction();
-    //! get state
     eManoStatus GetState() { return m_eManoState; }
-    //! start  match
     void MatchStart();
-    //! provides available calls
     void GetAdmittedCommands(VCT_COMMANDS& vct_Commands, int iPlayerIndex);
     void GetMoreCommands(VCT_COMMANDS& vct_Commands, int iPlayerIndex);
     void CommandWithPendingQuestion(PendQuestion& PendQues,
                                     VCT_COMMANDS& vct_Commands,
                                     int iPlayerIndex);
-    //! giocata start notification
     void GiocataStart();
 
    private:
@@ -164,47 +131,26 @@ class Mano {
     void removeObsoleteActions();
 
    private:
-    //! invido core engine
     InvidoCore* m_pInvidoCore;
-    //! giocata object
     Giocata* m_pGiocata;
-    //! mano status
     eManoStatus m_eManoState;
-    //! old mano status
     eManoStatus m_eOldManoState;
-    //! type of all players
     eTypeOfPLayer m_eTypePlayer[MAX_NUM_PLAYER];
-    //! Number of players that still have to play
     int m_iNumOfPlayers;
-    //! next action queue
     DEQ_ACTIONITEM m_deqNextAction;
-    //! match info score
     MatchPoints* m_pScore;
-    //! pending question queue
     DEQ_PENDQUESTION m_deqPendQuestion;
-    //! map of action names
     MAP_ACTION_NAMES m_MapActionNames;
-    //! map say score, for conversion
     MAP_SAY_SCORE m_MapSayScore;
-    //! map "have to play" state
     MAP_PL_STATUS m_MapManoStatePl;
-    //! map "have to responce" state
     MAP_PL_STATUS m_MapManoStateResp;
-    //! map player index on status
     MAP_STATUS_PL m_MapPlayerOnState;
-    //! map action on state
     MAP_STATUS_ACTION m_MapActionOnState;
-    //! table queue mano state
     DEQ_TABLESTATE m_deqTableState;
-    //! table object
     PlayersOnTable* m_pTable;
-    //! player index that change the score
     int m_iPlayerChangeScore;
-    //! map the score with the closest next
     MAP_SCORE_SCORENEXT m_mapScoreScNext;
-    //! map score with say
     MAP_SCORE_SAY m_mapScoreSay;
-    //! tracer service
     TraceService* m_pTracer;
 };
 

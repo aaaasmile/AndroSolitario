@@ -8,57 +8,33 @@
 
 #include "InvidoCoreEnv.h"
 #include "AlgPlayerInterface.h"
-
-//! class for player statistic
 class PlayerStatistic
 {
 public:
     PlayerStatistic();
-    //! clone statistic element
     void Clone(PlayerStatistic* pNew);
-    //! rest statistic
     void Reset();
 
 public:
-    //! actual score
     long    lScore;
-    //! actual number of hand old
     long    lNumHand;
-    //! actual number of briscole taken
     long    lNumBrisc;
-    //! actual number of carac taken
     long    lNumCarac;
-    //! number of strozzi remained
     long    bynStroz[NUM_SEEDS];
-    //! number of Re remained
     long    bynRe[NUM_SEEDS];
-    //! number of horse remained
     long    bynHorse[NUM_SEEDS];
-    //! number of Fanti remained
     long    bynFanti[NUM_SEEDS];
-    //! number of briscole remained
     long    lRemNumBrisc;
-    //! number of points remained
     long    lRemNumPoints;
-    //! last played seed first
     eSUIT   eLastPlayed;
-    //! number of briscole played
     long    bynBriscHad;
-    //! points played
     long    bynPointsHad;
-    //! points of briscole played
     long    bynBriscPointsHad;
-    //! number of briscole on the first hand
     long    bynBriscFirstHad;
-    //! number of carac played
     long    lCaracHad;
-    //! number of briscole in hand
     long    lInHand_nBris;
-    //! number of carac in hand
     long    lInHand_nCarac;
-    //! number of lisci in hand
     long    lInHand_nLisc;
-    //! number of segni wons
     long    lSegniWons;
 
     friend std::ostream &operator << (std::ostream &stream, const struct tag_cPlayerStatistic &o);
@@ -81,16 +57,10 @@ inline std::ostream &operator << (std::ostream &stream, const PlayerStatistic &o
    
     return stream;
 }
-
-
-//! structure for match statistic
 typedef struct tag_MATCH_STATISTIC
 {
-    //! total segni wons
     long   lTotMatchWons;
-    //! total segni losed
     long   lTotMatchLose;
-    //! total points
     long   lTotPoints;
    friend std::ostream &operator << (std::ostream &stream, const struct tag_MATCH_STATISTIC &o);
 }MATCH_STATISTIC;

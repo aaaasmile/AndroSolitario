@@ -14,8 +14,6 @@
 /////////////////////////////////////////////////////////////////////////////////////
 // *********************************     CPLAYER CLASS  ****************************
 /////////////////////////////////////////////////////////////////////////////////////
-
-//! enum for navigating in the cards hand
 enum eCARDINDEX
 {
     CIX_0 = 0,
@@ -33,10 +31,6 @@ inline eCARDINDEX &operator++ (eCARDINDEX & eF, int)
 {
    return eF = (eF >= CIX_2) ?  CIX_0 : eCARDINDEX(eF + 1);
 }
-
-
-
-//! class Player 
 /** Store information about the player
 */
 class Player
@@ -45,46 +39,27 @@ typedef std::vector<I_ALG_Player*> VCT_PALG;
 public: 
     Player();
     virtual ~Player();
-
-    //! create a default player
     void    Create();
-    //! set the type
     void    SetType(eTypeOfPLayer eVal);
-    //! set player level
     void    SetLevel(eGameLevel eNewLevel, I_ALG_Player* I_val);
-    //! get player level
     eGameLevel GetLevel(){return m_eLevel;}
-    //! provides player type
     eTypeOfPLayer  GetType(){return m_eKind;}
-    //! provides player index
     int     GetIndex(){return m_iIndex;}
-    //! set index
     void    SetIndex(int iVal){m_iIndex = iVal;}
-    //! provides player name
     CHAR*   GetName(){return m_pPlayerName;}
-    //! set player name
     void    SetName(LPCSTR lpszName);
-    //! provides algorithm 
     I_ALG_Player* GetAlg(){return m_pIAlgorithm;}
     
     friend std::ostream &operator << (std::ostream &stream, const Player &o);
-    //! copy constructor
     Player(const Player&a);
-    //! operator assignement
     Player& operator=(const Player&a);
 
 private:
-    //! playername
     CHAR             m_pPlayerName[BUFF_NAME];
-    //! kind of player
     eTypeOfPLayer    m_eKind;
-    //! player index
     int              m_iIndex;
-    //! algorithm interface
     I_ALG_Player*    m_pIAlgorithm;
-    //! created algorithms to destroy
     VCT_PALG         m_vctAlgToDestroy;
-    //! player level 
     eGameLevel       m_eLevel;
 };
 

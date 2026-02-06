@@ -14,18 +14,13 @@ class I_MatchScore;
 /////////////////////////////////////////////////////////////////////////////////////
 //   *******************  CPARTITA CLASS ***************************************
 /////////////////////////////////////////////////////////////////////////////////////
-
-//! class Partita
 /** class to manage a new partita
 */
 class Partita
 {
-//! enum action type
 enum eFN_ACTION
 {
-    //! partita end
     ACT_PARTITA_END,
-    //! no action
     NO_ACTION
 };
 public:
@@ -37,7 +32,6 @@ public:
     void    NewPartita(long lPlayerIx);
     void    Update_Partita(I_MatchScore* pIScore);
     void    Reset();
-    //! do the next action
     void    NextAction();
 
 private:
@@ -45,7 +39,6 @@ private:
     InvidoCore*     m_pInvidoCore;
     Giocata*        m_pGiocata;
     long             m_lGiocStart;
-    //! next action 
     eFN_ACTION         m_eNextAction;
 };
 

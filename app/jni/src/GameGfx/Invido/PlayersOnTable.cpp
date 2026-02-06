@@ -8,8 +8,6 @@
 // *********************************     CPLAYERSONTABLE CLASS
 // *********************
 /////////////////////////////////////////////////////////////////////////////////////
-
-//! constructor
 PlayersOnTable::PlayersOnTable() {
     m_lCurrent = 0;
     m_lNumPlayers = 0;

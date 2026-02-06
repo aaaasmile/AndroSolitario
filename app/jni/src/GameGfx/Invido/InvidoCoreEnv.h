@@ -42,36 +42,22 @@ const std::string g_CardsNameX[]=
 
 typedef std::vector<long> VCT_LONG;
 typedef VCT_LONG::iterator IT_VCTLONG;
-
-
-//! useful constants
 enum
 {
-    //! index of me
     PLAYER_ME         = 0,
-    //! index of opponent
     PLAYER_OPPONENT   = 1,
-    //! number of cards on game invido
     NUM_CARDS         = 32,
-    //! number of cards on briscola mazzo
     NUM_CARDS_MAZZBRI = 40,
-    //! cards on hand of the player
     NUM_CARDS_HAND    = 3,
     NUM_HANDS         = 3,
-    //! num of cards played on the table
     NUM_CARDS_PLAYED  = 2,
-    //! total points to win a match
     SCORE_GOAL        = 24,
-    //! special score 
     SPECIAL_SCORE     = 23,
-    //! special score goal
     SPECIAL_SCORE_GOAL = 8,
-    //! special score seven
     SCORE_SEVEN       = 7,
     NOT_VALID_INDEX   = -1,
     NUM_SEEDS         = 5,
     BUFF_NAME         = 64,
-    //! players index
     PLAYER1           = 0,
     PLAYER2           = 1,
     PLAYER3           = 2,
@@ -79,32 +65,23 @@ enum
     MAX_NUM_PLAYER    = 4,
     NUM_PLAY_INVIDO_2 = 2
 };
-
-//! type of game
 enum eGameType
 {
     LOCAL_TYPE      = 0,
     NET_CLIENT_TYPE = 1,
     NET_SERVER_TYPE = 2
 };
-
-
-//! Partita state
 enum ePartitaStatus
 {
     WAIT_NEW_PARTITA = 0,
     PARTITA_ONGOING  = 1,
     PARTITA_END      = 2
 };
-
-//! Giocata state
 enum eGiocataStatus
 {
     WAIT_NEW_GIOCATA = 0,
     GIOCATA_ONGOING  = 1
 };
-
-//! Mano state
 enum eManoStatus
 {
     MNST_WAIT_NEW_MANO      = 0,
@@ -118,54 +95,28 @@ enum eManoStatus
     MNST_WAIT_RESP_PLAYER_3 = 8,
     MNST_WAIT_RESP_PLAYER_4 = 9,
 };
-
-
-
-//! game level
 enum eGameLevel
 {
-    //! level dummy
     DUMMY = 0,
-    //! level beginner
     BEGINNER = 1,
-    //! level advanced
     ADVANCED = 2,
-    //! level nightmare
     NIGHTMARE = 3,
-    //! use hmi to play
     HMI       = 4,
-    //! tester python
     TEST_PYTHON,
-    //! server level
     SERVER_LEVEL
 };
-
-
-
-
-//! nature of the player
 enum eTypeOfPLayer
 {
-    //! local player
     PT_LOCAL,
-    //! machine player
     PT_MACHINE,
-    //!remote player
     PT_REMOTE,
-    //! server player handler
     PT_SERVER
 };
-
-//! type of notification for the script
 enum eScriptNotification
 {
-    //! deck was shuffled
     SCR_NFY_SHUFFLEDECK = 0,
-    //! have to say something
     SCR_NFY_HAVETO_SAY  = 1,
-    //! have to play something
     SCR_NFY_HAVETO_PLAY = 2,
-    //! new giocata notification
     SCR_NFY_NEWGIOCATA  = 3,
     SCR_NFY_ALGMANOEND  = 4,
     SCR_NFY_ALGGIOCATAEND = 5,

@@ -47,8 +47,6 @@ void AlgDummyPlayer::ALG_SetPlayerIndex(int iIndex) { m_iMyIndex = iIndex; }
 void AlgDummyPlayer::ALG_SetOpponentIndex(int iIndex, int iOpponentNr) {
     m_iOppIndex = iIndex;
 }
-
-//! set associate index
 void AlgDummyPlayer::ALG_SetAssociateIndex(int iIndex) {}
 
 void AlgDummyPlayer::ALG_NewMatch(int iNumPlayer) {}
