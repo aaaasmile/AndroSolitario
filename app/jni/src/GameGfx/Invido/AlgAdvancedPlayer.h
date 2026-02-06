@@ -1,7 +1,7 @@
-// cAlgAdvancedPlayer.h: interface for the cAlgAdvancedPlayer class.
+// AlgAdvancedPlayer.h: interface for the AlgAdvancedPlayer class.
 #if !defined( \
-    AFX_cAlgAdvancedPlayer_H__C00C987D_219F_4552_893D_1A67CCACCC8D__INCLUDED_)
-#define AFX_cAlgAdvancedPlayer_H__C00C987D_219F_4552_893D_1A67CCACCC8D__INCLUDED_
+    AFX_AlgAdvancedPlayer_H__C00C987D_219F_4552_893D_1A67CCACCC8D__INCLUDED_)
+#define AFX_AlgAdvancedPlayer_H__C00C987D_219F_4552_893D_1A67CCACCC8D__INCLUDED_
 
 #if _MSC_VER > 1000
 #pragma once
@@ -11,7 +11,7 @@
 
 #include "AlgPlayerInterface.h"
 #include "CardSpec.h"
-#include "cInvidoCoreEnv.h"
+#include "InvidoCoreEnv.h"
 
 
 class TraceService;
@@ -39,13 +39,13 @@ class cmpHandValue : public std::unary_function<cmpHandValue, bool> {
     }
 };
 
-//! class cAlgAdvancedPlayer
+//! class AlgAdvancedPlayer
 /** class that implement a dummy player
  */
-class cAlgAdvancedPlayer : public I_ALG_Player {
+class AlgAdvancedPlayer : public I_ALG_Player {
    public:
-    cAlgAdvancedPlayer();
-    virtual ~cAlgAdvancedPlayer();
+    AlgAdvancedPlayer();
+    virtual ~AlgAdvancedPlayer();
 
     // interface I_ALG_Player
     virtual void ALG_SetCoreInterface(I_CORE_Game* pCore);
@@ -131,4 +131,4 @@ class cAlgAdvancedPlayer : public I_ALG_Player {
     int m_ixCurrMano;
 };
 
-#endif  // !defined(AFX_cAlgAdvancedPlayer_H__C00C987D_219F_4552_893D_1A67CCACCC8D__INCLUDED_)
+#endif  // !defined(AFX_AlgAdvancedPlayer_H__C00C987D_219F_4552_893D_1A67CCACCC8D__INCLUDED_)

@@ -1,13 +1,13 @@
 
 
-// cAlgDummyPlayer.cpp: implementation of the cAlgDummyPlayer class.
+// AlgDummyPlayer.cpp: implementation of the AlgDummyPlayer class.
 //
 //////////////////////////////////////////////////////////////////////
 
 #include <map>
 
 #include "TraceService.h"
-#include "cAlgDummyPlayer.h"
+#include "AlgDummyPlayer.h"
 #include "win_type_global.h"
 
 //////////////////////////////////////////////////////////////////////
@@ -17,7 +17,7 @@
 typedef std::map<eSayPlayer, LPCSTR> _MAP_SAY;
 static _MAP_SAY g_MapSay;
 
-cAlgDummyPlayer::cAlgDummyPlayer() {
+AlgDummyPlayer::AlgDummyPlayer() {
     m_pCoreGame = 0;
     m_iOppIndex = NOT_VALID_INDEX;
     m_pTracer = TraceService::Instance();
@@ -36,24 +36,24 @@ cAlgDummyPlayer::cAlgDummyPlayer() {
     g_MapSay[GIOCA] = "Gioca";
 }
 
-cAlgDummyPlayer::~cAlgDummyPlayer() {}
+AlgDummyPlayer::~AlgDummyPlayer() {}
 
-void cAlgDummyPlayer::ALG_SetCoreInterface(I_CORE_Game* pCore) {
+void AlgDummyPlayer::ALG_SetCoreInterface(I_CORE_Game* pCore) {
     m_pCoreGame = pCore;
 }
 
-void cAlgDummyPlayer::ALG_SetPlayerIndex(int iIndex) { m_iMyIndex = iIndex; }
+void AlgDummyPlayer::ALG_SetPlayerIndex(int iIndex) { m_iMyIndex = iIndex; }
 
-void cAlgDummyPlayer::ALG_SetOpponentIndex(int iIndex, int iOpponentNr) {
+void AlgDummyPlayer::ALG_SetOpponentIndex(int iIndex, int iOpponentNr) {
     m_iOppIndex = iIndex;
 }
 
 //! set associate index
-void cAlgDummyPlayer::ALG_SetAssociateIndex(int iIndex) {}
+void AlgDummyPlayer::ALG_SetAssociateIndex(int iIndex) {}
 
-void cAlgDummyPlayer::ALG_NewMatch(int iNumPlayer) {}
+void AlgDummyPlayer::ALG_NewMatch(int iNumPlayer) {}
 
-void cAlgDummyPlayer::ALG_NewGiocata(const CARDINFO* pCardArray,
+void AlgDummyPlayer::ALG_NewGiocata(const CARDINFO* pCardArray,
                                      int iNumOfCards, int iPlayerIx) {
     ASSERT(iNumOfCards == NUM_CARDS_HAND);
     for (int i = 0; i < NUM_CARDS_HAND; i++) {
@@ -74,9 +74,9 @@ void cAlgDummyPlayer::ALG_NewGiocata(const CARDINFO* pCardArray,
     }
 }
 
-void cAlgDummyPlayer::ALG_PlayerHasVadoDentro(int iPlayerIx) { ASSERT(0); }
+void AlgDummyPlayer::ALG_PlayerHasVadoDentro(int iPlayerIx) { ASSERT(0); }
 
-void cAlgDummyPlayer::ALG_PlayerHasPlayed(int iPlayerIx,
+void AlgDummyPlayer::ALG_PlayerHasPlayed(int iPlayerIx,
                                           const CARDINFO* pCard) {
     ASSERT(pCard);
     if (iPlayerIx == m_iMyIndex) {
@@ -102,7 +102,7 @@ void cAlgDummyPlayer::ALG_PlayerHasPlayed(int iPlayerIx,
     }
 }
 
-void cAlgDummyPlayer::ALG_PlayerHasSaid(int iPlayerIx, eSayPlayer eSay) {
+void AlgDummyPlayer::ALG_PlayerHasSaid(int iPlayerIx, eSayPlayer eSay) {
     if (iPlayerIx == m_iOppIndex) {
         m_OpponentSay = eSay;
     } else if (iPlayerIx == m_iMyIndex) {
@@ -114,7 +114,7 @@ void cAlgDummyPlayer::ALG_PlayerHasSaid(int iPlayerIx, eSayPlayer eSay) {
     }
 }
 
-void cAlgDummyPlayer::ALG_Play() {
+void AlgDummyPlayer::ALG_Play() {
     CardSpec cardUndef;
 
     int iSayFiber = CASO(6);
@@ -155,9 +155,9 @@ void cAlgDummyPlayer::ALG_Play() {
     }
 }
 
-void cAlgDummyPlayer::ALG_ManoEnd(I_MatchScore* pScore) {}
+void AlgDummyPlayer::ALG_ManoEnd(I_MatchScore* pScore) {}
 
-void cAlgDummyPlayer::ALG_GiocataEnd(I_MatchScore* pScore) {
+void AlgDummyPlayer::ALG_GiocataEnd(I_MatchScore* pScore) {
     if (m_pTracer) {
         if (m_iMyIndex == 0) {
             bool bIsPata = pScore->IsGiocataPatada();
@@ -183,7 +183,7 @@ void cAlgDummyPlayer::ALG_GiocataEnd(I_MatchScore* pScore) {
     }
 }
 
-void cAlgDummyPlayer::ALG_MatchEnd(I_MatchScore* pScore) {
+void AlgDummyPlayer::ALG_MatchEnd(I_MatchScore* pScore) {
     if (m_pTracer) {
         if (m_iMyIndex == 0) {
             int iPlWinner = pScore->GetMatchWinner();
@@ -197,7 +197,7 @@ void cAlgDummyPlayer::ALG_MatchEnd(I_MatchScore* pScore) {
     }
 }
 
-void cAlgDummyPlayer::ALG_Say() {
+void AlgDummyPlayer::ALG_Say() {
     if (m_OpponentSay == AMONTE && m_MyLastSay == NO) {
         // a monte was called and i was responsed NO, don't change idea
         m_pCoreGame->Player_saySomething(m_iMyIndex, m_MyLastSay);
@@ -220,7 +220,7 @@ void cAlgDummyPlayer::ALG_Say() {
     }
 }
 
-void cAlgDummyPlayer::ALG_GicataScoreChange(eGiocataScoreState eNewScore) {
+void AlgDummyPlayer::ALG_GicataScoreChange(eGiocataScoreState eNewScore) {
     m_eScoreCurrent = eNewScore;
     if (m_pTracer) {
         if (m_iMyIndex == 0) {
@@ -230,4 +230,4 @@ void cAlgDummyPlayer::ALG_GicataScoreChange(eGiocataScoreState eNewScore) {
     }
 }
 
-void cAlgDummyPlayer::ALG_PlayerSaidWrong(int iPlayerIx) {}
+void AlgDummyPlayer::ALG_PlayerSaidWrong(int iPlayerIx) {}

@@ -1,14 +1,14 @@
 
 
-// cProbality.cpp
+// Probality.cpp
 
-#include "cProbality.h"
+#include "Probality.h"
 
 ////////////////////////////////////////////////////////////////
-//   *******************      cProbality CLASS ******************
+//   *******************      Probality CLASS ******************
 ////////////////////////////////////////////////////////////////
 
-void cProbality::SvilCombiHands(VCT_MAZZO& vct_Mazzo,
+void Probality::SvilCombiHands(VCT_MAZZO& vct_Mazzo,
                                 MTX_HANDCOMBI& mtx_Result) {
     long lNumCard = (long)vct_Mazzo.size();
     mtx_Result.clear();
@@ -69,7 +69,7 @@ void cProbality::SvilCombiHands(VCT_MAZZO& vct_Mazzo,
     // Utility::SaveItemToFile(mtx_Result, DEF_path_s, "allhands.txt");
 }
 
-double cProbality::BinomialCoef(long lN, long lK) {
+double Probality::BinomialCoef(long lN, long lK) {
     double dResult = 0.0;
     double dNum, dDen;
 
@@ -81,7 +81,7 @@ double cProbality::BinomialCoef(long lN, long lK) {
     return dResult;
 }
 
-double cProbality::Fattorial(long lN) {
+double Probality::Fattorial(long lN) {
     double dResult = 1.0;
 
     for (long i = 0; i < lN - 1; i++) {

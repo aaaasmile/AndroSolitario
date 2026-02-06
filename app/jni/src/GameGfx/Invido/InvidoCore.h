@@ -1,20 +1,20 @@
 
 
-// cInvidoCoreEngine.h
+// InvidoCoreEngine.h
 
 #ifndef _C_INVIDOCORE_H_
 #define _C_INVIDOCORE_H_
 
-#include "cGiocata.h"
-#include "cInvidoCoreEnv.h"
-#include "cMano.h"
-#include "cMatchPoints.h"
-#include "cPartita.h"
-#include "cPlayersOnTable.h"
-#include "cProbality.h"
+#include "Giocata.h"
+#include "InvidoCoreEnv.h"
+#include "Mano.h"
+#include "MatchPoints.h"
+#include "Partita.h"
+#include "PlayersOnTable.h"
+#include "Probality.h"
 
 
-class cMazzo;
+class Mazzo;
 class TraceService;
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -22,25 +22,25 @@ class TraceService;
 //   ***************************************
 /////////////////////////////////////////////////////////////////////////////////////
 
-//! class cInvidoCore
+//! class InvidoCore
 /** the core class for the invido. Hold all information about game in progress,
 level cards and so on.
 */
-class cInvidoCore : public I_CORE_Game {
+class InvidoCore : public I_CORE_Game {
    public:
-    cInvidoCore();
-    ~cInvidoCore();
+    InvidoCore();
+    ~InvidoCore();
 
     //! create the engine
-    void Create(cPlayer* pHmiPlayer, int iNumPlayers);
+    void Create(Player* pHmiPlayer, int iNumPlayers);
     //! provides information about whon won the game
-    bool WhoWonsTheGame(cPlayer** ppPlayer);
+    bool WhoWonsTheGame(Player** ppPlayer);
     //! provides the index of the player that have to play
-    bool GetPlayerInPlaying(cPlayer** ppPlayer);
+    bool GetPlayerInPlaying(Player** ppPlayer);
     //! set the game type
     void SetGameType(eGameType eVal) { m_eGameType = eVal; }
     //! provides a player
-    cPlayer* GetPlayer(int iIndex) {
+    Player* GetPlayer(int iIndex) {
         return m_PlayersOnTable.GetPlayerIndex(iIndex);
     }
     //! error message, somithing was wrong
@@ -48,9 +48,9 @@ class cInvidoCore : public I_CORE_Game {
     //! provides the number of players
     int GetNumOfPlayers() { return m_lNumPlayers; }
     //! provides match points object
-    cMatchPoints* GetMatchPointsObj() { return &m_MatchPoints; }
+    MatchPoints* GetMatchPointsObj() { return &m_MatchPoints; }
     //! provides the player table
-    cPlayersOnTable* GetTable() { return &m_PlayersOnTable; }
+    PlayersOnTable* GetTable() { return &m_PlayersOnTable; }
 
     // functions related to the script engine
     //! notify event to the script engine
@@ -70,7 +70,7 @@ class cInvidoCore : public I_CORE_Game {
     //! script want to check an item
     int Script_CheckResult(int iTypeOfItem, int iParam1, int iExpectedVal);
 
-    // functions called from cMano
+    // functions called from Mano
     //! a Mano is terminated
     void Mano_End();
     //! wait  player  have to play
@@ -86,13 +86,13 @@ class cInvidoCore : public I_CORE_Game {
     //! giocata a monte
     void Giocata_AMonte();
 
-    // functions called from cGiocata
+    // functions called from Giocata
     //! a giocata is ended
     void Giocata_End();
     //! start a new giocata: shuffle and distribuite cards
     void Giocata_Start(long lPlayerIx);
 
-    // function called from cPartita
+    // function called from Partita
     //! partita is terminated
     void Partita_End();
 
@@ -125,31 +125,31 @@ class cInvidoCore : public I_CORE_Game {
 
    private:
     //! players on table
-    cPlayersOnTable m_PlayersOnTable;
+    PlayersOnTable m_PlayersOnTable;
     //! Game type
     eGameType m_eGameType;
     //! number of players
     long m_lNumPlayers;
     //! player index that must play now
-    cPlayer* m_pPlHaveToPlay;
+    Player* m_pPlHaveToPlay;
     //! player index that has started the game
-    cPlayer* m_pStartPlayer;
+    Player* m_pStartPlayer;
     //! level of the game
     eGameLevel m_eGameLevel;
     //! match statistic
     MATCH_STATISTIC m_Match_Stat;
     //! deck
-    cMazzo* m_pMyMazzo;
+    Mazzo* m_pMyMazzo;
     //! partita
-    cPartita m_Partita;
+    Partita m_Partita;
     //! giocata
-    cGiocata m_Giocata;
+    Giocata m_Giocata;
     //! mano
-    cMano m_Mano;
+    Mano m_Mano;
     //! players algorithm
     I_ALG_Player* m_vctAlgPlayer[MAX_NUM_PLAYER];
     //! points handler in match
-    cMatchPoints m_MatchPoints;
+    MatchPoints m_MatchPoints;
     //! store cards of all players
     CardSpec m_aCardInfo[NUM_CARDS_HAND * MAX_NUM_PLAYER];
     //! tracer service

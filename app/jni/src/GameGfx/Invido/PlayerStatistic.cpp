@@ -1,12 +1,12 @@
 
 
-// cPlayerStatistic.cpp
+// PlayerStatistic.cpp
 
-#include "cPlayerStatistic.h"
+#include "PlayerStatistic.h"
 
-cPlayerStatistic::cPlayerStatistic() { Reset(); }
+PlayerStatistic::PlayerStatistic() { Reset(); }
 
-void cPlayerStatistic::Reset() {
+void PlayerStatistic::Reset() {
     for (int i = 0; i < NUM_SEEDS; i++) {
         bynStroz[i] = 2;
         bynRe[i] = 1;
@@ -30,7 +30,7 @@ void cPlayerStatistic::Reset() {
     lInHand_nLisc = 0;
 }
 
-void cPlayerStatistic::Clone(cPlayerStatistic* pNew) {
+void PlayerStatistic::Clone(PlayerStatistic* pNew) {
     ASSERT(pNew);
     pNew->lScore = lScore;
     pNew->lNumHand = lNumHand;

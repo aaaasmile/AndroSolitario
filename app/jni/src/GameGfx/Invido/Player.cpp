@@ -1,31 +1,31 @@
-// cPlayer.cpp
+// Player.cpp
 
-#include "cAlgAdvancedPlayer.h"
-#include "cAlgDummyPlayer.h"
-#include "cPlayer.h"
+#include "AlgAdvancedPlayer.h"
+#include "AlgDummyPlayer.h"
+#include "Player.h"
 
 
 ////////////////////////////////////////////////////////////////
 //  *************************  PLAYER CLASS *******************
 ////////////////////////////////////////////////////////////////
 
-cPlayer::cPlayer() {
+Player::Player() {
     m_iIndex = NOT_VALID_INDEX;
     m_pIAlgorithm = 0;
     m_eLevel = DUMMY;
 }
 
 ////////////////////////////////////////
-//       ~cPlayer
+//       ~Player
 /*! Destructor
  */
-cPlayer::~cPlayer() {
+Player::~Player() {
     for (size_t i = 0; i < m_vctAlgToDestroy.size(); i++) {
         delete m_vctAlgToDestroy[i];
     }
 }
 
-cPlayer::cPlayer(const cPlayer& a) {
+Player::Player(const Player& a) {
     strncpy(m_pPlayerName, a.m_pPlayerName, BUFF_NAME);
     m_eKind = a.m_eKind;
     m_iIndex = a.m_iIndex;
@@ -36,9 +36,9 @@ cPlayer::cPlayer(const cPlayer& a) {
 ////////////////////////////////////////
 //       operator=
 /*! Copy player operator
-// \param const cPlayer&a :
+// \param const Player&a :
 */
-cPlayer& cPlayer::operator=(const cPlayer& a) {
+Player& Player::operator=(const Player& a) {
     strncpy(m_pPlayerName, a.m_pPlayerName, BUFF_NAME);
     m_eKind = a.m_eKind;
     m_iIndex = a.m_iIndex;
@@ -48,7 +48,7 @@ cPlayer& cPlayer::operator=(const cPlayer& a) {
     return *this;
 }
 
-void cPlayer::Create() {
+void Player::Create() {
     CardSpec emptyCard;
     m_eKind = PT_LOCAL;
     strcpy(m_pPlayerName, "Remigiu");
@@ -57,13 +57,13 @@ void cPlayer::Create() {
     m_eLevel = DUMMY;
 }
 
-void cPlayer::SetName(LPCSTR lpszName) {
+void Player::SetName(LPCSTR lpszName) {
     strncpy(m_pPlayerName, lpszName, BUFF_NAME - 1);
 }
 
-void cPlayer::SetType(eTypeOfPLayer eVal) { m_eKind = eVal; }
+void Player::SetType(eTypeOfPLayer eVal) { m_eKind = eVal; }
 
-void cPlayer::SetLevel(eGameLevel eNewLevel, I_ALG_Player* I_val) {
+void Player::SetLevel(eGameLevel eNewLevel, I_ALG_Player* I_val) {
     if (m_pIAlgorithm != 0 && m_eLevel != HMI && m_eLevel != SERVER_LEVEL) {
         delete m_pIAlgorithm;
         m_pIAlgorithm = 0;
@@ -76,7 +76,7 @@ void cPlayer::SetLevel(eGameLevel eNewLevel, I_ALG_Player* I_val) {
             break;
 
         case ADVANCED:
-            m_pIAlgorithm = new cAlgAdvancedPlayer();
+            m_pIAlgorithm = new AlgAdvancedPlayer();
             m_vctAlgToDestroy.push_back(m_pIAlgorithm);
             break;
 

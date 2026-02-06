@@ -1,17 +1,17 @@
 
 
-// cMatchPoints.cpp: implementation of the cMatchPoints class.
+// MatchPoints.cpp: implementation of the MatchPoints class.
 //
 //////////////////////////////////////////////////////////////////////
 
-#include "cMano.h"
-#include "cMatchPoints.h"
+#include "Mano.h"
+#include "MatchPoints.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-cMatchPoints::cMatchPoints() {
+MatchPoints::MatchPoints() {
     m_iNumPlayers = NUM_PLAY_INVIDO_2;
     m_pMano = 0;
     m_bGameAbandoned = FALSE;
@@ -21,9 +21,9 @@ cMatchPoints::cMatchPoints() {
     m_eCurrentScore = SC_CANELA;
 }
 
-cMatchPoints::~cMatchPoints() {}
+MatchPoints::~MatchPoints() {}
 
-void cMatchPoints::MatchStart(int iNumPlayer) {
+void MatchPoints::MatchStart(int iNumPlayer) {
     for (int i = 0; i < MAX_NUM_PLAYER; i++) {
         m_vctPlayerPoints[i] = 0;
     }
@@ -34,7 +34,7 @@ void cMatchPoints::MatchStart(int iNumPlayer) {
     m_vctGiocataInfo.clear();
 }
 
-void cMatchPoints::GiocataStart() {
+void MatchPoints::GiocataStart() {
     CardSpec CardUndef;
     for (int i = 0; i < MAX_NUM_PLAYER; i++) {
         m_vctHandWons[i] = 0;
@@ -57,7 +57,7 @@ void cMatchPoints::GiocataStart() {
     m_bGameAbandoned = FALSE;
 }
 
-void cMatchPoints::PlayerPlay(int iPlayerIx, CARDINFO* pCard) {
+void MatchPoints::PlayerPlay(int iPlayerIx, CARDINFO* pCard) {
     CardSpec Card;
     ASSERT(pCard);
     Card.SetCardInfo(*pCard);
@@ -67,7 +67,7 @@ void cMatchPoints::PlayerPlay(int iPlayerIx, CARDINFO* pCard) {
     m_iNumCardsPlayed++;
 }
 
-void cMatchPoints::ManoEnd() {
+void MatchPoints::ManoEnd() {
     ASSERT(m_iNumCardsPlayed == m_iNumPlayers);
     int iManoTerminatedIndex = m_iManoRound;
     ASSERT(iManoTerminatedIndex >= 0 && iManoTerminatedIndex < NUM_CARDS_HAND);
@@ -147,7 +147,7 @@ void cMatchPoints::ManoEnd() {
     m_iNumCardsPlayed = 0;
 }
 
-void cMatchPoints::PlayerVaVia(int iPlayerIx) {
+void MatchPoints::PlayerVaVia(int iPlayerIx) {
     m_eIsGiocataEnd = GES_HAVE_WINNER;
     if (iPlayerIx == PLAYER1) {
         m_iPlayerGiocataWin = PLAYER2;
@@ -156,13 +156,13 @@ void cMatchPoints::PlayerVaVia(int iPlayerIx) {
     }
 }
 
-void cMatchPoints::GiocataEnd() {
+void MatchPoints::GiocataEnd() {
     if (m_eIsGiocataEnd == GES_HAVE_WINNER) {
         ASSERT(m_iPlayerGiocataWin != NOT_VALID_INDEX);
         // update the score
         m_vctPlayerPoints[m_iPlayerGiocataWin] += m_eCurrentScore;
         m_vctGiocataInfo.push_back(
-            cGiocataInfo(m_iPlayerGiocataWin, m_eCurrentScore));
+            GiocataInfo(m_iPlayerGiocataWin, m_eCurrentScore));
 
         if (m_vctPlayerPoints[m_iPlayerGiocataWin] >= m_iScoreGoal) {
             // match is terminated
@@ -178,14 +178,14 @@ void cMatchPoints::GiocataEnd() {
         }
     } else {
         // pata or monte
-        m_vctGiocataInfo.push_back(cGiocataInfo(NOT_VALID_INDEX, SC_AMONTE));
+        m_vctGiocataInfo.push_back(GiocataInfo(NOT_VALID_INDEX, SC_AMONTE));
     }
     for (int iManoNum = 0; iManoNum < NUM_CARDS_HAND; iManoNum++) {
         m_ManoDetailInfo[iManoNum].Reset();
     }
 }
 
-bool cMatchPoints::IsGiocatEnd() {
+bool MatchPoints::IsGiocatEnd() {
     bool bRet = FALSE;
 
     if (m_eIsGiocataEnd == GES_AMONTE || m_eIsGiocataEnd == GES_PATADA ||
@@ -195,16 +195,16 @@ bool cMatchPoints::IsGiocatEnd() {
     return bRet;
 }
 
-void cMatchPoints::AMonte() { m_eIsGiocataEnd = GES_AMONTE; }
+void MatchPoints::AMonte() { m_eIsGiocataEnd = GES_AMONTE; }
 
-void cMatchPoints::beginSpecialTurn() {
+void MatchPoints::beginSpecialTurn() {
     m_iScoreGoal = SPECIAL_SCORE_GOAL;
     m_vctPlayerPoints[PLAYER1] = 0;
     m_vctPlayerPoints[PLAYER2] = 0;
     m_bMatchInSpecialScore = TRUE;
 }
 
-void cMatchPoints::GetManoInfo(int iManoNum, int* piPlayerIx, bool* pbIsPlayed,
+void MatchPoints::GetManoInfo(int iManoNum, int* piPlayerIx, bool* pbIsPlayed,
                                bool* pbIsPata) {
     ASSERT(pbIsPata);
     ASSERT(pbIsPlayed);
@@ -219,14 +219,14 @@ void cMatchPoints::GetManoInfo(int iManoNum, int* piPlayerIx, bool* pbIsPlayed,
     }
 }
 
-void cMatchPoints::GetGiocataInfo(int iNumGiocata, cGiocataInfo* pGiocInfo) {
+void MatchPoints::GetGiocataInfo(int iNumGiocata, GiocataInfo* pGiocInfo) {
     ASSERT(pGiocInfo);
     if (iNumGiocata >= 0 && iNumGiocata < (int)m_vctGiocataInfo.size()) {
         *pGiocInfo = m_vctGiocataInfo[iNumGiocata];
     }
 }
 
-void cMatchPoints::ChangeCurrentScore(eGiocataScoreState eVal, int iPlayer) {
+void MatchPoints::ChangeCurrentScore(eGiocataScoreState eVal, int iPlayer) {
     if (eVal > 0) {
         ASSERT(iPlayer != m_iPlayerChangeScore);
     }
@@ -234,7 +234,7 @@ void cMatchPoints::ChangeCurrentScore(eGiocataScoreState eVal, int iPlayer) {
     m_iPlayerChangeScore = iPlayer;
 }
 
-void cMatchPoints::SetTheWinner(int iPlayerIx) {
+void MatchPoints::SetTheWinner(int iPlayerIx) {
     m_iPlayerMatchWin = iPlayerIx;
     m_bGameAbandoned = TRUE;
 }

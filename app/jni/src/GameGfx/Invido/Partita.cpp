@@ -1,17 +1,17 @@
-// cPartita.cpp
+// Partita.cpp
 
-#include "cGiocata.h"
-#include "cInvidoCore.h"
-#include "cInvidoCoreEnv.h"
-#include "cMatchPoints.h"
-#include "cPartita.h"
+#include "Giocata.h"
+#include "InvidoCore.h"
+#include "InvidoCoreEnv.h"
+#include "MatchPoints.h"
+#include "Partita.h"
 
 /////////////////////////////////////////////////////////////////////////////////////
 //   *******************  CPARTITA CLASS ***************************************
 /////////////////////////////////////////////////////////////////////////////////////
 
 //! constructor
-cPartita::cPartita() {
+Partita::Partita() {
     m_pGiocata = NULL;
     m_pInvidoCore = NULL;
     m_PartitaState = WAIT_NEW_PARTITA;
@@ -19,7 +19,7 @@ cPartita::cPartita() {
     m_eNextAction = NO_ACTION;
 }
 
-void cPartita::NewPartita(long lPlayerIx) {
+void Partita::NewPartita(long lPlayerIx) {
     m_lGiocStart = lPlayerIx;
 
     if (m_PartitaState != PARTITA_ONGOING) {
@@ -31,7 +31,7 @@ void cPartita::NewPartita(long lPlayerIx) {
     }
 }
 
-void cPartita::NextAction() {
+void Partita::NextAction() {
     switch (m_eNextAction) {
         case ACT_PARTITA_END:
             // partita is eneded
@@ -50,7 +50,7 @@ void cPartita::NextAction() {
     m_eNextAction = NO_ACTION;
 }
 
-void cPartita::Update_Partita(I_MatchScore* pIScore) {
+void Partita::Update_Partita(I_MatchScore* pIScore) {
     ASSERT(pIScore);
     ASSERT(m_PartitaState == PARTITA_ONGOING);
 
@@ -75,7 +75,7 @@ void cPartita::Update_Partita(I_MatchScore* pIScore) {
     }
 }
 
-void cPartita::Reset() {
+void Partita::Reset() {
     m_PartitaState = WAIT_NEW_PARTITA;
     m_lGiocStart = 0;
 }

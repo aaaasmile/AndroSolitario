@@ -3,8 +3,8 @@
 #include <map>
 
 #include "TraceService.h"
-#include "cAlgAdvancedPlayer.h"
-#include "cProbality.h"
+#include "AlgAdvancedPlayer.h"
+#include "Probality.h"
 #include "win_type_global.h"
 
 // random value between [0,x)
@@ -13,7 +13,7 @@
 typedef std::map<eSayPlayer, LPCSTR> _MAP_SAY;
 static _MAP_SAY g_MapSay;
 
-cAlgAdvancedPlayer::cAlgAdvancedPlayer() {
+AlgAdvancedPlayer::AlgAdvancedPlayer() {
     m_ixCurrMano = 0;
     m_pCoreGame = 0;
     m_iOppIndex = NOT_VALID_INDEX;
@@ -36,29 +36,29 @@ cAlgAdvancedPlayer::cAlgAdvancedPlayer() {
     g_MapSay[GIOCA] = "Gioca";
 }
 
-cAlgAdvancedPlayer::~cAlgAdvancedPlayer() {}
+AlgAdvancedPlayer::~AlgAdvancedPlayer() {}
 
-void cAlgAdvancedPlayer::ALG_SetCoreInterface(I_CORE_Game* pCore) {
+void AlgAdvancedPlayer::ALG_SetCoreInterface(I_CORE_Game* pCore) {
     m_pCoreGame = pCore;
 }
 
-void cAlgAdvancedPlayer::ALG_SetPlayerIndex(int iIndex) { m_iMyIndex = iIndex; }
+void AlgAdvancedPlayer::ALG_SetPlayerIndex(int iIndex) { m_iMyIndex = iIndex; }
 
-void cAlgAdvancedPlayer::ALG_SetOpponentIndex(int iIndex, int iOpponentNr) {
+void AlgAdvancedPlayer::ALG_SetOpponentIndex(int iIndex, int iOpponentNr) {
     m_iOppIndex = iIndex;
 }
 
 //! set associate index
-void cAlgAdvancedPlayer::ALG_SetAssociateIndex(int iIndex) {}
+void AlgAdvancedPlayer::ALG_SetAssociateIndex(int iIndex) {}
 
-void cAlgAdvancedPlayer::ALG_NewMatch(int iNumPlayer) {
+void AlgAdvancedPlayer::ALG_NewMatch(int iNumPlayer) {
     VCT_MAZZO vctMyDeck;
     for (int i = 0; i < NUM_CARDS; i++) {
         vctMyDeck.push_back(i);
     }
 }
 
-void cAlgAdvancedPlayer::ALG_NewGiocata(const CARDINFO* pCardArray,
+void AlgAdvancedPlayer::ALG_NewGiocata(const CARDINFO* pCardArray,
                                         int iNumOfCards, int iPlayerIx) {
     ASSERT(iNumOfCards == NUM_CARDS_HAND);
     CardSpec cardUndef;
@@ -104,7 +104,7 @@ void cAlgAdvancedPlayer::ALG_NewGiocata(const CARDINFO* pCardArray,
     }
 }
 
-void cAlgAdvancedPlayer::ALG_PlayerHasVadoDentro(int iPlayerIx) {
+void AlgAdvancedPlayer::ALG_PlayerHasVadoDentro(int iPlayerIx) {
     TRACE("[TRALG]Player %1 va dentro\n", iPlayerIx);
     CardSpec cardDentro;
     if (iPlayerIx == m_iMyIndex) {
@@ -124,7 +124,7 @@ void cAlgAdvancedPlayer::ALG_PlayerHasVadoDentro(int iPlayerIx) {
     }
 }
 
-void cAlgAdvancedPlayer::doVadoDentro(int cardPos) {
+void AlgAdvancedPlayer::doVadoDentro(int cardPos) {
     CardSpec cardUndef;
     m_iCPUCardDentroPos = cardPos;
     ASSERT(m_vct_Cards_CPU[cardPos] != cardUndef);
@@ -132,7 +132,7 @@ void cAlgAdvancedPlayer::doVadoDentro(int cardPos) {
                                  m_vct_Cards_CPU[cardPos].GetCardInfo());
 }
 
-void cAlgAdvancedPlayer::ALG_PlayerHasPlayed(int iPlayerIx,
+void AlgAdvancedPlayer::ALG_PlayerHasPlayed(int iPlayerIx,
                                              const CARDINFO* pCard) {
     ASSERT(pCard);
     ASSERT(pCard->byIndex != NOT_VALID_INDEX);
@@ -169,7 +169,7 @@ void cAlgAdvancedPlayer::ALG_PlayerHasPlayed(int iPlayerIx,
     m_sayMyRisp = VABENE;
 }
 
-void cAlgAdvancedPlayer::ALG_PlayerHasSaid(int iPlayerIx, eSayPlayer eSay) {
+void AlgAdvancedPlayer::ALG_PlayerHasSaid(int iPlayerIx, eSayPlayer eSay) {
     LPCSTR lpsNameSay = g_MapSay[eSay];
     m_pTracer->AddSimpleTrace(m_itrChan, "[TRALG]Player %d has said %s\n",
                               iPlayerIx, lpsNameSay);
@@ -193,7 +193,7 @@ void cAlgAdvancedPlayer::ALG_PlayerHasSaid(int iPlayerIx, eSayPlayer eSay) {
     }
 }
 
-bool cAlgAdvancedPlayer::Cagna(int lastNumChiamate) {
+bool AlgAdvancedPlayer::Cagna(int lastNumChiamate) {
     VCT_COMMANDS vct_cmd;
     ASSERT(m_pCoreGame);
     bool res = FALSE;
@@ -214,7 +214,7 @@ bool cAlgAdvancedPlayer::Cagna(int lastNumChiamate) {
     return res;
 }
 
-bool cAlgAdvancedPlayer::ChiamaAMonte(int lastNumChiamate) {
+bool AlgAdvancedPlayer::ChiamaAMonte(int lastNumChiamate) {
     m_iNumChiamateMonte += 1;
     if (m_iNumChiamateMonte < 4) {
         Chiama(AMONTE, lastNumChiamate);
@@ -223,13 +223,13 @@ bool cAlgAdvancedPlayer::ChiamaAMonte(int lastNumChiamate) {
     return FALSE;
 }
 
-void cAlgAdvancedPlayer::Chiama(eSayPlayer eSay, int lastChiamataNum) {
+void AlgAdvancedPlayer::Chiama(eSayPlayer eSay, int lastChiamataNum) {
     ASSERT(lastChiamataNum == m_iNumChiamateInGiocata);
     m_iNumChiamateInGiocata += 1;
     m_pCoreGame->Player_saySomething(m_iMyIndex, eSay);
 }
 
-bool cAlgAdvancedPlayer::ChiamaDiPiu(int lastNumChiamate) {
+bool AlgAdvancedPlayer::ChiamaDiPiu(int lastNumChiamate) {
     VCT_COMMANDS vct_cmd;
     ASSERT(m_pCoreGame);
 
@@ -244,7 +244,7 @@ bool cAlgAdvancedPlayer::ChiamaDiPiu(int lastNumChiamate) {
     return FALSE;
 }
 
-void cAlgAdvancedPlayer::PlayAsFirst() {
+void AlgAdvancedPlayer::PlayAsFirst() {
     int lastNumChiamate = m_iNumChiamateInGiocata;
     CARDINFO* result = NULL;
     CardSpec cardUndef;
@@ -527,7 +527,7 @@ void cAlgAdvancedPlayer::PlayAsFirst() {
     }
 }
 
-void cAlgAdvancedPlayer::GiocaACaso() {
+void AlgAdvancedPlayer::GiocaACaso() {
     CardSpec cardUndef;
     int iCartaPos = CASO(3);
     int iLoops = 0;
@@ -543,7 +543,7 @@ void cAlgAdvancedPlayer::GiocaACaso() {
                                  m_vct_Cards_CPU[iCartaPos].GetCardInfo());
 }
 
-void cAlgAdvancedPlayer::PlayAsSecond() {
+void AlgAdvancedPlayer::PlayAsSecond() {
     CARDINFO* result = NULL;
     CardSpec cardUndef;
     ASSERT(m_vct_Cards_played[m_ixCurrMano].size() == 1);
@@ -737,14 +737,14 @@ void cAlgAdvancedPlayer::PlayAsSecond() {
     }
 }
 
-bool cAlgAdvancedPlayer::IsPlayerFirst() {
+bool AlgAdvancedPlayer::IsPlayerFirst() {
     return m_vct_Cards_played[m_ixCurrMano].size() == 0 ? TRUE : FALSE;
 }
 
 // Ritorna: 1,2,3 a seconda della mano
-int cAlgAdvancedPlayer::NumMano() { return m_ixCurrMano + 1; }
+int AlgAdvancedPlayer::NumMano() { return m_ixCurrMano + 1; }
 
-void cAlgAdvancedPlayer::ALG_Play() {
+void AlgAdvancedPlayer::ALG_Play() {
     if (IsPlayerFirst()) {
         PlayAsFirst();
     } else {
@@ -752,7 +752,7 @@ void cAlgAdvancedPlayer::ALG_Play() {
     }
 }
 
-void cAlgAdvancedPlayer::ALG_ManoEnd(I_MatchScore* pScore) {
+void AlgAdvancedPlayer::ALG_ManoEnd(I_MatchScore* pScore) {
     m_opponetIsVadoDentro = FALSE;
     m_ixCurrMano++;
 
@@ -770,7 +770,7 @@ void cAlgAdvancedPlayer::ALG_ManoEnd(I_MatchScore* pScore) {
     }
 }
 
-void cAlgAdvancedPlayer::ALG_GiocataEnd(I_MatchScore* pScore) {
+void AlgAdvancedPlayer::ALG_GiocataEnd(I_MatchScore* pScore) {
     if (m_pTracer) {
         if (m_iMyIndex == 0) {
             bool bIsPata = pScore->IsGiocataPatada();
@@ -797,7 +797,7 @@ void cAlgAdvancedPlayer::ALG_GiocataEnd(I_MatchScore* pScore) {
     }
 }
 
-void cAlgAdvancedPlayer::ALG_MatchEnd(I_MatchScore* pScore) {
+void AlgAdvancedPlayer::ALG_MatchEnd(I_MatchScore* pScore) {
     int iPlWinner = pScore->GetMatchWinner();
     m_pTracer->AddSimpleTrace(m_itrChan, "[TRALG]Match vinto da %d\n",
                               iPlWinner);
@@ -807,7 +807,7 @@ void cAlgAdvancedPlayer::ALG_MatchEnd(I_MatchScore* pScore) {
         pScore->GetPointsPlayer(m_iOppIndex));
 }
 
-void cAlgAdvancedPlayer::ALG_HaveToRespond() {
+void AlgAdvancedPlayer::ALG_HaveToRespond() {
     m_pTracer->AddSimpleTrace(m_itrChan, "[TRALG] have to respond");
     CardSpec cardUndef;
     int lastNumChiamate = m_iNumChiamateInGiocata;
@@ -865,7 +865,7 @@ void cAlgAdvancedPlayer::ALG_HaveToRespond() {
     }
 }
 
-void cAlgAdvancedPlayer::handleSayPopints(int curr_mano, int pointsFirstCard,
+void AlgAdvancedPlayer::handleSayPopints(int curr_mano, int pointsFirstCard,
                                           int lastNumChiamate, int maxpoints,
                                           int sum_points) {
     if (maxpoints == 13 && m_bLastManoPatada) {
@@ -1069,7 +1069,7 @@ void cAlgAdvancedPlayer::handleSayPopints(int curr_mano, int pointsFirstCard,
     }
 }
 
-void cAlgAdvancedPlayer::handleSayAmonte(int curr_mano, int pointsFirstCard,
+void AlgAdvancedPlayer::handleSayAmonte(int curr_mano, int pointsFirstCard,
                                          int lastNumChiamate, int maxpoints,
                                          int sum_points) {
     if (curr_mano == 1 && pointsFirstCard == 13 &&
@@ -1129,7 +1129,7 @@ void cAlgAdvancedPlayer::handleSayAmonte(int curr_mano, int pointsFirstCard,
     }
 }
 
-void cAlgAdvancedPlayer::ALG_GicataScoreChange(eGiocataScoreState eNewScore) {
+void AlgAdvancedPlayer::ALG_GicataScoreChange(eGiocataScoreState eNewScore) {
     m_eScoreCurrent = eNewScore;
     if (m_pTracer) {
         if (m_iMyIndex == 0) {
@@ -1139,4 +1139,4 @@ void cAlgAdvancedPlayer::ALG_GicataScoreChange(eGiocataScoreState eNewScore) {
     }
 }
 
-void cAlgAdvancedPlayer::ALG_PlayerSaidWrong(int iPlayerIx) {}
+void AlgAdvancedPlayer::ALG_PlayerSaidWrong(int iPlayerIx) {}

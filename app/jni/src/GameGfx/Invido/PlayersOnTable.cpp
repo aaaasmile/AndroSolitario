@@ -1,8 +1,8 @@
 
 
-// cPlayersOnTable
+// PlayersOnTable
 
-#include "cPlayersOnTable.h"
+#include "PlayersOnTable.h"
 
 /////////////////////////////////////////////////////////////////////////////////////
 // *********************************     CPLAYERSONTABLE CLASS
@@ -10,7 +10,7 @@
 /////////////////////////////////////////////////////////////////////////////////////
 
 //! constructor
-cPlayersOnTable::cPlayersOnTable() {
+PlayersOnTable::PlayersOnTable() {
     m_lCurrent = 0;
     m_lNumPlayers = 0;
     m_lFirstOnTrick = NOT_VALID_INDEX;
@@ -18,7 +18,7 @@ cPlayersOnTable::cPlayersOnTable() {
     m_lFirstOnMatch = NOT_VALID_INDEX;
 }
 
-void cPlayersOnTable::SetFirstOnTrick(long lIndex) {
+void PlayersOnTable::SetFirstOnTrick(long lIndex) {
     if (lIndex < (long)m_vctPlayers.size() && lIndex >= 0) {
         m_lCurrent = lIndex;
         m_lFirstOnTrick = lIndex;
@@ -27,7 +27,7 @@ void cPlayersOnTable::SetFirstOnTrick(long lIndex) {
     }
 }
 
-void cPlayersOnTable::SetFirstOnGiocata(long lIndex) {
+void PlayersOnTable::SetFirstOnGiocata(long lIndex) {
     if (lIndex < (long)m_vctPlayers.size() && lIndex >= 0) {
         m_lCurrent = lIndex;
         m_lFirstOnTrick = lIndex;
@@ -37,7 +37,7 @@ void cPlayersOnTable::SetFirstOnGiocata(long lIndex) {
     }
 }
 
-void cPlayersOnTable::SetFirstOnMatch(long lIndex) {
+void PlayersOnTable::SetFirstOnMatch(long lIndex) {
     if (lIndex < (long)m_vctPlayers.size() && lIndex >= 0) {
         m_lCurrent = lIndex;
         m_lFirstOnTrick = lIndex;
@@ -48,14 +48,14 @@ void cPlayersOnTable::SetFirstOnMatch(long lIndex) {
     }
 }
 
-void cPlayersOnTable::Create(cPlayer* pHmiPlayer, int iNumPlayers) {
+void PlayersOnTable::Create(Player* pHmiPlayer, int iNumPlayers) {
     m_vctPlayers.clear();
     for (int i = 0; i < iNumPlayers; i++) {
         if (pHmiPlayer && i == 0) {
             pHmiPlayer->SetIndex(0);
             m_vctPlayers.push_back(*pHmiPlayer);
         } else {
-            m_vctPlayers.push_back(cPlayer());
+            m_vctPlayers.push_back(Player());
             m_vctPlayers[i].Create();
             // type is default value. Gfx engine change it.
             if (i == 0) {
@@ -72,7 +72,7 @@ void cPlayersOnTable::Create(cPlayer* pHmiPlayer, int iNumPlayers) {
     m_lNumPlayers = iNumPlayers;
 }
 
-cPlayer* cPlayersOnTable::GetPlayerToPlay(eSwitchPLayer eVal) {
+Player* PlayersOnTable::GetPlayerToPlay(eSwitchPLayer eVal) {
     size_t lNumPlayers = m_vctPlayers.size();
     long lTemp = m_lCurrent;
 
@@ -88,7 +88,7 @@ cPlayer* cPlayersOnTable::GetPlayerToPlay(eSwitchPLayer eVal) {
     return &m_vctPlayers[lTemp];
 }
 
-cPlayer* cPlayersOnTable::GetPlayerIndex(long lIndex) {
+Player* PlayersOnTable::GetPlayerIndex(long lIndex) {
     if (lIndex < (long)m_vctPlayers.size() && lIndex >= 0) {
     } else {
         ASSERT(0);
@@ -97,7 +97,7 @@ cPlayer* cPlayersOnTable::GetPlayerIndex(long lIndex) {
     return &m_vctPlayers[lIndex];
 }
 
-int cPlayersOnTable::CalcDistance(int iPlayerRef, int iPlayerTmp) {
+int PlayersOnTable::CalcDistance(int iPlayerRef, int iPlayerTmp) {
     int aTableIx[MAX_NUM_PLAYER];
     for (int i = 0; i < MAX_NUM_PLAYER; i++) {
         aTableIx[i] = i;
@@ -124,7 +124,7 @@ int cPlayersOnTable::CalcDistance(int iPlayerRef, int iPlayerTmp) {
     return iDist;
 }
 
-void cPlayersOnTable::CalcCircleIndex(int* paPlayerDeck) {
+void PlayersOnTable::CalcCircleIndex(int* paPlayerDeck) {
     ASSERT(paPlayerDeck);
     paPlayerDeck[0] = m_lCurrent;
     int k = 1;
@@ -137,7 +137,7 @@ void cPlayersOnTable::CalcCircleIndex(int* paPlayerDeck) {
     }
 }
 
-bool cPlayersOnTable::IsLevelPython() {
+bool PlayersOnTable::IsLevelPython() {
     bool bRes = FALSE;
 
     for (int i = 0; i < m_lNumPlayers; i++) {
@@ -151,7 +151,7 @@ bool cPlayersOnTable::IsLevelPython() {
     return bRes;
 }
 
-void cPlayersOnTable::CalcCircleIndex_Cust(int* paPlayerDeck, int iPlayerIni) {
+void PlayersOnTable::CalcCircleIndex_Cust(int* paPlayerDeck, int iPlayerIni) {
     ASSERT(paPlayerDeck);
 
     paPlayerDeck[0] = iPlayerIni;

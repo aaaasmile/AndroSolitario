@@ -1,4 +1,4 @@
-// cAlgDummyPlayer.h: interface for the cAlgDummyPlayer class.
+// AlgDummyPlayer.h: interface for the AlgDummyPlayer class.
 //
 //////////////////////////////////////////////////////////////////////
 
@@ -10,19 +10,19 @@
 #endif // _MSC_VER > 1000
 
 #include "AlgPlayerInterface.h"
-#include "cInvidoCoreEnv.h"
+#include "InvidoCoreEnv.h"
 #include "CardSpec.h"
 
 class TraceService;
 
-//! class cAlgDummyPlayer  
+//! class AlgDummyPlayer  
 /** class that implement a dummy player
 */
-class cAlgDummyPlayer  : public I_ALG_Player
+class AlgDummyPlayer  : public I_ALG_Player
 {
 public:
-	cAlgDummyPlayer();
-	virtual ~cAlgDummyPlayer();
+	AlgDummyPlayer();
+	virtual ~AlgDummyPlayer();
 
 // interface I_ALG_Player
     virtual void ALG_SetCoreInterface(I_CORE_Game* pCore);

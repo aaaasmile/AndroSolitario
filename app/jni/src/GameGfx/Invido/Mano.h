@@ -1,6 +1,6 @@
 
 
-// cMano.h
+// Mano.h
 
 #ifndef ____CMANO_H
 #define ____CMANO_H
@@ -9,12 +9,12 @@
 #include <map>
 
 #include "AlgPlayerInterface.h"
-#include "cInvidoCoreEnv.h"
+#include "InvidoCoreEnv.h"
 
 
-class cInvidoCore;
-class cGiocata;
-class cMatchPoints;
+class InvidoCore;
+class Giocata;
+class MatchPoints;
 
 //! enum action type
 enum eFN_MANOACTION {
@@ -49,24 +49,24 @@ typedef std::deque<eManoStatus> DEQ_TABLESTATE;
 
 //////////////////////////////////////////////////////////////////////
 
-//! class cPendQuestion
+//! class PendQuestion
 /** pendi question information
  */
-class cPendQuestion {
+class PendQuestion {
    public:
-    cPendQuestion() {
+    PendQuestion() {
         m_bIsAMonte = FALSE;
         m_eScore = SC_CANELA;
         m_iPlayerIx = NOT_VALID_INDEX;
     }
-    cPendQuestion(bool bVal, eGiocataScoreState eSc, int iPl) {
+    PendQuestion(bool bVal, eGiocataScoreState eSc, int iPl) {
         m_bIsAMonte = bVal;
         m_eScore = eSc;
         m_iPlayerIx = iPl;
     }
 
     //! assignement operator
-    void operator=(const cPendQuestion& r);
+    void operator=(const PendQuestion& r);
 
     //! score of the pending call
     eGiocataScoreState m_eScore;
@@ -76,7 +76,7 @@ class cPendQuestion {
     int m_iPlayerIx;
 };
 
-typedef std::deque<cPendQuestion> DEQ_PENDQUESTION;
+typedef std::deque<PendQuestion> DEQ_PENDQUESTION;
 
 //////////////////////////////////////////////////////////////////////
 
@@ -84,37 +84,37 @@ typedef std::deque<cPendQuestion> DEQ_PENDQUESTION;
 typedef std::vector<int> VCT_INT;
 #endif
 
-//! class cActionItem
+//! class ActionItem
 /** action item in the queue
  */
-class cActionItem {
+class ActionItem {
    public:
     //! constructor
-    cActionItem() { m_eNextAction = MANO_NO_ACTION; }
+    ActionItem() { m_eNextAction = MANO_NO_ACTION; }
 
     eFN_MANOACTION m_eNextAction;
     //! argument list for action calls
     VCT_INT m_vct_iArg;
 };
 
-typedef std::deque<cActionItem> DEQ_ACTIONITEM;
+typedef std::deque<ActionItem> DEQ_ACTIONITEM;
 
-class cPlayersOnTable;
+class PlayersOnTable;
 class TraceService;
 /////////////////////////////////////////////////////////////////////////////////////
 //   *******************  CMANO CLASS ***************************************
 /////////////////////////////////////////////////////////////////////////////////////
 
-//! class cMano
+//! class Mano
 /**
-Class cMano to manage when 2 players play a card
+Class Mano to manage when 2 players play a card
 */
-class cMano {
+class Mano {
    public:
-    cMano();
-    void SetCore(cInvidoCore* pVal) { m_pInvidoCore = pVal; }
-    void SetGiocata(cGiocata* pVal) { m_pGiocata = pVal; }
-    void SetScore(cMatchPoints* pVal) { m_pScore = pVal; }
+    Mano();
+    void SetCore(InvidoCore* pVal) { m_pInvidoCore = pVal; }
+    void SetGiocata(Giocata* pVal) { m_pGiocata = pVal; }
+    void SetScore(MatchPoints* pVal) { m_pScore = pVal; }
     //! start a new mano
     void NewMano(int iPlayerIx);
     //! on mano player say something
@@ -132,14 +132,14 @@ class cMano {
     //! provides available calls
     void GetAdmittedCommands(VCT_COMMANDS& vct_Commands, int iPlayerIndex);
     void GetMoreCommands(VCT_COMMANDS& vct_Commands, int iPlayerIndex);
-    void CommandWithPendingQuestion(cPendQuestion& PendQues,
+    void CommandWithPendingQuestion(PendQuestion& PendQues,
                                     VCT_COMMANDS& vct_Commands,
                                     int iPlayerIndex);
     //! giocata start notification
     void GiocataStart();
 
    private:
-    void actionOnQuestion(cPendQuestion& PendQues);
+    void actionOnQuestion(PendQuestion& PendQues);
     void handleVadoVia(int iPlayerIx);
     void handleVaBene(int iPlayerIx);
     void handle_ScoreCalled(int iPlayerIx, eSayPlayer eSay);
@@ -147,7 +147,7 @@ class cMano {
     void handle_CallMoreOrInvido(int iPlayerIx);
     void handle_CallNo(int iPlayerIx);
     void add_Action(int iPlayerIx, eFN_MANOACTION eAct);
-    bool get_LastPendQuest(cPendQuestion& PendQues);
+    bool get_LastPendQuest(PendQuestion& PendQues);
     void add_QuestMonte(int iPlayerIx);
     void remove_LastQuestion();
     void restore_StateBeforeQuest();
@@ -160,14 +160,14 @@ class cMano {
     void actionWithoutQuestion();
     void giocata_Go_Amonte(int iPlayerIx);
     bool isGiocataAMonte();
-    bool get_LastPendScoreQuest(cPendQuestion& PendQues);
+    bool get_LastPendScoreQuest(PendQuestion& PendQues);
     void removeObsoleteActions();
 
    private:
     //! invido core engine
-    cInvidoCore* m_pInvidoCore;
+    InvidoCore* m_pInvidoCore;
     //! giocata object
-    cGiocata* m_pGiocata;
+    Giocata* m_pGiocata;
     //! mano status
     eManoStatus m_eManoState;
     //! old mano status
@@ -179,7 +179,7 @@ class cMano {
     //! next action queue
     DEQ_ACTIONITEM m_deqNextAction;
     //! match info score
-    cMatchPoints* m_pScore;
+    MatchPoints* m_pScore;
     //! pending question queue
     DEQ_PENDQUESTION m_deqPendQuestion;
     //! map of action names
@@ -197,7 +197,7 @@ class cMano {
     //! table queue mano state
     DEQ_TABLESTATE m_deqTableState;
     //! table object
-    cPlayersOnTable* m_pTable;
+    PlayersOnTable* m_pTable;
     //! player index that change the score
     int m_iPlayerChangeScore;
     //! map the score with the closest next

@@ -1,22 +1,22 @@
-// cMazzo.cpp
+// Mazzo.cpp
 
 #include <win_type_global.h>
 
 #include "InvidoSettings.h"
-#include "cInvidoCore.h"
-#include "cMazzo.h"
+#include "InvidoCore.h"
+#include "Mazzo.h"
 
 ////////////////////////////////////////////////////////////////
-//   *******************      cMazzo CLASS *********************
+//   *******************      Mazzo CLASS *********************
 ////////////////////////////////////////////////////////////////
 
-cMazzo::cMazzo() {
+Mazzo::Mazzo() {
     m_lNextCard = 0;
     m_pCoreGame = 0;
     m_iRndSeed = 63200;
 }
 
-void cMazzo::Create() {
+void Mazzo::Create() {
     m_vctCards.reserve(NUM_CARDS);
     m_vctCards.clear();
 
@@ -32,20 +32,20 @@ void cMazzo::Create() {
     m_lNextCard = 0;
 }
 
-void cMazzo::SetIndexRaw(int iIndex, long lVal) {
+void Mazzo::SetIndexRaw(int iIndex, long lVal) {
     if (iIndex < (int)m_vctCards.size() && iIndex >= 0) {
         m_vctCards[iIndex] = lVal;
     }
 }
 
-bool cMazzo::CloneFrom(cMazzo& Master) {
+bool Mazzo::CloneFrom(Mazzo& Master) {
     m_lNextCard = Master.GetNextCardVal();
     m_vctCards = Master.GetVectorIndexes();
 
     return true;
 }
 
-bool cMazzo::Shuffle() {
+bool Mazzo::Shuffle() {
     IT_VCTLONG it_tmp;
 
     m_lNextCard = 0;
@@ -68,7 +68,7 @@ bool cMazzo::Shuffle() {
     return true;
 }
 
-long cMazzo::PickNextCard(bool* pbEnd) {
+long Mazzo::PickNextCard(bool* pbEnd) {
     long lResult = NOT_VALID_INDEX;
     if (m_lNextCard >= (long)m_vctCards.size()) {
         *pbEnd = FALSE;
@@ -82,7 +82,7 @@ long cMazzo::PickNextCard(bool* pbEnd) {
     return lResult;
 }
 
-bool cMazzo::PickNextCard(CardSpec* pRes) {
+bool Mazzo::PickNextCard(CardSpec* pRes) {
     ASSERT(pRes);
 
     pRes->Reset();
@@ -100,7 +100,7 @@ bool cMazzo::PickNextCard(CardSpec* pRes) {
     return bValid;
 }
 
-long cMazzo::ThrowTableCard() {
+long Mazzo::ThrowTableCard() {
     long lResult = NOT_VALID_INDEX;
     if (m_lNextCard >= (long)m_vctCards.size()) {
         return lResult;
@@ -116,9 +116,9 @@ long cMazzo::ThrowTableCard() {
     return lResult;
 }
 
-void cMazzo::TraceIt() { Utility::TraceContainer(m_vctCards, "Cards mazzo"); }
+void Mazzo::TraceIt() { Utility::TraceContainer(m_vctCards, "Cards mazzo"); }
 
-bool cMazzo::IsMoreCards() {
+bool Mazzo::IsMoreCards() {
     bool bRet = false;
     if (m_lNextCard < NUM_CARDS) {
         bRet = true;
@@ -126,7 +126,7 @@ bool cMazzo::IsMoreCards() {
     return bRet;
 }
 
-long cMazzo::GetIndexNextCard(bool* pbEnd) {
+long Mazzo::GetIndexNextCard(bool* pbEnd) {
     long lResult = NOT_VALID_INDEX;
     if (m_lNextCard >= NUM_CARDS) {
         *pbEnd = FALSE;

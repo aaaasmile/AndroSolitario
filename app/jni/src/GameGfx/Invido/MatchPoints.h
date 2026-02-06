@@ -1,6 +1,6 @@
 
 
-// cMatchPoints.h: interface for the cMatchPoints class.
+// MatchPoints.h: interface for the MatchPoints class.
 //
 //////////////////////////////////////////////////////////////////////
 
@@ -16,16 +16,16 @@
 
 #include "CardSpec.h"
 #include "InvidoInfoComm.h"
-#include "cInvidoCoreEnv.h"
+#include "InvidoCoreEnv.h"
 #include "win_type_global.h"
 
 
-class cMano;
+class Mano;
 
-//! class cManoInfo
-class cManoInfo {
+//! class ManoInfo
+class ManoInfo {
    public:
-    cManoInfo() {}
+    ManoInfo() {}
     //! reset info
     void Reset() {
         bIsPlayed = FALSE;
@@ -41,14 +41,14 @@ class cManoInfo {
     bool bIsPata;
 };
 
-//! class cGiocataInfo
-class cGiocataInfo {
+//! class GiocataInfo
+class GiocataInfo {
    public:
-    cGiocataInfo() {
+    GiocataInfo() {
         eScore = SC_AMONTE;
         iPlayerIndex = NOT_VALID_INDEX;
     }
-    cGiocataInfo(int iVal, eGiocataScoreState eVal) {
+    GiocataInfo(int iVal, eGiocataScoreState eVal) {
         eScore = eVal;
         iPlayerIndex = iVal;
     }
@@ -59,13 +59,13 @@ class cGiocataInfo {
     eGiocataScoreState eScore;
 };
 
-typedef std::vector<cGiocataInfo> VCT_GIOCATAINFO;
+typedef std::vector<GiocataInfo> VCT_GIOCATAINFO;
 
-//! class cCardPlayed
+//! class CardPlayed
 // information about played card
-class cCardPlayed {
+class CardPlayed {
    public:
-    cCardPlayed() {}
+    CardPlayed() {}
 
     //! information about card played
     CardSpec cardSpec;
@@ -73,11 +73,11 @@ class cCardPlayed {
     int iPlayerIx;
 };
 
-//! class cMatchPoints
+//! class MatchPoints
 /** class that provides match points informations. All informations are about
  * the current match
  */
-class cMatchPoints : public I_MatchScore {
+class MatchPoints : public I_MatchScore {
     //! enum eGiocataEndState
     enum eGiocataEndState {
         //! giocata is ongoing
@@ -91,8 +91,8 @@ class cMatchPoints : public I_MatchScore {
     };
 
    public:
-    cMatchPoints();
-    virtual ~cMatchPoints();
+    MatchPoints();
+    virtual ~MatchPoints();
 
     //! start a new match
     void MatchStart(int iNumPlayer);
@@ -110,13 +110,13 @@ class cMatchPoints : public I_MatchScore {
     void GetManoInfo(int iManoNum, int* piPlayerIx, bool* pbIsPlayed,
                      bool* pbIsPata);
     //! giocata informations
-    void GetGiocataInfo(int iNumGiocata, cGiocataInfo* pGiocInfo);
+    void GetGiocataInfo(int iNumGiocata, GiocataInfo* pGiocInfo);
     //! provides number of giocate
     int GetNumGiocateInCurrMatch() { return (int)m_vctGiocataInfo.size(); }
     //! player abandon giocata
     void PlayerVaVia(int iPlayerIx);
     //! set mano object
-    void SetManoObj(cMano* pVal) { m_pMano = pVal; }
+    void SetManoObj(Mano* pVal) { m_pMano = pVal; }
     //! giocata  a monte
     void AMonte();
     //! set the winner (if a game was interrupted)
@@ -183,7 +183,7 @@ class cMatchPoints : public I_MatchScore {
     //! current score changer
     int m_iPlayerChangeScore;
     //! cards played
-    cCardPlayed m_vctCardPlayed[MAX_NUM_PLAYER];
+    CardPlayed m_vctCardPlayed[MAX_NUM_PLAYER];
     //! number of cards played
     int m_iNumCardsPlayed;
     //! player who wons the mano
@@ -209,11 +209,11 @@ class cMatchPoints : public I_MatchScore {
     //! mano inner giocata was patada
     bool m_bOldManoPatada;
     //! mano detailed information
-    cManoInfo m_ManoDetailInfo[NUM_CARDS_HAND];
+    ManoInfo m_ManoDetailInfo[NUM_CARDS_HAND];
     //! giocate info details
     VCT_GIOCATAINFO m_vctGiocataInfo;
     //! mano state object
-    cMano* m_pMano;
+    Mano* m_pMano;
     //! game abandoned flag
     bool m_bGameAbandoned;
 };

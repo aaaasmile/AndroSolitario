@@ -1,13 +1,13 @@
 
 
-// cProbality.h
+// Probality.h
 
 #ifndef __CPROBABILITY_H____
 #define __CPROBABILITY_H____
 
 #include "CardSpec.h"
-#include "cInvidoCoreEnv.h"
-#include "cMazzo.h"
+#include "InvidoCoreEnv.h"
+#include "Mazzo.h"
 
 
 typedef std::vector<VCT_SINGLECARD> MTX_HANDCOMBI;
@@ -17,13 +17,13 @@ typedef std::vector<VCT_SINGLECARD> MTX_HANDCOMBI;
 // ************************
 /////////////////////////////////////////////////////////////////////////////////////
 
-//! class cProbality
+//! class Probality
 /**
 // class used to calculate probability correlated to the game
 */
-class cProbality {
+class Probality {
    public:
-    cProbality() {
+    Probality() {
         m_bIndexNotInit = true;
         m_iCardOnHand = 3;
     }

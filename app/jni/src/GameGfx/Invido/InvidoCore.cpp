@@ -1,15 +1,15 @@
-// cInvidoCoreEngine.cpp
+// InvidoCoreEngine.cpp
 
 #include "TraceService.h"
-#include "cInvidoCore.h"
-#include "cMazzo.h"
+#include "InvidoCore.h"
+#include "Mazzo.h"
 
 ////////////////////////////////////////////////////////////////
 // **********************   CINVIDOCORE CLASS *****************
 ////////////////////////////////////////////////////////////////
 
 // Constructor
-cInvidoCore::cInvidoCore() {
+InvidoCore::InvidoCore() {
     m_lNumPlayers = 0;
     m_pPlHaveToPlay = 0;
     m_pStartPlayer = 0;
@@ -18,18 +18,18 @@ cInvidoCore::cInvidoCore() {
 }
 
 ////////////////////////////////////////
-//       ~cInvidoCore
+//       ~InvidoCore
 /*! Destructor
  */
-cInvidoCore::~cInvidoCore() { delete m_pMyMazzo; }
+InvidoCore::~InvidoCore() { delete m_pMyMazzo; }
 
-void cInvidoCore::Create(cPlayer* pHmiPlayer, int iNumPlayers) {
+void InvidoCore::Create(Player* pHmiPlayer, int iNumPlayers) {
     m_pTracer = TraceService::Instance();
-    // TRACE("cInvidoCore is created\n");
-    m_pTracer->AddSimpleTrace(2, "cInvidoCore is created");
+    // TRACE("InvidoCore is created\n");
+    m_pTracer->AddSimpleTrace(2, "InvidoCore is created");
 
     // deck
-    m_pMyMazzo = new cMazzo();
+    m_pMyMazzo = new Mazzo();
     m_pMyMazzo->SetCoreEngine(this);
     m_pMyMazzo->Create();
 
@@ -58,16 +58,16 @@ void cInvidoCore::Create(cPlayer* pHmiPlayer, int iNumPlayers) {
     m_MatchPoints.SetManoObj(&m_Mano);
 }
 
-bool cInvidoCore::WhoWonsTheGame(cPlayer** ppPlayer) {
+bool InvidoCore::WhoWonsTheGame(Player** ppPlayer) {
     ASSERT(ppPlayer);
     ASSERT(0);
 
     return TRUE;
 }
 
-int cInvidoCore::getNewMatchFirstPlayer() { return CASO(m_lNumPlayers); }
+int InvidoCore::getNewMatchFirstPlayer() { return CASO(m_lNumPlayers); }
 
-void cInvidoCore::NewMatch() {
+void InvidoCore::NewMatch() {
     NotifyScript(SCR_NFY_NEWMATCH);
 
     // extract the first player
@@ -76,7 +76,7 @@ void cInvidoCore::NewMatch() {
     // save players alg in a table
     // don't change level during a match
     for (int i = 0; i < m_lNumPlayers; i++) {
-        cPlayer* pPlayer = m_PlayersOnTable.GetPlayerIndex(i);
+        Player* pPlayer = m_PlayersOnTable.GetPlayerIndex(i);
         m_vctAlgPlayer[i] = pPlayer->GetAlg();
         if (m_vctAlgPlayer[i]) {
             // information before match begin
@@ -122,7 +122,7 @@ void cInvidoCore::NewMatch() {
     m_MatchPoints.MatchStart(m_lNumPlayers);
 }
 
-bool cInvidoCore::GetPlayerInPlaying(cPlayer** ppPlayer) {
+bool InvidoCore::GetPlayerInPlaying(Player** ppPlayer) {
     ASSERT(ppPlayer);
 
     *ppPlayer = m_pPlHaveToPlay;
@@ -130,13 +130,13 @@ bool cInvidoCore::GetPlayerInPlaying(cPlayer** ppPlayer) {
     return TRUE;
 }
 
-void cInvidoCore::NextAction() {
+void InvidoCore::NextAction() {
     m_Mano.NextAction();
     m_Giocata.NextAction();
     m_Partita.NextAction();
 }
 
-CardSpec* cInvidoCore::isCardInPlayerHand(int iPlayerIx,
+CardSpec* InvidoCore::isCardInPlayerHand(int iPlayerIx,
                                           const CARDINFO* pCardInfo) {
     CardSpec* pCardSpecRes = NULL;
     ASSERT(pCardInfo);
@@ -156,14 +156,14 @@ CardSpec* cInvidoCore::isCardInPlayerHand(int iPlayerIx,
     return pCardSpecRes;
 }
 
-void cInvidoCore::resetCardInfoPlayers() {
+void InvidoCore::resetCardInfoPlayers() {
     int iSize = NUM_CARDS_HAND * MAX_NUM_PLAYER;
     for (int i = 0; i < iSize; i++) {
         m_aCardInfo[i].Reset();
     }
 }
 
-bool cInvidoCore::resetCard(int iPlayerIx, CARDINFO* pCardInfo) {
+bool InvidoCore::resetCard(int iPlayerIx, CARDINFO* pCardInfo) {
     bool bRet = FALSE;
     ASSERT(pCardInfo);
     ASSERT(iPlayerIx >= 0 && iPlayerIx < MAX_NUM_PLAYER);
@@ -183,7 +183,7 @@ bool cInvidoCore::resetCard(int iPlayerIx, CARDINFO* pCardInfo) {
     return bRet;
 }
 
-void cInvidoCore::Giocata_Start(long lPlayerIx) {
+void InvidoCore::Giocata_Start(long lPlayerIx) {
     TRACE("Nuova giocata\n");
 
     // reset card info of all players
@@ -202,14 +202,14 @@ void cInvidoCore::Giocata_Start(long lPlayerIx) {
 
     // 2) second - retreive the player that have to play and switch the table
     m_pPlHaveToPlay =
-        m_PlayersOnTable.GetPlayerToPlay(cPlayersOnTable::SWITCH_TO_NEXT);
+        m_PlayersOnTable.GetPlayerToPlay(PlayersOnTable::SWITCH_TO_NEXT);
 
     // 3) distribuite cards
     for (int i = 0; i < m_lNumPlayers; i++) {
         int iIxCurrPLayer = aPlayerDeck[i];
         ASSERT(iIxCurrPLayer >= 0 && iIxCurrPLayer < m_lNumPlayers);
 
-        cPlayer* pCurrPlayer = m_PlayersOnTable.GetPlayerIndex(iIxCurrPLayer);
+        Player* pCurrPlayer = m_PlayersOnTable.GetPlayerIndex(iIxCurrPLayer);
         CARDINFO CardArray[NUM_CARDS_HAND];
 
         TRACE("%s => ", pCurrPlayer->GetName());
@@ -239,7 +239,7 @@ void cInvidoCore::Giocata_Start(long lPlayerIx) {
     m_Mano.GiocataStart();
 }
 
-void cInvidoCore::Mano_End() {
+void InvidoCore::Mano_End() {
     m_MatchPoints.ManoEnd();
     int iPlayer = m_MatchPoints.GetManoWinner();
 
@@ -254,7 +254,7 @@ void cInvidoCore::Mano_End() {
         m_PlayersOnTable.SetFirstOnTrick(iPlayer);
     }
     m_pPlHaveToPlay =
-        m_PlayersOnTable.GetPlayerToPlay(cPlayersOnTable::SWITCH_TO_NEXT);
+        m_PlayersOnTable.GetPlayerToPlay(PlayersOnTable::SWITCH_TO_NEXT);
     m_Giocata.Update_Giocata(m_pPlHaveToPlay->GetIndex(), &m_MatchPoints);
 
     for (int i = 0; i < m_lNumPlayers; i++) {
@@ -266,19 +266,19 @@ void cInvidoCore::Mano_End() {
     NotifyScript(SCR_NFY_ALGMANOEND);
 }
 
-void cInvidoCore::Giocata_AMonte() {
+void InvidoCore::Giocata_AMonte() {
     m_MatchPoints.AMonte();
     m_Giocata.Update_Giocata(NOT_VALID_INDEX, &m_MatchPoints);
 }
 
-void cInvidoCore::Player_VaVia(int iPlayerIx) {
+void InvidoCore::Player_VaVia(int iPlayerIx) {
     // ASSERT(0);
     m_MatchPoints.PlayerVaVia(iPlayerIx);
 
     m_Giocata.Update_Giocata(iPlayerIx, &m_MatchPoints);
 }
 
-void cInvidoCore::ChangeGiocataScore(eGiocataScoreState eNewScore) {
+void InvidoCore::ChangeGiocataScore(eGiocataScoreState eNewScore) {
     for (int i = 0; i < m_lNumPlayers; i++) {
         if (m_vctAlgPlayer[i]) {
             m_vctAlgPlayer[i]->ALG_GicataScoreChange(eNewScore);
@@ -286,7 +286,7 @@ void cInvidoCore::ChangeGiocataScore(eGiocataScoreState eNewScore) {
     }
 }
 
-void cInvidoCore::Giocata_End() {
+void InvidoCore::Giocata_End() {
     // calculate points
     m_MatchPoints.GiocataEnd();
     // update match state machine
@@ -301,7 +301,7 @@ void cInvidoCore::Giocata_End() {
     NotifyScript(SCR_NFY_ALGGIOCATAEND);
 }
 
-void cInvidoCore::Partita_End() {
+void InvidoCore::Partita_End() {
     for (int i = 0; i < m_lNumPlayers; i++) {
         if (m_vctAlgPlayer[i]) {
             m_vctAlgPlayer[i]->ALG_MatchEnd(&m_MatchPoints);
@@ -310,7 +310,7 @@ void cInvidoCore::Partita_End() {
     NotifyScript(SCR_NFY_ALGMATCHEND);
 }
 
-void cInvidoCore::AbandonGame(int iPlayerIx) {
+void InvidoCore::AbandonGame(int iPlayerIx) {
     int iNextPlayer;
     int aPlayerDeck[MAX_NUM_PLAYER];
     m_PlayersOnTable.CalcCircleIndex_Cust(aPlayerDeck, iPlayerIx);
@@ -326,7 +326,7 @@ void cInvidoCore::AbandonGame(int iPlayerIx) {
     }
 }
 
-void cInvidoCore::NtyWaitingPlayer_Toplay(int iPlayerIx) {
+void InvidoCore::NtyWaitingPlayer_Toplay(int iPlayerIx) {
     ASSERT(m_pPlHaveToPlay);
     ASSERT(iPlayerIx == m_pPlHaveToPlay->GetIndex());
 
@@ -337,14 +337,14 @@ void cInvidoCore::NtyWaitingPlayer_Toplay(int iPlayerIx) {
     pAlg->ALG_Play();
 }
 
-void cInvidoCore::NtyWaitingPlayer_ToResp(int iPlayerIx) {
+void InvidoCore::NtyWaitingPlayer_ToResp(int iPlayerIx) {
     I_ALG_Player* pAlg = m_vctAlgPlayer[iPlayerIx];
     ASSERT(pAlg);
 
     pAlg->ALG_HaveToRespond();
 }
 
-void cInvidoCore::NtyPlayerSayBuiada(int iPlayerIx) {
+void InvidoCore::NtyPlayerSayBuiada(int iPlayerIx) {
     for (int i = 0; i < m_lNumPlayers; i++) {
         // notify all players that a player says something not correct
         if (m_vctAlgPlayer[i]) {
@@ -353,13 +353,13 @@ void cInvidoCore::NtyPlayerSayBuiada(int iPlayerIx) {
     }
 }
 
-void cInvidoCore::RaiseError(const std::string& errorMsg) {
+void InvidoCore::RaiseError(const std::string& errorMsg) {
     ASSERT(0);
     TRACE(const_cast<char*>(errorMsg.c_str()));
     TRACE("\n");
 }
 
-CardSpec* cInvidoCore::checkValidCardPlayed(int iPlayerIx,
+CardSpec* InvidoCore::checkValidCardPlayed(int iPlayerIx,
                                             const CARDINFO* pCardInfo) {
     CardSpec cardUndef;
     if (cardUndef.GetCardIndex() == pCardInfo->byIndex) {
@@ -371,7 +371,7 @@ CardSpec* cInvidoCore::checkValidCardPlayed(int iPlayerIx,
     return pCardplayed;
 }
 
-bool cInvidoCore::Player_vaDentro(int iPlayerIx, const CARDINFO* pCardInfo) {
+bool InvidoCore::Player_vaDentro(int iPlayerIx, const CARDINFO* pCardInfo) {
     CardSpec* pCardplayed = checkValidCardPlayed(iPlayerIx, pCardInfo);
     if (pCardplayed == NULL) {
         return FALSE;
@@ -382,7 +382,7 @@ bool cInvidoCore::Player_vaDentro(int iPlayerIx, const CARDINFO* pCardInfo) {
     if (m_Mano.Player_Play(iPlayerIx, TRUE)) {
         // next player is on game
         m_pPlHaveToPlay =
-            m_PlayersOnTable.GetPlayerToPlay(cPlayersOnTable::SWITCH_TO_NEXT);
+            m_PlayersOnTable.GetPlayerToPlay(PlayersOnTable::SWITCH_TO_NEXT);
 
         // update match points
         int ixCardVaDentro = 3;
@@ -408,7 +408,7 @@ bool cInvidoCore::Player_vaDentro(int iPlayerIx, const CARDINFO* pCardInfo) {
     return bRes;
 }
 
-bool cInvidoCore::Player_playCard(int iPlayerIx, const CARDINFO* pCardInfo) {
+bool InvidoCore::Player_playCard(int iPlayerIx, const CARDINFO* pCardInfo) {
     CardSpec* pCardplayed = checkValidCardPlayed(iPlayerIx, pCardInfo);
     if (pCardplayed == NULL) {
         return FALSE;
@@ -419,7 +419,7 @@ bool cInvidoCore::Player_playCard(int iPlayerIx, const CARDINFO* pCardInfo) {
     if (m_Mano.Player_Play(iPlayerIx, FALSE)) {
         // next player is on game
         m_pPlHaveToPlay =
-            m_PlayersOnTable.GetPlayerToPlay(cPlayersOnTable::SWITCH_TO_NEXT);
+            m_PlayersOnTable.GetPlayerToPlay(PlayersOnTable::SWITCH_TO_NEXT);
 
         // update match points
         m_MatchPoints.PlayerPlay(iPlayerIx, pCardplayed->GetCardInfo());
@@ -440,7 +440,7 @@ bool cInvidoCore::Player_playCard(int iPlayerIx, const CARDINFO* pCardInfo) {
     return bRes;
 }
 
-bool cInvidoCore::Player_saySomething(int iPlayerIx, eSayPlayer eSay) {
+bool InvidoCore::Player_saySomething(int iPlayerIx, eSayPlayer eSay) {
     bool bRes = FALSE;
     if (m_Mano.Player_Say(iPlayerIx, eSay)) {
         //  what he said is acceptable on the game
@@ -456,13 +456,13 @@ bool cInvidoCore::Player_saySomething(int iPlayerIx, eSayPlayer eSay) {
     return bRes;
 }
 
-void cInvidoCore::GetAdmittedCommands(VCT_COMMANDS& vct_Commands,
+void InvidoCore::GetAdmittedCommands(VCT_COMMANDS& vct_Commands,
                                       int iPlayerIndex) {
     m_Mano.GetAdmittedCommands(vct_Commands, iPlayerIndex);
 }
 
 // GetMoreCommands
-void cInvidoCore::GetMoreCommands(VCT_COMMANDS& vct_Commands,
+void InvidoCore::GetMoreCommands(VCT_COMMANDS& vct_Commands,
                                   int iPlayerIndex) {
     m_Mano.GetMoreCommands(vct_Commands, iPlayerIndex);
 }
@@ -472,20 +472,20 @@ void cInvidoCore::GetMoreCommands(VCT_COMMANDS& vct_Commands,
 /*Notify event to the script engine
 // \param eScriptNotification eVal :
 */
-void cInvidoCore::NotifyScript(eScriptNotification eVal) {
+void InvidoCore::NotifyScript(eScriptNotification eVal) {
     TRACE("Event %d\n", eVal);
 }
 
-void cInvidoCore::NotifyScriptAlgorithm(int iPlayerIx,
+void InvidoCore::NotifyScriptAlgorithm(int iPlayerIx,
                                         eScriptNotification eVal) {
     TRACE("Algorithm %d, %d\n", iPlayerIx, eVal);
 }
 
 ////////////////////////////////////////// functions called by Script
 
-void cInvidoCore::Script_OverrideDeck(int iPlayer, int iC1, int iC2, int iC3) {
-    cPlayer* pCurrPlayer =
-        m_PlayersOnTable.GetPlayerToPlay(cPlayersOnTable::NO_SWITCH);
+void InvidoCore::Script_OverrideDeck(int iPlayer, int iC1, int iC2, int iC3) {
+    Player* pCurrPlayer =
+        m_PlayersOnTable.GetPlayerToPlay(PlayersOnTable::NO_SWITCH);
     // the player that have to play is the player that becomes the first 3 card
     int iRefPlayerIndex = pCurrPlayer->GetIndex();
     int iBegPos = 0;
@@ -499,24 +499,24 @@ void cInvidoCore::Script_OverrideDeck(int iPlayer, int iC1, int iC2, int iC3) {
     m_pMyMazzo->SetIndexRaw(iBegPos + 2, iC3);
 }
 
-void cInvidoCore::Script_SetStartPlayer(int iPlayer) {}
+void InvidoCore::Script_SetStartPlayer(int iPlayer) {}
 
-void cInvidoCore::Script_Say(int iPlayer, eSayPlayer eSay) {
+void InvidoCore::Script_Say(int iPlayer, eSayPlayer eSay) {
     Player_saySomething(iPlayer, eSay);
 }
 
-void cInvidoCore::Script_Play(int iPlayer, CardSpec& CardPlayed) {
+void InvidoCore::Script_Play(int iPlayer, CardSpec& CardPlayed) {
     Player_playCard(iPlayer, CardPlayed.GetCardInfo());
 }
 
-void cInvidoCore::Script_MatchEnd() {
+void InvidoCore::Script_MatchEnd() {
     // reset state machines
     m_Partita.Reset();
     m_Giocata.Reset();
     m_Mano.Reset();
 }
 
-int cInvidoCore::Script_CheckResult(int iTypeOfItem, int iParam1,
+int InvidoCore::Script_CheckResult(int iTypeOfItem, int iParam1,
                                     int iExpectedVal) {
     int iRes = 0;
 

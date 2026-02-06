@@ -1,11 +1,11 @@
 
 
-// cGiocata.cpp
+// Giocata.cpp
 
-#include "cGiocata.h"
-#include "cInvidoCore.h"
-#include "cMano.h"
-#include "cMatchPoints.h"
+#include "Giocata.h"
+#include "InvidoCore.h"
+#include "Mano.h"
+#include "MatchPoints.h"
 
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -13,15 +13,15 @@
 /////////////////////////////////////////////////////////////////////////////////////
 
 //! constructor
-cGiocata::cGiocata() {
+Giocata::Giocata() {
     m_pInvidoCore = NULL;
     m_pPartita = NULL;
     m_pMano = NULL;
     m_eGiocataStatus = WAIT_NEW_GIOCATA;
 }
 
-void cGiocata::NewGiocata(long lPlayerIx) {
-    cActionItemGio Action;
+void Giocata::NewGiocata(long lPlayerIx) {
+    ActionItemGio Action;
 
     if (m_eGiocataStatus == WAIT_NEW_GIOCATA) {
         m_eGiocataStatus = GIOCATA_ONGOING;
@@ -35,13 +35,13 @@ void cGiocata::NewGiocata(long lPlayerIx) {
     }
 }
 
-void cGiocata::NextAction() {
+void Giocata::NextAction() {
     size_t iNumAct = m_deqNextAction.size();
     if (iNumAct == 0) {
         // no action
         return;
     }
-    cActionItemGio Action = m_deqNextAction.front();
+    ActionItemGio Action = m_deqNextAction.front();
     m_deqNextAction.pop_front();
 
     switch (Action.m_eNextAction) {
@@ -69,11 +69,11 @@ void cGiocata::NextAction() {
     }
 }
 
-void cGiocata::Update_Giocata(long lPlayerIx, I_MatchScore* pIScore) {
+void Giocata::Update_Giocata(long lPlayerIx, I_MatchScore* pIScore) {
     // check mano
     ASSERT(m_eGiocataStatus == GIOCATA_ONGOING);
     ASSERT(pIScore);
-    cActionItemGio Action;
+    ActionItemGio Action;
 
     if (pIScore->IsGiocatEnd()) {
         // giocata is terminated
@@ -85,7 +85,7 @@ void cGiocata::Update_Giocata(long lPlayerIx, I_MatchScore* pIScore) {
     }
 }
 
-void cGiocata::Reset() {
+void Giocata::Reset() {
     m_eGiocataStatus = WAIT_NEW_GIOCATA;
     m_deqNextAction.clear();
 }

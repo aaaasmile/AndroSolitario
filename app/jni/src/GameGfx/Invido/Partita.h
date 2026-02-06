@@ -1,24 +1,24 @@
 
 
-// cPartita.h
+// Partita.h
 
 #ifndef __CPARTITA_H__
 #define __CPARTITA_H__
 
-#include "cInvidoCoreEnv.h"
+#include "InvidoCoreEnv.h"
 
-class cInvidoCore;
-class cGiocata;
+class InvidoCore;
+class Giocata;
 class I_MatchScore;
 
 /////////////////////////////////////////////////////////////////////////////////////
 //   *******************  CPARTITA CLASS ***************************************
 /////////////////////////////////////////////////////////////////////////////////////
 
-//! class cPartita
+//! class Partita
 /** class to manage a new partita
 */
-class cPartita
+class Partita
 {
 //! enum action type
 enum eFN_ACTION
@@ -29,11 +29,11 @@ enum eFN_ACTION
     NO_ACTION
 };
 public:
-    cPartita();
+    Partita();
 
 public:
-    void    SetCore(cInvidoCore* pVal){m_pInvidoCore = pVal;}
-    void    SetGiocata(cGiocata* pVal){m_pGiocata = pVal;}
+    void    SetCore(InvidoCore* pVal){m_pInvidoCore = pVal;}
+    void    SetGiocata(Giocata* pVal){m_pGiocata = pVal;}
     void    NewPartita(long lPlayerIx);
     void    Update_Partita(I_MatchScore* pIScore);
     void    Reset();
@@ -42,8 +42,8 @@ public:
 
 private:
     ePartitaStatus   m_PartitaState;
-    cInvidoCore*     m_pInvidoCore;
-    cGiocata*        m_pGiocata;
+    InvidoCore*     m_pInvidoCore;
+    Giocata*        m_pGiocata;
     long             m_lGiocStart;
     //! next action 
     eFN_ACTION         m_eNextAction;

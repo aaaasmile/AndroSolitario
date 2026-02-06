@@ -1,19 +1,19 @@
 
 
-// cPlayersOnTable.h
+// PlayersOnTable.h
 
 #ifndef __PLAYERSONTABLE_H
 #define __PLAYERSONTABLE_H
 
-#include "cPlayer.h"
+#include "Player.h"
 
-//! class cPlayersOnTable
+//! class PlayersOnTable
 /* player on table ring
  */
-class cPlayersOnTable {
+class PlayersOnTable {
    public:
     enum eSwitchPLayer { SWITCH_TO_NEXT, NO_SWITCH };
-    cPlayersOnTable();
+    PlayersOnTable();
 
     //! set the first player in match
     void SetFirstOnMatch(long lIndex);
@@ -28,11 +28,11 @@ class cPlayersOnTable {
     //! provides the first player in the giocata
     long GetFirstOnGiocata() { return m_lFirstOnGiocata; }
     //! create the player list
-    void Create(cPlayer* pHmiPlayer, int iNumPlayers);
+    void Create(Player* pHmiPlayer, int iNumPlayers);
     //! provide the player in the list and update the iterator
-    cPlayer* GetPlayerToPlay(eSwitchPLayer eVal);
+    Player* GetPlayerToPlay(eSwitchPLayer eVal);
     //! get player from index
-    cPlayer* GetPlayerIndex(long lIndex);
+    Player* GetPlayerIndex(long lIndex);
     //! calculate the distance between 2 players
     int CalcDistance(int iPlayerRef, int PlayerTmp);
     //! calculate circle index

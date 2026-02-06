@@ -1,6 +1,6 @@
 
 
-//cInvidoCoreEnv.h
+// InvidoCoreEnv.h
 
 // c enum, struct for invido core
 

@@ -1,21 +1,21 @@
 
 
-// cPlayerStatistic.h
+// PlayerStatistic.h
 
 
 #ifndef _______PLAYER_STATISTIC_H
 #define _______PLAYER_STATISTIC_H
 
-#include "cInvidoCoreEnv.h"
+#include "InvidoCoreEnv.h"
 #include "AlgPlayerInterface.h"
 
 //! class for player statistic
-class cPlayerStatistic
+class PlayerStatistic
 {
 public:
-    cPlayerStatistic();
+    PlayerStatistic();
     //! clone statistic element
-    void Clone(cPlayerStatistic* pNew);
+    void Clone(PlayerStatistic* pNew);
     //! rest statistic
     void Reset();
 
@@ -65,7 +65,7 @@ public:
 
 };
 
-inline std::ostream &operator << (std::ostream &stream, const cPlayerStatistic &o)
+inline std::ostream &operator << (std::ostream &stream, const PlayerStatistic &o)
 { 
     stream << "---------------- new stat ------------------" << std::endl;
     stream << " punti totali = " << o.lScore << std::endl;

@@ -1,6 +1,6 @@
 
 
-// cInvidoGfx.h
+// InvidoGfx.h
 
 #ifndef __CINVIDO_GFX_H
 #define __CINVIDO_GFX_H
@@ -10,8 +10,8 @@
 #include <map>
 
 #include "AlgPlayerInterface.h"
-#include "cCardGfx.h"
-#include "cInvidoCore.h"
+#include "CardGfx.h"
+#include "InvidoCore.h"
 
 //! region id to draw cards
 enum {
@@ -39,23 +39,23 @@ const unsigned int CRD_OSYMBOL = 2;
 const unsigned int CRD_HSYMBOL = 3;
 
 class AppGfx;
-class cInvidoCore;
-class cTipoDiMazzo;
-class cButtonGfx;
-class cBalloonGfx;
-class cLanguages;
-class cMusicManager;
+class InvidoCore;
+class TipoDiMazzo;
+class ButtonGfx;
+class BalloonGfx;
+class Languages;
+class MusicManager;
 
 typedef std::map<eGiocataScoreState, STRING> MAP_SCORE;
 typedef std::map<eSayPlayer, STRING> MAP_SAY;
 typedef std::map<eSayPlayer, int> MAP_INTID;
 typedef std::vector<int> VCT_INT;
 
-//! class cInvidoGfx
+//! class InvidoGfx
 /**
 // class to handle the invido game grafic during the match.
 */
-class cInvidoGfx : public I_ALG_Player {
+class InvidoGfx : public I_ALG_Player {
    public:
     //! image index label. Add a new image always before the lNUM_ANIMAGEs
     enum {
@@ -80,8 +80,8 @@ class cInvidoGfx : public I_ALG_Player {
     //! other constants
     enum { NUMOFBUTTON = 6 };
 
-    cInvidoGfx(AppGfx* pApp);
-    ~cInvidoGfx();
+    InvidoGfx(AppGfx* pApp);
+    ~InvidoGfx();
     //! Initialize gfx
     void Initialize(SDL_Surface* s, SDL_Renderer* pRender,
                     SDL_Texture* pScreenTexture);
@@ -98,7 +98,7 @@ class cInvidoGfx : public I_ALG_Player {
     //! notification from music manager, effect is terminated
     void NtfyTermEff(int iCh);
     //! provides a player (game should be created before)
-    cPlayer* GetPlayer(int iIndex) { return m_pInvidoCore->GetPlayer(iIndex); }
+    Player* GetPlayer(int iIndex) { return m_pInvidoCore->GetPlayer(iIndex); }
 
     // Interface I_ALG_Player (callback functions from core invido engine)
     virtual void ALG_SetCoreInterface(I_CORE_Game* pCore) {}
@@ -141,8 +141,8 @@ class cInvidoGfx : public I_ALG_Player {
     int initDeck();
     int loadCardPac();
     void createRegionsInit();
-    void renderCard(cCardGfx* pCard);
-    void drawPlayedCard(cCardGfx* pCard);
+    void renderCard(CardGfx* pCard);
+    void drawPlayedCard(CardGfx* pCard);
 
     void handleKeyDownEvent(SDL_Event& event);
     void handleMouseDownEvent(SDL_Event& event);
@@ -151,7 +151,7 @@ class cInvidoGfx : public I_ALG_Player {
     void clickOnPlayerCard(int iIndex);
     void vadoDentro(int cardIx);
     void renderScreen();
-    void drawVadoDentroCard(cCardGfx* pCard);
+    void drawVadoDentroCard(CardGfx* pCard);
     void showPlayerMarkup(int iPlayerIx);
     void showManoScore(bool bIsPlayed, int iPlayerIx, bool bIsPata,
                        int iManoNum);
@@ -191,7 +191,7 @@ class cInvidoGfx : public I_ALG_Player {
     //! rect of front card
     SDL_Rect m_SrcCard;
     //! deck type
-    cTipoDiMazzo* m_pDeckType;
+    TipoDiMazzo* m_pDeckType;
     //! font status bar
     TTF_Font* m_pFontStatus;
     //! font
@@ -199,7 +199,7 @@ class cInvidoGfx : public I_ALG_Player {
     //! bar surface
     SDL_Surface* m_pSurf_Bar;
     //! invido core game
-    cInvidoCore* m_pInvidoCore;
+    InvidoCore* m_pInvidoCore;
     //! Engine app pointer
     AppGfx* m_pApp;
     //! drag flag
@@ -213,15 +213,15 @@ class cInvidoGfx : public I_ALG_Player {
     //! symbol height
     int m_iSymbolHeigth;
     //! cards in player hand
-    cCardGfx m_aPlayerCards[NUM_CARDS_HAND];
+    CardGfx m_aPlayerCards[NUM_CARDS_HAND];
     //! cards on cpu/oppent hand
-    cCardGfx m_aOpponentCards[NUM_CARDS_HAND];
+    CardGfx m_aOpponentCards[NUM_CARDS_HAND];
     //! cards taken
-    cCardGfx m_CardsTakenPla;
+    CardGfx m_CardsTakenPla;
     //! cards taken from opponent
-    cCardGfx m_CardsTakenOpp;
+    CardGfx m_CardsTakenOpp;
     //! cards on table
-    cCardGfx m_CardsTable[NUM_CARDS_PLAYED];
+    CardGfx m_CardsTable[NUM_CARDS_PLAYED];
     //! animation images
     SDL_Surface* m_pAnImages[NUM_ANIMAGES];
     //! player gui index
@@ -241,23 +241,23 @@ class cInvidoGfx : public I_ALG_Player {
     //! map synth id
     MAP_INTID m_Map_idSynth_Say;
     //! match points information
-    cMatchPoints* m_pMatchPoints;
+    MatchPoints* m_pMatchPoints;
     //! player can play on the gui
     bool m_bPlayerCanPlay;
     //! player with markup
     int m_iPlayerThatHaveMarkup;
     //! delay next action
-    cDelayNextAction m_DelayAction;
+    DelayNextAction m_DelayAction;
     //! command button array
-    cButtonGfx* m_pbtArrayCmd[NUMOFBUTTON];
+    ButtonGfx* m_pbtArrayCmd[NUMOFBUTTON];
     //! command say associated with the button
     eSayPlayer m_CmdDet[NUMOFBUTTON];
     //! balloon control
-    cBalloonGfx* m_pbalGfx;
+    BalloonGfx* m_pbalGfx;
     //! language manager
-    cLanguages* m_pLangMgr;
+    Languages* m_pLangMgr;
     //! music manager
-    cMusicManager* m_pMusicMgr;
+    MusicManager* m_pMusicMgr;
     //! flag match termninated
     bool m_bMatchTerminated;
 };

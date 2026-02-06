@@ -1,14 +1,14 @@
 
 
-// cPlayer.h
+// Player.h
 
 
 #ifndef  __CPLAYER_H__
 #define  __CPLAYER_H__
 
-#include "cInvidoCoreEnv.h"
+#include "InvidoCoreEnv.h"
 #include "CardSpec.h"
-#include "cPlayerStatistic.h"
+#include "PlayerStatistic.h"
 
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -36,15 +36,15 @@ inline eCARDINDEX &operator++ (eCARDINDEX & eF, int)
 
 
 
-//! class cPlayer 
+//! class Player 
 /** Store information about the player
 */
-class cPlayer
+class Player
 {
 typedef std::vector<I_ALG_Player*> VCT_PALG;
 public: 
-    cPlayer();
-    virtual ~cPlayer();
+    Player();
+    virtual ~Player();
 
     //! create a default player
     void    Create();
@@ -67,11 +67,11 @@ public:
     //! provides algorithm 
     I_ALG_Player* GetAlg(){return m_pIAlgorithm;}
     
-    friend std::ostream &operator << (std::ostream &stream, const cPlayer &o);
+    friend std::ostream &operator << (std::ostream &stream, const Player &o);
     //! copy constructor
-    cPlayer(const cPlayer&a);
+    Player(const Player&a);
     //! operator assignement
-    cPlayer& operator=(const cPlayer&a);
+    Player& operator=(const Player&a);
 
 private:
     //! playername
@@ -88,10 +88,10 @@ private:
     eGameLevel       m_eLevel;
 };
 
-typedef std::vector<cPlayer>  VCT_PLAYERS;
+typedef std::vector<Player>  VCT_PLAYERS;
 
 //operators
-inline std::ostream &operator << (std::ostream &stream, const cPlayer &o)
+inline std::ostream &operator << (std::ostream &stream, const Player &o)
 { 
     stream << o.m_pPlayerName << std::endl;
    

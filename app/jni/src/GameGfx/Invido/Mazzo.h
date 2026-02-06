@@ -1,33 +1,33 @@
 
 
-// cMazzo.h
+// Mazzo.h
 
 #ifndef __CMAZZO_H
 #define __CMAZZO_H
 
 #include "CardSpec.h"
-#include "cInvidoCoreEnv.h"
+#include "InvidoCoreEnv.h"
 #include "win_type_global.h"
 
 
-class cInvidoCore;
+class InvidoCore;
 
-//! class cMazzo
+//! class Mazzo
 /**
 // Class used to handle the deck. This is done with a vector of long. The index
 0 is always the deck
 // image index.
 */
-class cMazzo {
+class Mazzo {
    public:
-    cMazzo();
+    Mazzo();
 
     //! set core game engine object
-    void SetCoreEngine(cInvidoCore* pVal) { m_pCoreGame = pVal; }
+    void SetCoreEngine(InvidoCore* pVal) { m_pCoreGame = pVal; }
     //! create a deck
     void Create();
     //! clone a deck
-    bool CloneFrom(cMazzo& Master);
+    bool CloneFrom(Mazzo& Master);
     //! value of the next card
     long GetNextCardVal() { return m_lNextCard; }
     //! shuffle the deck
@@ -69,7 +69,7 @@ class cMazzo {
     //! index to the next card in the mazzo
     long m_lNextCard;
     //! core engine
-    cInvidoCore* m_pCoreGame;
+    InvidoCore* m_pCoreGame;
     //! random seed
     int m_iRndSeed;
 };

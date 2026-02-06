@@ -4,7 +4,7 @@
 #define ___CARDSPEC_H_
 
 #include "AlgPlayerInterface.h"
-#include "cInvidoCoreEnv.h"
+#include "InvidoCoreEnv.h"
 
 //! class CardSpec
 class CardSpec {
