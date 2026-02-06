@@ -9,10 +9,6 @@
 //  *************************  PLAYER CLASS *******************
 ////////////////////////////////////////////////////////////////
 
-////////////////////////////////////////
-//       cPlayer
-/*! Constructor
- */
 cPlayer::cPlayer() {
     m_iIndex = NOT_VALID_INDEX;
     m_pIAlgorithm = 0;
@@ -29,11 +25,6 @@ cPlayer::~cPlayer() {
     }
 }
 
-////////////////////////////////////////
-//       cPlayer
-/*! Copy constructor
-// \param const cPlayer&a :
-*/
 cPlayer::cPlayer(const cPlayer& a) {
     strncpy(m_pPlayerName, a.m_pPlayerName, BUFF_NAME);
     m_eKind = a.m_eKind;
@@ -57,10 +48,6 @@ cPlayer& cPlayer::operator=(const cPlayer& a) {
     return *this;
 }
 
-////////////////////////////////////////
-//       Create
-/*! Create a default player
- */
 void cPlayer::Create() {
     CardSpec emptyCard;
     m_eKind = PT_LOCAL;
@@ -70,31 +57,12 @@ void cPlayer::Create() {
     m_eLevel = DUMMY;
 }
 
-////////////////////////////////////////
-//       SetName
-/*! Set player name
-// \param LPCSTR lpszName : new name
-*/
 void cPlayer::SetName(LPCSTR lpszName) {
     strncpy(m_pPlayerName, lpszName, BUFF_NAME - 1);
 }
 
-////////////////////////////////////////
-//       SetType
-/*! Set type of player
-// \param eTypeOfPLayer eVal :
-*/
 void cPlayer::SetType(eTypeOfPLayer eVal) { m_eKind = eVal; }
 
-////////////////////////////////////////
-//       SetLevel
-/*! Set the level of the player. This crate a new algorithm class to manage the
-player AI.
-// Algorithm inteface coulb be also delivered as input parameter.
-// CAUTION on HMI algorithm, is not to be deleted, only copied
-// \param eGameLevel eNewLevel : level player
-// \param I_ALG_Player* I_val : eventually already created algorithm insterface
-*/
 void cPlayer::SetLevel(eGameLevel eNewLevel, I_ALG_Player* I_val) {
     if (m_pIAlgorithm != 0 && m_eLevel != HMI && m_eLevel != SERVER_LEVEL) {
         delete m_pIAlgorithm;

@@ -20,10 +20,6 @@ cGiocata::cGiocata() {
     m_eGiocataStatus = WAIT_NEW_GIOCATA;
 }
 
-////////////////////////////////////////
-//       NewGiocata
-/*! Start a new giocata
- */
 void cGiocata::NewGiocata(long lPlayerIx) {
     cActionItemGio Action;
 
@@ -39,10 +35,6 @@ void cGiocata::NewGiocata(long lPlayerIx) {
     }
 }
 
-////////////////////////////////////////
-//       NextAction
-/*! Take the next action
- */
 void cGiocata::NextAction() {
     size_t iNumAct = m_deqNextAction.size();
     if (iNumAct == 0) {
@@ -77,12 +69,6 @@ void cGiocata::NextAction() {
     }
 }
 
-////////////////////////////////////////
-//       Update_Giocata
-/*! A Mano is terminated, update the giocata.
-// \param long lPlayerIx: player that have start the trick
-// \param I_MatchScore* pIScore : score informations
-*/
 void cGiocata::Update_Giocata(long lPlayerIx, I_MatchScore* pIScore) {
     // check mano
     ASSERT(m_eGiocataStatus == GIOCATA_ONGOING);
@@ -99,10 +85,6 @@ void cGiocata::Update_Giocata(long lPlayerIx, I_MatchScore* pIScore) {
     }
 }
 
-////////////////////////////////////////
-//       Reset
-/*! Reset giocata status
- */
 void cGiocata::Reset() {
     m_eGiocataStatus = WAIT_NEW_GIOCATA;
     m_deqNextAction.clear();

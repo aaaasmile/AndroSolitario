@@ -24,12 +24,6 @@ cInvidoCore::cInvidoCore() {
  */
 cInvidoCore::~cInvidoCore() { delete m_pMyMazzo; }
 
-////////////////////////////////////////
-//       Create
-/*! Create the core game
-// \param cPlayer* pHmiPlayer : player instanciated in hmi
-// \param int iNumPlayers : number of players
-*/
 void cInvidoCore::Create(cPlayer* pHmiPlayer, int iNumPlayers) {
     m_pTracer = TraceService::Instance();
     // TRACE("cInvidoCore is created\n");
@@ -65,14 +59,6 @@ void cInvidoCore::Create(cPlayer* pHmiPlayer, int iNumPlayers) {
     m_MatchPoints.SetManoObj(&m_Mano);
 }
 
-////////////////////////////////////////
-//       WhoWonsTheGame
-/*! Provides the player index who wons the game. If the game is drawn pbIsDrawn
-is set to TRUE.
-// \param long* plPlayerIx : return winner index
-// \param BOOL* pbIsDrawn : return TRUE if the game has no winner, otherwise
-FALSE
-*/
 BOOL cInvidoCore::WhoWonsTheGame(cPlayer** ppPlayer) {
     ASSERT(ppPlayer);
     ASSERT(0);
@@ -82,10 +68,6 @@ BOOL cInvidoCore::WhoWonsTheGame(cPlayer** ppPlayer) {
 
 int cInvidoCore::getNewMatchFirstPlayer() { return CASO(m_lNumPlayers); }
 
-////////////////////////////////////////
-//       NewMatch
-/*! Start an Invido new match
- */
 void cInvidoCore::NewMatch() {
     NotifyScript(SCR_NFY_NEWMATCH);
 
@@ -141,11 +123,6 @@ void cInvidoCore::NewMatch() {
     m_MatchPoints.MatchStart(m_lNumPlayers);
 }
 
-////////////////////////////////////////
-//       GetPlayerInPlaying
-/*! Return the index of the player that must play
-// \param long * plPlayerIx :
-*/
 BOOL cInvidoCore::GetPlayerInPlaying(cPlayer** ppPlayer) {
     ASSERT(ppPlayer);
 
@@ -154,20 +131,12 @@ BOOL cInvidoCore::GetPlayerInPlaying(cPlayer** ppPlayer) {
     return TRUE;
 }
 
-////////////////////////////////////////
-//       NextAction
-/*! Trigger the next state
- */
 void cInvidoCore::NextAction() {
     m_Mano.NextAction();
     m_Giocata.NextAction();
     m_Partita.NextAction();
 }
 
-////////////////////////////////////////
-//       isCardInPlayerHand
-/*! return true if the card is on player hand, false otherwise
- */
 CardSpec* cInvidoCore::isCardInPlayerHand(int iPlayerIx,
                                           const CARDINFO* pCardInfo) {
     CardSpec* pCardSpecRes = NULL;
@@ -188,10 +157,6 @@ CardSpec* cInvidoCore::isCardInPlayerHand(int iPlayerIx,
     return pCardSpecRes;
 }
 
-////////////////////////////////////////
-//       resetCardInfoPlayers
-/*! Reset information on card about all players.
- */
 void cInvidoCore::resetCardInfoPlayers() {
     int iSize = NUM_CARDS_HAND * MAX_NUM_PLAYER;
     for (int i = 0; i < iSize; i++) {
@@ -199,11 +164,6 @@ void cInvidoCore::resetCardInfoPlayers() {
     }
 }
 
-////////////////////////////////////////
-//       resetCard
-/*! reset informatio about a card on player hand. This is called after that a
- * player has played a card.
- */
 BOOL cInvidoCore::resetCard(int iPlayerIx, CARDINFO* pCardInfo) {
     BOOL bRet = FALSE;
     ASSERT(pCardInfo);
@@ -224,11 +184,6 @@ BOOL cInvidoCore::resetCard(int iPlayerIx, CARDINFO* pCardInfo) {
     return bRet;
 }
 
-////////////////////////////////////////
-//       Giocata_Start
-/*! Shuffle the cards and distribuite the cards
-// \param long lPlayerIx : player index that must play
-*/
 void cInvidoCore::Giocata_Start(long lPlayerIx) {
     TRACE("Nuova giocata\n");
 
@@ -285,10 +240,6 @@ void cInvidoCore::Giocata_Start(long lPlayerIx) {
     m_Mano.GiocataStart();
 }
 
-////////////////////////////////////////
-//       Mano_End
-/*! A mano is terminated.
- */
 void cInvidoCore::Mano_End() {
     m_MatchPoints.ManoEnd();
     int iPlayer = m_MatchPoints.GetManoWinner();
@@ -316,20 +267,11 @@ void cInvidoCore::Mano_End() {
     NotifyScript(SCR_NFY_ALGMANOEND);
 }
 
-////////////////////////////////////////
-//       Giocata_AMonte
-/*! A giocata is going to "A monte"
- */
 void cInvidoCore::Giocata_AMonte() {
     m_MatchPoints.AMonte();
     m_Giocata.Update_Giocata(NOT_VALID_INDEX, &m_MatchPoints);
 }
 
-////////////////////////////////////////
-//       Player_VaVia
-/*! The player abandon the giocata
-// \param int iPlayerIx : Player index that abandon the giocata
-*/
 void cInvidoCore::Player_VaVia(int iPlayerIx) {
     // ASSERT(0);
     m_MatchPoints.PlayerVaVia(iPlayerIx);
@@ -337,11 +279,6 @@ void cInvidoCore::Player_VaVia(int iPlayerIx) {
     m_Giocata.Update_Giocata(iPlayerIx, &m_MatchPoints);
 }
 
-////////////////////////////////////////
-//       ChangeGiocataScore
-/*! Giocata score is changed
-// \param eGiocataScoreState eNewScore :
-*/
 void cInvidoCore::ChangeGiocataScore(eGiocataScoreState eNewScore) {
     for (int i = 0; i < m_lNumPlayers; i++) {
         if (m_vctAlgPlayer[i]) {
@@ -350,10 +287,6 @@ void cInvidoCore::ChangeGiocataScore(eGiocataScoreState eNewScore) {
     }
 }
 
-////////////////////////////////////////
-//       Giocata_End
-/*! Giocata is ended
- */
 void cInvidoCore::Giocata_End() {
     // calculate points
     m_MatchPoints.GiocataEnd();
@@ -369,10 +302,6 @@ void cInvidoCore::Giocata_End() {
     NotifyScript(SCR_NFY_ALGGIOCATAEND);
 }
 
-////////////////////////////////////////
-//       Partita_End
-/*! Match is terminated. Iform all algorithms
- */
 void cInvidoCore::Partita_End() {
     for (int i = 0; i < m_lNumPlayers; i++) {
         if (m_vctAlgPlayer[i]) {
@@ -382,11 +311,6 @@ void cInvidoCore::Partita_End() {
     NotifyScript(SCR_NFY_ALGMATCHEND);
 }
 
-////////////////////////////////////////
-//       AbandonGame
-/*! The player abandon the game, the game is teminated
-// \param int iPlayerIx : player index that abandon the game
-*/
 void cInvidoCore::AbandonGame(int iPlayerIx) {
     int iNextPlayer;
     int aPlayerDeck[MAX_NUM_PLAYER];
@@ -403,10 +327,6 @@ void cInvidoCore::AbandonGame(int iPlayerIx) {
     }
 }
 
-////////////////////////////////////////
-//       NtyWaitingPlayer_Toplay
-/*! Inform algorithm  that player  have to play
- */
 void cInvidoCore::NtyWaitingPlayer_Toplay(int iPlayerIx) {
     ASSERT(m_pPlHaveToPlay);
     ASSERT(iPlayerIx == m_pPlHaveToPlay->GetIndex());
@@ -418,11 +338,6 @@ void cInvidoCore::NtyWaitingPlayer_Toplay(int iPlayerIx) {
     pAlg->ALG_Play();
 }
 
-////////////////////////////////////////
-//       NtyWaitingPlayer_ToResp
-/*! Inform algorithm that player  have to responce
-// \param int iPlayerIx : player index
-*/
 void cInvidoCore::NtyWaitingPlayer_ToResp(int iPlayerIx) {
     I_ALG_Player* pAlg = m_vctAlgPlayer[iPlayerIx];
     ASSERT(pAlg);
@@ -430,11 +345,6 @@ void cInvidoCore::NtyWaitingPlayer_ToResp(int iPlayerIx) {
     pAlg->ALG_HaveToRespond();
 }
 
-////////////////////////////////////////
-//       NtyPlayerSayBuiada
-/*! The player say something not corerct
-// \param int iPlayerIx : player index
-*/
 void cInvidoCore::NtyPlayerSayBuiada(int iPlayerIx) {
     for (int i = 0; i < m_lNumPlayers; i++) {
         // notify all players that a player says something not correct
@@ -444,11 +354,6 @@ void cInvidoCore::NtyPlayerSayBuiada(int iPlayerIx) {
     }
 }
 
-////////////////////////////////////////
-//       RaiseError
-/*! To make error handling message system gui indipendent.
-// \param const std::string &errorMsg :
-*/
 void cInvidoCore::RaiseError(const std::string& errorMsg) {
     ASSERT(0);
     TRACE(const_cast<char*>(errorMsg.c_str()));
@@ -504,14 +409,6 @@ BOOL cInvidoCore::Player_vaDentro(int iPlayerIx, const CARDINFO* pCardInfo) {
     return bRes;
 }
 
-////////////////////////////////////////
-//       Player_playCard
-/*! A player have played a card, terminate a hand or the game or simply wait for
-the next action in the hand.
-// Check also if the card played is on player hand.
-// \param int iPlayerIx : player index
-// \param CARDINFO* pCardInfo : card information pointer
-*/
 BOOL cInvidoCore::Player_playCard(int iPlayerIx, const CARDINFO* pCardInfo) {
     CardSpec* pCardplayed = checkValidCardPlayed(iPlayerIx, pCardInfo);
     if (pCardplayed == NULL) {
@@ -544,11 +441,6 @@ BOOL cInvidoCore::Player_playCard(int iPlayerIx, const CARDINFO* pCardInfo) {
     return bRes;
 }
 
-////////////////////////////////////////
-//       Player_saySomething
-/*! A  player has said something
-// \param int iPlayerIx : player index
-*/
 BOOL cInvidoCore::Player_saySomething(int iPlayerIx, eSayPlayer eSay) {
     BOOL bRes = FALSE;
     if (m_Mano.Player_Say(iPlayerIx, eSay)) {
@@ -565,12 +457,6 @@ BOOL cInvidoCore::Player_saySomething(int iPlayerIx, eSayPlayer eSay) {
     return bRes;
 }
 
-////////////////////////////////////////
-//       GetAdmittedCommands
-/*! Provides a list of admitted commands
-// \param VCT_COMMANDS& vct_Commands : result list
-// \param int iPlayerIndex : player index
-*/
 void cInvidoCore::GetAdmittedCommands(VCT_COMMANDS& vct_Commands,
                                       int iPlayerIndex) {
     m_Mano.GetAdmittedCommands(vct_Commands, iPlayerIndex);
@@ -591,12 +477,6 @@ void cInvidoCore::NotifyScript(eScriptNotification eVal) {
     TRACE("Event %d\n", eVal);
 }
 
-////////////////////////////////////////
-//       NotifyScriptAlgorithm
-/*! Notify the algorithm
-// \param int iPlayerIx : player index that make  the notification
-// \param eScriptNotification eVal :
-*/
 void cInvidoCore::NotifyScriptAlgorithm(int iPlayerIx,
                                         eScriptNotification eVal) {
     TRACE("Algorithm %d, %d\n", iPlayerIx, eVal);
@@ -604,14 +484,6 @@ void cInvidoCore::NotifyScriptAlgorithm(int iPlayerIx,
 
 ////////////////////////////////////////// functions called by Script
 
-////////////////////////////////////////
-//       Script_OverrideDeck
-/*! Script override the current deck
-// \param int iPlayer : player index
-// \param int iC1 : card 1
-// \param int iC2 : card 2
-// \param int iC3 : card 3
-*/
 void cInvidoCore::Script_OverrideDeck(int iPlayer, int iC1, int iC2, int iC3) {
     cPlayer* pCurrPlayer =
         m_PlayersOnTable.GetPlayerToPlay(cPlayersOnTable::NO_SWITCH);
@@ -628,37 +500,16 @@ void cInvidoCore::Script_OverrideDeck(int iPlayer, int iC1, int iC2, int iC3) {
     m_pMyMazzo->SetIndexRaw(iBegPos + 2, iC3);
 }
 
-////////////////////////////////////////
-//       Script_SetStartPlayer
-/*!
-// \param int iPlayer :
-*/
 void cInvidoCore::Script_SetStartPlayer(int iPlayer) {}
 
-////////////////////////////////////////
-//       Script_Say
-/*! Script say
-// \param int iPlayer : player say
-// \param eSayPlayer eSay : say detail
-*/
 void cInvidoCore::Script_Say(int iPlayer, eSayPlayer eSay) {
     Player_saySomething(iPlayer, eSay);
 }
 
-////////////////////////////////////////
-//       Script_Play
-/*! Script engine has played a card
-// \param int iPlayer :
-// \param CardSpec& CardPlayed :
-*/
 void cInvidoCore::Script_Play(int iPlayer, CardSpec& CardPlayed) {
     Player_playCard(iPlayer, CardPlayed.GetCardInfo());
 }
 
-////////////////////////////////////////
-//       Script_MatchEnd
-/*! Terminate the match
- */
 void cInvidoCore::Script_MatchEnd() {
     // reset state machines
     m_Partita.Reset();
@@ -666,13 +517,6 @@ void cInvidoCore::Script_MatchEnd() {
     m_Mano.Reset();
 }
 
-////////////////////////////////////////
-//       Script_CheckResult
-/*!
-// \param int iTypeOfItem :
-// \param int iParam1 :
-// \param int iExpectedVal :
-*/
 int cInvidoCore::Script_CheckResult(int iTypeOfItem, int iParam1,
                                     int iExpectedVal) {
     int iRes = 0;

@@ -18,11 +18,6 @@ static const char* stalpzManoState[10] = {
     "MNST_WAIT_RESP_PLAYER_1", "MNST_WAIT_RESP_PLAYER_2",
     "MNST_WAIT_RESP_PLAYER_3", "MNST_WAIT_RESP_PLAYER_4"};
 
-////////////////////////////////////////
-//       intToEScore
-/*! Help function to convert integer score in enum score
-// \param int iVal :
-*/
 static eGiocataScoreState intToEScore(int iVal) {
     eGiocataScoreState eVal = SC_PATTA;
     switch (iVal) {
@@ -149,10 +144,6 @@ cMano::cMano() {
     m_pTracer = TraceService::Instance();
 }
 
-////////////////////////////////////////
-//       NextAction
-/*! Next action. Call a function in cInvidoCore
- */
 void cMano::NextAction() {
     size_t iNumAct = m_deqNextAction.size();
     if (iNumAct == 0) {
@@ -226,19 +217,11 @@ void cMano::NextAction() {
     }
 }
 
-////////////////////////////////////////
-//       GiocataStart
-/*! Giocata start notification. Initialize variables stored over mano.
- */
 void cMano::GiocataStart() {
     // reset player change score  index
     m_iPlayerChangeScore = NOT_VALID_INDEX;
 }
 
-////////////////////////////////////////
-//       MatchStart
-/*! A new match is started
- */
 void cMano::MatchStart() {
     m_iNumOfPlayers = m_pInvidoCore->GetNumOfPlayers();
     for (int i = 0; i < m_iNumOfPlayers; i++) {
@@ -249,11 +232,6 @@ void cMano::MatchStart() {
     m_pTable = m_pInvidoCore->GetTable();
 }
 
-////////////////////////////////////////
-//       NewMano
-/*! Start a new mano
-// \param int iPlayerIx : player that have to play
-*/
 void cMano::NewMano(int iPlayerIx) {
     clearQuestions();
 
@@ -284,12 +262,6 @@ void cMano::NewMano(int iPlayerIx) {
     }
 }
 
-////////////////////////////////////////
-//       Player_Play
-/*! The player has played a card. Return true if the play was admitted.
-// \param ong iPlayerIx : player index
-// \param vadoDentro:  true if it was played with vado dentro
-*/
 BOOL cMano::Player_Play(int iPlayerIx, BOOL vadoDentro) {
     // TRACE("Player%d play state %d \n", iPlayerIx, m_eManoState);
     if (m_pTracer->AddNewEntry(1, 3, EntryTraceDetail::TR_INFO, __FILE__,
@@ -374,11 +346,6 @@ BOOL cMano::Player_Play(int iPlayerIx, BOOL vadoDentro) {
     return TRUE;
 }
 
-////////////////////////////////////////
-//       Player_Say
-/*! Player say something
-// \param int iPlayerIx : index of the player that say
-*/
 BOOL cMano::Player_Say(int iPlayerIx, eSayPlayer eSay) {
     TRACE("Player%d say %d, state %d \n", iPlayerIx, eSay, m_eManoState);
     if (m_eManoState == MNST_WAIT_NEW_MANO || m_eManoState == MNST_MANO_END) {
@@ -409,13 +376,6 @@ BOOL cMano::Player_Say(int iPlayerIx, eSayPlayer eSay) {
     return bRes;
 }
 
-////////////////////////////////////////
-//       isScoreBigClosed
-/*! Return TRUE if the first argument is bigger as the second in the closest
-manner.
-// \param eGiocataScoreState eS1 : first score
-// \param eGiocataScoreState eS2 : second score
-*/
 BOOL cMano::isScoreBigClosed(eGiocataScoreState eS1, eGiocataScoreState eS2) {
     BOOL bRes = FALSE;
 
@@ -428,11 +388,6 @@ BOOL cMano::isScoreBigClosed(eGiocataScoreState eS1, eGiocataScoreState eS2) {
     return bRes;
 }
 
-////////////////////////////////////////
-//       handle_ScoreCalled
-/*! A score change was called
-// \param eSayPlayer eSay :
-*/
 void cMano::handle_ScoreCalled(int iPlayerIx, eSayPlayer eSay) {
     int iAttScore = m_pScore->GetCurrScore();
     eGiocataScoreState eScore;
@@ -503,12 +458,6 @@ void cMano::handle_ScoreCalled(int iPlayerIx, eSayPlayer eSay) {
     }
 }
 
-////////////////////////////////////////
-//       handle_MonteCall
-/*! A Monte call was said
-// \param int iPlayerIx :
-// \param eSayPlayer eSay :
-*/
 void cMano::handle_MonteCall(int iPlayerIx, eSayPlayer eSay) {
     cPendQuestion PendQuesLast;
 
@@ -531,11 +480,6 @@ void cMano::handle_MonteCall(int iPlayerIx, eSayPlayer eSay) {
     }
 }
 
-////////////////////////////////////////
-//       giocata_Go_Amonte
-/*! Giocata is going a monte, set action and state.
-// \param int iPlayerIx : player that make the giocata a monte
-*/
 void cMano::giocata_Go_Amonte(int iPlayerIx) {
     m_pScore->ChangeCurrentScore(SC_AMONTE, iPlayerIx);
     add_Action(iPlayerIx, MANO_AMONTE);
@@ -545,20 +489,10 @@ void cMano::giocata_Go_Amonte(int iPlayerIx) {
     clearQuestions();
 }
 
-////////////////////////////////////////
-//       handle_CallMoreOrInvido
-/*! Handle call more
-// \param int iPlayerIx :
-*/
 void cMano::handle_CallMoreOrInvido(int iPlayerIx) {
     // Nothing to do here
 }
 
-////////////////////////////////////////
-//       handle_CallNo
-/*! Negative responce
-// \param int iPlayerIx :
-*/
 void cMano::handle_CallNo(int iPlayerIx) {
     cPendQuestion PendQues;
     if (get_LastPendQuest(PendQues)) {
@@ -587,11 +521,6 @@ void cMano::handle_CallNo(int iPlayerIx) {
     }
 }
 
-////////////////////////////////////////
-//       handleVaBene
-/*! Player say "Va bene"
-// \param iPlayerIx : player index
-*/
 void cMano::handleVaBene(int iPlayerIx) {
     cPendQuestion PendQues;
     if (get_LastPendQuest(PendQues)) {
@@ -621,11 +550,6 @@ void cMano::handleVaBene(int iPlayerIx) {
     }
 }
 
-////////////////////////////////////////
-//       handleVadoVia
-/*! Handle player say "Vado Via"
-// \param int iPlayerIx : player that say vado via
-*/
 void cMano::handleVadoVia(int iPlayerIx) {
     cPendQuestion PendQues;
     if (get_LastPendQuest(PendQues)) {
@@ -651,11 +575,6 @@ void cMano::handleVadoVia(int iPlayerIx) {
     }
 }
 
-////////////////////////////////////////
-//       actionOnQuestion
-/*!Select the action of the question call
-// \param cPendQuestion& PendQues : last question done
-*/
 void cMano::actionOnQuestion(cPendQuestion& PendQues) {
     if (IsPlayerOnCardPl()) {
         // save the state because we are going in calling phase
@@ -673,10 +592,6 @@ void cMano::actionOnQuestion(cPendQuestion& PendQues) {
     m_eManoState = m_MapManoStateResp[iPlayerNext];
 }
 
-////////////////////////////////////////
-//       actionWithoutQuestion
-/*! There is no question pending, take an action to retrigger the state
- */
 void cMano::actionWithoutQuestion() {
     ASSERT(m_deqPendQuestion.size() == 0);
     if (!IsPlayerOnCardPl()) {
@@ -692,20 +607,11 @@ void cMano::actionWithoutQuestion() {
     }
 }
 
-////////////////////////////////////////
-//       Reset
-/*! Reset mano state
- */
 void cMano::Reset() {
     m_deqNextAction.clear();
     m_eManoState = MNST_WAIT_NEW_MANO;
 }
 
-////////////////////////////////////////
-//       add_QuestMonte
-/*! Add a monte question
-// \param int iPlayerIx :
-*/
 void cMano::add_QuestMonte(int iPlayerIx) {
     // add the MONTE question to the queue
     cPendQuestion PendQues(TRUE, SC_AMONTE, iPlayerIx);
@@ -714,12 +620,6 @@ void cMano::add_QuestMonte(int iPlayerIx) {
     actionOnQuestion(PendQues);
 }
 
-////////////////////////////////////////
-//       add_Action
-/*! Add an action on the queue
-// \param int iPar_0 : Parameter 0 of action (player, score)
-// \param eFN_MANOACTION eAct :
-*/
 void cMano::add_Action(int iPar_0, eFN_MANOACTION eAct) {
     cActionItem Action;
 
@@ -736,14 +636,6 @@ void cMano::add_Action(int iPar_0, eFN_MANOACTION eAct) {
           iPar_0);
 }
 
-////////////////////////////////////////
-//       removeObsoleteActions
-/*! Remove all aboslete actions from queue. Obsolete actions are
-MANO_WAITPL_TOPLAY and
-// MANO_WAIPL_TORESP. An action becomes obsolete when another action comes that
-substitute
-// the old one.
-*/
 void cMano::removeObsoleteActions() {
     size_t iNumAct = m_deqNextAction.size();
     for (int i = 0; i < iNumAct; i++) {
@@ -756,11 +648,6 @@ void cMano::removeObsoleteActions() {
     }
 }
 
-////////////////////////////////////////
-//       get_LastPendQuest
-/*! Provides the last pending question. Return TRUE if a question is present.
-// \param cPendQuestion& PendQues :
-*/
 BOOL cMano::get_LastPendQuest(cPendQuestion& PendQues) {
     BOOL bRes = FALSE;
     size_t iNumEle = m_deqPendQuestion.size();
@@ -771,11 +658,6 @@ BOOL cMano::get_LastPendQuest(cPendQuestion& PendQues) {
     return bRes;
 }
 
-////////////////////////////////////////
-//       get_LastPendScoreQuest
-/*! Provides the last pending question with points (exclude calls a monte)
-// \param cPendQuestion& PendQues :
-*/
 BOOL cMano::get_LastPendScoreQuest(cPendQuestion& PendQues) {
     BOOL bRes = FALSE;
     size_t iNumEle = m_deqPendQuestion.size();
@@ -794,10 +676,6 @@ BOOL cMano::get_LastPendScoreQuest(cPendQuestion& PendQues) {
     return bRes;
 }
 
-////////////////////////////////////////
-//       remove_LastQuestion
-/*! Remove the last question
- */
 void cMano::remove_LastQuestion() {
     size_t iNumEle = m_deqPendQuestion.size();
     if (iNumEle > 0) {
@@ -805,10 +683,6 @@ void cMano::remove_LastQuestion() {
     }
 }
 
-////////////////////////////////////////
-//       restore_StateBeforeQuest
-/*! Restore the state before the question was done
- */
 void cMano::restore_StateBeforeQuest() {
     m_eManoState = m_eOldManoState;
     eFN_MANOACTION eAct_Type = m_MapActionOnState[m_eManoState];
@@ -817,25 +691,13 @@ void cMano::restore_StateBeforeQuest() {
     add_Action(iPlayerIx, eAct_Type);
 }
 
-////////////////////////////////////////
-//       save_StateBeforeQuest
-/*! Save the state before question
- */
 void cMano::save_StateBeforeQuest() { m_eOldManoState = m_eManoState; }
 
-////////////////////////////////////////
-//       clearQuestions
-/*! Clear all questions pending
- */
 void cMano::clearQuestions() {
     TRACE("Clear all pending questions\n");
     m_deqPendQuestion.clear();
 }
 
-////////////////////////////////////////
-//       IsPlayerOnCardPl
-/*! Return true if on player have to play, false otherwise
- */
 BOOL cMano::IsPlayerOnCardPl() {
     BOOL bRes = FALSE;
     if (m_eManoState == MNST_WAIT_PLAY_PLAYER_1 ||
@@ -847,10 +709,6 @@ BOOL cMano::IsPlayerOnCardPl() {
     return bRes;
 }
 
-////////////////////////////////////////
-//       nextTableState
-/*! Provides the next on the mano.
- */
 eManoStatus cMano::nextTableState() {
     ASSERT(m_deqTableState.size() > 0);
     eManoStatus eRetState = MNST_WAIT_NEW_MANO;
@@ -907,10 +765,6 @@ void cMano::GetMoreCommands(VCT_COMMANDS& vct_Commands, int iPlayerIndex) {
     }
 }
 
-////////////////////////////////////////
-//       GetAdmittedCommands
-/*! Provides all possible call commands on the actual game point.
- */
 void cMano::GetAdmittedCommands(VCT_COMMANDS& vct_Commands, int iPlayerIndex) {
     vct_Commands.clear();
 
@@ -942,11 +796,6 @@ void cMano::GetAdmittedCommands(VCT_COMMANDS& vct_Commands, int iPlayerIndex) {
     }
 }
 
-////////////////////////////////////////
-//       nextAvailSayScore
-/*! Provides the next available score
-// \param eSayPlayer* peSayAvail :
-*/
 BOOL cMano::nextAvailSayScore(eSayPlayer* peSayAvail) {
     BOOL bRet = TRUE;
     ASSERT(peSayAvail);
@@ -990,10 +839,6 @@ BOOL cMano::nextAvailSayScore(eSayPlayer* peSayAvail) {
     return bRet;
 }
 
-////////////////////////////////////////
-//       isGiocataAMonte
-/*! TRUE if the giocata is gone a monte, FALSE otherwise.
- */
 BOOL cMano::isGiocataAMonte() {
     BOOL bRet = FALSE;
     cMatchPoints* pMatchPoints = m_pInvidoCore->GetMatchPointsObj();

@@ -6,10 +6,6 @@
 
 cPlayerStatistic::cPlayerStatistic() { Reset(); }
 
-////////////////////////////////////////
-//       Reset
-/*! Reset statistic to the initial values
- */
 void cPlayerStatistic::Reset() {
     for (int i = 0; i < NUM_SEEDS; i++) {
         bynStroz[i] = 2;
@@ -34,11 +30,6 @@ void cPlayerStatistic::Reset() {
     lInHand_nLisc = 0;
 }
 
-////////////////////////////////////////
-//       Clone
-/*! Clone this element
-// \param cPlayerStatistic* pNew : destination pointer element
-*/
 void cPlayerStatistic::Clone(cPlayerStatistic* pNew) {
     ASSERT(pNew);
     pNew->lScore = lScore;

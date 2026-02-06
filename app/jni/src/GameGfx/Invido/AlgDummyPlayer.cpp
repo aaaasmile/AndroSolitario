@@ -38,28 +38,12 @@ cAlgDummyPlayer::cAlgDummyPlayer() {
 
 cAlgDummyPlayer::~cAlgDummyPlayer() {}
 
-////////////////////////////////////////
-//       ALG_SetCoreInterface
-/*!
-// \param I_CORE_Game* pCore :
-*/
 void cAlgDummyPlayer::ALG_SetCoreInterface(I_CORE_Game* pCore) {
     m_pCoreGame = pCore;
 }
 
-////////////////////////////////////////
-//       ALG_SetPlayerIndex
-/*! set player index
-// \param int iIndex :
-*/
 void cAlgDummyPlayer::ALG_SetPlayerIndex(int iIndex) { m_iMyIndex = iIndex; }
 
-////////////////////////////////////////
-//       ALG_SetOpponentIndex
-/*! set opponent index
-// \param int iIndex :
-// \param int iOpponentNr :
-*/
 void cAlgDummyPlayer::ALG_SetOpponentIndex(int iIndex, int iOpponentNr) {
     m_iOppIndex = iIndex;
 }
@@ -67,19 +51,8 @@ void cAlgDummyPlayer::ALG_SetOpponentIndex(int iIndex, int iOpponentNr) {
 //! set associate index
 void cAlgDummyPlayer::ALG_SetAssociateIndex(int iIndex) {}
 
-////////////////////////////////////////
-//       ALG_NewMatch
-/*! new match notification
-// \param int iNumPlayer :
-*/
 void cAlgDummyPlayer::ALG_NewMatch(int iNumPlayer) {}
 
-////////////////////////////////////////
-//       ALG_NewGiocata
-/*! new giocata notification
-// \param CARDINFO* pCardArray :
-// \param int iNumOfCards :
-*/
 void cAlgDummyPlayer::ALG_NewGiocata(const CARDINFO* pCardArray,
                                      int iNumOfCards, int iPlayerIx) {
     ASSERT(iNumOfCards == NUM_CARDS_HAND);
@@ -103,12 +76,6 @@ void cAlgDummyPlayer::ALG_NewGiocata(const CARDINFO* pCardArray,
 
 void cAlgDummyPlayer::ALG_PlayerHasVadoDentro(int iPlayerIx) { ASSERT(0); }
 
-////////////////////////////////////////
-//       ALG_PlayerHasPlayed
-/*! player has played a card
-// \param int iPlayerIx :
-// \param CARDINFO* pCard :
-*/
 void cAlgDummyPlayer::ALG_PlayerHasPlayed(int iPlayerIx,
                                           const CARDINFO* pCard) {
     ASSERT(pCard);
@@ -135,12 +102,6 @@ void cAlgDummyPlayer::ALG_PlayerHasPlayed(int iPlayerIx,
     }
 }
 
-////////////////////////////////////////
-//       ALG_PlayerHasSaid
-/*! player has said something
-// \param int iPlayerIx :
-// \param eSayPlayer eSay :
-*/
 void cAlgDummyPlayer::ALG_PlayerHasSaid(int iPlayerIx, eSayPlayer eSay) {
     if (iPlayerIx == m_iOppIndex) {
         m_OpponentSay = eSay;
@@ -153,10 +114,6 @@ void cAlgDummyPlayer::ALG_PlayerHasSaid(int iPlayerIx, eSayPlayer eSay) {
     }
 }
 
-////////////////////////////////////////
-//       ALG_Play
-/*! player have to play notification
- */
 void cAlgDummyPlayer::ALG_Play() {
     CardSpec cardUndef;
 
@@ -198,16 +155,8 @@ void cAlgDummyPlayer::ALG_Play() {
     }
 }
 
-////////////////////////////////////////
-//       ALG_ManoEnd
-/*! mano end notification
- */
 void cAlgDummyPlayer::ALG_ManoEnd(I_MatchScore* pScore) {}
 
-////////////////////////////////////////
-//       ALG_GiocataEnd
-/*!
- */
 void cAlgDummyPlayer::ALG_GiocataEnd(I_MatchScore* pScore) {
     if (m_pTracer) {
         if (m_iMyIndex == 0) {
@@ -234,10 +183,6 @@ void cAlgDummyPlayer::ALG_GiocataEnd(I_MatchScore* pScore) {
     }
 }
 
-////////////////////////////////////////
-//       ALG_MatchEnd
-/*! match end notification
- */
 void cAlgDummyPlayer::ALG_MatchEnd(I_MatchScore* pScore) {
     if (m_pTracer) {
         if (m_iMyIndex == 0) {
@@ -252,10 +197,6 @@ void cAlgDummyPlayer::ALG_MatchEnd(I_MatchScore* pScore) {
     }
 }
 
-////////////////////////////////////////
-//       ALG_Say
-/*! Algorithm is invited to responce
- */
 void cAlgDummyPlayer::ALG_Say() {
     if (m_OpponentSay == AMONTE && m_MyLastSay == NO) {
         // a monte was called and i was responsed NO, don't change idea
@@ -279,11 +220,6 @@ void cAlgDummyPlayer::ALG_Say() {
     }
 }
 
-////////////////////////////////////////
-//       ALG_GicataScoreChange
-/*!
-// \param eGiocataScoreState eNewScore :
-*/
 void cAlgDummyPlayer::ALG_GicataScoreChange(eGiocataScoreState eNewScore) {
     m_eScoreCurrent = eNewScore;
     if (m_pTracer) {

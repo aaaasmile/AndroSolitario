@@ -19,10 +19,6 @@ cPartita::cPartita() {
     m_eNextAction = NO_ACTION;
 }
 
-////////////////////////////////////////
-//       NewPartita
-/*! Start a new partita
- */
 void cPartita::NewPartita(long lPlayerIx) {
     m_lGiocStart = lPlayerIx;
 
@@ -35,10 +31,6 @@ void cPartita::NewPartita(long lPlayerIx) {
     }
 }
 
-////////////////////////////////////////
-//       NextAction
-/*! Take the next action
- */
 void cPartita::NextAction() {
     switch (m_eNextAction) {
         case ACT_PARTITA_END:
@@ -58,10 +50,6 @@ void cPartita::NextAction() {
     m_eNextAction = NO_ACTION;
 }
 
-////////////////////////////////////////
-//       Update_Partita
-/*! Giocata is terminated, update the partita
- */
 void cPartita::Update_Partita(I_MatchScore* pIScore) {
     ASSERT(pIScore);
     ASSERT(m_PartitaState == PARTITA_ONGOING);
@@ -87,10 +75,6 @@ void cPartita::Update_Partita(I_MatchScore* pIScore) {
     }
 }
 
-////////////////////////////////////////
-//       Reset
-/*!
- */
 void cPartita::Reset() {
     m_PartitaState = WAIT_NEW_PARTITA;
     m_lGiocStart = 0;

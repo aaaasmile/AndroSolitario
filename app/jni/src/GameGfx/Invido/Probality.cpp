@@ -8,11 +8,6 @@
 //   *******************      cProbality CLASS ******************
 ////////////////////////////////////////////////////////////////
 
-////////////////////////////////////////
-//       SvilCombiHands
-/*! Develop all possible hands with input deck
-// \param VCT_MAZZO &vct_Mazzo : input deck
-*/
 void cProbality::SvilCombiHands(VCT_MAZZO& vct_Mazzo,
                                 MTX_HANDCOMBI& mtx_Result) {
     long lNumCard = (long)vct_Mazzo.size();
@@ -74,12 +69,6 @@ void cProbality::SvilCombiHands(VCT_MAZZO& vct_Mazzo,
     // Utility::SaveItemToFile(mtx_Result, DEF_path_s, "allhands.txt");
 }
 
-////////////////////////////////////////
-//       BinomialCoef
-/*! Coefficiente binomiale
-// \param long lN : numero di elementi
-// \param long lK : classe
-*/
 double cProbality::BinomialCoef(long lN, long lK) {
     double dResult = 0.0;
     double dNum, dDen;
@@ -92,11 +81,6 @@ double cProbality::BinomialCoef(long lN, long lK) {
     return dResult;
 }
 
-////////////////////////////////////////
-//       Fattorial
-/*! Fattoriale di n elementi
-// \param long lN : numero degli elementi
-*/
 double cProbality::Fattorial(long lN) {
     double dResult = 1.0;
 

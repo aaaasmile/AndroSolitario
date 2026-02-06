@@ -46,21 +46,12 @@ cInvidoCore* g_pInvidoCore;
 
 static cInvidoGfx* g_stacInvidoGfx = 0;
 
-////////////////////////////////////////
-//       fnEffectTer
-/*! Effect terminated notification of music manager
-// \param int iCh :
-*/
 void fnEffectTer(int iCh) {
     // do something
     ASSERT(g_stacInvidoGfx);
     g_stacInvidoGfx->NtfyTermEff(iCh);
 }
 
-////////////////////////////////////////
-//       cInvidoGfx
-/*! constructor
- */
 cInvidoGfx::cInvidoGfx(AppGfx* pApp) {
     m_pScene_background = 0;
     m_pFontText = 0;
@@ -301,10 +292,6 @@ void cInvidoGfx::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRender,
                                            m_pScreen->h, 32, 0, 0, 0, 0);
 }
 
-////////////////////////////////////////
-//       cleanup
-/*! Free all allocated resources
- */
 void cInvidoGfx::cleanup() {
     if (m_pScene_background) {
         SDL_FreeSurface(m_pScene_background);
@@ -325,10 +312,6 @@ void cInvidoGfx::cleanup() {
     }
 }
 
-////////////////////////////////////////
-//       drawStaticScene
-/*! Draw the table, included all cards, status, chat
- */
 void cInvidoGfx::drawStaticScene() {
     if (m_pScene_background) {
         SDL_BlitSurface(m_pScene_background, NULL, m_pScreen, NULL);
@@ -366,11 +349,6 @@ void cInvidoGfx::drawStaticScene() {
     SDL_RenderPresent(m_psdlRenderer);
 }
 
-////////////////////////////////////////
-//       renderCard
-/*! Render a card gfx
-// \param cCardGfx* pCard : pointer to the card
-*/
 void cInvidoGfx::renderCard(cCardGfx* pCard) {
     if (pCard->State == cCardGfx::CSW_ST_INVISIBLE) {
         return;
@@ -385,11 +363,6 @@ void cInvidoGfx::renderCard(cCardGfx* pCard) {
     }
 }
 
-////////////////////////////////////////
-//       renderPlayerName
-/*! Display the name of the player
-// \param int iPlayerIx :
-*/
 void cInvidoGfx::renderPlayerName(int iPlayerIx) {
     cPlayer* pPlayer = m_pInvidoCore->GetPlayer(iPlayerIx);
 
@@ -413,10 +386,6 @@ void cInvidoGfx::renderPlayerName(int iPlayerIx) {
     }
 }
 
-////////////////////////////////////////
-//       initDeck
-/*! Inizializza il mazzo
- */
 int cInvidoGfx::initDeck() {
     // load deck from pac file
     if (m_pDeck == NULL) {
@@ -474,10 +443,6 @@ int cInvidoGfx::initDeck() {
     return 0;
 }
 
-////////////////////////////////////////
-//       createRegionsInit
-/*! Create region for the table
- */
 void cInvidoGfx::createRegionsInit() {
     // opponent cards
     for (int i = 0; i < NUM_CARDS_HAND; i++) {
@@ -510,10 +475,6 @@ void cInvidoGfx::createRegionsInit() {
     }
 }
 
-////////////////////////////////////////
-//       animateBeginGiocata
-/*! Animation new giocata (card distribution)
- */
 void cInvidoGfx::animateBeginGiocata() {
     TRACE("animateBeginGiocata - begin\n");
     Uint32 uiTickTot = 0;
@@ -582,12 +543,6 @@ void cInvidoGfx::animateBeginGiocata() {
     drawStaticScene();
 }
 
-////////////////////////////////////////
-//       animateManoEnd
-/*! Animate mano end. Move played cards together and than move it to the trick
-winner.
-// \param int iPlayerIx : player that win the trick
-*/
 void cInvidoGfx::animateManoEnd(int iPlayerIx) {
     Uint32 uiTickTot = 0;
     Uint32 uiInitialTick = SDL_GetTicks();
@@ -725,11 +680,6 @@ void cInvidoGfx::animateManoEnd(int iPlayerIx) {
     SDL_FreeSurface(pCurrentDisplay);
 }
 
-////////////////////////////////////////
-//       animGiocataEnd
-/*! Shows a little animation because giocata is terminated.
-// \param int iPlayerIx : Player that wons the giocata
-*/
 void cInvidoGfx::animGiocataEnd(int iPlayerIx, BOOL bIsPata) {
     int iTickTot = 0;
     int iTickFlashDiff = 0;
@@ -820,10 +770,6 @@ void cInvidoGfx::animGiocataEnd(int iPlayerIx, BOOL bIsPata) {
     } while (iTickTot < 1000);
 }
 
-////////////////////////////////////////
-//       animateCards
-/*! Shows a little animation.
- */
 int cInvidoGfx::animateCards() {
     srand((unsigned)time(NULL));
 
@@ -877,10 +823,6 @@ int cInvidoGfx::animateCards() {
     return 0;
 }
 
-////////////////////////////////////////
-//       showOkMsgBox
-/*! Show an ok messge box
- */
 void cInvidoGfx::showOkMsgBox(LPCSTR strText) {
     // prepare the size of the box
     cMesgBoxGfx MsgBox;
@@ -895,10 +837,6 @@ void cInvidoGfx::showOkMsgBox(LPCSTR strText) {
     MsgBox.Show(m_pScreen, "Ok", "", strText);
 }
 
-////////////////////////////////////////
-//       loadCardPac
-/*! Carica il mazzo delle carte dal file in formato pac
- */
 int cInvidoGfx::loadCardPac() {
     Uint32 timetag;
     char describtion[100];
@@ -946,13 +884,6 @@ int cInvidoGfx::loadCardPac() {
     return 0;
 }
 
-////////////////////////////////////////
-//       showYesNoMsgBox
-/*! Show yes/no message box
-// \param LPCSTR strText : Content of the messagebox
-\return :1 for yes
-\return :0 for no
-*/
 int cInvidoGfx::showYesNoMsgBox(LPCSTR strText) {
     ASSERT(m_pAlphaDisplay);
 
@@ -977,10 +908,6 @@ int cInvidoGfx::showYesNoMsgBox(LPCSTR strText) {
     return iRes;
 }
 
-////////////////////////////////////////
-//       InitInvidoVsCPU
-/*! Init the 2 players invido game: player against CPU
- */
 void cInvidoGfx::InitInvidoVsCPU() {
     if (m_pInvidoCore) {
         delete m_pInvidoCore;
@@ -1009,10 +936,6 @@ void cInvidoGfx::InitInvidoVsCPU() {
     m_bMatchTerminated = FALSE;
 }
 
-////////////////////////////////////////
-//       MatchLoop
-/*! Match loop
- */
 void cInvidoGfx::MatchLoop() {
     Mix_ChannelFinished(fnEffectTer);
     m_pInvidoCore->NewMatch();
@@ -1086,11 +1009,6 @@ void cInvidoGfx::MatchLoop() {
     }
 }
 
-////////////////////////////////////////
-//       handleMouseDownEvent
-/*! Mouse down event happens
-// \param SDL_Event &event :
-*/
 void cInvidoGfx::handleMouseDownEvent(SDL_Event& event) {
     int i;
     if (event.button.button == SDL_BUTTON_LEFT) {
@@ -1200,11 +1118,6 @@ void cInvidoGfx::showPopUpCallMenu(CardSpec& cardClicked, int iX, int iY,
     drawStaticScene();
 }
 
-////////////////////////////////////////
-//       clickOnPlayerCard
-/*! A player card was clicked
-// \param int iIndex : index of the card clicked
-*/
 void cInvidoGfx::clickOnPlayerCard(int iIndex) {
     TRACE("card clicked %d\n", iIndex);
     if (m_bPlayerCanPlay &&
@@ -1241,11 +1154,6 @@ void cInvidoGfx::drawVadoDentroCard(cCardGfx* pCard) {
     renderScreen();
 }
 
-////////////////////////////////////////
-//       drawPlayedCard
-/*! Draw a card that was played
-// \param cCardGfx* pCard :
-*/
 void cInvidoGfx::drawPlayedCard(cCardGfx* pCard) {
     int iIndexToUse = 0;
     if (m_CardsTable[0].State == cCardGfx::CSW_ST_INVISIBLE) {
@@ -1282,11 +1190,6 @@ void cInvidoGfx::handleMouseUpEvent(SDL_Event& event) {
     }
 }
 
-////////////////////////////////////////
-//       handleKeyDownEvent
-/*! User press a key on keyboard
-// \param SDL_Event &event :
-*/
 void cInvidoGfx::handleKeyDownEvent(SDL_Event& event) {
     if (event.key.keysym.sym == SDLK_n) {
         // startNewMatch();
@@ -1301,11 +1204,6 @@ void cInvidoGfx::handleKeyDownEvent(SDL_Event& event) {
     };  // Refresh
 }
 
-////////////////////////////////////////
-//       showPlayerMarkup
-/*! Show a little bitmap near to the player that have to play
-// \param int iPlayerIx :
-*/
 void cInvidoGfx::showPlayerMarkup(int iPlayerIx) {
     SDL_Rect dest;
     if (iPlayerIx == PLAYER1) {
@@ -1322,14 +1220,6 @@ void cInvidoGfx::showPlayerMarkup(int iPlayerIx) {
     SDL_BlitSurface(m_pAnImages[IMG_TOCCA_PLAYER], NULL, m_pScreen, &dest);
 }
 
-////////////////////////////////////////
-//       showPointsPlayer
-/*! Shows the score of the players. Caneli are drawn max 3 one the same line,
-egg max 2. No caneli and eggs on
-// the same line are possible.
-// \param int iPlayerIx : player index
-// \param VCT_INT& vct_Points : vector of points scored (sequence of 3 and 1)
-*/
 void cInvidoGfx::showPointsPlayer(int iPlayerIx, VCT_INT& vct_Points) {
     int iCurr_Y;
     SDL_Rect dest;
@@ -1440,10 +1330,6 @@ void cInvidoGfx::showPointsPlayer(int iPlayerIx, VCT_INT& vct_Points) {
     }
 }
 
-////////////////////////////////////////
-//       showManoScore
-/*! Show the score of the mano using leds.
- */
 void cInvidoGfx::showManoScore(BOOL bIsPlayed, int iPlayerIx, BOOL bIsPata,
                                int iManoNum) {
     SDL_Rect dest;
@@ -1497,11 +1383,6 @@ void cInvidoGfx::showManoScore(BOOL bIsPlayed, int iPlayerIx, BOOL bIsPata,
     }
 }
 
-////////////////////////////////////////
-//       guiPlayerTurn
-/*! Inform that the player have to play using the GUI
-// \param int iPlayer :
-*/
 void cInvidoGfx::guiPlayerTurn(int iPlayer) {
     ASSERT(m_pMatchPoints);
     m_bPlayerCanPlay = TRUE;
@@ -1519,10 +1400,6 @@ void cInvidoGfx::guiPlayerTurn(int iPlayer) {
     }
 }
 
-////////////////////////////////////////
-//       showCurrentScore
-/*! Show the current match score
- */
 void cInvidoGfx::showCurrentScore() {
     // mano score
     for (int iManoNum = 0; iManoNum < NUM_CARDS_HAND; iManoNum++) {
@@ -1642,10 +1519,6 @@ void cInvidoGfx::showCurrentScore() {
     }
 }
 
-////////////////////////////////////////
-//       enableCmds
-/*! Enable available commands
- */
 void cInvidoGfx::enableCmds() {
     VCT_COMMANDS vct_cmd;
     ASSERT(m_pInvidoCore);
@@ -1663,12 +1536,6 @@ void cInvidoGfx::enableCmds() {
     }
 }
 
-////////////////////////////////////////
-//       enableOnlyCmdButtons
-/*! Enables buttons for commands. If the parameter is 0, all buttons are
-disabled
-// \param int iNumButt : number of buttons to be enabled
-*/
 void cInvidoGfx::enableOnlyCmdButtons(size_t iNumButt) {
     int i, j;
     for (i = 0; i < iNumButt; i++) {
@@ -1686,13 +1553,6 @@ void cInvidoGfx::enableOnlyCmdButtons(size_t iNumButt) {
     }
 }
 
-////////////////////////////////////////
-//       setCmdButton
-/*! Set the command on the button
-// \param int iButtonIndex :
-// \param eSayPlayer eSay :
-// \param LPCSTR strCaption :
-*/
 void cInvidoGfx::setCmdButton(size_t iButtonIndex, eSayPlayer eSay,
                               LPCSTR strCaption) {
     if (iButtonIndex >= 0 && iButtonIndex < NUMOFBUTTON) {
@@ -1705,11 +1565,6 @@ void cInvidoGfx::setCmdButton(size_t iButtonIndex, eSayPlayer eSay,
     }
 }
 
-////////////////////////////////////////
-//       ButCmdClicked
-/*! Button clicked callback
-// \param int iButID : button id
-*/
 void cInvidoGfx::ButCmdClicked(int iButID) {
     if (iButID >= 0 && iButID < NUMOFBUTTON) {
         // first 6 ids are say commands buttons
@@ -1731,42 +1586,23 @@ void cInvidoGfx::ButCmdClicked(int iButID) {
     }
 }
 
-////////////////////////////////////////
-//       NtfyTermEff
-/*! Effect playing is terminated
-// \param int iCh :
-*/
 void cInvidoGfx::NtfyTermEff(int iCh) { m_DelayAction.ChangeCurrDelay(50); }
 
 // ***************************************************
 //********  interface invido core  callback **********
 // ***************************************************
 
-////////////////////////////////////////
-//       ALG_Play
-/*! player have to play notification
- */
 void cInvidoGfx::ALG_Play() {
     guiPlayerTurn(m_PlayerGuiIndex);
     enableCmds();
 }
 
-////////////////////////////////////////
-//       ALG_HaveToRespond
-/*! player have to responce notification
- */
 void cInvidoGfx::ALG_HaveToRespond() {
     TRACE("%s %s\n", lpszCST_SU,
           m_pLangMgr->GetStringId(cLanguages::ID_CP_RISP1).c_str());
     enableCmds();
 }
 
-////////////////////////////////////////
-//       ALG_PlayerHasSaid
-/*! player say something
-// \param int iPlayerIx :
-// \param eSayPlayer SaySomeThing :
-*/
 void cInvidoGfx::ALG_PlayerHasSaid(int iPlayerIx, eSayPlayer SaySomeThing) {
     m_pbalGfx->Disable();
 
@@ -1847,12 +1683,6 @@ void cInvidoGfx::opponentHasPlayedCard(CardSpec& Card, BOOL vadoDentro) {
     }
 }
 
-////////////////////////////////////////
-//       ALG_PlayerHasPlayed
-/*! player  play a card
-// \param int iPlayerIx :
-// \param CardSpec Card :
-*/
 void cInvidoGfx::ALG_PlayerHasPlayed(int iPlayerIx, const CARDINFO* pCard) {
     // disable ballon
     m_pbalGfx->Disable();
@@ -1899,10 +1729,6 @@ void cInvidoGfx::ALG_PlayerHasPlayed(int iPlayerIx, const CARDINFO* pCard) {
     }
 }
 
-////////////////////////////////////////
-//       ALG_NewGiocata
-/*! Cards are distruited. Draw it.
- */
 void cInvidoGfx::ALG_NewGiocata(const CARDINFO* pCardArray, int iNumOfCards,
                                 int iPlayerIx) {
     TRACE("ALG_NewGiocata\n");
@@ -1937,10 +1763,6 @@ void cInvidoGfx::ALG_NewGiocata(const CARDINFO* pCardArray, int iNumOfCards,
     animateBeginGiocata();
 }
 
-////////////////////////////////////////
-//       ALG_ManoEnd
-/*! Mano is terminated
- */
 void cInvidoGfx::ALG_ManoEnd(I_MatchScore* pScore) {
     ASSERT(pScore);
     m_bPlayerCanPlay = FALSE;
@@ -1985,10 +1807,6 @@ void cInvidoGfx::ALG_ManoEnd(I_MatchScore* pScore) {
     drawStaticScene();
 }
 
-////////////////////////////////////////
-//       ALG_GiocataEnd
-/*! Giocata is terminated
- */
 void cInvidoGfx::ALG_GiocataEnd(I_MatchScore* pScore) {
     int iPlayerIx = pScore->GetGiocataWinner();
 
@@ -2046,10 +1864,6 @@ void cInvidoGfx::ALG_GiocataEnd(I_MatchScore* pScore) {
     showOkMsgBox(strMsgFinGiocata.c_str());
 }
 
-////////////////////////////////////////
-//       ALG_MatchEnd
-/*! Match is end
- */
 void cInvidoGfx::ALG_MatchEnd(I_MatchScore* pScore) {
     int iPlayerIx = pScore->GetMatchWinner();
     int iPlayLoser;
@@ -2080,11 +1894,6 @@ void cInvidoGfx::ALG_MatchEnd(I_MatchScore* pScore) {
     m_bMatchTerminated = TRUE;
 }
 
-////////////////////////////////////////
-//       ALG_GicataScoreChange
-/*! giocata score changed
-// \param eGiocataScoreState eNewScore :
-*/
 void cInvidoGfx::ALG_GicataScoreChange(eGiocataScoreState eNewScore) {
     STRING lpsNamePoints = m_MapPunti[eNewScore];
     // Punteggio della giocata ora �:
@@ -2101,11 +1910,6 @@ void cInvidoGfx::ALG_PlayerSaidWrong(int iPlayerIx) {
     }
 }
 
-////////////////////////////////////////
-//       INP_PlayerSay
-/*!
-// \param eSayPlayer eSay :
-*/
 void cInvidoGfx::INP_PlayerSay(eSayPlayer eSay) {
     m_pInvidoCore->Player_saySomething(m_PlayerGuiIndex, eSay);
 }

@@ -16,10 +16,6 @@ cMazzo::cMazzo() {
     m_iRndSeed = 63200;
 }
 
-////////////////////////////////////////
-//       Create
-/*! Create a deck for invido game
- */
 void cMazzo::Create() {
     m_vctCards.reserve(NUM_CARDS);
     m_vctCards.clear();
@@ -36,22 +32,12 @@ void cMazzo::Create() {
     m_lNextCard = 0;
 }
 
-////////////////////////////////////////
-//       SetIndexRaw
-/*! Set the card value at defined position. Use this function to override the
- * shuffle of deck.
- */
 void cMazzo::SetIndexRaw(int iIndex, long lVal) {
     if (iIndex < (int)m_vctCards.size() && iIndex >= 0) {
         m_vctCards[iIndex] = lVal;
     }
 }
 
-////////////////////////////////////////
-//       CloneFrom
-/*! Clone the deck from another deck
-// \param cMazzo &Master : deck to be cloned
-*/
 bool cMazzo::CloneFrom(cMazzo& Master) {
     m_lNextCard = Master.GetNextCardVal();
     m_vctCards = Master.GetVectorIndexes();
@@ -59,10 +45,6 @@ bool cMazzo::CloneFrom(cMazzo& Master) {
     return true;
 }
 
-////////////////////////////////////////
-//       Shuffle
-/*! Shuffle deck
- */
 bool cMazzo::Shuffle() {
     IT_VCTLONG it_tmp;
 
@@ -86,11 +68,6 @@ bool cMazzo::Shuffle() {
     return true;
 }
 
-////////////////////////////////////////
-//       PickNextCard
-/*! Provides the next card on card pull on table
-// \param BOOL* pbEnd : return BOOLean result if card are present
-*/
 long cMazzo::PickNextCard(BOOL* pbEnd) {
     long lResult = NOT_VALID_INDEX;
     if (m_lNextCard >= (long)m_vctCards.size()) {
@@ -105,12 +82,6 @@ long cMazzo::PickNextCard(BOOL* pbEnd) {
     return lResult;
 }
 
-////////////////////////////////////////
-//       PickNextCard
-/*! Provides the next card on card pull on table. Works as iterator and
-increment the stack index.
-// \param CardSpec* pRes : returned cards
-*/
 BOOL cMazzo::PickNextCard(CardSpec* pRes) {
     ASSERT(pRes);
 
@@ -129,11 +100,6 @@ BOOL cMazzo::PickNextCard(CardSpec* pRes) {
     return bValid;
 }
 
-////////////////////////////////////////
-//       ThrowTableCard
-/*! Make the "briscola" and provides the card index that lies on table
- * (briscola)
- */
 long cMazzo::ThrowTableCard() {
     long lResult = NOT_VALID_INDEX;
     if (m_lNextCard >= (long)m_vctCards.size()) {
@@ -150,16 +116,8 @@ long cMazzo::ThrowTableCard() {
     return lResult;
 }
 
-////////////////////////////////////////
-//       TraceIt
-/*!
- */
 void cMazzo::TraceIt() { Utility::TraceContainer(m_vctCards, "Cards mazzo"); }
 
-////////////////////////////////////////
-//       IsMoreCards
-/*!
- */
 bool cMazzo::IsMoreCards() {
     bool bRet = false;
     if (m_lNextCard < NUM_CARDS) {
@@ -168,11 +126,6 @@ bool cMazzo::IsMoreCards() {
     return bRet;
 }
 
-////////////////////////////////////////
-//       GetIndexNextCard
-/*! Return the next card on top of the deck. No increment next card.
-// \param BOOL* pbEnd : returned BOOLean result if card are present
-*/
 long cMazzo::GetIndexNextCard(BOOL* pbEnd) {
     long lResult = NOT_VALID_INDEX;
     if (m_lNextCard >= NUM_CARDS) {

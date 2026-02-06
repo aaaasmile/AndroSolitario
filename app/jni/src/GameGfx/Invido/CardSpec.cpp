@@ -2,17 +2,8 @@
 
 #include "CardSpec.h"
 
-////////////////////////////////////////
-//       CardSpec
-/*! Contructor
- */
 CardSpec::CardSpec() { Reset(); }
 
-////////////////////////////////////////
-//       SetCardIndex
-/*! Adjust index and seed from card index
-// \param long itmpIndex : index of 40 cards mazzo
-*/
 void CardSpec::SetCardIndex(int itmpIndex) {
     if (itmpIndex >= 0 && itmpIndex <= NUM_CARDS_MAZZBRI) {
         m_CardInfo.byIndex = itmpIndex;
@@ -49,31 +40,18 @@ void CardSpec::operator=(const CardSpec& r) {
     m_CardInfo.eSuit = r.m_CardInfo.eSuit;
 }
 
-////////////////////////////////////////
-//       Reset
-/*! Reset the card info
- */
 void CardSpec::Reset() {
     m_CardInfo.byIndex = NOT_VALID_INDEX;
     m_CardInfo.CardName[0] = '\0';
     m_CardInfo.eSuit = UNDEF;
 }
 
-////////////////////////////////////////
-//       SetCardInfo
-/*!
-// \param CARDINFO& Card :
-*/
 void CardSpec::SetCardInfo(const CARDINFO& Card) {
     strncpy(m_CardInfo.CardName, Card.CardName, NUM_BYTE_NAME);
     m_CardInfo.byIndex = Card.byIndex;
     m_CardInfo.eSuit = Card.eSuit;
 }
 
-////////////////////////////////////////
-//       FillInfo
-/*! Provides information structure
- */
 void CardSpec::FillInfo(CARDINFO* pCardInfo) {
     ASSERT(pCardInfo);
     strncpy(pCardInfo->CardName, m_CardInfo.CardName, NUM_BYTE_NAME);

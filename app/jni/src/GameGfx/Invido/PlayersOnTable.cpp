@@ -18,11 +18,6 @@ cPlayersOnTable::cPlayersOnTable() {
     m_lFirstOnMatch = NOT_VALID_INDEX;
 }
 
-////////////////////////////////////////
-//       SetFirstOnTrick
-/*! Set first player on trick
-// \param long lIndex : index of the first player
-*/
 void cPlayersOnTable::SetFirstOnTrick(long lIndex) {
     if (lIndex < (long)m_vctPlayers.size() && lIndex >= 0) {
         m_lCurrent = lIndex;
@@ -32,11 +27,6 @@ void cPlayersOnTable::SetFirstOnTrick(long lIndex) {
     }
 }
 
-////////////////////////////////////////
-//       SetFirstOnGiocata
-/*! Set the first player index in the current giocata
-// \param long lIndex :
-*/
 void cPlayersOnTable::SetFirstOnGiocata(long lIndex) {
     if (lIndex < (long)m_vctPlayers.size() && lIndex >= 0) {
         m_lCurrent = lIndex;
@@ -47,11 +37,6 @@ void cPlayersOnTable::SetFirstOnGiocata(long lIndex) {
     }
 }
 
-////////////////////////////////////////
-//       SetFirstOnMatch
-/*! set the first player in match
-// \param long lIndex :
-*/
 void cPlayersOnTable::SetFirstOnMatch(long lIndex) {
     if (lIndex < (long)m_vctPlayers.size() && lIndex >= 0) {
         m_lCurrent = lIndex;
@@ -63,12 +48,6 @@ void cPlayersOnTable::SetFirstOnMatch(long lIndex) {
     }
 }
 
-////////////////////////////////////////
-//       Create
-/*! Create structure for players on the table
-// \param cPlayer* pHmiPlayer : player instanciated in hmi
-// \param long lNumPlayers : number of players
-*/
 void cPlayersOnTable::Create(cPlayer* pHmiPlayer, int iNumPlayers) {
     m_vctPlayers.clear();
     for (int i = 0; i < iNumPlayers; i++) {
@@ -93,13 +72,6 @@ void cPlayersOnTable::Create(cPlayer* pHmiPlayer, int iNumPlayers) {
     m_lNumPlayers = iNumPlayers;
 }
 
-////////////////////////////////////////
-//       GetPlayerToPlay
-/*! Provides the player that have to play and set the iterator to the next.
-// Function is to be called only from giocata algorithm oterwise the order is
-not correct.
-// \param eSwitchPLayer eVal: switch value
-*/
 cPlayer* cPlayersOnTable::GetPlayerToPlay(eSwitchPLayer eVal) {
     size_t lNumPlayers = m_vctPlayers.size();
     long lTemp = m_lCurrent;
@@ -116,11 +88,6 @@ cPlayer* cPlayersOnTable::GetPlayerToPlay(eSwitchPLayer eVal) {
     return &m_vctPlayers[lTemp];
 }
 
-////////////////////////////////////////
-//       GetPlayerIndex
-/*! Provides player on index
-// \param long lIndex : player index
-*/
 cPlayer* cPlayersOnTable::GetPlayerIndex(long lIndex) {
     if (lIndex < (long)m_vctPlayers.size() && lIndex >= 0) {
     } else {
@@ -130,15 +97,6 @@ cPlayer* cPlayersOnTable::GetPlayerIndex(long lIndex) {
     return &m_vctPlayers[lIndex];
 }
 
-////////////////////////////////////////
-//       CalcDistance
-/*! Function to calculate the distance between two players on table.
-// The table of players is: 0,1,2,3. The distance between 3 (ref) and 2 (tmp)
-is 3.
-// The distance between 2 (ref) and 3 (tmp) is 1.
-// \param int iPlayerRef :
-// \param int PlayerTmp :
-*/
 int cPlayersOnTable::CalcDistance(int iPlayerRef, int iPlayerTmp) {
     int aTableIx[MAX_NUM_PLAYER];
     for (int i = 0; i < MAX_NUM_PLAYER; i++) {
@@ -166,11 +124,6 @@ int cPlayersOnTable::CalcDistance(int iPlayerRef, int iPlayerTmp) {
     return iDist;
 }
 
-////////////////////////////////////////
-//       CalcCircleIndex
-/*! Calculate the circle of player indexes
-// \param int* paPlayerDeck : result circle
-*/
 void cPlayersOnTable::CalcCircleIndex(int* paPlayerDeck) {
     ASSERT(paPlayerDeck);
     paPlayerDeck[0] = m_lCurrent;
@@ -184,10 +137,6 @@ void cPlayersOnTable::CalcCircleIndex(int* paPlayerDeck) {
     }
 }
 
-////////////////////////////////////////
-//       IsLevelPython
-/*! Check if a player has the level python set
- */
 BOOL cPlayersOnTable::IsLevelPython() {
     BOOL bRes = FALSE;
 
@@ -202,12 +151,6 @@ BOOL cPlayersOnTable::IsLevelPython() {
     return bRes;
 }
 
-////////////////////////////////////////
-//       CalcCircleIndex_Cust
-/*! Calculate the circle using a custom initial index
-// \param int* paPlayerDeck :
-// \param int iPlayerIni :
-*/
 void cPlayersOnTable::CalcCircleIndex_Cust(int* paPlayerDeck, int iPlayerIni) {
     ASSERT(paPlayerDeck);
 

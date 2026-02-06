@@ -43,28 +43,12 @@ cAlgAdvancedPlayer::cAlgAdvancedPlayer() {
 
 cAlgAdvancedPlayer::~cAlgAdvancedPlayer() {}
 
-////////////////////////////////////////
-//       ALG_SetCoreInterface
-/*!
-// \param I_CORE_Game* pCore :
-*/
 void cAlgAdvancedPlayer::ALG_SetCoreInterface(I_CORE_Game* pCore) {
     m_pCoreGame = pCore;
 }
 
-////////////////////////////////////////
-//       ALG_SetPlayerIndex
-/*! set player index
-// \param int iIndex :
-*/
 void cAlgAdvancedPlayer::ALG_SetPlayerIndex(int iIndex) { m_iMyIndex = iIndex; }
 
-////////////////////////////////////////
-//       ALG_SetOpponentIndex
-/*! set opponent index
-// \param int iIndex :
-// \param int iOpponentNr :
-*/
 void cAlgAdvancedPlayer::ALG_SetOpponentIndex(int iIndex, int iOpponentNr) {
     m_iOppIndex = iIndex;
 }
@@ -72,11 +56,6 @@ void cAlgAdvancedPlayer::ALG_SetOpponentIndex(int iIndex, int iOpponentNr) {
 //! set associate index
 void cAlgAdvancedPlayer::ALG_SetAssociateIndex(int iIndex) {}
 
-////////////////////////////////////////
-//       ALG_NewMatch
-/*! new match notification
-// \param int iNumPlayer :
-*/
 void cAlgAdvancedPlayer::ALG_NewMatch(int iNumPlayer) {
     VCT_MAZZO vctMyDeck;
     for (int i = 0; i < NUM_CARDS; i++) {
@@ -84,12 +63,6 @@ void cAlgAdvancedPlayer::ALG_NewMatch(int iNumPlayer) {
     }
 }
 
-////////////////////////////////////////
-//       ALG_NewGiocata
-/*! new giocata notification
-// \param CARDINFO* pCardArray :
-// \param int iNumOfCards :
-*/
 void cAlgAdvancedPlayer::ALG_NewGiocata(const CARDINFO* pCardArray,
                                         int iNumOfCards, int iPlayerIx) {
     ASSERT(iNumOfCards == NUM_CARDS_HAND);
@@ -164,12 +137,6 @@ void cAlgAdvancedPlayer::doVadoDentro(int cardPos) {
                                  m_vct_Cards_CPU[cardPos].GetCardInfo());
 }
 
-////////////////////////////////////////
-//       ALG_PlayerHasPlayed
-/*! player has played a card
-// \param int iPlayerIx :
-// \param CARDINFO* pCard :
-*/
 void cAlgAdvancedPlayer::ALG_PlayerHasPlayed(int iPlayerIx,
                                              const CARDINFO* pCard) {
     ASSERT(pCard);
@@ -207,12 +174,6 @@ void cAlgAdvancedPlayer::ALG_PlayerHasPlayed(int iPlayerIx,
     m_sayMyRisp = VABENE;
 }
 
-////////////////////////////////////////
-//       ALG_PlayerHasSaid
-/*! player has said something
-// \param int iPlayerIx :
-// \param eSayPlayer eSay :
-*/
 void cAlgAdvancedPlayer::ALG_PlayerHasSaid(int iPlayerIx, eSayPlayer eSay) {
     LPCSTR lpsNameSay = g_MapSay[eSay];
     m_pTracer->AddSimpleTrace(m_itrChan, "[TRALG]Player %d has said %s\n",
@@ -788,10 +749,6 @@ BOOL cAlgAdvancedPlayer::IsPlayerFirst() {
 // Ritorna: 1,2,3 a seconda della mano
 int cAlgAdvancedPlayer::NumMano() { return m_ixCurrMano + 1; }
 
-////////////////////////////////////////
-//       ALG_Play
-/*! player have to play notification
- */
 void cAlgAdvancedPlayer::ALG_Play() {
     if (IsPlayerFirst()) {
         PlayAsFirst();
@@ -800,10 +757,6 @@ void cAlgAdvancedPlayer::ALG_Play() {
     }
 }
 
-////////////////////////////////////////
-//       ALG_ManoEnd
-/*! mano end notification
- */
 void cAlgAdvancedPlayer::ALG_ManoEnd(I_MatchScore* pScore) {
     m_opponetIsVadoDentro = FALSE;
     m_ixCurrMano++;
@@ -822,10 +775,6 @@ void cAlgAdvancedPlayer::ALG_ManoEnd(I_MatchScore* pScore) {
     }
 }
 
-////////////////////////////////////////
-//       ALG_GiocataEnd
-/*!
- */
 void cAlgAdvancedPlayer::ALG_GiocataEnd(I_MatchScore* pScore) {
     if (m_pTracer) {
         if (m_iMyIndex == 0) {
@@ -853,10 +802,6 @@ void cAlgAdvancedPlayer::ALG_GiocataEnd(I_MatchScore* pScore) {
     }
 }
 
-////////////////////////////////////////
-//       ALG_MatchEnd
-/*! match end notification
- */
 void cAlgAdvancedPlayer::ALG_MatchEnd(I_MatchScore* pScore) {
     int iPlWinner = pScore->GetMatchWinner();
     m_pTracer->AddSimpleTrace(m_itrChan, "[TRALG]Match vinto da %d\n",
@@ -867,10 +812,6 @@ void cAlgAdvancedPlayer::ALG_MatchEnd(I_MatchScore* pScore) {
         pScore->GetPointsPlayer(m_iOppIndex));
 }
 
-////////////////////////////////////////
-//       ALG_HaveToRespond
-/*! Algorithm is invited to respond
- */
 void cAlgAdvancedPlayer::ALG_HaveToRespond() {
     m_pTracer->AddSimpleTrace(m_itrChan, "[TRALG] have to respond");
     CardSpec cardUndef;
@@ -1193,11 +1134,6 @@ void cAlgAdvancedPlayer::handleSayAmonte(int curr_mano, int pointsFirstCard,
     }
 }
 
-////////////////////////////////////////
-//       ALG_GicataScoreChange
-/*!
-// \param eGiocataScoreState eNewScore :
-*/
 void cAlgAdvancedPlayer::ALG_GicataScoreChange(eGiocataScoreState eNewScore) {
     m_eScoreCurrent = eNewScore;
     if (m_pTracer) {

@@ -24,10 +24,6 @@ cMatchPoints::cMatchPoints() {
 
 cMatchPoints::~cMatchPoints() {}
 
-////////////////////////////////////////
-//       MatchStart
-/*! A new match is started
- */
 void cMatchPoints::MatchStart(int iNumPlayer) {
     for (int i = 0; i < MAX_NUM_PLAYER; i++) {
         m_vctPlayerPoints[i] = 0;
@@ -39,10 +35,6 @@ void cMatchPoints::MatchStart(int iNumPlayer) {
     m_vctGiocataInfo.clear();
 }
 
-////////////////////////////////////////
-//       GiocataStart
-/*! A new giocata is started
- */
 void cMatchPoints::GiocataStart() {
     CardSpec CardUndef;
     for (int i = 0; i < MAX_NUM_PLAYER; i++) {
@@ -66,12 +58,6 @@ void cMatchPoints::GiocataStart() {
     m_bGameAbandoned = FALSE;
 }
 
-////////////////////////////////////////
-//       PlayerPlay
-/*! Player has played a card
-// \param int iPlayerIx :
-// \param CARDINFO* pCard :
-*/
 void cMatchPoints::PlayerPlay(int iPlayerIx, CARDINFO* pCard) {
     CardSpec Card;
     ASSERT(pCard);
@@ -82,10 +68,6 @@ void cMatchPoints::PlayerPlay(int iPlayerIx, CARDINFO* pCard) {
     m_iNumCardsPlayed++;
 }
 
-////////////////////////////////////////
-//       ManoEnd
-/*! Mano is terminated. Calculate the mano winner and if the mano is patada.
- */
 void cMatchPoints::ManoEnd() {
     ASSERT(m_iNumCardsPlayed == m_iNumPlayers);
     int iManoTerminatedIndex = m_iManoRound;
@@ -166,11 +148,6 @@ void cMatchPoints::ManoEnd() {
     m_iNumCardsPlayed = 0;
 }
 
-////////////////////////////////////////
-//       PlayerVaVia
-/*! Player abandon giocata
-// \param int iPlayerIx :
-*/
 void cMatchPoints::PlayerVaVia(int iPlayerIx) {
     m_eIsGiocataEnd = GES_HAVE_WINNER;
     if (iPlayerIx == PLAYER1) {
@@ -180,10 +157,6 @@ void cMatchPoints::PlayerVaVia(int iPlayerIx) {
     }
 }
 
-////////////////////////////////////////
-//       GiocataEnd
-/*! Giocata is end. Update player score.
- */
 void cMatchPoints::GiocataEnd() {
     if (m_eIsGiocataEnd == GES_HAVE_WINNER) {
         ASSERT(m_iPlayerGiocataWin != NOT_VALID_INDEX);
@@ -213,10 +186,6 @@ void cMatchPoints::GiocataEnd() {
     }
 }
 
-////////////////////////////////////////
-//       IsGiocatEnd
-/*! Return true if the current giocata is end
- */
 BOOL cMatchPoints::IsGiocatEnd() {
     BOOL bRet = FALSE;
 
@@ -227,16 +196,8 @@ BOOL cMatchPoints::IsGiocatEnd() {
     return bRet;
 }
 
-////////////////////////////////////////
-//       AMonte
-/*! Giocata a monte
- */
 void cMatchPoints::AMonte() { m_eIsGiocataEnd = GES_AMONTE; }
 
-////////////////////////////////////////
-//       beginSpecialTurn
-/*! Begin the turn to 8-8
- */
 void cMatchPoints::beginSpecialTurn() {
     m_iScoreGoal = SPECIAL_SCORE_GOAL;
     m_vctPlayerPoints[PLAYER1] = 0;
@@ -244,14 +205,6 @@ void cMatchPoints::beginSpecialTurn() {
     m_bMatchInSpecialScore = TRUE;
 }
 
-////////////////////////////////////////
-//       GetManoInfo
-/*! Provides mano informations inner to giocata
-// \param int iManoNum : mano number to get info
-// \param int* piPlayerIx : player winner index
-// \param BOOL* pbIsPlayed : true if mano is already played
-// \param BOOL* pbIsPata : true if mano is patada
-*/
 void cMatchPoints::GetManoInfo(int iManoNum, int* piPlayerIx, BOOL* pbIsPlayed,
                                BOOL* pbIsPata) {
     ASSERT(pbIsPata);
@@ -267,11 +220,6 @@ void cMatchPoints::GetManoInfo(int iManoNum, int* piPlayerIx, BOOL* pbIsPlayed,
     }
 }
 
-////////////////////////////////////////
-//       GetGiocataInfo
-/*!
-// \param cGiocataInfo* pGiocInfo :
-*/
 void cMatchPoints::GetGiocataInfo(int iNumGiocata, cGiocataInfo* pGiocInfo) {
     ASSERT(pGiocInfo);
     if (iNumGiocata >= 0 && iNumGiocata < (int)m_vctGiocataInfo.size()) {
@@ -279,12 +227,6 @@ void cMatchPoints::GetGiocataInfo(int iNumGiocata, cGiocataInfo* pGiocInfo) {
     }
 }
 
-////////////////////////////////////////
-//       ChangeCurrentScore
-/*! Current giocata score is changed by a player
-// \param eGiocataScoreState eVal : new score
-// \param int iPlayer : player responsible for the change
-*/
 void cMatchPoints::ChangeCurrentScore(eGiocataScoreState eVal, int iPlayer) {
     if (eVal > 0) {
         ASSERT(iPlayer != m_iPlayerChangeScore);
@@ -293,12 +235,6 @@ void cMatchPoints::ChangeCurrentScore(eGiocataScoreState eVal, int iPlayer) {
     m_iPlayerChangeScore = iPlayer;
 }
 
-////////////////////////////////////////
-//       SetTheWinner
-/*! One player abandon the game, we have a winner. The winner index is usualy
-calculated on giocata end.
-// \param int iPlayerIx :
-*/
 void cMatchPoints::SetTheWinner(int iPlayerIx) {
     m_iPlayerMatchWin = iPlayerIx;
     m_bGameAbandoned = TRUE;
