@@ -83,7 +83,7 @@ void cAlgDummyPlayer::ALG_PlayerHasPlayed(int iPlayerIx,
         CardSpec Card;
         CardSpec CardUndef;
         Card.SetCardInfo(*pCard);
-        BOOL bFound = FALSE;
+        bool bFound = FALSE;
         // card successfully played
         for (int i = 0; !bFound && i < NUM_CARDS_HAND; i++) {
             if (Card == m_vct_Cards_CPU[i]) {
@@ -160,7 +160,7 @@ void cAlgDummyPlayer::ALG_ManoEnd(I_MatchScore* pScore) {}
 void cAlgDummyPlayer::ALG_GiocataEnd(I_MatchScore* pScore) {
     if (m_pTracer) {
         if (m_iMyIndex == 0) {
-            BOOL bIsPata = pScore->IsGiocataPatada();
+            bool bIsPata = pScore->IsGiocataPatada();
             if (bIsPata) {
                 // giocata patada
                 m_pTracer->AddSimpleTrace(3, "[TRALG]Giocata patada\n");

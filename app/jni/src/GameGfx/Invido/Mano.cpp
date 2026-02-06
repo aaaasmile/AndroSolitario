@@ -5,7 +5,6 @@
 #include "cMano.h"
 #include "cMatchPoints.h"
 
-
 static const char* stalpzActionName[10] = {
     "MANO_WAITPL_TOPLAY", "MANO_WAIPL_TORESP", "MANO_SAYBUIDA",
     "MANO_AMONTE",        "MANO_VADODENTRO",   "MANO_VADOVIA",
@@ -262,7 +261,7 @@ void cMano::NewMano(int iPlayerIx) {
     }
 }
 
-BOOL cMano::Player_Play(int iPlayerIx, BOOL vadoDentro) {
+bool cMano::Player_Play(int iPlayerIx, bool vadoDentro) {
     // TRACE("Player%d play state %d \n", iPlayerIx, m_eManoState);
     if (m_pTracer->AddNewEntry(1, 3, EntryTraceDetail::TR_INFO, __FILE__,
                                __LINE__))
@@ -346,14 +345,14 @@ BOOL cMano::Player_Play(int iPlayerIx, BOOL vadoDentro) {
     return TRUE;
 }
 
-BOOL cMano::Player_Say(int iPlayerIx, eSayPlayer eSay) {
+bool cMano::Player_Say(int iPlayerIx, eSayPlayer eSay) {
     TRACE("Player%d say %d, state %d \n", iPlayerIx, eSay, m_eManoState);
     if (m_eManoState == MNST_WAIT_NEW_MANO || m_eManoState == MNST_MANO_END) {
         // don't accept calls if the mano is not initialized
         return FALSE;
     }
 
-    BOOL bRes = TRUE;
+    bool bRes = TRUE;
 
     if (eSay == INVIDO || eSay == TRASMAS || eSay == TRASMASNOEF ||
         eSay == FUERAJEUQ || eSay == PARTIDA) {
@@ -376,8 +375,8 @@ BOOL cMano::Player_Say(int iPlayerIx, eSayPlayer eSay) {
     return bRes;
 }
 
-BOOL cMano::isScoreBigClosed(eGiocataScoreState eS1, eGiocataScoreState eS2) {
-    BOOL bRes = FALSE;
+bool cMano::isScoreBigClosed(eGiocataScoreState eS1, eGiocataScoreState eS2) {
+    bool bRes = FALSE;
 
     // eS2 is the smaller score
     eGiocataScoreState eTmp = m_mapScoreScNext[eS2];
@@ -648,8 +647,8 @@ void cMano::removeObsoleteActions() {
     }
 }
 
-BOOL cMano::get_LastPendQuest(cPendQuestion& PendQues) {
-    BOOL bRes = FALSE;
+bool cMano::get_LastPendQuest(cPendQuestion& PendQues) {
+    bool bRes = FALSE;
     size_t iNumEle = m_deqPendQuestion.size();
     if (iNumEle > 0) {
         PendQues = m_deqPendQuestion[iNumEle - 1];
@@ -658,8 +657,8 @@ BOOL cMano::get_LastPendQuest(cPendQuestion& PendQues) {
     return bRes;
 }
 
-BOOL cMano::get_LastPendScoreQuest(cPendQuestion& PendQues) {
-    BOOL bRes = FALSE;
+bool cMano::get_LastPendScoreQuest(cPendQuestion& PendQues) {
+    bool bRes = FALSE;
     size_t iNumEle = m_deqPendQuestion.size();
     int iCurr = 0;
     while (iNumEle - iCurr > 0) {
@@ -698,8 +697,8 @@ void cMano::clearQuestions() {
     m_deqPendQuestion.clear();
 }
 
-BOOL cMano::IsPlayerOnCardPl() {
-    BOOL bRes = FALSE;
+bool cMano::IsPlayerOnCardPl() {
+    bool bRes = FALSE;
     if (m_eManoState == MNST_WAIT_PLAY_PLAYER_1 ||
         m_eManoState == MNST_WAIT_PLAY_PLAYER_2 ||
         m_eManoState == MNST_WAIT_PLAY_PLAYER_3 ||
@@ -796,8 +795,8 @@ void cMano::GetAdmittedCommands(VCT_COMMANDS& vct_Commands, int iPlayerIndex) {
     }
 }
 
-BOOL cMano::nextAvailSayScore(eSayPlayer* peSayAvail) {
-    BOOL bRet = TRUE;
+bool cMano::nextAvailSayScore(eSayPlayer* peSayAvail) {
+    bool bRet = TRUE;
     ASSERT(peSayAvail);
     eSayPlayer eTmp = AMONTE;
 
@@ -839,8 +838,8 @@ BOOL cMano::nextAvailSayScore(eSayPlayer* peSayAvail) {
     return bRet;
 }
 
-BOOL cMano::isGiocataAMonte() {
-    BOOL bRet = FALSE;
+bool cMano::isGiocataAMonte() {
+    bool bRet = FALSE;
     cMatchPoints* pMatchPoints = m_pInvidoCore->GetMatchPointsObj();
     ASSERT(pMatchPoints);
     eGiocataScoreState eCurrScore = pMatchPoints->GetCurrScore();

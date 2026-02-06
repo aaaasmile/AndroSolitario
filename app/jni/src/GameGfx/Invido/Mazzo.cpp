@@ -68,7 +68,7 @@ bool cMazzo::Shuffle() {
     return true;
 }
 
-long cMazzo::PickNextCard(BOOL* pbEnd) {
+long cMazzo::PickNextCard(bool* pbEnd) {
     long lResult = NOT_VALID_INDEX;
     if (m_lNextCard >= (long)m_vctCards.size()) {
         *pbEnd = FALSE;
@@ -82,11 +82,11 @@ long cMazzo::PickNextCard(BOOL* pbEnd) {
     return lResult;
 }
 
-BOOL cMazzo::PickNextCard(CardSpec* pRes) {
+bool cMazzo::PickNextCard(CardSpec* pRes) {
     ASSERT(pRes);
 
     pRes->Reset();
-    BOOL bValid = FALSE;
+    bool bValid = FALSE;
 
     if (m_lNextCard < (long)m_vctCards.size()) {
         bValid = TRUE;
@@ -126,7 +126,7 @@ bool cMazzo::IsMoreCards() {
     return bRet;
 }
 
-long cMazzo::GetIndexNextCard(BOOL* pbEnd) {
+long cMazzo::GetIndexNextCard(bool* pbEnd) {
     long lResult = NOT_VALID_INDEX;
     if (m_lNextCard >= NUM_CARDS) {
         *pbEnd = FALSE;

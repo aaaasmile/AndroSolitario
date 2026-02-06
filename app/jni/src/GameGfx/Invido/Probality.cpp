@@ -91,12 +91,6 @@ double cProbality::Fattorial(long lN) {
     return dResult;
 }
 
-////////////////////////////////////////
-//       <<
-/*! Dump dello sviluppo in stream
-// \param std::ostream &stream : output stream
-// \param const MTX_HANDCOMBI &o :
-*/
 std::ostream& operator<<(std::ostream& stream, const MTX_HANDCOMBI& o) {
     long lCount = 0;
     size_t iNumEle = o.size();

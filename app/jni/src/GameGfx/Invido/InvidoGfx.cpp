@@ -20,7 +20,6 @@
 #include "gfx_util.h"
 #include "win_type_global.h"
 
-
 #define FPS (1000 / 30)
 
 static const char* lpszImageDir = "data/images/";
@@ -492,7 +491,7 @@ void cInvidoGfx::animateBeginGiocata() {
     int yspeed = 0;
     int xspeed = 0;
     int GRAVITY = 1;
-    BOOL bEnd = FALSE;
+    bool bEnd = FALSE;
     do {
         // clear screen
         SDL_BlitSurface(m_pScene_background, NULL, m_pScreen, NULL);
@@ -601,8 +600,8 @@ void cInvidoGfx::animateManoEnd(int iPlayerIx) {
 
     SDL_BlitSurface(m_pScreen, NULL, pCurrentDisplay, NULL);
 
-    BOOL bEnd = FALSE;
-    BOOL bPhase1_X = FALSE;
+    bool bEnd = FALSE;
+    bool bPhase1_X = FALSE;
     int loopCount = 0;
     SDL_Texture* pTextureAlphaDisplay =
         SDL_CreateTextureFromSurface(m_psdlRenderer, m_pAlphaDisplay);
@@ -680,12 +679,12 @@ void cInvidoGfx::animateManoEnd(int iPlayerIx) {
     SDL_FreeSurface(pCurrentDisplay);
 }
 
-void cInvidoGfx::animGiocataEnd(int iPlayerIx, BOOL bIsPata) {
+void cInvidoGfx::animGiocataEnd(int iPlayerIx, bool bIsPata) {
     int iTickTot = 0;
     int iTickFlashDiff = 0;
     SDL_Rect destWIN;
     SDL_Rect destLOS;
-    BOOL bFlash = TRUE;
+    bool bFlash = TRUE;
     int iCooYA = m_pScreen->h - 30;
     ;
     int iCooYB = 20;
@@ -1330,7 +1329,7 @@ void cInvidoGfx::showPointsPlayer(int iPlayerIx, VCT_INT& vct_Points) {
     }
 }
 
-void cInvidoGfx::showManoScore(BOOL bIsPlayed, int iPlayerIx, BOOL bIsPata,
+void cInvidoGfx::showManoScore(bool bIsPlayed, int iPlayerIx, bool bIsPata,
                                int iManoNum) {
     SDL_Rect dest;
     SDL_Rect destOff;
@@ -1403,8 +1402,8 @@ void cInvidoGfx::guiPlayerTurn(int iPlayer) {
 void cInvidoGfx::showCurrentScore() {
     // mano score
     for (int iManoNum = 0; iManoNum < NUM_CARDS_HAND; iManoNum++) {
-        BOOL bIsPata;
-        BOOL bIsPlayed;
+        bool bIsPata;
+        bool bIsPlayed;
         int iPlayerIx;
         m_pMatchPoints->GetManoInfo(iManoNum, &iPlayerIx, &bIsPlayed, &bIsPata);
         showManoScore(bIsPlayed, iPlayerIx, bIsPata, iManoNum);
@@ -1651,8 +1650,8 @@ void cInvidoGfx::ALG_PlayerHasVadoDentro(int iPlayerIx) {
     }
 }
 
-void cInvidoGfx::opponentHasPlayedCard(CardSpec& Card, BOOL vadoDentro) {
-    BOOL bFound = FALSE;
+void cInvidoGfx::opponentHasPlayedCard(CardSpec& Card, bool vadoDentro) {
+    bool bFound = FALSE;
     for (int iIndex = 0; !bFound && iIndex < NUM_CARDS_HAND; iIndex++) {
         if (m_aOpponentCards[iIndex].State == cCardGfx::CSW_ST_BACK) {
             if (vadoDentro) {
@@ -1810,7 +1809,7 @@ void cInvidoGfx::ALG_ManoEnd(I_MatchScore* pScore) {
 void cInvidoGfx::ALG_GiocataEnd(I_MatchScore* pScore) {
     int iPlayerIx = pScore->GetGiocataWinner();
 
-    BOOL bIsPata = pScore->IsGiocataPatada();
+    bool bIsPata = pScore->IsGiocataPatada();
     STRING strMsgFinGiocata;
     if (bIsPata) {
         // giocata patada

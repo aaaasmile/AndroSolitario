@@ -108,7 +108,7 @@ int cPlayersOnTable::CalcDistance(int iPlayerRef, int iPlayerTmp) {
     ASSERT(iPlayerTmp >= 0 && iPlayerTmp < m_lNumPlayers);
     ASSERT(iPlayerRef >= 0 && iPlayerRef < m_lNumPlayers);
 
-    BOOL bFound = FALSE;
+    bool bFound = FALSE;
     while (!bFound && iDist < m_lNumPlayers) {
         if (aTableIx[iTmp] == iPlayerTmp) {
             bFound = TRUE;
@@ -137,8 +137,8 @@ void cPlayersOnTable::CalcCircleIndex(int* paPlayerDeck) {
     }
 }
 
-BOOL cPlayersOnTable::IsLevelPython() {
-    BOOL bRes = FALSE;
+bool cPlayersOnTable::IsLevelPython() {
+    bool bRes = FALSE;
 
     for (int i = 0; i < m_lNumPlayers; i++) {
         eGameLevel eLevel = m_vctPlayers[i].GetLevel();

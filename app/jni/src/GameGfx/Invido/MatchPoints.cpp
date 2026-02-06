@@ -7,7 +7,6 @@
 #include "cMano.h"
 #include "cMatchPoints.h"
 
-
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -186,8 +185,8 @@ void cMatchPoints::GiocataEnd() {
     }
 }
 
-BOOL cMatchPoints::IsGiocatEnd() {
-    BOOL bRet = FALSE;
+bool cMatchPoints::IsGiocatEnd() {
+    bool bRet = FALSE;
 
     if (m_eIsGiocataEnd == GES_AMONTE || m_eIsGiocataEnd == GES_PATADA ||
         m_eIsGiocataEnd == GES_HAVE_WINNER) {
@@ -205,8 +204,8 @@ void cMatchPoints::beginSpecialTurn() {
     m_bMatchInSpecialScore = TRUE;
 }
 
-void cMatchPoints::GetManoInfo(int iManoNum, int* piPlayerIx, BOOL* pbIsPlayed,
-                               BOOL* pbIsPata) {
+void cMatchPoints::GetManoInfo(int iManoNum, int* piPlayerIx, bool* pbIsPlayed,
+                               bool* pbIsPata) {
     ASSERT(pbIsPata);
     ASSERT(pbIsPlayed);
     ASSERT(piPlayerIx);

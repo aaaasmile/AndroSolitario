@@ -4,7 +4,6 @@
 #include "cInvidoCore.h"
 #include "cMazzo.h"
 
-
 ////////////////////////////////////////////////////////////////
 // **********************   CINVIDOCORE CLASS *****************
 ////////////////////////////////////////////////////////////////
@@ -59,7 +58,7 @@ void cInvidoCore::Create(cPlayer* pHmiPlayer, int iNumPlayers) {
     m_MatchPoints.SetManoObj(&m_Mano);
 }
 
-BOOL cInvidoCore::WhoWonsTheGame(cPlayer** ppPlayer) {
+bool cInvidoCore::WhoWonsTheGame(cPlayer** ppPlayer) {
     ASSERT(ppPlayer);
     ASSERT(0);
 
@@ -123,7 +122,7 @@ void cInvidoCore::NewMatch() {
     m_MatchPoints.MatchStart(m_lNumPlayers);
 }
 
-BOOL cInvidoCore::GetPlayerInPlaying(cPlayer** ppPlayer) {
+bool cInvidoCore::GetPlayerInPlaying(cPlayer** ppPlayer) {
     ASSERT(ppPlayer);
 
     *ppPlayer = m_pPlHaveToPlay;
@@ -164,8 +163,8 @@ void cInvidoCore::resetCardInfoPlayers() {
     }
 }
 
-BOOL cInvidoCore::resetCard(int iPlayerIx, CARDINFO* pCardInfo) {
-    BOOL bRet = FALSE;
+bool cInvidoCore::resetCard(int iPlayerIx, CARDINFO* pCardInfo) {
+    bool bRet = FALSE;
     ASSERT(pCardInfo);
     ASSERT(iPlayerIx >= 0 && iPlayerIx < MAX_NUM_PLAYER);
 
@@ -372,13 +371,13 @@ CardSpec* cInvidoCore::checkValidCardPlayed(int iPlayerIx,
     return pCardplayed;
 }
 
-BOOL cInvidoCore::Player_vaDentro(int iPlayerIx, const CARDINFO* pCardInfo) {
+bool cInvidoCore::Player_vaDentro(int iPlayerIx, const CARDINFO* pCardInfo) {
     CardSpec* pCardplayed = checkValidCardPlayed(iPlayerIx, pCardInfo);
     if (pCardplayed == NULL) {
         return FALSE;
     }
 
-    BOOL bRes = FALSE;
+    bool bRes = FALSE;
     // change mano state
     if (m_Mano.Player_Play(iPlayerIx, TRUE)) {
         // next player is on game
@@ -409,13 +408,13 @@ BOOL cInvidoCore::Player_vaDentro(int iPlayerIx, const CARDINFO* pCardInfo) {
     return bRes;
 }
 
-BOOL cInvidoCore::Player_playCard(int iPlayerIx, const CARDINFO* pCardInfo) {
+bool cInvidoCore::Player_playCard(int iPlayerIx, const CARDINFO* pCardInfo) {
     CardSpec* pCardplayed = checkValidCardPlayed(iPlayerIx, pCardInfo);
     if (pCardplayed == NULL) {
         return FALSE;
     }
 
-    BOOL bRes = FALSE;
+    bool bRes = FALSE;
     // change mano state
     if (m_Mano.Player_Play(iPlayerIx, FALSE)) {
         // next player is on game
@@ -441,8 +440,8 @@ BOOL cInvidoCore::Player_playCard(int iPlayerIx, const CARDINFO* pCardInfo) {
     return bRes;
 }
 
-BOOL cInvidoCore::Player_saySomething(int iPlayerIx, eSayPlayer eSay) {
-    BOOL bRes = FALSE;
+bool cInvidoCore::Player_saySomething(int iPlayerIx, eSayPlayer eSay) {
+    bool bRes = FALSE;
     if (m_Mano.Player_Say(iPlayerIx, eSay)) {
         //  what he said is acceptable on the game
         for (int i = 0; i < m_lNumPlayers; i++) {

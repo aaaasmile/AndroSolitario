@@ -7,11 +7,6 @@
 #include "cProbality.h"
 #include "win_type_global.h"
 
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 // random value between [0,x)
 #define CASO(x) (x * rand()) / RAND_MAX
 
@@ -147,7 +142,7 @@ void cAlgAdvancedPlayer::ALG_PlayerHasPlayed(int iPlayerIx,
         CardSpec Card;
         CardSpec CardUndef;
         Card.SetCardInfo(*pCard);
-        BOOL bFound = FALSE;
+        bool bFound = FALSE;
         // card successfully played
         for (i = 0; !bFound && i < NUM_CARDS_HAND; i++) {
             if (Card == m_vct_Cards_CPU[i]) {
@@ -198,10 +193,10 @@ void cAlgAdvancedPlayer::ALG_PlayerHasSaid(int iPlayerIx, eSayPlayer eSay) {
     }
 }
 
-BOOL cAlgAdvancedPlayer::Cagna(int lastNumChiamate) {
+bool cAlgAdvancedPlayer::Cagna(int lastNumChiamate) {
     VCT_COMMANDS vct_cmd;
     ASSERT(m_pCoreGame);
-    BOOL res = FALSE;
+    bool res = FALSE;
     m_pCoreGame->GetAdmittedCommands(vct_cmd, m_iMyIndex);
     size_t iNumCmds = vct_cmd.size();
     if (iNumCmds > 0) {
@@ -219,7 +214,7 @@ BOOL cAlgAdvancedPlayer::Cagna(int lastNumChiamate) {
     return res;
 }
 
-BOOL cAlgAdvancedPlayer::ChiamaAMonte(int lastNumChiamate) {
+bool cAlgAdvancedPlayer::ChiamaAMonte(int lastNumChiamate) {
     m_iNumChiamateMonte += 1;
     if (m_iNumChiamateMonte < 4) {
         Chiama(AMONTE, lastNumChiamate);
@@ -234,7 +229,7 @@ void cAlgAdvancedPlayer::Chiama(eSayPlayer eSay, int lastChiamataNum) {
     m_pCoreGame->Player_saySomething(m_iMyIndex, eSay);
 }
 
-BOOL cAlgAdvancedPlayer::ChiamaDiPiu(int lastNumChiamate) {
+bool cAlgAdvancedPlayer::ChiamaDiPiu(int lastNumChiamate) {
     VCT_COMMANDS vct_cmd;
     ASSERT(m_pCoreGame);
 
@@ -742,7 +737,7 @@ void cAlgAdvancedPlayer::PlayAsSecond() {
     }
 }
 
-BOOL cAlgAdvancedPlayer::IsPlayerFirst() {
+bool cAlgAdvancedPlayer::IsPlayerFirst() {
     return m_vct_Cards_played[m_ixCurrMano].size() == 0 ? TRUE : FALSE;
 }
 
@@ -778,7 +773,7 @@ void cAlgAdvancedPlayer::ALG_ManoEnd(I_MatchScore* pScore) {
 void cAlgAdvancedPlayer::ALG_GiocataEnd(I_MatchScore* pScore) {
     if (m_pTracer) {
         if (m_iMyIndex == 0) {
-            BOOL bIsPata = pScore->IsGiocataPatada();
+            bool bIsPata = pScore->IsGiocataPatada();
             if (bIsPata) {
                 // giocata patada
                 m_pTracer->AddSimpleTrace(m_itrChan, "[TRALG]Giocata patada\n");
