@@ -1,5 +1,3 @@
-// CardSpec.h
-
 #ifndef ___CARDSPEC_H_
 #define ___CARDSPEC_H_
 

@@ -1,7 +1,3 @@
-
-
-// Mano.h
-
 #ifndef ____CMANO_H
 #define ____CMANO_H
 
@@ -77,12 +73,6 @@ typedef std::deque<ActionItem> DEQ_ACTIONITEM;
 
 class PlayersOnTable;
 class TraceService;
-/////////////////////////////////////////////////////////////////////////////////////
-//   *******************  CMANO CLASS ***************************************
-/////////////////////////////////////////////////////////////////////////////////////
-/**
-Class Mano to manage when 2 players play a card
-*/
 class Mano {
    public:
     Mano();

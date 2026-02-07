@@ -1,7 +1,3 @@
-
-
-// Partita.h
-
 #ifndef __CPARTITA_H__
 #define __CPARTITA_H__
 

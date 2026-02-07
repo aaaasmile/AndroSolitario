@@ -1,5 +1,3 @@
-// Partita.cpp
-
 #include "Partita.h"
 
 #include "Giocata.h"

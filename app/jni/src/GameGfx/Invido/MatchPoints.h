@@ -1,16 +1,5 @@
-
-
-// MatchPoints.h: interface for the MatchPoints class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#if !defined( \
-    AFX_CMATCHPOINTS_H__A8E0031A_CF94_4322_9E51_9C761FDDDC7C__INCLUDED_)
-#define AFX_CMATCHPOINTS_H__A8E0031A_CF94_4322_9E51_9C761FDDDC7C__INCLUDED_
-
-#if _MSC_VER > 1000
-#pragma once
-#endif  // _MSC_VER > 1000
+#ifndef __MATCHPOINTS_H
+#define __MATCHPOINTS_H
 
 #include <deque>
 

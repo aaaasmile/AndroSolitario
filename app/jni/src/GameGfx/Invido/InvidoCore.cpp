@@ -1,5 +1,3 @@
-// InvidoCoreEngine.cpp
-
 #include "InvidoCore.h"
 
 #include "Mazzo.h"

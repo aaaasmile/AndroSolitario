@@ -1,13 +1,8 @@
-
-
-// Mazzo.h
-
 #ifndef __CMAZZO_H
 #define __CMAZZO_H
 
 #include "CardSpec.h"
 #include "InvidoCoreEnv.h"
-#include "win_type_global.h"
 
 class InvidoCore;
 

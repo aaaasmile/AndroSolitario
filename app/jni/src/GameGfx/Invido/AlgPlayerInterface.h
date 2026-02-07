@@ -4,9 +4,7 @@
 #define ___ALGPLAYER_H_
 
 #include "InvidoInfoComm.h"
-/**Interface implemented by core game engine. This set of function are available
-// to player algorithm to communicate with the core engine
-*/
+
 class I_CORE_Game {
    public:
     I_CORE_Game() {}
@@ -19,8 +17,7 @@ class I_CORE_Game {
     virtual void GetMoreCommands(VCT_COMMANDS& vct_Commands,
                                  int iPlayerIndex) = 0;
 };
-/** Interface to access information about the current match score.
- */
+
 class I_MatchScore {
    public:
     I_MatchScore() {}
@@ -66,15 +63,6 @@ class I_ALG_Player {
     virtual void ALG_HaveToRespond() = 0;
     virtual void ALG_GicataScoreChange(eGiocataScoreState eNewScore) = 0;
     virtual void ALG_PlayerSaidWrong(int iPlayerIx) = 0;
-};
-
-// Interface tracer
-class I_GuiTracer {
-   public:
-    I_GuiTracer() {}
-    virtual void TraceData(const BYTE* pbyData, int nDataLen,
-                           char* pTextComment) = 0;
-    virtual void Trace(const char* szFmt, ...) = 0;
 };
 
 #endif

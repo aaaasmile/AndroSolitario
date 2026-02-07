@@ -1,16 +1,9 @@
-
-
-// Giocata.cpp
-
 #include "Giocata.h"
 
 #include "InvidoCore.h"
 #include "Mano.h"
 #include "MatchPoints.h"
 
-/////////////////////////////////////////////////////////////////////////////////////
-//   *******************  CGIOCATA CLASS ***************************************
-/////////////////////////////////////////////////////////////////////////////////////
 Giocata::Giocata() {
     m_pInvidoCore = NULL;
     m_pPartita = NULL;

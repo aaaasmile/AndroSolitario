@@ -1,18 +1,11 @@
-// AlgAdvancedPlayer.h: interface for the AlgAdvancedPlayer class.
-#if !defined( \
-    AFX_AlgAdvancedPlayer_H__C00C987D_219F_4552_893D_1A67CCACCC8D__INCLUDED_)
-#define AFX_AlgAdvancedPlayer_H__C00C987D_219F_4552_893D_1A67CCACCC8D__INCLUDED_
-
-#if _MSC_VER > 1000
-#pragma once
-#endif  // _MSC_VER > 1000
+#ifndef _ALG_PLAYER_H__
+#define _ALG_PLAYER_H__
 
 #include <functional>
 
 #include "AlgPlayerInterface.h"
 #include "CardSpec.h"
 #include "InvidoCoreEnv.h"
-
 
 class TraceService;
 class cmpHandValue : public std::unary_function<cmpHandValue, bool> {
@@ -104,4 +97,4 @@ class AlgAdvancedPlayer : public I_ALG_Player {
     int m_ixCurrMano;
 };
 
-#endif  // !defined(AFX_AlgAdvancedPlayer_H__C00C987D_219F_4552_893D_1A67CCACCC8D__INCLUDED_)
+#endif

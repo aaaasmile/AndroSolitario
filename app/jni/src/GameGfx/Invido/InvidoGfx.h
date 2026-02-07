@@ -1,7 +1,3 @@
-
-
-// InvidoGfx.h
-
 #ifndef __CINVIDO_GFX_H
 #define __CINVIDO_GFX_H
 

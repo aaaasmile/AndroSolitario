@@ -1,5 +1,3 @@
-// Player.cpp
-
 #include "Player.h"
 
 #include "AlgAdvancedPlayer.h"

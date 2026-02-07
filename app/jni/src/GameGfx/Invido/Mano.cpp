@@ -1,5 +1,3 @@
-// Mano.cpp
-
 #include "Mano.h"
 
 #include "InvidoCore.h"

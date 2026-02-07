@@ -1,7 +1,3 @@
-
-
-// Player.h
-
 #ifndef __CPLAYER_H__
 #define __CPLAYER_H__
 

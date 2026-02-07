@@ -1,8 +1,4 @@
-// Mazzo.cpp
-
 #include "Mazzo.h"
-
-#include <win_type_global.h>
 
 #include "InvidoCore.h"
 #include "InvidoSettings.h"

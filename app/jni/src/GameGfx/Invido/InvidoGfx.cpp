@@ -1,6 +1,3 @@
-// InvidoGfx.cpp
-#pragma warning(disable : 4786)
-
 #include "InvidoGfx.h"
 
 #include <SDL_endian.h>
@@ -19,7 +16,6 @@
 #include "PopUpMenuGfx.h"
 #include "TipoDiMazzo.h"
 #include "gfx_util.h"
-#include "win_type_global.h"
 
 #define FPS (1000 / 30)
 

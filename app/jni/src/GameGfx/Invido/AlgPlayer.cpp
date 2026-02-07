@@ -1,12 +1,11 @@
 
 
-#include "AlgAdvancedPlayer.h"
+#include "AlgPlayer.h"
 
 #include <map>
 
 #include "Probality.h"
 #include "TraceService.h"
-#include "win_type_global.h"
 
 // random value between [0,x)
 #define CASO(x) (x * rand()) / RAND_MAX
