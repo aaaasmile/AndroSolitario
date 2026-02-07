@@ -3,8 +3,8 @@
 ; Non-commercial use only
 
 #define MyAppName "Solitario"
-#define MyAppVersion "3.0.8"
-#define MySetupVersion "3_0_8"
+#define MyAppVersion "3.0.13"
+#define MySetupVersion "3_0_13"
 #define MyAppPublisher "Igorrun"
 #define MyAppURL "https://www.invido.it/"
 #define MyAppExeName "solitario.exe"
