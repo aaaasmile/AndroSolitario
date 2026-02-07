@@ -1,8 +1,8 @@
 #ifndef ___CARDSPEC_H_
 #define ___CARDSPEC_H_
 
+#include "CardGfx.h"
 #include "Config.h"
-#include "InvidoCoreEnv.h"
 
 typedef struct _CardInfo {
     unsigned char byIndex;

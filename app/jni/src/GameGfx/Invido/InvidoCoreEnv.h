@@ -94,8 +94,6 @@ enum eScriptNotification {
     SCR_NFY_NEWMATCH = 7
 };
 
-enum eSUIT { BASTONI = 0, COPPE = 1, DENARI = 2, SPADE = 3, UNDEF = 4 };
-
 enum eSayPlayer {
     AMONTE = 0,
     INVIDO = 1,

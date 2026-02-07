@@ -1,7 +1,3 @@
-
-
-// Giocata.h
-
 #ifndef ___CGIOCATA____H
 #define ___CGIOCATA____H
 

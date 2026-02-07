@@ -14,10 +14,7 @@ InvidoCore::InvidoCore() {
 InvidoCore::~InvidoCore() { delete m_pMyMazzo; }
 
 void InvidoCore::Create(Player* pHmiPlayer, int iNumPlayers) {
-    m_pTracer = TraceService::Instance();
-    // TRACE_DEBUG("InvidoCore is created\n");
-    m_pTracer->AddSimpleTrace(2, "InvidoCore is created");
-
+    TRACE_DEBUG("InvidoCore is created\n");
     m_pMyMazzo = new Mazzo();
     m_pMyMazzo->SetCoreEngine(this);
     m_pMyMazzo->Create();
@@ -362,7 +359,7 @@ bool InvidoCore::Player_vaDentro(int iPlayerIx, const CARDINFO* pCardInfo) {
 
     bool bRes = false;
     // change mano state
-    if (m_Mano.Player_Play(iPlayerIx, TRUE)) {
+    if (m_Mano.Player_Play(iPlayerIx, true)) {
         // next player is on game
         m_pPlHaveToPlay =
             m_PlayersOnTable.GetPlayerToPlay(PlayersOnTable::SWITCH_TO_NEXT);
@@ -371,8 +368,7 @@ bool InvidoCore::Player_vaDentro(int iPlayerIx, const CARDINFO* pCardInfo) {
         int ixCardVaDentro = 3;
         CARDINFO cardVadodentro;  // quattro di bastoni, carta sempre perdente
         cardVadodentro.byIndex = ixCardVaDentro;
-        strncpy(cardVadodentro.CardName, g_CardsNameX[ixCardVaDentro].c_str(),
-                NUM_BYTE_NAME);
+        cardVadodentro.CardName = g_CardsNameX[ixCardVaDentro];
         cardVadodentro.eSuit = BASTONI;
 
         m_MatchPoints.PlayerPlay(iPlayerIx, &cardVadodentro);
@@ -391,6 +387,8 @@ bool InvidoCore::Player_vaDentro(int iPlayerIx, const CARDINFO* pCardInfo) {
     return bRes;
 }
 
+void InvidoCore::SetRandomSeed(int iVal) { m_pMyMazzo->SetRandomSeed(iVal); }
+
 bool InvidoCore::Player_playCard(int iPlayerIx, const CARDINFO* pCardInfo) {
     CardSpec* pCardplayed = checkValidCardPlayed(iPlayerIx, pCardInfo);
     if (pCardplayed == NULL) {
@@ -399,7 +397,7 @@ bool InvidoCore::Player_playCard(int iPlayerIx, const CARDINFO* pCardInfo) {
 
     bool bRes = false;
     // change mano state
-    if (m_Mano.Player_Play(iPlayerIx, FALSE)) {
+    if (m_Mano.Player_Play(iPlayerIx, false)) {
         // next player is on game
         m_pPlHaveToPlay =
             m_PlayersOnTable.GetPlayerToPlay(PlayersOnTable::SWITCH_TO_NEXT);

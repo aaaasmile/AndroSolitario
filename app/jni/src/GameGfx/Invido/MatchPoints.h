@@ -1,12 +1,11 @@
 #ifndef __MATCHPOINTS_H
 #define __MATCHPOINTS_H
 
-#include <deque>
+#include <SDL3/SDL.h>
 
+#include "AlgPlayerInterface.h"
 #include "CardSpec.h"
 #include "InvidoCoreEnv.h"
-#include "InvidoInfoComm.h"
-#include "win_type_global.h"
 
 class Mano;
 class ManoInfo {
@@ -36,16 +35,14 @@ class GiocataInfo {
 };
 
 typedef std::vector<GiocataInfo> VCT_GIOCATAINFO;
-// information about played card
+
 class CardPlayed {
    public:
     CardPlayed() {}
     CardSpec cardSpec;
     int playerIx;
 };
-/** class that provides match points informations. All informations are about
- * the current match
- */
+
 class MatchPoints : public I_MatchScore {
     enum eGiocataEndState {
         GES_ON_GOING,
@@ -132,4 +129,4 @@ class MatchPoints : public I_MatchScore {
     bool _isGameAbandoned;
 };
 
-#endif  // !defined(AFX_CMATCHPOINTS_H__A8E0031A_CF94_4322_9E51_9C761FDDDC7C__INCLUDED_)
+#endif

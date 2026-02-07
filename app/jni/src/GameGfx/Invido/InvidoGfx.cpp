@@ -1,7 +1,7 @@
 #include "InvidoGfx.h"
 
-#include <SDL_endian.h>
-#include <SDL_image.h>
+#include <SDL3/SDL_endian.h>
+#include <SDL3_image/SDL_image.h>
 #include <stdio.h>
 #include <time.h>
 
@@ -17,36 +17,39 @@
 #include "TipoDiMazzo.h"
 #include "gfx_util.h"
 
-#define FPS (1000 / 30)
-
-static const char* lpszImageDir = "data/images/";
+static const char* lpszImageDir = DATA_PREFIX "images/invido/";
 static const char* lpszImageBack = "im000740.jpg";
-static const char* lpszMazziDir = "data/mazzi/";
-static const char* lpszFontConsoleImg = "data/images/ConsoleFont.png";
 static const char* lpszaImage_filenames[InvidoGfx::NUM_ANIMAGES] = {
-    "data/images/tocca.png",        "data/images/LedOff.bmp",
-    "data/images/LedOn.bmp",        "data/images/canela.bmp",
-    "data/images/uovo.bmp",         "data/images/vertical.png",
-    "data/images/cornerdl.png",     "data/images/cornerdr.png",
-    "data/images/cornerul.png",     "data/images/cornerur.png",
-    "data/images/horizontal.png",   "data/images/LedOnBlue.bmp",
-    "data/images/LedOnRed.bmp",     "data/images/canela_obl.bmp",
-    "data/images/balloon_body.pcx", "data/images/balloon_up.pcx"};
+    DATA_PREFIX "images/invido/tocca.png",
+    DATA_PREFIX "images/invido/LedOff.bmp",
+    DATA_PREFIX "images/invido/LedOn.bmp",
+    DATA_PREFIX "images/invido/canela.bmp",
+    DATA_PREFIX "images/invido/uovo.bmp",
+    DATA_PREFIX "images/invido/vertical.png",
+    DATA_PREFIX "images/invido/cornerdl.png",
+    DATA_PREFIX "images/invido/cornerdr.png",
+    DATA_PREFIX "images/invido/cornerul.png",
+    DATA_PREFIX "images/invido/cornerur.png",
+    DATA_PREFIX "images/invido/horizontal.png",
+    DATA_PREFIX "images/invido/LedOnBlue.bmp",
+    DATA_PREFIX "images/invido/LedOnRed.bmp",
+    DATA_PREFIX "images/invido/canela_obl.bmp",
+    DATA_PREFIX "images/invido/balloon_body.pcx",
+    DATA_PREFIX "images/invido/balloon_up.pcx"};
 
 static const char* lpszCST_INFO = "[INFO]";
 static const char* lpszCST_SCORE = "[SCORE]";
 static const char* lpszCST_SU = "[SU]";
 
-// invido core
-InvidoCore* g_pInvidoCore;
+// InvidoCore* g_pInvidoCore;
 
-static InvidoGfx* g_stacInvidoGfx = 0;
+// static InvidoGfx* g_stacInvidoGfx = 0;
 
-void fnEffectTer(int iCh) {
-    // do something
-    SDL_assert(g_stacInvidoGfx);
-    g_stacInvidoGfx->NtfyTermEff(iCh);
-}
+// void fnEffectTer(int iCh) {
+//     // do something
+//     SDL_assert(g_stacInvidoGfx);
+//     g_stacInvidoGfx->NtfyTermEff(iCh);
+// }
 
 InvidoGfx::InvidoGfx(AppGfx* pApp) {
     _p_Scene_background = 0;
@@ -74,15 +77,11 @@ InvidoGfx::InvidoGfx(AppGfx* pApp) {
     }
     _p_LangMgr = 0;
     _p_MusicMgr = 0;
-    g_stacInvidoGfx = this;
+    // g_stacInvidoGfx = this;
     _isMatchTerminated = false;
     _p_AlphaDisplay = 0;
 }
 
-////////////////////////////////////////
-//       ~InvidoGfx
-/*! Destructor
- */
 InvidoGfx::~InvidoGfx() { cleanup(); }
 
 void InvidoGfx::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRender,
@@ -193,7 +192,7 @@ void InvidoGfx::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRender,
 
     m_pDeckType = new TipoDiMazzo;
     m_pDeckType->SetTypeIndex(g_Options.All.iTipoMazzo);
-    // init deck with all  images of the cards
+
     initDeck();
 
     std::string strFileName;

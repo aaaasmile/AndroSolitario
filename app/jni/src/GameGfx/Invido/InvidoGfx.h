@@ -44,9 +44,7 @@ typedef std::map<eGiocataScoreState, STRING> MAP_SCORE;
 typedef std::map<eSayPlayer, STRING> MAP_SAY;
 typedef std::map<eSayPlayer, int> MAP_INTID;
 typedef std::vector<int> VCT_INT;
-/**
-// class to handle the invido game grafic during the match.
-*/
+
 class InvidoGfx : public I_ALG_Player {
    public:
     enum {
@@ -178,7 +176,6 @@ class InvidoGfx : public I_ALG_Player {
     MatchPoints* _p_MatchPoints;
     bool _isPlayerCanPlay;
     int _playerThatHaveMarkup;
-    DelayNextAction _DelayAction;
     ButtonGfx* _p_btArrayCmd[NUMOFBUTTON];
     eSayPlayer _CmdDet[NUMOFBUTTON];
     BalloonGfx* _p_balGfx;
@@ -187,4 +184,4 @@ class InvidoGfx : public I_ALG_Player {
     bool _isMatchTerminated;
 };
 
-#endif  // CGAME_H
+#endif

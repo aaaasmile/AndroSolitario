@@ -10,11 +10,10 @@
 #include "Mano.h"
 #include "MatchPoints.h"
 #include "Partita.h"
+#include "PlayerStatistic.h"
 #include "PlayersOnTable.h"
-#include "Probality.h"
 
 class Mazzo;
-class TraceService;
 
 class InvidoCore : public I_CORE_Game {
    public:
@@ -51,19 +50,15 @@ class InvidoCore : public I_CORE_Game {
     void Player_VaVia(int iPlayerIx);
     void Giocata_AMonte();
 
-    // functions called from Giocata
     void Giocata_End();
     void Giocata_Start(long lPlayerIx);
 
-    // function called from Partita
     void Partita_End();
 
-    // functions called from HMI
     void NewMatch();
     void NextAction();
-    void SetRandomSeed(int iVal) { m_pMyMazzo->SetRandomSeed(iVal); }
+    void SetRandomSeed(int iVal);
 
-    // I_CORE_Game: functions called from algorithm
     bool Player_saySomething(int iPlayerIx, eSayPlayer eSay);
     bool Player_playCard(int iPlayerIx, const CARDINFO* pCardInfo);
     bool Player_vaDentro(int iPlayerIx, const CARDINFO* pCardInfo);
@@ -93,7 +88,6 @@ class InvidoCore : public I_CORE_Game {
     I_ALG_Player* m_vctAlgPlayer[MAX_NUM_PLAYER];
     MatchPoints m_MatchPoints;
     CardSpec m_aCardInfo[NUM_CARDS_HAND * MAX_NUM_PLAYER];
-    TraceService* m_pTracer;
 };
 
 #endif

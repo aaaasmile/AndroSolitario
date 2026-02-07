@@ -1,9 +1,10 @@
 #ifndef __CPLAYER_H__
 #define __CPLAYER_H__
 
-#include "CardSpec.h"
+#include <iostream>
+
+#include "AlgPlayerInterface.h"
 #include "InvidoCoreEnv.h"
-#include "PlayerStatistic.h"
 
 enum eCARDINDEX { CIX_0 = 0, CIX_1 = 1, CIX_2 = 2 };
 

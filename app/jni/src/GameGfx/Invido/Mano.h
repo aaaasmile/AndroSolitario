@@ -4,7 +4,7 @@
 #include <deque>
 #include <map>
 
-#include "AlgPlayerInterface.h"
+#include "Config.h"
 #include "InvidoCoreEnv.h"
 
 class InvidoCore;

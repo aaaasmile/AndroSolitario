@@ -1,11 +1,8 @@
-// AlgPlayerInterface.h
-
 #ifndef ___ALGPLAYER_H_
 #define ___ALGPLAYER_H_
 
 #include "CardSpec.h"
 #include "InvidoCoreEnv.h"
-
 
 class I_CORE_Game {
    public:
