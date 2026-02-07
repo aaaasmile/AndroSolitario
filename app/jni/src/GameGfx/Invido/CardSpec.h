@@ -5,7 +5,7 @@
 #include "Config.h"
 
 typedef struct _CardInfo {
-    unsigned char byIndex;
+    int byIndex;
     eSUIT eSuit;
     std::string CardName;
 } CARDINFO;
