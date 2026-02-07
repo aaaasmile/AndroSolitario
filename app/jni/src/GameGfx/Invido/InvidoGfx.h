@@ -74,17 +74,17 @@ class InvidoGfx : public I_ALG_Player {
                     SDL_Texture* pScreenTexture);
     void MatchLoop();
     void InitInvidoVsCPU();
-    void SetMainApp(AppGfx* pVal) { m_pApp = pVal; }
+    void SetMainApp(AppGfx* pVal) { _p_App = pVal; }
     void INP_PlayerSay(eSayPlayer eSay);
     void ButCmdClicked(int iButID);
     void NtfyTermEff(int iCh);
-    Player* GetPlayer(int iIndex) { return m_pInvidoCore->GetPlayer(iIndex); }
+    Player* GetPlayer(int iIndex) { return _p_InvidoCore->GetPlayer(iIndex); }
 
     // Interface I_ALG_Player (callback functions from core invido engine)
     virtual void ALG_SetCoreInterface(I_CORE_Game* pCore) {}
-    virtual void ALG_SetPlayerIndex(int iIndex) { m_PlayerGuiIndex = iIndex; }
+    virtual void ALG_SetPlayerIndex(int iIndex) { _playerGuiIndex = iIndex; }
     virtual void ALG_SetOpponentIndex(int iIndex, int iOpponentNr) {
-        m_iOpponentIndex = iIndex;
+        _opponentIndex = iIndex;
     }
     virtual void ALG_SetAssociateIndex(int iIndex) {}
     virtual void ALG_NewMatch(int iNumPlayer) {}
@@ -139,50 +139,50 @@ class InvidoGfx : public I_ALG_Player {
     void opponentHasPlayedCard(CardSpec& Card, bool vadoDentro);
 
    private:
-    SDL_Surface* m_pScreen;
-    SDL_Renderer* m_psdlRenderer;
-    SDL_Texture* m_pScreenTexture;
-    SDL_Surface* m_pScene_background;
-    SDL_Surface* m_pAlphaDisplay;
-    SDL_Surface* m_pDeck;
-    SDL_Surface* m_pSymbols;
-    SDL_Rect m_SrcBack;
-    SDL_Rect m_SrcCard;
-    TipoDiMazzo* m_pDeckType;
-    TTF_Font* m_pFontStatus;
-    TTF_Font* m_pFontText;
-    SDL_Surface* m_pSurf_Bar;
-    InvidoCore* m_pInvidoCore;
-    AppGfx* m_pApp;
-    bool m_bStartdrag;
-    int m_iCardWidth;
-    int m_iCardHeight;
-    int m_iSymbolWidth;
-    int m_iSymbolHeigth;
-    CardGfx m_aPlayerCards[NUM_CARDS_HAND];
-    CardGfx m_aOpponentCards[NUM_CARDS_HAND];
-    CardGfx m_CardsTakenPla;
-    CardGfx m_CardsTakenOpp;
-    CardGfx m_CardsTable[NUM_CARDS_PLAYED];
-    SDL_Surface* m_pAnImages[NUM_ANIMAGES];
-    int m_PlayerGuiIndex;
-    int m_iOpponentIndex;
-    int m_CardVadoDentroIndex;
-    MAP_SCORE m_MapPunti;
-    MAP_SAY m_Map_bt_Say;
-    MAP_SAY m_Map_fb_Say;
-    MAP_INTID m_Map_id_EchoSay;
-    MAP_INTID m_Map_idSynth_Say;
-    MatchPoints* m_pMatchPoints;
-    bool m_bPlayerCanPlay;
-    int m_iPlayerThatHaveMarkup;
-    DelayNextAction m_DelayAction;
-    ButtonGfx* m_pbtArrayCmd[NUMOFBUTTON];
-    eSayPlayer m_CmdDet[NUMOFBUTTON];
-    BalloonGfx* m_pbalGfx;
-    Languages* m_pLangMgr;
-    MusicManager* m_pMusicMgr;
-    bool m_bMatchTerminated;
+    SDL_Surface* _p_Screen;
+    SDL_Renderer* _p_sdlRenderer;
+    SDL_Texture* _p_ScreenTexture;
+    SDL_Surface* _p_Scene_background;
+    SDL_Surface* _p_AlphaDisplay;
+    SDL_Surface* _p_Deck;
+    SDL_Surface* _p_Symbols;
+    SDL_Rect _SrcBack;
+    SDL_Rect _SrcCard;
+    TipoDiMazzo* _p_DeckType;
+    TTF_Font* _p_FontStatus;
+    TTF_Font* _p_FontText;
+    SDL_Surface* _p_Surf_Bar;
+    InvidoCore* _p_InvidoCore;
+    AppGfx* _p_App;
+    bool _isStartdrag;
+    int _cardWidth;
+    int _cardHeight;
+    int _symbolWidth;
+    int _symbolHeigth;
+    CardGfx _aPlayerCards[NUM_CARDS_HAND];
+    CardGfx _aOpponentCards[NUM_CARDS_HAND];
+    CardGfx _CardsTakenPla;
+    CardGfx _CardsTakenOpp;
+    CardGfx _CardsTable[NUM_CARDS_PLAYED];
+    SDL_Surface* _p_AnImages[NUM_ANIMAGES];
+    int _playerGuiIndex;
+    int _opponentIndex;
+    int _cardVadoDentroIndex;
+    MAP_SCORE _MapPunti;
+    MAP_SAY _Map_bt_Say;
+    MAP_SAY _Map_fb_Say;
+    MAP_INTID _Map_id_EchoSay;
+    MAP_INTID _Map_idSynth_Say;
+    MatchPoints* _p_MatchPoints;
+    bool _isPlayerCanPlay;
+    int _playerThatHaveMarkup;
+    DelayNextAction _DelayAction;
+    ButtonGfx* _p_btArrayCmd[NUMOFBUTTON];
+    eSayPlayer _CmdDet[NUMOFBUTTON];
+    BalloonGfx* _p_balGfx;
+    Languages* _p_LangMgr;
+    MusicManager* _p_MusicMgr;
+    bool _isMatchTerminated;
 };
 
 #endif  // CGAME_H

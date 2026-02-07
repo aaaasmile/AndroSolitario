@@ -49,34 +49,34 @@ void fnEffectTer(int iCh) {
 }
 
 InvidoGfx::InvidoGfx(AppGfx* pApp) {
-    m_pScene_background = 0;
-    m_pFontText = 0;
-    m_pSurf_Bar = 0;
+    _p_Scene_background = 0;
+    _p_FontText = 0;
+    _p_Surf_Bar = 0;
     m_pApp = pApp;
-    m_bStartdrag = false;
+    _isStartdrag = false;
 
-    m_iSymbolWidth = 84;
-    m_iSymbolHeigth = 144;
-    m_pDeck = 0;
-    m_pSymbols = 0;
-    m_pFontStatus = 0;
-    m_pDeckType = 0;
+    _symbolWidth = 84;
+    _symbolHeigth = 144;
+    _p_Deck = 0;
+    _p_Symbols = 0;
+    _p_FontStatus = 0;
+    _p_DeckType = 0;
 
     for (int i = 0; i < NUM_ANIMAGES; i++) {
-        m_pAnImages[i] = 0;
+        _p_AnImages[i] = 0;
     }
-    m_pMatchPoints = 0;
-    m_pInvidoCore = 0;
-    m_bPlayerCanPlay = false;
-    m_iPlayerThatHaveMarkup = 0;
+    _p_MatchPoints = 0;
+    g_pInvidoCore = 0;
+    _isPlayerCanPlay = false;
+    _playerThatHaveMarkup = 0;
     for (int j = 0; j < NUMOFBUTTON; j++) {
-        m_pbtArrayCmd[0] = 0;
+        _p_btArrayCmd[0] = 0;
     }
-    m_pLangMgr = 0;
-    m_pMusicMgr = 0;
+    _p_LangMgr = 0;
+    _p_MusicMgr = 0;
     g_stacInvidoGfx = this;
-    m_bMatchTerminated = false;
-    m_pAlphaDisplay = 0;
+    _isMatchTerminated = false;
+    _p_AlphaDisplay = 0;
 }
 
 ////////////////////////////////////////
@@ -209,12 +209,12 @@ void InvidoGfx::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRender,
                     strFileName.c_str());
             throw Error::Init(ErrBuff);
         }
-        m_pScene_background = IMG_LoadJPG_RW(srcBack);
+        _p_Scene_background = IMG_LoadJPG_RW(srcBack);
     } else {
         // use a default green surface
-        m_pScene_background = SDL_CreateRGBSurface(
+        _p_Scene_background = SDL_CreateRGBSurface(
             SDL_SWSURFACE, m_pScreen->w, m_pScreen->h, 32, 0, 0, 0, 0);
-        SDL_FillRect(m_pScene_background, NULL,
+        SDL_FillRect(_p_Scene_background, NULL,
                      SDL_MapRGBA(m_pScreen->format, 0, 80, 0, 0));
     }
 
@@ -222,7 +222,7 @@ void InvidoGfx::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRender,
     createRegionsInit();
 
     m_pFontStatus = m_pApp->GetFontAriblk();
-    m_pFontText = m_pApp->GetFontVera();
+    _p_FontText = m_pApp->GetFontVera();
 
     // load images for animation stuff
     int rr = 0;
@@ -289,9 +289,9 @@ void InvidoGfx::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRender,
 }
 
 void InvidoGfx::cleanup() {
-    if (m_pScene_background) {
-        SDL_FreeSurface(m_pScene_background);
-        m_pScene_background = NULL;
+    if (_p_Scene_background) {
+        SDL_FreeSurface(_p_Scene_background);
+        _p_Scene_background = NULL;
     }
 
     if (m_pSurf_Bar) {
@@ -309,8 +309,8 @@ void InvidoGfx::cleanup() {
 }
 
 void InvidoGfx::drawStaticScene() {
-    if (m_pScene_background) {
-        SDL_BlitSurface(m_pScene_background, NULL, m_pScreen, NULL);
+    if (_p_Scene_background) {
+        SDL_BlitSurface(_p_Scene_background, NULL, m_pScreen, NULL);
     }
 
     for (int i = 0; i < NUM_CARDS_HAND; i++) {
@@ -370,13 +370,13 @@ void InvidoGfx::renderPlayerName(int iPlayerIx) {
         GFX_UTIL::DrawStaticSpriteEx(m_pScreen, 0, 0, 150, 25, 310, 17,
                                      m_pSurf_Bar);
         GFX_UTIL::DrawString(m_pScreen, txt_to_render, 315, 21,
-                             GFX_UTIL_COLOR::White, m_pFontText, false);
+                             GFX_UTIL_COLOR::White, _p_FontText, false);
     } else if (iPlayerIx == PLAYER1) {
         sprintf(txt_to_render, "%s", pPlayer->GetName());
         GFX_UTIL::DrawStaticSpriteEx(m_pScreen, 0, 0, 150, 25, 310,
                                      m_pScreen->h - 35, m_pSurf_Bar);
         GFX_UTIL::DrawString(m_pScreen, txt_to_render, 315, m_pScreen->h - 31,
-                             GFX_UTIL_COLOR::White, m_pFontText, true);
+                             GFX_UTIL_COLOR::White, _p_FontText, true);
     } else {
         SDL_assert(0);
     }
@@ -491,7 +491,7 @@ void InvidoGfx::animateBeginGiocata() {
     bool bEnd = false;
     do {
         // clear screen
-        SDL_BlitSurface(m_pScene_background, NULL, m_pScreen, NULL);
+        SDL_BlitSurface(_p_Scene_background, NULL, m_pScreen, NULL);
 
         for (int iManoNum = 0; iManoNum < NUM_CARDS_HAND; iManoNum++) {
             if (iManoNum == 0) {
@@ -1091,7 +1091,7 @@ void InvidoGfx::showPopUpCallMenu(CardSpec& cardClicked, int iX, int iY,
     rctBox.x = iX;
 
     // show a mesage box
-    PopUpMenu.Init(&rctBox, m_pScreen, m_pFontText, m_psdlRenderer);
+    PopUpMenu.Init(&rctBox, m_pScreen, _p_FontText, m_psdlRenderer);
     SDL_BlitSurface(m_pScreen, NULL, m_pAlphaDisplay, NULL);
 
     for (size_t i = 0; i < iNumCmdsAval; i++) {
@@ -1174,7 +1174,7 @@ void InvidoGfx::drawPlayedCard(CardGfx* pCard) {
 //       HandleMouseMoveEvent
 void InvidoGfx::handleMouseMoveEvent(SDL_Event& event) {
     for (int i = 0; i < NUMOFBUTTON; i++) {
-        m_pbtArrayCmd[i]->MouseMove(event, m_pScreen, m_pScene_background,
+        m_pbtArrayCmd[i]->MouseMove(event, m_pScreen, _p_Scene_background,
                                     m_pScreenTexture);
     }
 }
@@ -1450,11 +1450,11 @@ void InvidoGfx::showCurrentScore() {
     int iLenName = (int)strTmp.length();
     GFX_UTIL::DrawString(m_pScreen, pPlayer->GetName(),
                          iX_vertical - (9 * iLenName), iY1,
-                         GFX_UTIL_COLOR::White, m_pFontText, true);
+                         GFX_UTIL_COLOR::White, _p_FontText, true);
     // player 2
     pPlayer = m_pInvidoCore->GetPlayer(PLAYER2);
     GFX_UTIL::DrawString(m_pScreen, pPlayer->GetName(), iX_vertical + 10, iY1,
-                         GFX_UTIL_COLOR::White, m_pFontText, false);
+                         GFX_UTIL_COLOR::White, _p_FontText, false);
 
     // current giocata score
     eGiocataScoreState eCurrScore = m_pMatchPoints->GetCurrScore();
@@ -1467,11 +1467,11 @@ void InvidoGfx::showCurrentScore() {
             m_pLangMgr->GetStringId(Languages::ID_STA_PTCURRENT).c_str(),
             lpsNamePoints.c_str());
     int tx, ty;
-    TTF_SizeText(m_pFontText, buffTmp, &tx, &ty);
+    TTF_SizeText(_p_FontText, buffTmp, &tx, &ty);
     int iX_posCurrScore = iX_vertical - tx / 2;
     int iY_posCurrScore = iY_end + 10;
     GFX_UTIL::DrawString(m_pScreen, buffTmp, iX_posCurrScore, iY_posCurrScore,
-                         GFX_UTIL_COLOR::White, m_pFontText, false);
+                         GFX_UTIL_COLOR::White, _p_FontText, false);
 
     // player score
     int iNumGiocate = m_pMatchPoints->GetNumGiocateInCurrMatch();
@@ -1544,7 +1544,7 @@ void InvidoGfx::enableOnlyCmdButtons(size_t iNumButt) {
         m_pbtArrayCmd[j]->EnableWindow(FALSE);
         m_pbtArrayCmd[j]->SetState(ButtonGfx::INVISIBLE);
         m_pbtArrayCmd[j]->SetWindowText("-");
-        m_pbtArrayCmd[j]->RedrawButton(m_pScreen, m_pScene_background,
+        m_pbtArrayCmd[j]->RedrawButton(m_pScreen, _p_Scene_background,
                                        m_pScreenTexture);
     }
 }
@@ -1555,7 +1555,7 @@ void InvidoGfx::setCmdButton(size_t iButtonIndex, eSayPlayer eSay,
         m_pbtArrayCmd[iButtonIndex]->SetWindowText(strCaption);
         m_CmdDet[iButtonIndex] = eSay;
         m_pbtArrayCmd[iButtonIndex]->RedrawButton(
-            m_pScreen, m_pScene_background, m_pScreenTexture);
+            m_pScreen, _p_Scene_background, m_pScreenTexture);
     } else {
         SDL_assert(0);
     }

@@ -24,32 +24,32 @@ class Player {
     void Create();
     void SetType(eTypeOfPLayer eVal);
     void SetLevel(eGameLevel eNewLevel, I_ALG_Player* I_val);
-    eGameLevel GetLevel() { return m_eLevel; }
-    eTypeOfPLayer GetType() { return m_eKind; }
-    int GetIndex() { return m_iIndex; }
-    void SetIndex(int iVal) { m_iIndex = iVal; }
-    char* GetName() { return m_pPlayerName; }
+    eGameLevel GetLevel() { return _eLevel; }
+    eTypeOfPLayer GetType() { return _eKind; }
+    int GetIndex() { return _index; }
+    void SetIndex(int iVal) { _index = iVal; }
+    char* GetName() { return _p_PlayerName; }
     void SetName(LPCSTR lpszName);
-    I_ALG_Player* GetAlg() { return m_pIAlgorithm; }
+    I_ALG_Player* GetAlg() { return _p_IAlgorithm; }
 
     friend std::ostream& operator<<(std::ostream& stream, const Player& o);
     Player(const Player& a);
     Player& operator=(const Player& a);
 
    private:
-    char m_pPlayerName[BUFF_NAME];
-    eTypeOfPLayer m_eKind;
-    int m_iIndex;
-    I_ALG_Player* m_pIAlgorithm;
-    VCT_PALG m_vctAlgToDestroy;
-    eGameLevel m_eLevel;
+    char _p_PlayerName[BUFF_NAME];
+    eTypeOfPLayer _eKind;
+    int _index;
+    I_ALG_Player* _p_IAlgorithm;
+    VCT_PALG _vctAlgToDestroy;
+    eGameLevel _eLevel;
 };
 
 typedef std::vector<Player> VCT_PLAYERS;
 
 // operators
 inline std::ostream& operator<<(std::ostream& stream, const Player& o) {
-    stream << o.m_pPlayerName << std::endl;
+    stream << o._p_PlayerName << std::endl;
 
     return stream;
 }

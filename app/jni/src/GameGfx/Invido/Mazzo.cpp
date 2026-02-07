@@ -4,14 +4,14 @@
 #include "InvidoSettings.h"
 
 Mazzo::Mazzo() {
-    m_lNextCard = 0;
-    m_pCoreGame = 0;
-    m_iRndSeed = 63200;
+    _nextCard = 0;
+    _p_CoreGame = 0;
+    _rndSeed = 63200;
 }
 
 void Mazzo::Create() {
-    m_vctCards.reserve(NUM_CARDS);
-    m_vctCards.clear();
+    _vctCards.reserve(NUM_CARDS);
+    _vctCards.clear();
 
     // invido card index
     int aCardIndex[] = {0,  1,  2,  5,  6,  7,  8,  9,  10, 11, 12,
@@ -19,21 +19,21 @@ void Mazzo::Create() {
                         28, 29, 30, 31, 32, 35, 36, 37, 38, 39};
 
     for (int i = 0; i < NUM_CARDS; i++) {
-        m_vctCards.push_back(aCardIndex[i]);
+        _vctCards.push_back(aCardIndex[i]);
     }
 
-    m_lNextCard = 0;
+    _nextCard = 0;
 }
 
 void Mazzo::SetIndexRaw(int iIndex, long lVal) {
-    if (iIndex < (int)m_vctCards.size() && iIndex >= 0) {
-        m_vctCards[iIndex] = lVal;
+    if (iIndex < (int)_vctCards.size() && iIndex >= 0) {
+        _vctCards[iIndex] = lVal;
     }
 }
 
 bool Mazzo::CloneFrom(Mazzo& Master) {
-    m_lNextCard = Master.GetNextCardVal();
-    m_vctCards = Master.GetVectorIndexes();
+    _nextCard = Master.GetNextCardVal();
+    _vctCards = Master.GetVectorIndexes();
 
     return true;
 }
@@ -41,36 +41,36 @@ bool Mazzo::CloneFrom(Mazzo& Master) {
 bool Mazzo::Shuffle() {
     IT_VCTLONG it_tmp;
 
-    m_lNextCard = 0;
+    _nextCard = 0;
 
-    it_tmp = m_vctCards.begin();
+    it_tmp = _vctCards.begin();
     // Leave the deck card to the first position
 
     // use the rand() function to shuffle the pool (deck is not shuffled)
-    std::random_shuffle(it_tmp, m_vctCards.end());
+    std::random_shuffle(it_tmp, _vctCards.end());
 
 #ifndef SERVER_PRG
     if (g_Options.All.iDebugLevel > 3) {
-        Utility::TraceContainer(m_vctCards, "Cards mazzo");
+        Utility::TraceContainer(_vctCards, "Cards mazzo");
     }
 #endif
 
     // call a callback in python script for shuffle deck
-    m_pCoreGame->NotifyScript(SCR_NFY_SHUFFLEDECK);
+    _p_CoreGame->NotifyScript(SCR_NFY_SHUFFLEDECK);
 
     return true;
 }
 
 long Mazzo::PickNextCard(bool* pbEnd) {
     long lResult = NOT_VALID_INDEX;
-    if (m_lNextCard >= (long)m_vctCards.size()) {
+    if (_nextCard >= (long)_vctCards.size()) {
         *pbEnd = false;
         return lResult;
     }
     *pbEnd = true;
 
-    lResult = m_vctCards[m_lNextCard];
-    m_lNextCard++;
+    lResult = _vctCards[_nextCard];
+    _nextCard++;
 
     return lResult;
 }
@@ -81,13 +81,13 @@ bool Mazzo::PickNextCard(CardSpec* pRes) {
     pRes->Reset();
     bool bValid = false;
 
-    if (m_lNextCard < (long)m_vctCards.size()) {
+    if (_nextCard < (long)_vctCards.size()) {
         bValid = true;
-        long lIndex = m_vctCards[m_lNextCard];
+        long lIndex = _vctCards[_nextCard];
 
         pRes->SetCardIndex(lIndex);
 
-        m_lNextCard++;
+        _nextCard++;
     }
 
     return bValid;
@@ -95,25 +95,25 @@ bool Mazzo::PickNextCard(CardSpec* pRes) {
 
 long Mazzo::ThrowTableCard() {
     long lResult = NOT_VALID_INDEX;
-    if (m_lNextCard >= (long)m_vctCards.size()) {
+    if (_nextCard >= (long)_vctCards.size()) {
         return lResult;
     }
 
-    lResult = m_vctCards[m_lNextCard];
+    lResult = _vctCards[_nextCard];
 
     // swap the next card with the last
-    long lLast = m_vctCards[NUM_CARDS - 1];
-    m_vctCards[NUM_CARDS - 1] = m_vctCards[m_lNextCard];
-    m_vctCards[m_lNextCard] = lLast;
+    long lLast = _vctCards[NUM_CARDS - 1];
+    _vctCards[NUM_CARDS - 1] = _vctCards[_nextCard];
+    _vctCards[_nextCard] = lLast;
 
     return lResult;
 }
 
-void Mazzo::TraceIt() { Utility::TraceContainer(m_vctCards, "Cards mazzo"); }
+void Mazzo::TraceIt() { Utility::TraceContainer(_vctCards, "Cards mazzo"); }
 
 bool Mazzo::IsMoreCards() {
     bool bRet = false;
-    if (m_lNextCard < NUM_CARDS) {
+    if (_nextCard < NUM_CARDS) {
         bRet = true;
     }
     return bRet;
@@ -121,13 +121,13 @@ bool Mazzo::IsMoreCards() {
 
 long Mazzo::GetIndexNextCard(bool* pbEnd) {
     long lResult = NOT_VALID_INDEX;
-    if (m_lNextCard >= NUM_CARDS) {
+    if (_nextCard >= NUM_CARDS) {
         *pbEnd = false;
         return lResult;
     }
     *pbEnd = true;
 
-    lResult = m_vctCards[m_lNextCard];
+    lResult = _vctCards[_nextCard];
 
     return lResult;
 }

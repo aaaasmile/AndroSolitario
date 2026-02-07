@@ -3,196 +3,196 @@
 #include "Mano.h"
 
 MatchPoints::MatchPoints() {
-    m_iNumPlayers = NUM_PLAY_INVIDO_2;
-    m_pMano = 0;
-    m_bGameAbandoned = false;
+    _numPlayers = NUM_PLAY_INVIDO_2;
+    _p_Mano = 0;
+    _isGameAbandoned = false;
     for (int iManoNum = 0; iManoNum < NUM_CARDS_HAND; iManoNum++) {
-        m_ManoDetailInfo[iManoNum].Reset();
+        _ManoDetailInfo[iManoNum].Reset();
     }
-    m_eCurrentScore = SC_CANELA;
+    _currentScore = SC_CANELA;
 }
 
 MatchPoints::~MatchPoints() {}
 
 void MatchPoints::MatchStart(int iNumPlayer) {
     for (int i = 0; i < MAX_NUM_PLAYER; i++) {
-        m_vctPlayerPoints[i] = 0;
+        _vctPlayerPoints[i] = 0;
     }
-    m_iNumPlayers = iNumPlayer;
-    m_iPlayerMatchWin = NOT_VALID_INDEX;
-    m_iScoreGoal = SCORE_GOAL;
-    m_bMatchInSpecialScore = false;
-    m_vctGiocataInfo.clear();
+    _numPlayers = iNumPlayer;
+    _playerMatchWin = NOT_VALID_INDEX;
+    _scoreGoal = SCORE_GOAL;
+    _isMatchInSpecialScore = false;
+    _vctGiocataInfo.clear();
 }
 
 void MatchPoints::GiocataStart() {
     CardSpec CardUndef;
     for (int i = 0; i < MAX_NUM_PLAYER; i++) {
-        m_vctHandWons[i] = 0;
-        m_vctCardPlayed[i].cardSpec = CardUndef;
-        m_vctCardPlayed[i].iPlayerIx = NOT_VALID_INDEX;
+        _vctHandWons[i] = 0;
+        _vctCardPlayed[i].cardSpec = CardUndef;
+        _vctCardPlayed[i].playerIx = NOT_VALID_INDEX;
     }
-    m_iNumCardsPlayed = 0;
-    m_eCurrentScore = SC_CANELA;
-    m_iPlayerWonsHand = NOT_VALID_INDEX;
-    m_iPlayerFirstHand = NOT_VALID_INDEX;
-    m_iPlayerGiocataWin = NOT_VALID_INDEX;
-    m_eIsGiocataEnd = GES_ON_GOING;
-    m_bIsManoPatatda = false;
-    m_iManoRound = 0;
-    m_bOldManoPatada = false;
+    _numCardsPlayed = 0;
+    _currentScore = SC_CANELA;
+    _playerWonsHand = NOT_VALID_INDEX;
+    _playerFirstHand = NOT_VALID_INDEX;
+    _playerGiocataWin = NOT_VALID_INDEX;
+    _eIsGiocataEnd = GES_ON_GOING;
+    _isManoPatatda = false;
+    _manoRound = 0;
+    _isOldManoPatada = false;
     for (int iManoNum = 0; iManoNum < NUM_CARDS_HAND; iManoNum++) {
-        m_ManoDetailInfo[iManoNum].Reset();
+        _ManoDetailInfo[iManoNum].Reset();
     }
-    m_iPlayerChangeScore = NOT_VALID_INDEX;
-    m_bGameAbandoned = false;
+    _playerChangeScore = NOT_VALID_INDEX;
+    _isGameAbandoned = false;
 }
 
 void MatchPoints::PlayerPlay(int iPlayerIx, CARDINFO* pCard) {
     CardSpec Card;
     SDL_assert(pCard);
     Card.SetCardInfo(*pCard);
-    SDL_assert(m_iNumCardsPlayed < MAX_NUM_PLAYER && m_iNumCardsPlayed >= 0);
-    m_vctCardPlayed[m_iNumCardsPlayed].iPlayerIx = iPlayerIx;
-    m_vctCardPlayed[m_iNumCardsPlayed].cardSpec = Card;
-    m_iNumCardsPlayed++;
+    SDL_assert(_numCardsPlayed < MAX_NUM_PLAYER && _numCardsPlayed >= 0);
+    _vctCardPlayed[_numCardsPlayed].playerIx = iPlayerIx;
+    _vctCardPlayed[_numCardsPlayed].cardSpec = Card;
+    _numCardsPlayed++;
 }
 
 void MatchPoints::ManoEnd() {
-    SDL_assert(m_iNumCardsPlayed == m_iNumPlayers);
-    int iManoTerminatedIndex = m_iManoRound;
+    SDL_assert(_numCardsPlayed == _numPlayers);
+    int iManoTerminatedIndex = _manoRound;
     SDL_assert(iManoTerminatedIndex >= 0 &&
                iManoTerminatedIndex < NUM_CARDS_HAND);
-    m_iManoRound++;
+    _manoRound++;
     // hand is terminated
-    if (m_iNumPlayers == NUM_PLAY_INVIDO_2)  // consistency check
+    if (_numPlayers == NUM_PLAY_INVIDO_2)  // consistency check
     {
         int iPoints_1 =
-            g_PointsTable[m_vctCardPlayed[PLAYER1].cardSpec.GetCardIndex()];
-        int iPlayer_1 = m_vctCardPlayed[PLAYER1].iPlayerIx;
+            g_PointsTable[_vctCardPlayed[PLAYER1].cardSpec.GetCardIndex()];
+        int iPlayer_1 = _vctCardPlayed[PLAYER1].playerIx;
         int iPoints_2 =
-            g_PointsTable[m_vctCardPlayed[PLAYER2].cardSpec.GetCardIndex()];
-        int iPlayer_2 = m_vctCardPlayed[PLAYER2].iPlayerIx;
-        m_bIsManoPatatda = false;
+            g_PointsTable[_vctCardPlayed[PLAYER2].cardSpec.GetCardIndex()];
+        int iPlayer_2 = _vctCardPlayed[PLAYER2].playerIx;
+        _isManoPatatda = false;
         // mano is played
-        m_ManoDetailInfo[iManoTerminatedIndex].bIsPlayed = true;
+        _ManoDetailInfo[iManoTerminatedIndex].isPlayed = true;
 
         if (iPoints_1 == iPoints_2) {
             // nobody wins the hand
-            m_bIsManoPatatda = true;
-            if (m_iPlayerFirstHand != NOT_VALID_INDEX) {
+            _isManoPatatda = true;
+            if (_playerFirstHand != NOT_VALID_INDEX) {
                 // the first player who take the mano is the giocata winner
-                m_iPlayerGiocataWin = m_iPlayerFirstHand;
-                m_eIsGiocataEnd = GES_HAVE_WINNER;
+                _playerGiocataWin = _playerFirstHand;
+                _eIsGiocataEnd = GES_HAVE_WINNER;
             }
-            m_iPlayerWonsHand = NOT_VALID_INDEX;
-            m_ManoDetailInfo[iManoTerminatedIndex].bIsPata = true;
+            _playerWonsHand = NOT_VALID_INDEX;
+            _ManoDetailInfo[iManoTerminatedIndex].isPata = true;
 
             // mark the mano patada, the next who take the trick win
-            m_bOldManoPatada = true;
+            _isOldManoPatada = true;
         } else if (iPoints_1 > iPoints_2) {
             // first player wons the mano
-            m_vctHandWons[iPlayer_1]++;
-            if (m_iPlayerFirstHand == NOT_VALID_INDEX) {
-                m_iPlayerFirstHand = iPlayer_1;
+            _vctHandWons[iPlayer_1]++;
+            if (_playerFirstHand == NOT_VALID_INDEX) {
+                _playerFirstHand = iPlayer_1;
             }
-            if (m_vctHandWons[iPlayer_1] >= NUM_PLAY_INVIDO_2 ||
-                m_bOldManoPatada) {
+            if (_vctHandWons[iPlayer_1] >= NUM_PLAY_INVIDO_2 ||
+                _isOldManoPatada) {
                 // giocata is terminated, giocata winner is the first player in
                 // this hand
-                m_iPlayerGiocataWin = iPlayer_1;
-                m_eIsGiocataEnd = GES_HAVE_WINNER;
+                _playerGiocataWin = iPlayer_1;
+                _eIsGiocataEnd = GES_HAVE_WINNER;
             }
-            m_iPlayerWonsHand = iPlayer_1;
-            m_ManoDetailInfo[iManoTerminatedIndex].iPlayerIndex = iPlayer_1;
+            _playerWonsHand = iPlayer_1;
+            _ManoDetailInfo[iManoTerminatedIndex].playerIndex = iPlayer_1;
         } else {
             // second player catch the mano
-            m_vctHandWons[iPlayer_2]++;
-            if (m_iPlayerFirstHand == NOT_VALID_INDEX) {
-                m_iPlayerFirstHand = iPlayer_2;
+            _vctHandWons[iPlayer_2]++;
+            if (_playerFirstHand == NOT_VALID_INDEX) {
+                _playerFirstHand = iPlayer_2;
             }
-            if (m_vctHandWons[iPlayer_2] >= NUM_PLAY_INVIDO_2 ||
-                m_bOldManoPatada) {
+            if (_vctHandWons[iPlayer_2] >= NUM_PLAY_INVIDO_2 ||
+                _isOldManoPatada) {
                 // giocata is terminated, giocata winner is the second player in
                 // this hand
-                m_iPlayerGiocataWin = iPlayer_2;
-                m_eIsGiocataEnd = GES_HAVE_WINNER;
+                _playerGiocataWin = iPlayer_2;
+                _eIsGiocataEnd = GES_HAVE_WINNER;
             }
-            m_iPlayerWonsHand = iPlayer_2;
-            m_ManoDetailInfo[iManoTerminatedIndex].iPlayerIndex = iPlayer_2;
+            _playerWonsHand = iPlayer_2;
+            _ManoDetailInfo[iManoTerminatedIndex].playerIndex = iPlayer_2;
         }
-        if (m_iManoRound >= NUM_CARDS_HAND) {
+        if (_manoRound >= NUM_CARDS_HAND) {
             // giocata is terminated
-            if (m_bIsManoPatatda && (m_iPlayerFirstHand == NOT_VALID_INDEX)) {
+            if (_isManoPatatda && (_playerFirstHand == NOT_VALID_INDEX)) {
                 // strange case all hands was patadi. Giocata is also patada.
-                m_eIsGiocataEnd = GES_PATADA;
-                m_iPlayerGiocataWin = iPlayer_1;
+                _eIsGiocataEnd = GES_PATADA;
+                _playerGiocataWin = iPlayer_1;
             } else {
                 // giocata winner must be already defined
-                SDL_assert(m_iPlayerGiocataWin != NOT_VALID_INDEX);
+                SDL_assert(_playerGiocataWin != NOT_VALID_INDEX);
             }
         }
     } else {
         SDL_assert(0);
     }
-    m_iNumCardsPlayed = 0;
+    _numCardsPlayed = 0;
 }
 
 void MatchPoints::PlayerVaVia(int iPlayerIx) {
-    m_eIsGiocataEnd = GES_HAVE_WINNER;
+    _eIsGiocataEnd = GES_HAVE_WINNER;
     if (iPlayerIx == PLAYER1) {
-        m_iPlayerGiocataWin = PLAYER2;
+        _playerGiocataWin = PLAYER2;
     } else {
-        m_iPlayerGiocataWin = PLAYER1;
+        _playerGiocataWin = PLAYER1;
     }
 }
 
 void MatchPoints::GiocataEnd() {
-    if (m_eIsGiocataEnd == GES_HAVE_WINNER) {
-        SDL_assert(m_iPlayerGiocataWin != NOT_VALID_INDEX);
+    if (_eIsGiocataEnd == GES_HAVE_WINNER) {
+        SDL_assert(_playerGiocataWin != NOT_VALID_INDEX);
         // update the score
-        m_vctPlayerPoints[m_iPlayerGiocataWin] += m_eCurrentScore;
-        m_vctGiocataInfo.push_back(
-            GiocataInfo(m_iPlayerGiocataWin, m_eCurrentScore));
+        _vctPlayerPoints[_playerGiocataWin] += _currentScore;
+        _vctGiocataInfo.push_back(
+            GiocataInfo(_playerGiocataWin, _currentScore));
 
-        if (m_vctPlayerPoints[m_iPlayerGiocataWin] >= m_iScoreGoal) {
+        if (_vctPlayerPoints[_playerGiocataWin] >= _scoreGoal) {
             // match is terminated
-            m_iPlayerMatchWin = m_iPlayerGiocataWin;
-        } else if (m_vctPlayerPoints[PLAYER1] == SPECIAL_SCORE &&
-                   m_vctPlayerPoints[PLAYER2] == SPECIAL_SCORE) {
+            _playerMatchWin = _playerGiocataWin;
+        } else if (_vctPlayerPoints[PLAYER1] == SPECIAL_SCORE &&
+                   _vctPlayerPoints[PLAYER2] == SPECIAL_SCORE) {
             // special condition both player are on 23 to 23 or after 7 to 7....
             beginSpecialTurn();
-        } else if (m_bMatchInSpecialScore &&
-                   (m_vctPlayerPoints[PLAYER1] == SCORE_SEVEN &&
-                    m_vctPlayerPoints[PLAYER2] == SCORE_SEVEN)) {
+        } else if (_isMatchInSpecialScore &&
+                   (_vctPlayerPoints[PLAYER1] == SCORE_SEVEN &&
+                    _vctPlayerPoints[PLAYER2] == SCORE_SEVEN)) {
             beginSpecialTurn();
         }
     } else {
         // pata or monte
-        m_vctGiocataInfo.push_back(GiocataInfo(NOT_VALID_INDEX, SC_AMONTE));
+        _vctGiocataInfo.push_back(GiocataInfo(NOT_VALID_INDEX, SC_AMONTE));
     }
     for (int iManoNum = 0; iManoNum < NUM_CARDS_HAND; iManoNum++) {
-        m_ManoDetailInfo[iManoNum].Reset();
+        _ManoDetailInfo[iManoNum].Reset();
     }
 }
 
 bool MatchPoints::IsGiocatEnd() {
     bool bRet = false;
 
-    if (m_eIsGiocataEnd == GES_AMONTE || m_eIsGiocataEnd == GES_PATADA ||
-        m_eIsGiocataEnd == GES_HAVE_WINNER) {
+    if (_eIsGiocataEnd == GES_AMONTE || _eIsGiocataEnd == GES_PATADA ||
+        _eIsGiocataEnd == GES_HAVE_WINNER) {
         bRet = true;
     }
     return bRet;
 }
 
-void MatchPoints::AMonte() { m_eIsGiocataEnd = GES_AMONTE; }
+void MatchPoints::AMonte() { _eIsGiocataEnd = GES_AMONTE; }
 
 void MatchPoints::beginSpecialTurn() {
-    m_iScoreGoal = SPECIAL_SCORE_GOAL;
-    m_vctPlayerPoints[PLAYER1] = 0;
-    m_vctPlayerPoints[PLAYER2] = 0;
-    m_bMatchInSpecialScore = true;
+    _scoreGoal = SPECIAL_SCORE_GOAL;
+    _vctPlayerPoints[PLAYER1] = 0;
+    _vctPlayerPoints[PLAYER2] = 0;
+    _isMatchInSpecialScore = true;
 }
 
 void MatchPoints::GetManoInfo(int iManoNum, int* piPlayerIx, bool* pbIsPlayed,
@@ -201,9 +201,9 @@ void MatchPoints::GetManoInfo(int iManoNum, int* piPlayerIx, bool* pbIsPlayed,
     SDL_assert(pbIsPlayed);
     SDL_assert(piPlayerIx);
     if (iManoNum >= 0 && iManoNum < NUM_CARDS_HAND) {
-        *pbIsPata = m_ManoDetailInfo[iManoNum].bIsPata;
-        *pbIsPlayed = m_ManoDetailInfo[iManoNum].bIsPlayed;
-        *piPlayerIx = m_ManoDetailInfo[iManoNum].iPlayerIndex;
+        *pbIsPata = _ManoDetailInfo[iManoNum].isPata;
+        *pbIsPlayed = _ManoDetailInfo[iManoNum].isPlayed;
+        *piPlayerIx = _ManoDetailInfo[iManoNum].playerIndex;
 
     } else {
         SDL_assert(0);
@@ -212,20 +212,20 @@ void MatchPoints::GetManoInfo(int iManoNum, int* piPlayerIx, bool* pbIsPlayed,
 
 void MatchPoints::GetGiocataInfo(int iNumGiocata, GiocataInfo* pGiocInfo) {
     SDL_assert(pGiocInfo);
-    if (iNumGiocata >= 0 && iNumGiocata < (int)m_vctGiocataInfo.size()) {
-        *pGiocInfo = m_vctGiocataInfo[iNumGiocata];
+    if (iNumGiocata >= 0 && iNumGiocata < (int)_vctGiocataInfo.size()) {
+        *pGiocInfo = _vctGiocataInfo[iNumGiocata];
     }
 }
 
 void MatchPoints::ChangeCurrentScore(eGiocataScoreState eVal, int iPlayer) {
     if (eVal > 0) {
-        SDL_assert(iPlayer != m_iPlayerChangeScore);
+        SDL_assert(iPlayer != _playerChangeScore);
     }
-    m_eCurrentScore = eVal;
-    m_iPlayerChangeScore = iPlayer;
+    _currentScore = eVal;
+    _playerChangeScore = iPlayer;
 }
 
 void MatchPoints::SetTheWinner(int iPlayerIx) {
-    m_iPlayerMatchWin = iPlayerIx;
-    m_bGameAbandoned = true;
+    _playerMatchWin = iPlayerIx;
+    _isGameAbandoned = true;
 }

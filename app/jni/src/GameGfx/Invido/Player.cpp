@@ -4,56 +4,56 @@
 #include "AlgDummyPlayer.h"
 
 Player::Player() {
-    m_iIndex = NOT_VALID_INDEX;
-    m_pIAlgorithm = 0;
-    m_eLevel = DUMMY;
+    _index = NOT_VALID_INDEX;
+    _p_IAlgorithm = 0;
+    _eLevel = DUMMY;
 }
 
 Player::~Player() {
-    for (size_t i = 0; i < m_vctAlgToDestroy.size(); i++) {
-        delete m_vctAlgToDestroy[i];
+    for (size_t i = 0; i < _vctAlgToDestroy.size(); i++) {
+        delete _vctAlgToDestroy[i];
     }
 }
 
 Player::Player(const Player& a) {
-    strncpy(m_pPlayerName, a.m_pPlayerName, BUFF_NAME);
-    m_eKind = a.m_eKind;
-    m_iIndex = a.m_iIndex;
-    m_pIAlgorithm = a.m_pIAlgorithm;
-    m_eLevel = a.m_eLevel;
+    strncpy(_p_PlayerName, a._p_PlayerName, BUFF_NAME);
+    _eKind = a._eKind;
+    _index = a._index;
+    _p_IAlgorithm = a._p_IAlgorithm;
+    _eLevel = a._eLevel;
 }
 
 Player& Player::operator=(const Player& a) {
-    strncpy(m_pPlayerName, a.m_pPlayerName, BUFF_NAME);
-    m_eKind = a.m_eKind;
-    m_iIndex = a.m_iIndex;
-    m_pIAlgorithm = a.m_pIAlgorithm;
-    m_eLevel = a.m_eLevel;
+    strncpy(_p_PlayerName, a._p_PlayerName, BUFF_NAME);
+    _eKind = a._eKind;
+    _index = a._index;
+    _p_IAlgorithm = a._p_IAlgorithm;
+    _eLevel = a._eLevel;
 
     return *this;
 }
 
 void Player::Create() {
     CardSpec emptyCard;
-    m_eKind = PT_LOCAL;
-    strcpy(m_pPlayerName, "Remigiu");
+    _eKind = PT_LOCAL;
+    strcpy(_p_PlayerName, "Remigiu");
 
-    m_iIndex = NOT_VALID_INDEX;
-    m_eLevel = DUMMY;
+    _index = NOT_VALID_INDEX;
+    _eLevel = DUMMY;
 }
 
 void Player::SetName(LPCSTR lpszName) {
-    strncpy(m_pPlayerName, lpszName, BUFF_NAME - 1);
+    strncpy(_p_PlayerName, lpszName, BUFF_NAME - 1);
 }
 
-void Player::SetType(eTypeOfPLayer eVal) { m_eKind = eVal; }
+void Player::SetType(eTypeOfPLayer eVal) { _eKind = eVal; }
 
 void Player::SetLevel(eGameLevel eNewLevel, I_ALG_Player* I_val) {
-    if (m_pIAlgorithm != 0 && m_eLevel != HMI && m_eLevel != SERVER_LEVEL) {
-        delete m_pIAlgorithm;
-        m_pIAlgorithm = 0;
+    if (_p_IAlgorithm != 0 && _eLevel != HMI && _eLevel != SERVER_LEVEL) {
+        delete _p_IAlgorithm;
+        _p_IAlgorithm = 0;
     }
-    m_eLevel = eNewLevel;
+    _eLevel = eNewLevel;
 
     switch (eNewLevel) {
         case BEGINNER:
@@ -61,8 +61,8 @@ void Player::SetLevel(eGameLevel eNewLevel, I_ALG_Player* I_val) {
             break;
 
         case ADVANCED:
-            m_pIAlgorithm = new AlgAdvancedPlayer();
-            m_vctAlgToDestroy.push_back(m_pIAlgorithm);
+            _p_IAlgorithm = new AlgAdvancedPlayer();
+            _vctAlgToDestroy.push_back(_p_IAlgorithm);
             break;
 
         case NIGHTMARE:
@@ -72,7 +72,7 @@ void Player::SetLevel(eGameLevel eNewLevel, I_ALG_Player* I_val) {
         case SERVER_LEVEL:
         case HMI:
             SDL_assert(I_val);
-            m_pIAlgorithm = I_val;
+            _p_IAlgorithm = I_val;
             break;
 
         default:

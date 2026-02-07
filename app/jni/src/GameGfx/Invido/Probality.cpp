@@ -5,26 +5,26 @@ void Probality::SvilCombiHands(VCT_MAZZO& vct_Mazzo,
     long lNumCard = (long)vct_Mazzo.size();
     mtx_Result.clear();
 
-    size_t lNumCombi = (size_t)BinomialCoef(lNumCard, m_iCardOnHand);
+    size_t lNumCombi = (size_t)BinomialCoef(lNumCard, _cardOnHand);
 
-    if (m_bIndexNotInit) {
-        m_vctCounter.clear();
+    if (_indexNotInit) {
+        _vctCounter.clear();
         // inizializza counter
-        for (long i = 0; i < m_iCardOnHand; i++) {
-            m_vctCounter.push_back(i);
+        for (long i = 0; i < _cardOnHand; i++) {
+            _vctCounter.push_back(i);
         }
     }
 
-    m_bIndexNotInit = false;
+    _indexNotInit = false;
 
     // riserva spazio per lo sviluppo integrale
     mtx_Result.reserve(lNumCombi);
 
-    VCT_SINGLECARD vct_tmpRow(m_iCardOnHand);
+    VCT_SINGLECARD vct_tmpRow(_cardOnHand);
     // sviluppo delle colonne
     for (long lCurrRow = 0; lCurrRow < lNumCombi; lCurrRow++) {
-        for (long j = 0; j < m_iCardOnHand; j++) {
-            long lIndex = m_vctCounter[j];
+        for (long j = 0; j < _cardOnHand; j++) {
+            long lIndex = _vctCounter[j];
             SDL_assert(lIndex < lNumCard && lIndex >= 0);
             vct_tmpRow[j] = vct_Mazzo[lIndex];
         }
@@ -39,9 +39,9 @@ void Probality::SvilCombiHands(VCT_MAZZO& vct_Mazzo,
         long i = 0, j = 0;
         long lChangeSubIndex = 0;
         // incrementa gli indici
-        for (j = m_iCardOnHand - 1; j >= 0; j--) {
-            m_vctCounter[j]++;
-            if (m_vctCounter[j] == lNumCard - i) {
+        for (j = _cardOnHand - 1; j >= 0; j--) {
+            _vctCounter[j]++;
+            if (_vctCounter[j] == lNumCard - i) {
                 // indice a fine corsa
                 lChangeSubIndex = i + 1;
             } else {
@@ -51,10 +51,10 @@ void Probality::SvilCombiHands(VCT_MAZZO& vct_Mazzo,
         }
         // aggiorna tutti gli indici
         for (; lChangeSubIndex > 0; lChangeSubIndex--) {
-            j = m_iCardOnHand - lChangeSubIndex;
+            j = _cardOnHand - lChangeSubIndex;
             SDL_assert(j - 1 >= 0);
-            SDL_assert(m_vctCounter[j - 1] + 1 < lNumCard);
-            m_vctCounter[j] = m_vctCounter[j - 1] + 1;
+            SDL_assert(_vctCounter[j - 1] + 1 < lNumCard);
+            _vctCounter[j] = _vctCounter[j - 1] + 1;
         }
     }
 

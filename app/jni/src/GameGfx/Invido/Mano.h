@@ -37,19 +37,19 @@ typedef std::deque<eManoStatus> DEQ_TABLESTATE;
 class PendQuestion {
    public:
     PendQuestion() {
-        m_bIsAMonte = false;
-        m_eScore = SC_CANELA;
-        m_iPlayerIx = NOT_VALID_INDEX;
+        _isAMonte = false;
+        _eScore = SC_CANELA;
+        _playerIx = NOT_VALID_INDEX;
     }
     PendQuestion(bool bVal, eGiocataScoreState eSc, int iPl) {
-        m_bIsAMonte = bVal;
-        m_eScore = eSc;
-        m_iPlayerIx = iPl;
+        _isAMonte = bVal;
+        _eScore = eSc;
+        _playerIx = iPl;
     }
     void operator=(const PendQuestion& r);
-    eGiocataScoreState m_eScore;
-    bool m_bIsAMonte;
-    int m_iPlayerIx;
+    eGiocataScoreState _eScore;
+    bool _isAMonte;
+    int _playerIx;
 };
 
 typedef std::deque<PendQuestion> DEQ_PENDQUESTION;
@@ -63,10 +63,10 @@ typedef std::vector<int> VCT_INT;
  */
 class ActionItem {
    public:
-    ActionItem() { m_eNextAction = MANO_NO_ACTION; }
+    ActionItem() { _eNextAction = MANO_NO_ACTION; }
 
-    eFN_MANOACTION m_eNextAction;
-    VCT_INT m_vct_iArg;
+    eFN_MANOACTION _eNextAction;
+    VCT_INT _vct_iArg;
 };
 
 typedef std::deque<ActionItem> DEQ_ACTIONITEM;
@@ -76,16 +76,16 @@ class TraceService;
 class Mano {
    public:
     Mano();
-    void SetCore(InvidoCore* pVal) { m_pInvidoCore = pVal; }
-    void SetGiocata(Giocata* pVal) { m_pGiocata = pVal; }
-    void SetScore(MatchPoints* pVal) { m_pScore = pVal; }
+    void SetCore(InvidoCore* pVal) { _p_InvidoCore = pVal; }
+    void SetGiocata(Giocata* pVal) { _p_Giocata = pVal; }
+    void SetScore(MatchPoints* pVal) { _p_Score = pVal; }
     void NewMano(int iPlayerIx);
     bool Player_Say(int iPlayerIx, eSayPlayer eSay);
     // player play a card
     bool Player_Play(int iPlayerIx, bool vadoDentro);
     void Reset();
     void NextAction();
-    eManoStatus GetState() { return m_eManoState; }
+    eManoStatus GetState() { return _eManoState; }
     void MatchStart();
     void GetAdmittedCommands(VCT_COMMANDS& vct_Commands, int iPlayerIndex);
     void GetMoreCommands(VCT_COMMANDS& vct_Commands, int iPlayerIndex);
@@ -120,27 +120,27 @@ class Mano {
     void removeObsoleteActions();
 
    private:
-    InvidoCore* m_pInvidoCore;
-    Giocata* m_pGiocata;
-    eManoStatus m_eManoState;
-    eManoStatus m_eOldManoState;
-    eTypeOfPLayer m_eTypePlayer[MAX_NUM_PLAYER];
-    int m_iNumOfPlayers;
-    DEQ_ACTIONITEM m_deqNextAction;
-    MatchPoints* m_pScore;
-    DEQ_PENDQUESTION m_deqPendQuestion;
-    MAP_ACTION_NAMES m_MapActionNames;
-    MAP_SAY_SCORE m_MapSayScore;
-    MAP_PL_STATUS m_MapManoStatePl;
-    MAP_PL_STATUS m_MapManoStateResp;
-    MAP_STATUS_PL m_MapPlayerOnState;
-    MAP_STATUS_ACTION m_MapActionOnState;
-    DEQ_TABLESTATE m_deqTableState;
-    PlayersOnTable* m_pTable;
-    int m_iPlayerChangeScore;
-    MAP_SCORE_SCORENEXT m_mapScoreScNext;
-    MAP_SCORE_SAY m_mapScoreSay;
-    TraceService* m_pTracer;
+    InvidoCore* _p_InvidoCore;
+    Giocata* _p_Giocata;
+    eManoStatus _eManoState;
+    eManoStatus _eOldManoState;
+    eTypeOfPLayer _eTypePlayer[MAX_NUM_PLAYER];
+    int _numOfPlayers;
+    DEQ_ACTIONITEM _deqNextAction;
+    MatchPoints* _p_Score;
+    DEQ_PENDQUESTION _deqPendQuestion;
+    MAP_ACTION_NAMES _MapActionNames;
+    MAP_SAY_SCORE _MapSayScore;
+    MAP_PL_STATUS _MapManoStatePl;
+    MAP_PL_STATUS _MapManoStateResp;
+    MAP_STATUS_PL _MapPlayerOnState;
+    MAP_STATUS_ACTION _MapActionOnState;
+    DEQ_TABLESTATE _deqTableState;
+    PlayersOnTable* _p_Table;
+    int _playerChangeScore;
+    MAP_SCORE_SCORENEXT _mapScoreScNext;
+    MAP_SCORE_SAY _mapScoreSay;
+    TraceService* _p_Tracer;
 };
 
 #endif

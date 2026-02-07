@@ -10,8 +10,8 @@ typedef std::vector<VCT_SINGLECARD> MTX_HANDCOMBI;
 class Probality {
    public:
     Probality() {
-        m_bIndexNotInit = true;
-        m_iCardOnHand = 3;
+        _indexNotInit = true;
+        _cardOnHand = 3;
     }
     void SvilCombiHands(VCT_MAZZO& vct_Mazzo, MTX_HANDCOMBI& mtx_Result);
     double BinomialCoef(long lN, long lK);
@@ -21,9 +21,9 @@ class Probality {
                                     const MTX_HANDCOMBI& o);
 
    private:
-    bool m_bIndexNotInit;
-    VCT_LONG m_vctCounter;
-    int m_iCardOnHand;
+    bool _indexNotInit;
+    VCT_LONG _vctCounter;
+    int _cardOnHand;
 };
 
 #endif

@@ -47,138 +47,137 @@ static eGiocataScoreState intToEScore(int iVal) {
 }
 
 void PendQuestion::operator=(const PendQuestion& r) {
-    m_eScore = r.m_eScore;
-    m_bIsAMonte = r.m_bIsAMonte;
-    m_iPlayerIx = r.m_iPlayerIx;
+    _eScore = r._eScore;
+    _isAMonte = r._isAMonte;
+    _playerIx = r._playerIx;
 }
 
 Mano::Mano() {
-    m_pInvidoCore = NULL;
-    m_pGiocata = NULL;
-    m_eManoState = MNST_WAIT_NEW_MANO;
-    m_pScore = NULL;
+    _p_InvidoCore = NULL;
+    _p_Giocata = NULL;
+    _eManoState = MNST_WAIT_NEW_MANO;
+    _p_Score = NULL;
 
     // initialize map for action tracing
-    m_MapActionNames[MANO_WAITPL_TOPLAY] = "WAITPL_TOPLAY";
-    m_MapActionNames[MANO_WAIPL_TORESP] = "WAIPL_TORESP";
-    m_MapActionNames[MANO_SAYBUIDA] = "SAYBUIDA";
-    m_MapActionNames[MANO_AMONTE] = "AMONTE";
-    m_MapActionNames[MANO_VADODENTRO] = "VADODENTRO";
-    m_MapActionNames[MANO_VADOVIA] = "VADOVIA";
-    m_MapActionNames[MANO_END] = "END";
-    m_MapActionNames[MANO_CHANGESCORE] = "CHANGESCORE";
-    m_MapActionNames[MANO_NO_ACTION] = "NO_ACTION";
+    _MapActionNames[MANO_WAITPL_TOPLAY] = "WAITPL_TOPLAY";
+    _MapActionNames[MANO_WAIPL_TORESP] = "WAIPL_TORESP";
+    _MapActionNames[MANO_SAYBUIDA] = "SAYBUIDA";
+    _MapActionNames[MANO_AMONTE] = "AMONTE";
+    _MapActionNames[MANO_VADODENTRO] = "VADODENTRO";
+    _MapActionNames[MANO_VADOVIA] = "VADOVIA";
+    _MapActionNames[MANO_END] = "END";
+    _MapActionNames[MANO_CHANGESCORE] = "CHANGESCORE";
+    _MapActionNames[MANO_NO_ACTION] = "NO_ACTION";
 
     // initialize map for conversion say and score
-    m_MapSayScore[AMONTE] = SC_AMONTE;
-    m_MapSayScore[INVIDO] = SC_INVIDO;
-    m_MapSayScore[TRASMAS] = SC_TRASMAS;
-    m_MapSayScore[TRASMASNOEF] = SC_TRASMASNOEF;
-    m_MapSayScore[FUERAJEUQ] = SC_FUERAJEUQ;
-    m_MapSayScore[PARTIDA] = SC_PARTIDA;
+    _MapSayScore[AMONTE] = SC_AMONTE;
+    _MapSayScore[INVIDO] = SC_INVIDO;
+    _MapSayScore[TRASMAS] = SC_TRASMAS;
+    _MapSayScore[TRASMASNOEF] = SC_TRASMASNOEF;
+    _MapSayScore[FUERAJEUQ] = SC_FUERAJEUQ;
+    _MapSayScore[PARTIDA] = SC_PARTIDA;
 
     // score say map
-    m_mapScoreSay[SC_AMONTE] = AMONTE;
-    m_mapScoreSay[SC_INVIDO] = INVIDO;
-    m_mapScoreSay[SC_TRASMAS] = TRASMAS;
-    m_mapScoreSay[SC_TRASMASNOEF] = TRASMASNOEF;
-    m_mapScoreSay[SC_FUERAJEUQ] = FUERAJEUQ;
-    m_mapScoreSay[SC_PARTIDA] = PARTIDA;
+    _mapScoreSay[SC_AMONTE] = AMONTE;
+    _mapScoreSay[SC_INVIDO] = INVIDO;
+    _mapScoreSay[SC_TRASMAS] = TRASMAS;
+    _mapScoreSay[SC_TRASMASNOEF] = TRASMASNOEF;
+    _mapScoreSay[SC_FUERAJEUQ] = FUERAJEUQ;
+    _mapScoreSay[SC_PARTIDA] = PARTIDA;
 
     // initilize map player status
-    m_MapManoStatePl[PLAYER1] = MNST_WAIT_PLAY_PLAYER_1;
-    m_MapManoStatePl[PLAYER2] = MNST_WAIT_PLAY_PLAYER_2;
-    m_MapManoStatePl[PLAYER3] = MNST_WAIT_PLAY_PLAYER_3;
-    m_MapManoStatePl[PLAYER4] = MNST_WAIT_PLAY_PLAYER_4;
+    _MapManoStatePl[PLAYER1] = MNST_WAIT_PLAY_PLAYER_1;
+    _MapManoStatePl[PLAYER2] = MNST_WAIT_PLAY_PLAYER_2;
+    _MapManoStatePl[PLAYER3] = MNST_WAIT_PLAY_PLAYER_3;
+    _MapManoStatePl[PLAYER4] = MNST_WAIT_PLAY_PLAYER_4;
 
     // responce status
-    m_MapManoStateResp[PLAYER1] = MNST_WAIT_RESP_PLAYER_1;
-    m_MapManoStateResp[PLAYER2] = MNST_WAIT_RESP_PLAYER_2;
-    m_MapManoStateResp[PLAYER3] = MNST_WAIT_RESP_PLAYER_3;
-    m_MapManoStateResp[PLAYER4] = MNST_WAIT_RESP_PLAYER_4;
+    _MapManoStateResp[PLAYER1] = MNST_WAIT_RESP_PLAYER_1;
+    _MapManoStateResp[PLAYER2] = MNST_WAIT_RESP_PLAYER_2;
+    _MapManoStateResp[PLAYER3] = MNST_WAIT_RESP_PLAYER_3;
+    _MapManoStateResp[PLAYER4] = MNST_WAIT_RESP_PLAYER_4;
 
     // player index map init
-    m_MapPlayerOnState[MNST_WAIT_PLAY_PLAYER_1] = PLAYER1;
-    m_MapPlayerOnState[MNST_WAIT_PLAY_PLAYER_2] = PLAYER2;
-    m_MapPlayerOnState[MNST_WAIT_PLAY_PLAYER_3] = PLAYER3;
-    m_MapPlayerOnState[MNST_WAIT_PLAY_PLAYER_4] = PLAYER4;
+    _MapPlayerOnState[MNST_WAIT_PLAY_PLAYER_1] = PLAYER1;
+    _MapPlayerOnState[MNST_WAIT_PLAY_PLAYER_2] = PLAYER2;
+    _MapPlayerOnState[MNST_WAIT_PLAY_PLAYER_3] = PLAYER3;
+    _MapPlayerOnState[MNST_WAIT_PLAY_PLAYER_4] = PLAYER4;
 
     // action on state init
-    m_MapActionOnState[MNST_WAIT_PLAY_PLAYER_1] = MANO_WAITPL_TOPLAY;
-    m_MapActionOnState[MNST_WAIT_PLAY_PLAYER_2] = MANO_WAITPL_TOPLAY;
-    m_MapActionOnState[MNST_WAIT_PLAY_PLAYER_3] = MANO_WAITPL_TOPLAY;
-    m_MapActionOnState[MNST_WAIT_PLAY_PLAYER_4] = MANO_WAITPL_TOPLAY;
-    m_MapActionOnState[MNST_MANO_END] = MANO_END;
-    m_MapActionOnState[MNST_WAIT_RESP_PLAYER_1] = MANO_WAIPL_TORESP;
-    m_MapActionOnState[MNST_WAIT_RESP_PLAYER_2] = MANO_WAIPL_TORESP;
-    m_MapActionOnState[MNST_WAIT_RESP_PLAYER_3] = MANO_WAIPL_TORESP;
-    m_MapActionOnState[MNST_WAIT_RESP_PLAYER_4] = MANO_WAIPL_TORESP;
+    _MapActionOnState[MNST_WAIT_PLAY_PLAYER_1] = MANO_WAITPL_TOPLAY;
+    _MapActionOnState[MNST_WAIT_PLAY_PLAYER_2] = MANO_WAITPL_TOPLAY;
+    _MapActionOnState[MNST_WAIT_PLAY_PLAYER_3] = MANO_WAITPL_TOPLAY;
+    _MapActionOnState[MNST_WAIT_PLAY_PLAYER_4] = MANO_WAITPL_TOPLAY;
+    _MapActionOnState[MNST_MANO_END] = MANO_END;
+    _MapActionOnState[MNST_WAIT_RESP_PLAYER_1] = MANO_WAIPL_TORESP;
+    _MapActionOnState[MNST_WAIT_RESP_PLAYER_2] = MANO_WAIPL_TORESP;
+    _MapActionOnState[MNST_WAIT_RESP_PLAYER_3] = MANO_WAIPL_TORESP;
+    _MapActionOnState[MNST_WAIT_RESP_PLAYER_4] = MANO_WAIPL_TORESP;
 
     // score - score next
-    m_mapScoreScNext[SC_CANELA] = SC_INVIDO;
-    m_mapScoreScNext[SC_INVIDO] = SC_TRASMAS;
-    m_mapScoreScNext[SC_TRASMAS] = SC_TRASMASNOEF;
-    m_mapScoreScNext[SC_TRASMASNOEF] = SC_FUERAJEUQ;
-    m_mapScoreScNext[SC_FUERAJEUQ] = SC_PARTIDA;
+    _mapScoreScNext[SC_CANELA] = SC_INVIDO;
+    _mapScoreScNext[SC_INVIDO] = SC_TRASMAS;
+    _mapScoreScNext[SC_TRASMAS] = SC_TRASMASNOEF;
+    _mapScoreScNext[SC_TRASMASNOEF] = SC_FUERAJEUQ;
+    _mapScoreScNext[SC_FUERAJEUQ] = SC_PARTIDA;
 
-    m_pTable = 0;
+    _p_Table = 0;
 
-    m_pTracer = TraceService::Instance();
+    _p_Tracer = TraceService::Instance();
 }
 
 void Mano::NextAction() {
-    size_t iNumAct = m_deqNextAction.size();
+    size_t iNumAct = _deqNextAction.size();
     if (iNumAct == 0) {
         // no action
         return;
     }
-    ActionItem Action = m_deqNextAction.front();
-    m_deqNextAction.pop_front();
+    ActionItem Action = _deqNextAction.front();
+    _deqNextAction.pop_front();
 
     eGiocataScoreState eScore;
-    // TRACE_DEBUG("Process action (NextAction): %d\n", Action.m_eNextAction);
-    if (m_pTracer->AddNewEntry(1, 1, EntryTraceDetail::TR_INFO, __FILE__,
+    // TRACE_DEBUG("Process action (NextAction): %d\n", Action._eNextAction);
+    if (_p_Tracer->AddNewEntry(1, 1, EntryTraceDetail::TR_INFO, __FILE__,
                                __LINE__))
-        m_pTracer->AddCommentToLastEntry(
-            "Process action (NextAction): %s",
-            stalpzActionName[Action.m_eNextAction]);
+        _p_Tracer->AddCommentToLastEntry("Process action (NextAction): %s",
+                                         stalpzActionName[Action._eNextAction]);
 
-    switch (Action.m_eNextAction) {
+    switch (Action._eNextAction) {
         case MANO_WAITPL_TOPLAY:
-            SDL_assert(Action.m_vct_iArg.size() > 0);
-            // may be m_eNextAction is modified
-            m_pInvidoCore->NtyWaitingPlayer_Toplay(Action.m_vct_iArg[0]);
-            if (m_pTracer->AddNewEntry(1, 2, EntryTraceDetail::TR_INFO,
+            SDL_assert(Action._vct_iArg.size() > 0);
+            // may be _eNextAction is modified
+            _p_InvidoCore->NtyWaitingPlayer_Toplay(Action._vct_iArg[0]);
+            if (_p_Tracer->AddNewEntry(1, 2, EntryTraceDetail::TR_INFO,
                                        __FILE__, __LINE__))
-                m_pTracer->AddCommentToLastEntry("Wait play player: %d",
-                                                 Action.m_vct_iArg[0]);
+                _p_Tracer->AddCommentToLastEntry("Wait play player: %d",
+                                                 Action._vct_iArg[0]);
             break;
 
         case MANO_AMONTE:
-            m_pInvidoCore->Giocata_AMonte();
+            _p_InvidoCore->Giocata_AMonte();
             break;
 
         case MANO_VADODENTRO:
-            // m_pInvidoCore->;
+            // _p_InvidoCore->;
             //  TO DO
             SDL_assert(0);
             break;
 
         case MANO_VADOVIA:
-            m_pInvidoCore->Player_VaVia(Action.m_vct_iArg[0]);
+            _p_InvidoCore->Player_VaVia(Action._vct_iArg[0]);
             break;
 
         case MANO_WAIPL_TORESP:
-            m_pInvidoCore->NtyWaitingPlayer_ToResp(Action.m_vct_iArg[0]);
+            _p_InvidoCore->NtyWaitingPlayer_ToResp(Action._vct_iArg[0]);
             break;
 
         case MANO_END:
-            m_pInvidoCore->Mano_End();
+            _p_InvidoCore->Mano_End();
             break;
 
         case MANO_CHANGESCORE:
-            eScore = intToEScore(Action.m_vct_iArg[0]);
-            m_pInvidoCore->ChangeGiocataScore(eScore);
+            eScore = intToEScore(Action._vct_iArg[0]);
+            _p_InvidoCore->ChangeGiocataScore(eScore);
             // process the next action without waiting the next trigger
             NextAction();
             break;
@@ -190,7 +189,7 @@ void Mano::NextAction() {
             break;
 
         case MANO_SAYBUIDA:
-            m_pInvidoCore->NtyPlayerSayBuiada(Action.m_vct_iArg[0]);
+            _p_InvidoCore->NtyPlayerSayBuiada(Action._vct_iArg[0]);
             break;
 
         default:
@@ -201,24 +200,24 @@ void Mano::NextAction() {
 
 void Mano::GiocataStart() {
     // reset player change score  index
-    m_iPlayerChangeScore = NOT_VALID_INDEX;
+    _playerChangeScore = NOT_VALID_INDEX;
 }
 
 void Mano::MatchStart() {
-    m_iNumOfPlayers = m_pInvidoCore->GetNumOfPlayers();
-    for (int i = 0; i < m_iNumOfPlayers; i++) {
-        Player* pPlayer = m_pInvidoCore->GetPlayer(i);
-        m_eTypePlayer[i] = pPlayer->GetType();
+    _numOfPlayers = _p_InvidoCore->GetNumOfPlayers();
+    for (int i = 0; i < _numOfPlayers; i++) {
+        Player* pPlayer = _p_InvidoCore->GetPlayer(i);
+        _eTypePlayer[i] = pPlayer->GetType();
     }
 
-    m_pTable = m_pInvidoCore->GetTable();
+    _p_Table = _p_InvidoCore->GetTable();
 }
 
 void Mano::NewMano(int iPlayerIx) {
     clearQuestions();
 
-    if (m_eManoState == MNST_WAIT_NEW_MANO || m_eManoState == MNST_MANO_END) {
-        SDL_assert(iPlayerIx >= 0 && iPlayerIx < m_iNumOfPlayers);
+    if (_eManoState == MNST_WAIT_NEW_MANO || _eManoState == MNST_MANO_END) {
+        SDL_assert(iPlayerIx >= 0 && iPlayerIx < _numOfPlayers);
         // set action
         add_Action(iPlayerIx, MANO_WAITPL_TOPLAY);
 
@@ -226,38 +225,38 @@ void Mano::NewMano(int iPlayerIx) {
         int aTablePlayer[MAX_NUM_PLAYER];
 
         // calculate the array of player indexes
-        m_pTable->CalcCircleIndex_Cust(aTablePlayer, iPlayerIx);
-        m_deqTableState.clear();
-        for (int i = 0; i < m_iNumOfPlayers; i++) {
+        _p_Table->CalcCircleIndex_Cust(aTablePlayer, iPlayerIx);
+        _deqTableState.clear();
+        for (int i = 0; i < _numOfPlayers; i++) {
             int iTmpPlayer = aTablePlayer[i];
-            eManoStatus eVal = m_MapManoStatePl[iTmpPlayer];
-            m_deqTableState.push_back(eVal);
+            eManoStatus eVal = _MapManoStatePl[iTmpPlayer];
+            _deqTableState.push_back(eVal);
         }
-        m_deqTableState.push_back(MNST_MANO_END);
+        _deqTableState.push_back(MNST_MANO_END);
 
         // next state
-        m_eManoState = nextTableState();
+        _eManoState = nextTableState();
 
     } else {
-        m_pInvidoCore->RaiseError("Mano state not correct\n");
+        _p_InvidoCore->RaiseError("Mano state not correct\n");
         SDL_assert(0);
     }
 }
 
 bool Mano::Player_Play(int iPlayerIx, bool vadoDentro) {
-    // TRACE_DEBUG("Player%d play state %d \n", iPlayerIx, m_eManoState);
-    if (m_pTracer->AddNewEntry(1, 3, EntryTraceDetail::TR_INFO, __FILE__,
+    // TRACE_DEBUG("Player%d play state %d \n", iPlayerIx, _eManoState);
+    if (_p_Tracer->AddNewEntry(1, 3, EntryTraceDetail::TR_INFO, __FILE__,
                                __LINE__))
-        m_pTracer->AddCommentToLastEntry("Player%d play state %s", iPlayerIx,
-                                         stalpzManoState[m_eManoState]);
+        _p_Tracer->AddCommentToLastEntry("Player%d play state %s", iPlayerIx,
+                                         stalpzManoState[_eManoState]);
 
-    if (m_eManoState == MNST_WAIT_NEW_MANO || m_eManoState == MNST_MANO_END) {
+    if (_eManoState == MNST_WAIT_NEW_MANO || _eManoState == MNST_MANO_END) {
         // don't accept play if the mano is not initialized
-        if (m_pTracer->AddNewEntry(1, 4, EntryTraceDetail::TR_WARN, __FILE__,
+        if (_p_Tracer->AddNewEntry(1, 4, EntryTraceDetail::TR_WARN, __FILE__,
                                    __LINE__))
-            m_pTracer->AddCommentToLastEntry("Don't accept card play %d %s",
+            _p_Tracer->AddCommentToLastEntry("Don't accept card play %d %s",
                                              iPlayerIx,
-                                             stalpzManoState[m_eManoState]);
+                                             stalpzManoState[_eManoState]);
         return false;
     }
 
@@ -266,71 +265,69 @@ bool Mano::Player_Play(int iPlayerIx, bool vadoDentro) {
 
         PendQuestion PendQues;
         if (get_LastPendQuest(PendQues)) {
-            if (PendQues.m_iPlayerIx == iPlayerIx) {
+            if (PendQues._playerIx == iPlayerIx) {
                 // same player has make a question: waiting the responce before
                 // play
-                if (m_pTracer->AddNewEntry(1, 5, EntryTraceDetail::TR_WARN,
+                if (_p_Tracer->AddNewEntry(1, 5, EntryTraceDetail::TR_WARN,
                                            __FILE__, __LINE__))
-                    m_pTracer->AddCommentToLastEntry(
+                    _p_Tracer->AddCommentToLastEntry(
                         "Player %d, question is pending, wait responce",
                         iPlayerIx);
 
                 return false;
             }
-            if (PendQues.m_bIsAMonte) {
+            if (PendQues._isAMonte) {
                 // a monte call is pending: play a card is not admitted
-                if (m_pTracer->AddNewEntry(1, 6, EntryTraceDetail::TR_WARN,
+                if (_p_Tracer->AddNewEntry(1, 6, EntryTraceDetail::TR_WARN,
                                            __FILE__, __LINE__))
-                    m_pTracer->AddCommentToLastEntry(
+                    _p_Tracer->AddCommentToLastEntry(
                         "Player %d, monte call is pending, wait responce",
                         iPlayerIx);
 
                 return false;
             } else {
                 // score question is pending: silent accept the question
-                m_pScore->ChangeCurrentScore(PendQues.m_eScore,
-                                             PendQues.m_iPlayerIx);
+                _p_Score->ChangeCurrentScore(PendQues._eScore,
+                                             PendQues._playerIx);
                 // clear question list
                 clearQuestions();
                 // save the player index that make a change
-                m_iPlayerChangeScore = PendQues.m_iPlayerIx;
+                _playerChangeScore = PendQues._playerIx;
             }
         } else {
             // no question and no player state. Wrong state
-            if (m_pTracer->AddNewEntry(1, 7, EntryTraceDetail::TR_ERR, __FILE__,
+            if (_p_Tracer->AddNewEntry(1, 7, EntryTraceDetail::TR_ERR, __FILE__,
                                        __LINE__))
-                m_pTracer->AddCommentToLastEntry(
+                _p_Tracer->AddCommentToLastEntry(
                     "no question and no player state. Wrong state");
             SDL_assert(0);
         }
     }
 
-    eManoStatus eExpectedState = m_MapManoStatePl[iPlayerIx];
-    if (eExpectedState != m_eManoState) {
+    eManoStatus eExpectedState = _MapManoStatePl[iPlayerIx];
+    if (eExpectedState != _eManoState) {
         // player is not allowed to play
-        if (m_pTracer->AddNewEntry(1, 8, EntryTraceDetail::TR_WARN, __FILE__,
+        if (_p_Tracer->AddNewEntry(1, 8, EntryTraceDetail::TR_WARN, __FILE__,
                                    __LINE__))
-            m_pTracer->AddCommentToLastEntry(
+            _p_Tracer->AddCommentToLastEntry(
                 "Player %d, is not allowed to play, expected state %s: ",
                 iPlayerIx, stalpzManoState[eExpectedState]);
         return false;
     }
 
     // next state
-    m_eManoState = nextTableState();
+    _eManoState = nextTableState();
     // new player on play
-    int iNewPlayer = m_MapPlayerOnState[m_eManoState];
+    int iNewPlayer = _MapPlayerOnState[_eManoState];
     // new action
-    eFN_MANOACTION eAct_Type = m_MapActionOnState[m_eManoState];
+    eFN_MANOACTION eAct_Type = _MapActionOnState[_eManoState];
 
     add_Action(iNewPlayer, eAct_Type);
-
     return true;
 }
 
 bool Mano::Player_Say(int iPlayerIx, eSayPlayer eSay) {
-    TRACE_DEBUG("Player%d say %d, state %d \n", iPlayerIx, eSay, m_eManoState);
-    if (m_eManoState == MNST_WAIT_NEW_MANO || m_eManoState == MNST_MANO_END) {
+    if (_eManoState == MNST_WAIT_NEW_MANO || _eManoState == MNST_MANO_END) {
         // don't accept calls if the mano is not initialized
         return false;
     }
@@ -362,7 +359,7 @@ bool Mano::isScoreBigClosed(eGiocataScoreState eS1, eGiocataScoreState eS2) {
     bool bRes = false;
 
     // eS2 is the smaller score
-    eGiocataScoreState eTmp = m_mapScoreScNext[eS2];
+    eGiocataScoreState eTmp = _mapScoreScNext[eS2];
     if (eTmp == eS1) {
         // ok the 2 score are enought closed
         bRes = true;
@@ -371,9 +368,9 @@ bool Mano::isScoreBigClosed(eGiocataScoreState eS1, eGiocataScoreState eS2) {
 }
 
 void Mano::handle_ScoreCalled(int iPlayerIx, eSayPlayer eSay) {
-    int iAttScore = m_pScore->GetCurrScore();
+    int iAttScore = _p_Score->GetCurrScore();
     eGiocataScoreState eScore;
-    eScore = m_MapSayScore[eSay];
+    eScore = _MapSayScore[eSay];
 
     PendQuestion PendScoreQuesLast;
     PendQuestion PendQuesMonte;
@@ -382,20 +379,20 @@ void Mano::handle_ScoreCalled(int iPlayerIx, eSayPlayer eSay) {
         // score call is admitted only if the pending question  was a small of
         // the call score from opponent How small? only the closest call is
         // admitted (canela->invido->trasmas->noef->foera->partida)
-        if (PendScoreQuesLast.m_iPlayerIx != iPlayerIx &&
-            isScoreBigClosed(eScore, PendScoreQuesLast.m_eScore)) {
+        if (PendScoreQuesLast._playerIx != iPlayerIx &&
+            isScoreBigClosed(eScore, PendScoreQuesLast._eScore)) {
             // score call admitted
 
             // implicit change of score to the first call
-            m_pScore->ChangeCurrentScore(PendScoreQuesLast.m_eScore,
-                                         PendScoreQuesLast.m_iPlayerIx);
+            _p_Score->ChangeCurrentScore(PendScoreQuesLast._eScore,
+                                         PendScoreQuesLast._playerIx);
             // save the player index that make a change
-            m_iPlayerChangeScore = PendScoreQuesLast.m_iPlayerIx;
-            add_Action(PendScoreQuesLast.m_eScore, MANO_CHANGESCORE);
+            _playerChangeScore = PendScoreQuesLast._playerIx;
+            add_Action(PendScoreQuesLast._eScore, MANO_CHANGESCORE);
 
             // new question state
             PendQuestion NewPendQues(FALSE, eScore, iPlayerIx);
-            m_deqPendQuestion.push_back(NewPendQues);
+            _deqPendQuestion.push_back(NewPendQues);
 
             actionOnQuestion(NewPendQues);
 
@@ -413,8 +410,8 @@ void Mano::handle_ScoreCalled(int iPlayerIx, eSayPlayer eSay) {
     } else if (get_LastPendQuest(PendQuesMonte)) {
         // if a question is pending, it could be only a monte
         // a monte pending question
-        SDL_assert(PendQuesMonte.m_bIsAMonte);
-        if (iPlayerIx == m_iPlayerChangeScore) {
+        SDL_assert(PendQuesMonte._isAMonte);
+        if (iPlayerIx == _playerChangeScore) {
             // the same player can't increment the score
             // call not admitted
             add_Action(iPlayerIx, MANO_SAYBUIDA);
@@ -422,14 +419,14 @@ void Mano::handle_ScoreCalled(int iPlayerIx, eSayPlayer eSay) {
         }
 
     } else if (eScore > iAttScore) {
-        if (iPlayerIx == m_iPlayerChangeScore) {
+        if (iPlayerIx == _playerChangeScore) {
             // the same player can't change the score
             add_Action(iPlayerIx, MANO_SAYBUIDA);
             actionWithoutQuestion();
         } else {
             // no pending question, call accepted
             PendQuestion NewPendQues(FALSE, eScore, iPlayerIx);
-            m_deqPendQuestion.push_back(NewPendQues);
+            _deqPendQuestion.push_back(NewPendQues);
 
             actionOnQuestion(NewPendQues);
         }
@@ -444,9 +441,9 @@ void Mano::handle_MonteCall(int iPlayerIx, eSayPlayer eSay) {
     PendQuestion PendQuesLast;
 
     if (get_LastPendQuest(PendQuesLast)) {
-        if (PendQuesLast.m_bIsAMonte) {
+        if (PendQuesLast._isAMonte) {
             // there is a MONTE pending question
-            if (PendQuesLast.m_iPlayerIx != iPlayerIx) {
+            if (PendQuesLast._playerIx != iPlayerIx) {
                 // ok this giocata goes a monte
                 giocata_Go_Amonte(iPlayerIx);
             } else {
@@ -463,9 +460,9 @@ void Mano::handle_MonteCall(int iPlayerIx, eSayPlayer eSay) {
 }
 
 void Mano::giocata_Go_Amonte(int iPlayerIx) {
-    m_pScore->ChangeCurrentScore(SC_AMONTE, iPlayerIx);
+    _p_Score->ChangeCurrentScore(SC_AMONTE, iPlayerIx);
     add_Action(iPlayerIx, MANO_AMONTE);
-    m_eManoState = MNST_WAIT_NEW_MANO;
+    _eManoState = MNST_WAIT_NEW_MANO;
 
     // clear question list
     clearQuestions();
@@ -480,7 +477,7 @@ void Mano::handle_CallNo(int iPlayerIx) {
     if (get_LastPendQuest(PendQues)) {
         // there is question pending, the responce is no
         // no is admitted only on "A monte" call
-        if (PendQues.m_bIsAMonte) {
+        if (PendQues._isAMonte) {
             // remove the monte question
             remove_LastQuestion();
             if (get_LastPendQuest(PendQues)) {
@@ -507,17 +504,16 @@ void Mano::handleVaBene(int iPlayerIx) {
     PendQuestion PendQues;
     if (get_LastPendQuest(PendQues)) {
         // question was pending
-        if (PendQues.m_bIsAMonte) {
+        if (PendQues._isAMonte) {
             // question was a monte, accept it
             giocata_Go_Amonte(iPlayerIx);
 
         } else {
             // change score question, set the new score
-            m_pScore->ChangeCurrentScore(PendQues.m_eScore,
-                                         PendQues.m_iPlayerIx);
+            _p_Score->ChangeCurrentScore(PendQues._eScore, PendQues._playerIx);
             // save the player index that make a change
-            m_iPlayerChangeScore = PendQues.m_iPlayerIx;
-            add_Action(PendQues.m_eScore, MANO_CHANGESCORE);
+            _playerChangeScore = PendQues._playerIx;
+            add_Action(PendQues._eScore, MANO_CHANGESCORE);
             // clear question list
             clearQuestions();
 
@@ -535,12 +531,12 @@ void Mano::handleVaBene(int iPlayerIx) {
 void Mano::handleVadoVia(int iPlayerIx) {
     PendQuestion PendQues;
     if (get_LastPendQuest(PendQues)) {
-        if (PendQues.m_iPlayerIx != iPlayerIx && !PendQues.m_bIsAMonte) {
+        if (PendQues._playerIx != iPlayerIx && !PendQues._isAMonte) {
             // last change score question not accepted
             add_Action(iPlayerIx, MANO_VADOVIA);
             // clear question list
             clearQuestions();
-            m_eManoState = MNST_WAIT_NEW_MANO;
+            _eManoState = MNST_WAIT_NEW_MANO;
 
         } else {
             // amonte question or the player was already asking
@@ -553,7 +549,7 @@ void Mano::handleVadoVia(int iPlayerIx) {
         add_Action(iPlayerIx, MANO_VADOVIA);
         // clear question list
         clearQuestions();
-        m_eManoState = MNST_WAIT_NEW_MANO;
+        _eManoState = MNST_WAIT_NEW_MANO;
     }
 }
 
@@ -566,16 +562,16 @@ void Mano::actionOnQuestion(PendQuestion& PendQues) {
     // prepare state queue on table players
     int aTablePlayer[MAX_NUM_PLAYER];
     // calculate the array of player indexes
-    m_pTable->CalcCircleIndex_Cust(aTablePlayer, PendQues.m_iPlayerIx);
+    _p_Table->CalcCircleIndex_Cust(aTablePlayer, PendQues._playerIx);
     // use the index of the next player
     int iPlayerNext = aTablePlayer[1];
     add_Action(iPlayerNext, MANO_WAIPL_TORESP);
 
-    m_eManoState = m_MapManoStateResp[iPlayerNext];
+    _eManoState = _MapManoStateResp[iPlayerNext];
 }
 
 void Mano::actionWithoutQuestion() {
-    SDL_assert(m_deqPendQuestion.size() == 0);
+    SDL_assert(_deqPendQuestion.size() == 0);
     if (!IsPlayerOnCardPl()) {
         // status is not card playing, but responding
         // restore the old state playing
@@ -583,21 +579,21 @@ void Mano::actionWithoutQuestion() {
 
     } else {
         // retrigger the play status
-        int iPlayerIx = m_MapPlayerOnState[m_eManoState];
-        eFN_MANOACTION eAct_Type = m_MapActionOnState[m_eManoState];
+        int iPlayerIx = _MapPlayerOnState[_eManoState];
+        eFN_MANOACTION eAct_Type = _MapActionOnState[_eManoState];
         add_Action(iPlayerIx, eAct_Type);
     }
 }
 
 void Mano::Reset() {
-    m_deqNextAction.clear();
-    m_eManoState = MNST_WAIT_NEW_MANO;
+    _deqNextAction.clear();
+    _eManoState = MNST_WAIT_NEW_MANO;
 }
 
 void Mano::add_QuestMonte(int iPlayerIx) {
     // add the MONTE question to the queue
     PendQuestion PendQues(TRUE, SC_AMONTE, iPlayerIx);
-    m_deqPendQuestion.push_back(PendQues);
+    _deqPendQuestion.push_back(PendQues);
 
     actionOnQuestion(PendQues);
 }
@@ -605,36 +601,36 @@ void Mano::add_QuestMonte(int iPlayerIx) {
 void Mano::add_Action(int iPar_0, eFN_MANOACTION eAct) {
     ActionItem Action;
 
-    Action.m_eNextAction = eAct;
-    Action.m_vct_iArg.push_back(iPar_0);
+    Action._eNextAction = eAct;
+    Action._vct_iArg.push_back(iPar_0);
     if (eAct == MANO_WAITPL_TOPLAY || eAct == MANO_WAIPL_TORESP) {
         // remove action scheduled but not yet executed because obsolete
         removeObsoleteActions();
     }
-    m_deqNextAction.push_back(Action);
+    _deqNextAction.push_back(Action);
 
-    STRING strActName = m_MapActionNames[eAct];
+    STRING strActName = _MapActionNames[eAct];
     TRACE_DEBUG("Mano-> Action scheduled %s, param: %d\n", strActName.c_str(),
                 iPar_0);
 }
 
 void Mano::removeObsoleteActions() {
-    size_t iNumAct = m_deqNextAction.size();
+    size_t iNumAct = _deqNextAction.size();
     for (int i = 0; i < iNumAct; i++) {
-        ActionItem Action = m_deqNextAction[i];
-        if (Action.m_eNextAction == MANO_WAITPL_TOPLAY ||
-            Action.m_eNextAction == MANO_WAIPL_TORESP) {
+        ActionItem Action = _deqNextAction[i];
+        if (Action._eNextAction == MANO_WAITPL_TOPLAY ||
+            Action._eNextAction == MANO_WAIPL_TORESP) {
             // this is an obselete action, make it inoffensive
-            m_deqNextAction[i].m_eNextAction = MANO_NO_ACTION;
+            _deqNextAction[i]._eNextAction = MANO_NO_ACTION;
         }
     }
 }
 
 bool Mano::get_LastPendQuest(PendQuestion& PendQues) {
     bool bRes = false;
-    size_t iNumEle = m_deqPendQuestion.size();
+    size_t iNumEle = _deqPendQuestion.size();
     if (iNumEle > 0) {
-        PendQues = m_deqPendQuestion[iNumEle - 1];
+        PendQues = _deqPendQuestion[iNumEle - 1];
         bRes = true;
     }
     return bRes;
@@ -642,13 +638,13 @@ bool Mano::get_LastPendQuest(PendQuestion& PendQues) {
 
 bool Mano::get_LastPendScoreQuest(PendQuestion& PendQues) {
     bool bRes = false;
-    size_t iNumEle = m_deqPendQuestion.size();
+    size_t iNumEle = _deqPendQuestion.size();
     int iCurr = 0;
     while (iNumEle - iCurr > 0) {
         size_t iIndexLast = iNumEle - iCurr - 1;
-        PendQues = m_deqPendQuestion[iIndexLast];
+        PendQues = _deqPendQuestion[iIndexLast];
 
-        if (!PendQues.m_bIsAMonte) {
+        if (!PendQues._isAMonte) {
             // this is a score question, ok we have it
             bRes = true;
             break;
@@ -659,44 +655,44 @@ bool Mano::get_LastPendScoreQuest(PendQuestion& PendQues) {
 }
 
 void Mano::remove_LastQuestion() {
-    size_t iNumEle = m_deqPendQuestion.size();
+    size_t iNumEle = _deqPendQuestion.size();
     if (iNumEle > 0) {
-        m_deqPendQuestion.pop_back();
+        _deqPendQuestion.pop_back();
     }
 }
 
 void Mano::restore_StateBeforeQuest() {
-    m_eManoState = m_eOldManoState;
-    eFN_MANOACTION eAct_Type = m_MapActionOnState[m_eManoState];
+    _eManoState = _eOldManoState;
+    eFN_MANOACTION eAct_Type = _MapActionOnState[_eManoState];
 
-    int iPlayerIx = m_MapPlayerOnState[m_eManoState];
+    int iPlayerIx = _MapPlayerOnState[_eManoState];
     add_Action(iPlayerIx, eAct_Type);
 }
 
-void Mano::save_StateBeforeQuest() { m_eOldManoState = m_eManoState; }
+void Mano::save_StateBeforeQuest() { _eOldManoState = _eManoState; }
 
 void Mano::clearQuestions() {
     TRACE_DEBUG("Clear all pending questions\n");
-    m_deqPendQuestion.clear();
+    _deqPendQuestion.clear();
 }
 
 bool Mano::IsPlayerOnCardPl() {
     bool bRes = false;
-    if (m_eManoState == MNST_WAIT_PLAY_PLAYER_1 ||
-        m_eManoState == MNST_WAIT_PLAY_PLAYER_2 ||
-        m_eManoState == MNST_WAIT_PLAY_PLAYER_3 ||
-        m_eManoState == MNST_WAIT_PLAY_PLAYER_4) {
+    if (_eManoState == MNST_WAIT_PLAY_PLAYER_1 ||
+        _eManoState == MNST_WAIT_PLAY_PLAYER_2 ||
+        _eManoState == MNST_WAIT_PLAY_PLAYER_3 ||
+        _eManoState == MNST_WAIT_PLAY_PLAYER_4) {
         bRes = true;
     }
     return bRes;
 }
 
 eManoStatus Mano::nextTableState() {
-    SDL_assert(m_deqTableState.size() > 0);
+    SDL_assert(_deqTableState.size() > 0);
     eManoStatus eRetState = MNST_WAIT_NEW_MANO;
-    if (m_deqTableState.size() > 0) {
-        eRetState = m_deqTableState[0];
-        m_deqTableState.pop_front();
+    if (_deqTableState.size() > 0) {
+        eRetState = _deqTableState[0];
+        _deqTableState.pop_front();
     }
 
     return eRetState;
@@ -705,14 +701,14 @@ eManoStatus Mano::nextTableState() {
 void Mano::CommandWithPendingQuestion(PendQuestion& PendQues,
                                       VCT_COMMANDS& vct_Commands,
                                       int iPlayerIndex) {
-    if (iPlayerIndex == PendQues.m_iPlayerIx) {
+    if (iPlayerIndex == PendQues._playerIx) {
         // if pending question is from the same player,
         // he can say anything
         vct_Commands.clear();
         return;
     }
     // the question is an opponent question
-    if (PendQues.m_bIsAMonte) {
+    if (PendQues._isAMonte) {
         // pending question is "a monte"
         vct_Commands.push_back(VABENE);
         vct_Commands.push_back(NO);
@@ -722,10 +718,10 @@ void Mano::CommandWithPendingQuestion(PendQuestion& PendQues,
         vct_Commands.push_back(AMONTE);
         vct_Commands.push_back(GIOCA);
         // get the next score
-        if (PendQues.m_eScore != PARTIDA) {
+        if (PendQues._eScore != PARTIDA) {
             // it is possible to call more score
-            eGiocataScoreState eNextScore = m_mapScoreScNext[PendQues.m_eScore];
-            eSayPlayer eCallMore = m_mapScoreSay[eNextScore];
+            eGiocataScoreState eNextScore = _mapScoreScNext[PendQues._eScore];
+            eSayPlayer eCallMore = _mapScoreSay[eNextScore];
             vct_Commands.push_back(eCallMore);
         }
     }
@@ -740,9 +736,9 @@ void Mano::GetMoreCommands(VCT_COMMANDS& vct_Commands, int iPlayerIndex) {
         return;
     }
     vct_Commands.push_back(VADODENTRO);
-    if (m_iPlayerChangeScore == iPlayerIndex) {
+    if (_playerChangeScore == iPlayerIndex) {
         vct_Commands.push_back(CHIAMADIPIU);
-    } else if (m_iPlayerChangeScore == NOT_VALID_INDEX) {
+    } else if (_playerChangeScore == NOT_VALID_INDEX) {
         vct_Commands.push_back(CHIAMA_BORTOLO);
     }
 }
@@ -767,7 +763,7 @@ void Mano::GetAdmittedCommands(VCT_COMMANDS& vct_Commands, int iPlayerIndex) {
         // we are on game
         vct_Commands.push_back(VADOVIA);
         vct_Commands.push_back(AMONTE);
-        if (m_iPlayerChangeScore != iPlayerIndex) {
+        if (_playerChangeScore != iPlayerIndex) {
             // player can call in order to increase the score
             if (nextAvailSayScore(&eSayAvail)) {
                 vct_Commands.push_back(eSayAvail);
@@ -784,7 +780,7 @@ bool Mano::nextAvailSayScore(eSayPlayer* peSayAvail) {
     eSayPlayer eTmp = AMONTE;
 
     // retrive current score
-    MatchPoints* pMatchPoints = m_pInvidoCore->GetMatchPointsObj();
+    MatchPoints* pMatchPoints = _p_InvidoCore->GetMatchPointsObj();
     SDL_assert(pMatchPoints);
     eGiocataScoreState eCurrScore = pMatchPoints->GetCurrScore();
 
@@ -823,7 +819,7 @@ bool Mano::nextAvailSayScore(eSayPlayer* peSayAvail) {
 
 bool Mano::isGiocataAMonte() {
     bool bRet = false;
-    MatchPoints* pMatchPoints = m_pInvidoCore->GetMatchPointsObj();
+    MatchPoints* pMatchPoints = _p_InvidoCore->GetMatchPointsObj();
     SDL_assert(pMatchPoints);
     eGiocataScoreState eCurrScore = pMatchPoints->GetCurrScore();
     if (eCurrScore == SC_AMONTE || eCurrScore == SC_PATTA) {
