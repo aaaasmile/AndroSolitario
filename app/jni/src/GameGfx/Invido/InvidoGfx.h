@@ -1,13 +1,15 @@
 #ifndef __CINVIDO_GFX_H
 #define __CINVIDO_GFX_H
 
-#include <SDL_ttf.h>
+#include <SDL3/SDL.h>
+#include <SDL3_ttf/SDL_ttf.h>
 
 #include <map>
 
 #include "AlgPlayerInterface.h"
 #include "CardGfx.h"
 #include "InvidoCore.h"
+
 enum {
     CRD_MAZZOALTRECARTE = 0,
     CRD_PLAYER1,

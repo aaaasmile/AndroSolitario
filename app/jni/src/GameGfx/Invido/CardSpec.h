@@ -1,8 +1,15 @@
 #ifndef ___CARDSPEC_H_
 #define ___CARDSPEC_H_
 
-#include "AlgPlayerInterface.h"
+#include "Config.h"
 #include "InvidoCoreEnv.h"
+
+typedef struct _CardInfo {
+    unsigned char byIndex;
+    eSUIT eSuit;
+    std::string CardName;
+} CARDINFO;
+
 class CardSpec {
    public:
     CardSpec();
@@ -10,7 +17,7 @@ class CardSpec {
     void SetCardIndex(int itmpIndex);
     int GetCardIndex() { return m_CardInfo.byIndex; }
     eSUIT GetSuit() { return m_CardInfo.eSuit; }
-    LPCSTR GetName() { return m_CardInfo.CardName; }
+    LPCSTR GetName() { return m_CardInfo.CardName.c_str(); }
     void operator=(const CardSpec& r);
     bool operator==(const CardSpec& r) {
         return m_CardInfo.byIndex == r.m_CardInfo.byIndex;

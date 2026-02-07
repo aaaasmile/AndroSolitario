@@ -1,18 +1,10 @@
 #ifndef _C_COREINVIDOENV_H_
 #define _C_COREINVIDOENV_H_
 
-#include <algorithm>
-#include <iostream>
+#include <string>
 #include <vector>
 
-#include "fuzzy.h"
-#include "save_utility.h"
 
-#define TRACE_BRISC_LEVEL 5  // trace level
-
-const std::string DEF_path_s = ".\\";  // path dove vengono memorizzati i dati
-
-// points table. This table is to retrieve points for each cards in the pool
 const int g_PointsTable[] = {
     /*Asso*/ 11, /*Due*/ 12,  /*Tre*/ 13,  /*Quattro*/ 4, /*cinque*/ 5,
     /*Sei*/ 6,   /*Sette*/ 7, /*Fante*/ 8, /*Cavallo*/ 9, /*Re*/ 10,
@@ -41,7 +33,7 @@ const std::string g_CardsNameX[] = {
 
 typedef std::vector<long> VCT_LONG;
 typedef VCT_LONG::iterator IT_VCTLONG;
-enum {
+enum eGameConst {
     PLAYER_ME = 0,
     PLAYER_OPPONENT = 1,
     NUM_CARDS = 32,
@@ -101,6 +93,36 @@ enum eScriptNotification {
     SCR_NFY_ALGGIOCATAEND = 5,
     SCR_NFY_ALGMATCHEND = 6,
     SCR_NFY_NEWMATCH = 7
+};
+
+enum eSUIT { BASTONI = 0, COPPE = 1, DENARI = 2, SPADE = 3, UNDEF = 4 };
+
+enum eSayPlayer {
+    AMONTE = 0,
+    INVIDO = 1,
+    TRASMAS = 2,
+    TRASMASNOEF = 3,
+    FUERAJEUQ = 4,
+    PARTIDA = 5,
+    VABENE = 6,
+    VADOVIA = 7,
+    CHIAMADIPIU = 8,
+    NO = 9,
+    VADODENTRO = 10,
+    GIOCA = 11,
+    CHIAMA_BORTOLO = 12,
+    NOTHING = 13
+};
+
+enum eGiocataScoreState {
+    SC_AMONTE = 0,
+    SC_PATTA = 0,
+    SC_CANELA = 1,
+    SC_INVIDO = 3,
+    SC_TRASMAS = 6,
+    SC_TRASMASNOEF = 9,
+    SC_FUERAJEUQ = 12,
+    SC_PARTIDA = 24,
 };
 
 #endif
