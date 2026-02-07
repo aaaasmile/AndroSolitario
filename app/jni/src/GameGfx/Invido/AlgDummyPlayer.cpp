@@ -11,11 +11,6 @@
 #include "TraceService.h"
 #include "win_type_global.h"
 
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 typedef std::map<eSayPlayer, LPCSTR> _MAP_SAY;
 static _MAP_SAY g_MapSay;
 
@@ -82,13 +77,13 @@ void AlgDummyPlayer::ALG_PlayerHasPlayed(int iPlayerIx, const CARDINFO* pCard) {
         CardSpec Card;
         CardSpec CardUndef;
         Card.SetCardInfo(*pCard);
-        bool bFound = FALSE;
+        bool bFound = false;
         // card successfully played
         for (int i = 0; !bFound && i < NUM_CARDS_HAND; i++) {
             if (Card == m_vct_Cards_CPU[i]) {
                 // card found
                 m_vct_Cards_CPU[i] = CardUndef;
-                bFound = TRUE;
+                bFound = true;
             }
         }
         SDL_assert(bFound);

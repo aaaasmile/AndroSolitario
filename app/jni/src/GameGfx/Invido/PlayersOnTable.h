@@ -1,7 +1,3 @@
-
-
-// PlayersOnTable.h
-
 #ifndef __PLAYERSONTABLE_H
 #define __PLAYERSONTABLE_H
 

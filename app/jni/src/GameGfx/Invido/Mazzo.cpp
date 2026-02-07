@@ -7,11 +7,6 @@
 #include "InvidoCore.h"
 #include "InvidoSettings.h"
 
-
-////////////////////////////////////////////////////////////////
-//   *******************      Mazzo CLASS *********************
-////////////////////////////////////////////////////////////////
-
 Mazzo::Mazzo() {
     m_lNextCard = 0;
     m_pCoreGame = 0;
@@ -73,10 +68,10 @@ bool Mazzo::Shuffle() {
 long Mazzo::PickNextCard(bool* pbEnd) {
     long lResult = NOT_VALID_INDEX;
     if (m_lNextCard >= (long)m_vctCards.size()) {
-        *pbEnd = FALSE;
+        *pbEnd = false;
         return lResult;
     }
-    *pbEnd = TRUE;
+    *pbEnd = true;
 
     lResult = m_vctCards[m_lNextCard];
     m_lNextCard++;
@@ -88,10 +83,10 @@ bool Mazzo::PickNextCard(CardSpec* pRes) {
     SDL_assert(pRes);
 
     pRes->Reset();
-    bool bValid = FALSE;
+    bool bValid = false;
 
     if (m_lNextCard < (long)m_vctCards.size()) {
-        bValid = TRUE;
+        bValid = true;
         long lIndex = m_vctCards[m_lNextCard];
 
         pRes->SetCardIndex(lIndex);
@@ -131,10 +126,10 @@ bool Mazzo::IsMoreCards() {
 long Mazzo::GetIndexNextCard(bool* pbEnd) {
     long lResult = NOT_VALID_INDEX;
     if (m_lNextCard >= NUM_CARDS) {
-        *pbEnd = FALSE;
+        *pbEnd = false;
         return lResult;
     }
-    *pbEnd = TRUE;
+    *pbEnd = true;
 
     lResult = m_vctCards[m_lNextCard];
 

@@ -7,10 +7,6 @@
 #include "InvidoCoreEnv.h"
 #include "MatchPoints.h"
 
-
-/////////////////////////////////////////////////////////////////////////////////////
-//   *******************  CPARTITA CLASS ***************************************
-/////////////////////////////////////////////////////////////////////////////////////
 Partita::Partita() {
     m_pGiocata = NULL;
     m_pInvidoCore = NULL;
@@ -68,7 +64,8 @@ void Partita::Update_Partita(I_MatchScore* pIScore) {
                 m_lGiocStart = 0;
                 break;
             default:
-                m_pInvidoCore->RaiseError("m_lGiocStart index not right\n");
+                m_pInvidoCore->RaiseError(
+                    "[Update_Partita] Index out of bound\n");
                 break;
         }
         m_pGiocata->NewGiocata(m_lGiocStart);

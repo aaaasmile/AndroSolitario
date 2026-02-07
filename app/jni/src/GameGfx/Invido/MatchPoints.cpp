@@ -1,22 +1,13 @@
 
 
-// MatchPoints.cpp: implementation of the MatchPoints class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "MatchPoints.h"
 
 #include "Mano.h"
 
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 MatchPoints::MatchPoints() {
     m_iNumPlayers = NUM_PLAY_INVIDO_2;
     m_pMano = 0;
-    m_bGameAbandoned = FALSE;
+    m_bGameAbandoned = false;
     for (int iManoNum = 0; iManoNum < NUM_CARDS_HAND; iManoNum++) {
         m_ManoDetailInfo[iManoNum].Reset();
     }
@@ -32,7 +23,7 @@ void MatchPoints::MatchStart(int iNumPlayer) {
     m_iNumPlayers = iNumPlayer;
     m_iPlayerMatchWin = NOT_VALID_INDEX;
     m_iScoreGoal = SCORE_GOAL;
-    m_bMatchInSpecialScore = FALSE;
+    m_bMatchInSpecialScore = false;
     m_vctGiocataInfo.clear();
 }
 
@@ -49,14 +40,14 @@ void MatchPoints::GiocataStart() {
     m_iPlayerFirstHand = NOT_VALID_INDEX;
     m_iPlayerGiocataWin = NOT_VALID_INDEX;
     m_eIsGiocataEnd = GES_ON_GOING;
-    m_bIsManoPatatda = FALSE;
+    m_bIsManoPatatda = false;
     m_iManoRound = 0;
-    m_bOldManoPatada = FALSE;
+    m_bOldManoPatada = false;
     for (int iManoNum = 0; iManoNum < NUM_CARDS_HAND; iManoNum++) {
         m_ManoDetailInfo[iManoNum].Reset();
     }
     m_iPlayerChangeScore = NOT_VALID_INDEX;
-    m_bGameAbandoned = FALSE;
+    m_bGameAbandoned = false;
 }
 
 void MatchPoints::PlayerPlay(int iPlayerIx, CARDINFO* pCard) {
@@ -84,23 +75,23 @@ void MatchPoints::ManoEnd() {
         int iPoints_2 =
             g_PointsTable[m_vctCardPlayed[PLAYER2].cardSpec.GetCardIndex()];
         int iPlayer_2 = m_vctCardPlayed[PLAYER2].iPlayerIx;
-        m_bIsManoPatatda = FALSE;
+        m_bIsManoPatatda = false;
         // mano is played
-        m_ManoDetailInfo[iManoTerminatedIndex].bIsPlayed = TRUE;
+        m_ManoDetailInfo[iManoTerminatedIndex].bIsPlayed = true;
 
         if (iPoints_1 == iPoints_2) {
             // nobody wins the hand
-            m_bIsManoPatatda = TRUE;
+            m_bIsManoPatatda = true;
             if (m_iPlayerFirstHand != NOT_VALID_INDEX) {
                 // the first player who take the mano is the giocata winner
                 m_iPlayerGiocataWin = m_iPlayerFirstHand;
                 m_eIsGiocataEnd = GES_HAVE_WINNER;
             }
             m_iPlayerWonsHand = NOT_VALID_INDEX;
-            m_ManoDetailInfo[iManoTerminatedIndex].bIsPata = TRUE;
+            m_ManoDetailInfo[iManoTerminatedIndex].bIsPata = true;
 
             // mark the mano patada, the next who take the trick win
-            m_bOldManoPatada = TRUE;
+            m_bOldManoPatada = true;
         } else if (iPoints_1 > iPoints_2) {
             // first player wons the mano
             m_vctHandWons[iPlayer_1]++;
@@ -146,7 +137,6 @@ void MatchPoints::ManoEnd() {
     } else {
         SDL_assert(0);
     }
-    // reset info about mano
     m_iNumCardsPlayed = 0;
 }
 
@@ -189,11 +179,11 @@ void MatchPoints::GiocataEnd() {
 }
 
 bool MatchPoints::IsGiocatEnd() {
-    bool bRet = FALSE;
+    bool bRet = false;
 
     if (m_eIsGiocataEnd == GES_AMONTE || m_eIsGiocataEnd == GES_PATADA ||
         m_eIsGiocataEnd == GES_HAVE_WINNER) {
-        bRet = TRUE;
+        bRet = true;
     }
     return bRet;
 }
@@ -204,7 +194,7 @@ void MatchPoints::beginSpecialTurn() {
     m_iScoreGoal = SPECIAL_SCORE_GOAL;
     m_vctPlayerPoints[PLAYER1] = 0;
     m_vctPlayerPoints[PLAYER2] = 0;
-    m_bMatchInSpecialScore = TRUE;
+    m_bMatchInSpecialScore = true;
 }
 
 void MatchPoints::GetManoInfo(int iManoNum, int* piPlayerIx, bool* pbIsPlayed,
@@ -239,5 +229,5 @@ void MatchPoints::ChangeCurrentScore(eGiocataScoreState eVal, int iPlayer) {
 
 void MatchPoints::SetTheWinner(int iPlayerIx) {
     m_iPlayerMatchWin = iPlayerIx;
-    m_bGameAbandoned = TRUE;
+    m_bGameAbandoned = true;
 }

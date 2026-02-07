@@ -24,8 +24,8 @@ class ManoInfo {
    public:
     ManoInfo() {}
     void Reset() {
-        bIsPlayed = FALSE;
-        bIsPata = FALSE;
+        bIsPlayed = false;
+        bIsPata = false;
         iPlayerIndex = NOT_VALID_INDEX;
     }
     int iPlayerIndex;
@@ -93,21 +93,21 @@ class MatchPoints : public I_MatchScore {
     virtual bool IsManoPatada() { return m_bIsManoPatatda; }
     virtual bool IsGiocataPatada() {
         if (m_eIsGiocataEnd == GES_PATADA)
-            return TRUE;
+            return true;
         else
-            return FALSE;
+            return false;
     }
     virtual bool IsGiocataMonte() {
         if (m_eIsGiocataEnd == GES_AMONTE)
-            return TRUE;
+            return true;
         else
-            return FALSE;
+            return false;
     }
     virtual bool IsMatchEnd() {
         if (m_iPlayerMatchWin != NOT_VALID_INDEX)
-            return TRUE;
+            return true;
         else
-            return FALSE;
+            return false;
     }
     virtual int GetPointsPlayer(int iPlayerIx) {
         SDL_assert(iPlayerIx >= 0 && iPlayerIx < MAX_NUM_PLAYER);

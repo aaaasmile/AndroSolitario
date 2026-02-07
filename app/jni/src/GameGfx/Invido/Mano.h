@@ -11,7 +11,6 @@
 #include "AlgPlayerInterface.h"
 #include "InvidoCoreEnv.h"
 
-
 class InvidoCore;
 class Giocata;
 class MatchPoints;
@@ -42,7 +41,7 @@ typedef std::deque<eManoStatus> DEQ_TABLESTATE;
 class PendQuestion {
    public:
     PendQuestion() {
-        m_bIsAMonte = FALSE;
+        m_bIsAMonte = false;
         m_eScore = SC_CANELA;
         m_iPlayerIx = NOT_VALID_INDEX;
     }

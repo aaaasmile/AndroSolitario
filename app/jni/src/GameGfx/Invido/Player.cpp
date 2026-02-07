@@ -5,20 +5,12 @@
 #include "AlgAdvancedPlayer.h"
 #include "AlgDummyPlayer.h"
 
-////////////////////////////////////////////////////////////////
-//  *************************  PLAYER CLASS *******************
-////////////////////////////////////////////////////////////////
-
 Player::Player() {
     m_iIndex = NOT_VALID_INDEX;
     m_pIAlgorithm = 0;
     m_eLevel = DUMMY;
 }
 
-////////////////////////////////////////
-//       ~Player
-/*! Destructor
- */
 Player::~Player() {
     for (size_t i = 0; i < m_vctAlgToDestroy.size(); i++) {
         delete m_vctAlgToDestroy[i];
@@ -33,11 +25,6 @@ Player::Player(const Player& a) {
     m_eLevel = a.m_eLevel;
 }
 
-////////////////////////////////////////
-//       operator=
-/*! Copy player operator
-// \param const Player&a :
-*/
 Player& Player::operator=(const Player& a) {
     strncpy(m_pPlayerName, a.m_pPlayerName, BUFF_NAME);
     m_eKind = a.m_eKind;

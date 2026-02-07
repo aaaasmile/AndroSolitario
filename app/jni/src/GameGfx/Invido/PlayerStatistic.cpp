@@ -1,7 +1,3 @@
-
-
-// PlayerStatistic.cpp
-
 #include "PlayerStatistic.h"
 
 PlayerStatistic::PlayerStatistic() { Reset(); }

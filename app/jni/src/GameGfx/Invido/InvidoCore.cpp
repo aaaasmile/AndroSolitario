@@ -5,12 +5,6 @@
 #include "Mazzo.h"
 #include "TraceService.h"
 
-
-////////////////////////////////////////////////////////////////
-// **********************   CINVIDOCORE CLASS *****************
-////////////////////////////////////////////////////////////////
-
-// Constructor
 InvidoCore::InvidoCore() {
     m_lNumPlayers = 0;
     m_pPlHaveToPlay = 0;
@@ -19,18 +13,13 @@ InvidoCore::InvidoCore() {
     resetCardInfoPlayers();
 }
 
-////////////////////////////////////////
-//       ~InvidoCore
-/*! Destructor
- */
 InvidoCore::~InvidoCore() { delete m_pMyMazzo; }
 
 void InvidoCore::Create(Player* pHmiPlayer, int iNumPlayers) {
     m_pTracer = TraceService::Instance();
-    // TRACE("InvidoCore is created\n");
+    // TRACE_DEBUG("InvidoCore is created\n");
     m_pTracer->AddSimpleTrace(2, "InvidoCore is created");
 
-    // deck
     m_pMyMazzo = new Mazzo();
     m_pMyMazzo->SetCoreEngine(this);
     m_pMyMazzo->Create();
@@ -39,7 +28,6 @@ void InvidoCore::Create(Player* pHmiPlayer, int iNumPlayers) {
 
     m_eGameType = LOCAL_TYPE;
 
-    // init state
     m_Partita.SetCore(this);
     m_Partita.SetGiocata(&m_Giocata);
 
@@ -64,7 +52,7 @@ bool InvidoCore::WhoWonsTheGame(Player** ppPlayer) {
     SDL_assert(ppPlayer);
     SDL_assert(0);
 
-    return TRUE;
+    return true;
 }
 
 int InvidoCore::getNewMatchFirstPlayer() { return CASO(m_lNumPlayers); }
@@ -129,7 +117,7 @@ bool InvidoCore::GetPlayerInPlaying(Player** ppPlayer) {
 
     *ppPlayer = m_pPlHaveToPlay;
 
-    return TRUE;
+    return true;
 }
 
 void InvidoCore::NextAction() {
@@ -166,7 +154,7 @@ void InvidoCore::resetCardInfoPlayers() {
 }
 
 bool InvidoCore::resetCard(int iPlayerIx, CARDINFO* pCardInfo) {
-    bool bRet = FALSE;
+    bool bRet = false;
     SDL_assert(pCardInfo);
     SDL_assert(iPlayerIx >= 0 && iPlayerIx < MAX_NUM_PLAYER);
 
@@ -176,7 +164,7 @@ bool InvidoCore::resetCard(int iPlayerIx, CARDINFO* pCardInfo) {
     for (int i = 0; i < NUM_CARDS_HAND; i++) {
         int iPlayerPosIx = iPlayerIx * NUM_CARDS_HAND + i;
         if (m_aCardInfo[iPlayerPosIx] == myCard) {
-            bRet = TRUE;
+            bRet = true;
             m_aCardInfo[iPlayerPosIx].Reset();
             break;
         }
@@ -186,13 +174,10 @@ bool InvidoCore::resetCard(int iPlayerIx, CARDINFO* pCardInfo) {
 }
 
 void InvidoCore::Giocata_Start(long lPlayerIx) {
-    TRACE("Nuova giocata\n");
+    TRACE_DEBUG("Nuova giocata\n");
 
-    // reset card info of all players
     resetCardInfoPlayers();
-    // shuffle cards
     m_pMyMazzo->Shuffle();
-    // distribuite the cards
     CardSpec tmpCard;
     m_PlayersOnTable.SetFirstOnGiocata(lPlayerIx);
 
@@ -214,21 +199,21 @@ void InvidoCore::Giocata_Start(long lPlayerIx) {
         Player* pCurrPlayer = m_PlayersOnTable.GetPlayerIndex(iIxCurrPLayer);
         CARDINFO CardArray[NUM_CARDS_HAND];
 
-        TRACE("%s => ", pCurrPlayer->GetName());
+        TRACE_DEBUG("%s => ", pCurrPlayer->GetName());
 
         for (int j = 0; j < NUM_CARDS_HAND; j++) {
             // distribuite all cards on player
             m_pMyMazzo->PickNextCard(&tmpCard);
 
             tmpCard.FillInfo(&CardArray[j]);
-            TRACE("[%s] , ix: %d, pt: %d", tmpCard.GetName(),
-                  tmpCard.GetCardIndex(), tmpCard.GetPoints());
+            TRACE_DEBUG("[%s] , ix: %d, pt: %d", tmpCard.GetName(),
+                        tmpCard.GetCardIndex(), tmpCard.GetPoints());
 
             // store card information for controlling
             int iTmpCdIndex = iIxCurrPLayer * NUM_CARDS_HAND + j;
             m_aCardInfo[iTmpCdIndex] = tmpCard;
         }
-        TRACE("\n");
+        TRACE_DEBUG("\n");
         if (m_vctAlgPlayer[iIxCurrPLayer]) {
             m_vctAlgPlayer[iIxCurrPLayer]->ALG_NewGiocata(
                 CardArray, NUM_CARDS_HAND, lPlayerIx);
@@ -335,7 +320,6 @@ void InvidoCore::NtyWaitingPlayer_Toplay(int iPlayerIx) {
     I_ALG_Player* pAlg = m_vctAlgPlayer[iPlayerIx];
     SDL_assert(pAlg);
 
-    // algorithm have to play
     pAlg->ALG_Play();
 }
 
@@ -348,7 +332,6 @@ void InvidoCore::NtyWaitingPlayer_ToResp(int iPlayerIx) {
 
 void InvidoCore::NtyPlayerSayBuiada(int iPlayerIx) {
     for (int i = 0; i < m_lNumPlayers; i++) {
-        // notify all players that a player says something not correct
         if (m_vctAlgPlayer[i]) {
             m_vctAlgPlayer[i]->ALG_PlayerSaidWrong(iPlayerIx);
         }
@@ -357,8 +340,8 @@ void InvidoCore::NtyPlayerSayBuiada(int iPlayerIx) {
 
 void InvidoCore::RaiseError(const std::string& errorMsg) {
     SDL_assert(0);
-    TRACE(const_cast<char*>(errorMsg.c_str()));
-    TRACE("\n");
+    TRACE_DEBUG(const_cast<char*>(errorMsg.c_str()));
+    TRACE_DEBUG("\n");
 }
 
 CardSpec* InvidoCore::checkValidCardPlayed(int iPlayerIx,
@@ -376,10 +359,10 @@ CardSpec* InvidoCore::checkValidCardPlayed(int iPlayerIx,
 bool InvidoCore::Player_vaDentro(int iPlayerIx, const CARDINFO* pCardInfo) {
     CardSpec* pCardplayed = checkValidCardPlayed(iPlayerIx, pCardInfo);
     if (pCardplayed == NULL) {
-        return FALSE;
+        return false;
     }
 
-    bool bRes = FALSE;
+    bool bRes = false;
     // change mano state
     if (m_Mano.Player_Play(iPlayerIx, TRUE)) {
         // next player is on game
@@ -405,7 +388,7 @@ bool InvidoCore::Player_vaDentro(int iPlayerIx, const CARDINFO* pCardInfo) {
 
         // reset info about played card
         resetCard(iPlayerIx, pCardplayed->GetCardInfo());
-        bRes = TRUE;
+        bRes = true;
     }
     return bRes;
 }
@@ -413,10 +396,10 @@ bool InvidoCore::Player_vaDentro(int iPlayerIx, const CARDINFO* pCardInfo) {
 bool InvidoCore::Player_playCard(int iPlayerIx, const CARDINFO* pCardInfo) {
     CardSpec* pCardplayed = checkValidCardPlayed(iPlayerIx, pCardInfo);
     if (pCardplayed == NULL) {
-        return FALSE;
+        return false;
     }
 
-    bool bRes = FALSE;
+    bool bRes = false;
     // change mano state
     if (m_Mano.Player_Play(iPlayerIx, FALSE)) {
         // next player is on game
@@ -437,13 +420,13 @@ bool InvidoCore::Player_playCard(int iPlayerIx, const CARDINFO* pCardInfo) {
         // reset info about played card
         resetCard(iPlayerIx, pCardplayed->GetCardInfo());
 
-        bRes = TRUE;
+        bRes = true;
     }
     return bRes;
 }
 
 bool InvidoCore::Player_saySomething(int iPlayerIx, eSayPlayer eSay) {
-    bool bRes = FALSE;
+    bool bRes = false;
     if (m_Mano.Player_Say(iPlayerIx, eSay)) {
         //  what he said is acceptable on the game
         for (int i = 0; i < m_lNumPlayers; i++) {
@@ -452,7 +435,7 @@ bool InvidoCore::Player_saySomething(int iPlayerIx, eSayPlayer eSay) {
                 m_vctAlgPlayer[i]->ALG_PlayerHasSaid(iPlayerIx, eSay);
             }
         }
-        bRes = TRUE;
+        bRes = true;
     }
 
     return bRes;
@@ -463,23 +446,17 @@ void InvidoCore::GetAdmittedCommands(VCT_COMMANDS& vct_Commands,
     m_Mano.GetAdmittedCommands(vct_Commands, iPlayerIndex);
 }
 
-// GetMoreCommands
 void InvidoCore::GetMoreCommands(VCT_COMMANDS& vct_Commands, int iPlayerIndex) {
     m_Mano.GetMoreCommands(vct_Commands, iPlayerIndex);
 }
 
-////////////////////////////////////////
-//       NotifyScript
-/*Notify event to the script engine
-// \param eScriptNotification eVal :
-*/
 void InvidoCore::NotifyScript(eScriptNotification eVal) {
-    TRACE("Event %d\n", eVal);
+    TRACE_DEBUG("Event %d\n", eVal);
 }
 
 void InvidoCore::NotifyScriptAlgorithm(int iPlayerIx,
                                        eScriptNotification eVal) {
-    TRACE("Algorithm %d, %d\n", iPlayerIx, eVal);
+    TRACE_DEBUG("Algorithm %d, %d\n", iPlayerIx, eVal);
 }
 
 ////////////////////////////////////////// functions called by Script

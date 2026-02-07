@@ -1,7 +1,3 @@
-
-
-// PlayersOnTable
-
 #include "PlayersOnTable.h"
 
 PlayersOnTable::PlayersOnTable() {
@@ -102,10 +98,10 @@ int PlayersOnTable::CalcDistance(int iPlayerRef, int iPlayerTmp) {
     SDL_assert(iPlayerTmp >= 0 && iPlayerTmp < m_lNumPlayers);
     SDL_assert(iPlayerRef >= 0 && iPlayerRef < m_lNumPlayers);
 
-    bool bFound = FALSE;
+    bool bFound = false;
     while (!bFound && iDist < m_lNumPlayers) {
         if (aTableIx[iTmp] == iPlayerTmp) {
-            bFound = TRUE;
+            bFound = true;
         } else {
             iDist++;
             iTmp++;
@@ -132,12 +128,12 @@ void PlayersOnTable::CalcCircleIndex(int* paPlayerDeck) {
 }
 
 bool PlayersOnTable::IsLevelPython() {
-    bool bRes = FALSE;
+    bool bRes = false;
 
     for (int i = 0; i < m_lNumPlayers; i++) {
         eGameLevel eLevel = m_vctPlayers[i].GetLevel();
         if (eLevel == TEST_PYTHON) {
-            bRes = TRUE;
+            bRes = true;
             break;
         }
     }

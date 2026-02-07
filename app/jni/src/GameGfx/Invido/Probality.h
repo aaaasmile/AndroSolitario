@@ -1,7 +1,3 @@
-
-
-// Probality.h
-
 #ifndef __CPROBABILITY_H____
 #define __CPROBABILITY_H____
 

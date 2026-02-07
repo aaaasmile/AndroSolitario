@@ -13,7 +13,7 @@ void CardSpec::SetCardIndex(int itmpIndex) {
 
     if (itmpIndex >= 0 && itmpIndex < NUM_CARDS_MAZZBRI) {
         strcpy(m_CardInfo.CardName,
-               const_cast<CHAR*>(g_CardsNameX[itmpIndex].c_str()));
+               const_cast<char*>(g_CardsNameX[itmpIndex].c_str()));
     }
 
     if (m_CardInfo.byIndex >= 0 && m_CardInfo.byIndex < 10) {

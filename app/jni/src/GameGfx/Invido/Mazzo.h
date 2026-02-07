@@ -9,13 +9,8 @@
 #include "InvidoCoreEnv.h"
 #include "win_type_global.h"
 
-
 class InvidoCore;
-/**
-// Class used to handle the deck. This is done with a vector of long. The index
-0 is always the deck
-// image index.
-*/
+
 class Mazzo {
    public:
     Mazzo();

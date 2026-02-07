@@ -8,7 +8,6 @@
 #include "TraceService.h"
 #include "win_type_global.h"
 
-
 // random value between [0,x)
 #define CASO(x) (x * rand()) / RAND_MAX
 
@@ -66,9 +65,9 @@ void AlgAdvancedPlayer::ALG_NewGiocata(const CARDINFO* pCardArray,
     m_iNumManiWon = 0;
     m_iNumChiamateMonte = 0;
     m_iNumChiamateInGiocata = 0;
-    m_bIamCalledPoints = FALSE;
-    m_opponetIsVadoDentro = FALSE;
-    m_WonFirstHand = FALSE;
+    m_bIamCalledPoints = false;
+    m_opponetIsVadoDentro = false;
+    m_WonFirstHand = false;
     m_ixCurrMano = 0;
 
     m_iPlayerOnTurn = iPlayerIx;
@@ -90,7 +89,7 @@ void AlgAdvancedPlayer::ALG_NewGiocata(const CARDINFO* pCardArray,
     m_sayMyRisp = VABENE;
     m_OpponentSay = VABENE;
     m_sayOppRisp = VABENE;
-    m_bLastManoPatada = FALSE;
+    m_bLastManoPatada = false;
 
     if (m_pTracer) {
         CardSpec Card;
@@ -105,7 +104,7 @@ void AlgAdvancedPlayer::ALG_NewGiocata(const CARDINFO* pCardArray,
 }
 
 void AlgAdvancedPlayer::ALG_PlayerHasVadoDentro(int iPlayerIx) {
-    TRACE("[TRALG]Player %1 va dentro\n", iPlayerIx);
+    TRACE_DEBUG("[TRALG]Player %1 va dentro\n", iPlayerIx);
     CardSpec cardDentro;
     if (iPlayerIx == m_iMyIndex) {
         // l'idea � quella di ritrovare la carta con la quale si � andati dentro
@@ -118,7 +117,7 @@ void AlgAdvancedPlayer::ALG_PlayerHasVadoDentro(int iPlayerIx) {
         ALG_PlayerHasPlayed(iPlayerIx, cardDentro.GetCardInfo());
         m_iCPUCardDentroPos = NOT_VALID_INDEX;
     } else {
-        m_opponetIsVadoDentro = TRUE;
+        m_opponetIsVadoDentro = true;
         cardDentro.SetCardIndex(3);
         ALG_PlayerHasPlayed(iPlayerIx, cardDentro.GetCardInfo());
     }
@@ -142,13 +141,13 @@ void AlgAdvancedPlayer::ALG_PlayerHasPlayed(int iPlayerIx,
         CardSpec Card;
         CardSpec CardUndef;
         Card.SetCardInfo(*pCard);
-        bool bFound = FALSE;
+        bool bFound = false;
         // card successfully played
         for (i = 0; !bFound && i < NUM_CARDS_HAND; i++) {
             if (Card == m_vct_Cards_CPU[i]) {
                 // card found
                 m_vct_Cards_CPU[i] = CardUndef;
-                bFound = TRUE;
+                bFound = true;
             }
         }
         SDL_assert(bFound);
@@ -188,7 +187,7 @@ void AlgAdvancedPlayer::ALG_PlayerHasSaid(int iPlayerIx, eSayPlayer eSay) {
         } else {
             // chiamata a punti
             m_MyLastSay = eSay;
-            m_bIamCalledPoints = TRUE;
+            m_bIamCalledPoints = true;
         }
     }
 }
@@ -196,7 +195,7 @@ void AlgAdvancedPlayer::ALG_PlayerHasSaid(int iPlayerIx, eSayPlayer eSay) {
 bool AlgAdvancedPlayer::Cagna(int lastNumChiamate) {
     VCT_COMMANDS vct_cmd;
     SDL_assert(m_pCoreGame);
-    bool res = FALSE;
+    bool res = false;
     m_pCoreGame->GetAdmittedCommands(vct_cmd, m_iMyIndex);
     size_t iNumCmds = vct_cmd.size();
     if (iNumCmds > 0) {
@@ -209,7 +208,7 @@ bool AlgAdvancedPlayer::Cagna(int lastNumChiamate) {
             iTry++;
         } while (eSay == VADOVIA && iTry < 5);
         Chiama(eSay, lastNumChiamate);
-        res = TRUE;
+        res = true;
     }
     return res;
 }
@@ -218,9 +217,9 @@ bool AlgAdvancedPlayer::ChiamaAMonte(int lastNumChiamate) {
     m_iNumChiamateMonte += 1;
     if (m_iNumChiamateMonte < 4) {
         Chiama(AMONTE, lastNumChiamate);
-        return TRUE;
+        return true;
     }
-    return FALSE;
+    return false;
 }
 
 void AlgAdvancedPlayer::Chiama(eSayPlayer eSay, int lastChiamataNum) {
@@ -238,10 +237,10 @@ bool AlgAdvancedPlayer::ChiamaDiPiu(int lastNumChiamate) {
         eSayPlayer eSay = vct_cmd[i];
         if (eSay >= INVIDO && eSay <= PARTIDA) {
             Chiama(eSay, lastNumChiamate);
-            return TRUE;
+            return true;
         }
     }
-    return FALSE;
+    return false;
 }
 
 void AlgAdvancedPlayer::PlayAsFirst() {
@@ -281,14 +280,14 @@ void AlgAdvancedPlayer::PlayAsFirst() {
         arrPoints[i] = points;
         sum_points += points;
     }
-    TRACE(
+    TRACE_DEBUG(
         "[1ST]Take: min pos %d (pt %d), med pos %d (pt %d), max pos %d(pt %d) "
         "\n",
         min_pos, min_points, med_pos, med_points, max_pos, maxpoints);
 
     if (curr_mano == 2 && m_iNumManiWon == 1) {
         result = m_vct_Cards_CPU[min_pos].GetCardInfo();
-        TRACE("Candidate from min position\n");
+        TRACE_DEBUG("Candidate from min position\n");
     } else {
         result = m_vct_Cards_CPU[max_pos].GetCardInfo();
     }
@@ -303,22 +302,22 @@ void AlgAdvancedPlayer::PlayAsFirst() {
                                  : pointsCardMano1_pl2;
 
         // seconda mano prima mano vinta
-        TRACE("[TRALG]Vado dentro? maxpoints is %d\n", maxpoints);
+        TRACE_DEBUG("[TRALG]Vado dentro? maxpoints is %d\n", maxpoints);
         if (maxpoints == 13) {
             // tre in mano che vince sicuro
             if (CASO(10) != 9) {
-                TRACE("[TRALG]Dentro per win\n");
+                TRACE_DEBUG("[TRALG]Dentro per win\n");
                 doVadoDentro(min_pos);
                 return;
             }
         } else if (maxpoints > 10) {
             if (CASO(maxpoints) > 9) {
-                TRACE("[TRALG]Dentro per win con rischio\n");
+                TRACE_DEBUG("[TRALG]Dentro per win con rischio\n");
                 doVadoDentro(min_pos);
                 return;
             }
         } else if (result != NULL && min_points < maxPointsMano1) {
-            TRACE("[TRALG]Dentro per bluf\n");
+            TRACE_DEBUG("[TRALG]Dentro per bluf\n");
             doVadoDentro(min_pos);
             return;
         } else if (CASO(3) == 1 && m_eScoreCurrent <= SC_INVIDO) {
@@ -580,7 +579,7 @@ void AlgAdvancedPlayer::PlayAsSecond() {
         arrPoints[i] = points;
         sum_points += points;
     }
-    TRACE(
+    TRACE_DEBUG(
         "[2ND]Points played card %d, Take: min pos %d (pt %d), first_take_pos "
         "%d (pt %d), max pos %d(pt %d) \n",
         pointsFirstCard, min_pos, min_points, first_take_pos, first_take_points,
@@ -738,7 +737,7 @@ void AlgAdvancedPlayer::PlayAsSecond() {
 }
 
 bool AlgAdvancedPlayer::IsPlayerFirst() {
-    return m_vct_Cards_played[m_ixCurrMano].size() == 0 ? TRUE : FALSE;
+    return m_vct_Cards_played[m_ixCurrMano].size() == 0 ? TRUE : false;
 }
 
 // Ritorna: 1,2,3 a seconda della mano
@@ -753,7 +752,7 @@ void AlgAdvancedPlayer::ALG_Play() {
 }
 
 void AlgAdvancedPlayer::ALG_ManoEnd(I_MatchScore* pScore) {
-    m_opponetIsVadoDentro = FALSE;
+    m_opponetIsVadoDentro = false;
     m_ixCurrMano++;
 
     m_bLastManoPatada = pScore->IsManoPatada();
@@ -764,7 +763,7 @@ void AlgAdvancedPlayer::ALG_ManoEnd(I_MatchScore* pScore) {
     m_iNumChiamateMonte = 0;
     if (pScore->GetManoWinner() == m_iMyIndex && !pScore->IsManoPatada()) {
         if (index == 0 || (index == 1 && m_bLastManoPatada)) {
-            m_WonFirstHand = TRUE;
+            m_WonFirstHand = true;
         }
         m_iNumManiWon += 1;
     }
@@ -849,8 +848,8 @@ void AlgAdvancedPlayer::ALG_HaveToRespond() {
         sum_points += points;
     }
     int curr_mano = NumMano();
-    TRACE("[ALG] Say: points first card %d, max points %d \n", pointsFirstCard,
-          maxpoints);
+    TRACE_DEBUG("[ALG] Say: points first card %d, max points %d \n",
+                pointsFirstCard, maxpoints);
 
     if (m_OpponentSay >= INVIDO && m_OpponentSay <= PARTIDA) {
         handleSayPopints(curr_mano, pointsFirstCard, lastNumChiamate, maxpoints,
@@ -1046,7 +1045,7 @@ void AlgAdvancedPlayer::handleSayPopints(int curr_mano, int pointsFirstCard,
             m_pTracer->AddSimpleTrace(m_itrChan, "[TRALG] Say Pt R036-B");
         }
     } else {
-        TRACE(
+        TRACE_DEBUG(
             "[TRALG] unhandled response rule: curr_mano %d, maxpoints: %d, "
             "pointsFirstCard %d, m_iPlayerOnTurn %d, prima vinta %d, mani "
             "vinte %d \n",

@@ -21,7 +21,6 @@
 #include "gfx_util.h"
 #include "win_type_global.h"
 
-
 #define FPS (1000 / 30)
 
 static const char* lpszImageDir = "data/images/";
@@ -72,7 +71,7 @@ InvidoGfx::InvidoGfx(AppGfx* pApp) {
     }
     m_pMatchPoints = 0;
     m_pInvidoCore = 0;
-    m_bPlayerCanPlay = FALSE;
+    m_bPlayerCanPlay = false;
     m_iPlayerThatHaveMarkup = 0;
     for (int j = 0; j < NUMOFBUTTON; j++) {
         m_pbtArrayCmd[0] = 0;
@@ -80,7 +79,7 @@ InvidoGfx::InvidoGfx(AppGfx* pApp) {
     m_pLangMgr = 0;
     m_pMusicMgr = 0;
     g_stacInvidoGfx = this;
-    m_bMatchTerminated = FALSE;
+    m_bMatchTerminated = false;
     m_pAlphaDisplay = 0;
 }
 
@@ -97,7 +96,7 @@ void InvidoGfx::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRender,
     m_pScreenTexture = pScreenTexture;
 
     cleanup();
-    CHAR ErrBuff[512];
+    char ErrBuff[512];
 
     Languages* pLangMgr = m_pApp->GetLanguageMan();
     m_pLangMgr = pLangMgr;
@@ -411,7 +410,7 @@ int InvidoGfx::initDeck() {
     m_pSymbols = SDL_LoadBMP(strFileSymbName.c_str());
 
     if (m_pSymbols == 0) {
-        CHAR ErrBuff[512];
+        char ErrBuff[512];
         sprintf(ErrBuff, "Error on load deck file (symbols) %s",
                 strFileSymbName.c_str());
         throw Error::Init(ErrBuff);
@@ -477,7 +476,7 @@ void InvidoGfx::createRegionsInit() {
 }
 
 void InvidoGfx::animateBeginGiocata() {
-    TRACE("animateBeginGiocata - begin\n");
+    TRACE_DEBUG("animateBeginGiocata - begin\n");
     Uint32 uiTickTot = 0;
     Uint32 uiInitialTick = SDL_GetTicks();
     Uint32 uiLast_time = uiInitialTick;
@@ -493,7 +492,7 @@ void InvidoGfx::animateBeginGiocata() {
     int yspeed = 0;
     int xspeed = 0;
     int GRAVITY = 1;
-    bool bEnd = FALSE;
+    bool bEnd = false;
     do {
         // clear screen
         SDL_BlitSurface(m_pScene_background, NULL, m_pScreen, NULL);
@@ -517,7 +516,7 @@ void InvidoGfx::animateBeginGiocata() {
                 cardTmp[iManoNum].m_iY = m_aPlayerCards[iManoNum].m_iY;
                 cardTmp[iManoNum].m_iX = m_aPlayerCards[iManoNum].m_iX;
                 // uiTickTot
-                bEnd = TRUE;
+                bEnd = true;
             }
 
             // update card position
@@ -538,7 +537,7 @@ void InvidoGfx::animateBeginGiocata() {
         }
     } while (uiTickTot < 1500);
 
-    TRACE("animateBeginGiocata - end\n");
+    TRACE_DEBUG("animateBeginGiocata - end\n");
 
     // restore previous scene
     drawStaticScene();
@@ -602,8 +601,8 @@ void InvidoGfx::animateManoEnd(int iPlayerIx) {
 
     SDL_BlitSurface(m_pScreen, NULL, pCurrentDisplay, NULL);
 
-    bool bEnd = FALSE;
-    bool bPhase1_X = FALSE;
+    bool bEnd = false;
+    bool bPhase1_X = false;
     int loopCount = 0;
     SDL_Texture* pTextureAlphaDisplay =
         SDL_CreateTextureFromSurface(m_psdlRenderer, m_pAlphaDisplay);
@@ -625,7 +624,7 @@ void InvidoGfx::animateManoEnd(int iPlayerIx) {
             // ok the card reach the central position
             cardTmp[0].m_iVx = 0;
             cardTmp[1].m_iVx = 0;
-            bPhase1_X = TRUE;
+            bPhase1_X = true;
         }
 
         SDL_BlitSurface(m_pAlphaDisplay, NULL, m_pScreen, NULL);
@@ -644,14 +643,14 @@ void InvidoGfx::animateManoEnd(int iPlayerIx) {
                 cardTmp[1].m_iVy += iIncVel;
                 if (cardTmp[1].m_iY >= m_pScreen->h) {
                     // cards outside of the screen
-                    bEnd = TRUE;
+                    bEnd = true;
                 }
             } else if (iPlayerIx == 1) {
                 cardTmp[0].m_iVy -= iIncVel;
                 cardTmp[1].m_iVy -= iIncVel;
                 if (cardTmp[0].m_iY <= 0) {
                     // cards outside of the screen
-                    bEnd = TRUE;
+                    bEnd = true;
                 }
             } else {
                 // patada
@@ -659,7 +658,7 @@ void InvidoGfx::animateManoEnd(int iPlayerIx) {
                 cardTmp[1].m_iVx -= iIncVel;
                 if (cardTmp[1].m_iX <= 0) {
                     // cards outside of the screen
-                    bEnd = TRUE;
+                    bEnd = true;
                 }
             }
         }
@@ -673,7 +672,7 @@ void InvidoGfx::animateManoEnd(int iPlayerIx) {
         }
         loopCount += 1;
         if (loopCount > 100) {
-            bEnd = TRUE;
+            bEnd = true;
         }
         //} while (uiTickTot < 2000 && !bEnd);
     } while (!bEnd);
@@ -686,7 +685,7 @@ void InvidoGfx::animGiocataEnd(int iPlayerIx, bool bIsPata) {
     int iTickFlashDiff = 0;
     SDL_Rect destWIN;
     SDL_Rect destLOS;
-    bool bFlash = TRUE;
+    bool bFlash = true;
     int iCooYA = m_pScreen->h - 30;
     ;
     int iCooYB = 20;
@@ -764,7 +763,7 @@ void InvidoGfx::animGiocataEnd(int iPlayerIx, bool bIsPata) {
         int iNowTick = SDL_GetTicks();
         iTickFlashDiff = iNowTick - iFlashTickStart;
         if (iTickFlashDiff > 90) {
-            bFlash = bFlash ? FALSE : TRUE;
+            bFlash = bFlash ? FALSE : true;
             iFlashTickStart = iNowTick;
         }
         iTickTot = iNowTick - iInitialTick;
@@ -853,7 +852,7 @@ int InvidoGfx::loadCardPac() {
 
     SDL_RWops* src = SDL_RWFromFile(strFileName.c_str(), "rb");
     if (src == 0) {
-        CHAR ErrBuff[512];
+        char ErrBuff[512];
         sprintf(ErrBuff, "Error on load deck file %s", strFileName.c_str());
         throw Error::Init(ErrBuff);
     }
@@ -932,9 +931,10 @@ void InvidoGfx::InitInvidoVsCPU() {
     pPlayer2->SetLevel(ADVANCED, NULL);
     m_pMatchPoints = m_pInvidoCore->GetMatchPointsObj();
 
-    TRACE("Partita tra %s e %s", pPlayer1->GetName(), pPlayer2->GetName());
+    TRACE_DEBUG("Partita tra %s e %s", pPlayer1->GetName(),
+                pPlayer2->GetName());
 
-    m_bMatchTerminated = FALSE;
+    m_bMatchTerminated = false;
 }
 
 void InvidoGfx::MatchLoop() {
@@ -951,7 +951,7 @@ void InvidoGfx::MatchLoop() {
 
     uiLast_time = SDL_GetTicks();
     STRING strTextTmp;
-    TRACE("Inizio partita loop \n");
+    TRACE_DEBUG("Inizio partita loop \n");
     while (done == 0 && m_bMatchTerminated == FALSE) {
         uiFrame++;
 
@@ -964,7 +964,7 @@ void InvidoGfx::MatchLoop() {
                         m_pLangMgr->GetStringId(Languages::ID_MATCHENDQUESTION);
                     if (showYesNoMsgBox(strTextTmp.c_str()) ==
                         MesgBoxGfx::MB_RES_YES) {
-                        TRACE("Partita finita per scelta utente\n");
+                        TRACE_DEBUG("Partita finita per scelta utente\n");
                         return;
                     }
                     break;
@@ -1075,7 +1075,7 @@ void InvidoGfx::handleMouseDownEvent(SDL_Event& event) {
 // showPopUpCallMenu
 void InvidoGfx::showPopUpCallMenu(CardSpec& cardClicked, int iX, int iY,
                                   eSayPlayer* peSay) {
-    TRACE("show popup menu\n");
+    TRACE_DEBUG("show popup menu\n");
     SDL_assert(peSay);
     SDL_assert(m_pAlphaDisplay);
     *peSay = NOTHING;
@@ -1115,28 +1115,28 @@ void InvidoGfx::showPopUpCallMenu(CardSpec& cardClicked, int iX, int iY,
         *peSay = NOTHING;
     }
 
-    TRACE("END popup menu\n");
+    TRACE_DEBUG("END popup menu\n");
     drawStaticScene();
 }
 
 void InvidoGfx::clickOnPlayerCard(int iIndex) {
-    TRACE("card clicked %d\n", iIndex);
+    TRACE_DEBUG("card clicked %d\n", iIndex);
     if (m_bPlayerCanPlay &&
         (m_aPlayerCards[iIndex].State == CardGfx::CSW_ST_VISIBLE)) {
         m_pInvidoCore->Player_playCard(
             PLAYER_ME, m_aPlayerCards[iIndex].cardSpec.GetCardInfo());
-        m_bPlayerCanPlay = FALSE;
+        m_bPlayerCanPlay = false;
     }
 }
 
 void InvidoGfx::vadoDentro(int cardIx) {
-    TRACE("Card vado dentro %d\n", cardIx);
+    TRACE_DEBUG("Card vado dentro %d\n", cardIx);
     if (m_bPlayerCanPlay &&
         (m_aPlayerCards[cardIx].State == CardGfx::CSW_ST_VISIBLE)) {
         m_CardVadoDentroIndex = cardIx;
         m_pInvidoCore->Player_vaDentro(
             PLAYER_ME, m_aPlayerCards[cardIx].cardSpec.GetCardInfo());
-        m_bPlayerCanPlay = FALSE;
+        m_bPlayerCanPlay = false;
     }
 }
 
@@ -1386,7 +1386,7 @@ void InvidoGfx::showManoScore(bool bIsPlayed, int iPlayerIx, bool bIsPata,
 
 void InvidoGfx::guiPlayerTurn(int iPlayer) {
     SDL_assert(m_pMatchPoints);
-    m_bPlayerCanPlay = TRUE;
+    m_bPlayerCanPlay = true;
 
     m_iPlayerThatHaveMarkup = iPlayer;
 
@@ -1396,8 +1396,8 @@ void InvidoGfx::guiPlayerTurn(int iPlayer) {
     Player* pPlayer = m_pInvidoCore->GetPlayer(iPlayer);
 
     if (g_Options.All.iVerbose > 5) {
-        TRACE("%s Player che deve giocare %d: %s\n", lpszCST_INFO, iPlayer,
-              pPlayer->GetName());
+        TRACE_DEBUG("%s Player che deve giocare %d: %s\n", lpszCST_INFO,
+                    iPlayer, pPlayer->GetName());
     }
 }
 
@@ -1466,7 +1466,7 @@ void InvidoGfx::showCurrentScore() {
     if (m_pMatchPoints->IsGiocataMonte()) {
         lpsNamePoints = m_pLangMgr->GetStringId(Languages::ID_S_AMONTE).c_str();
     }
-    CHAR buffTmp[256];
+    char buffTmp[256];
     sprintf(buffTmp, "%s: %s",
             m_pLangMgr->GetStringId(Languages::ID_STA_PTCURRENT).c_str(),
             lpsNamePoints.c_str());
@@ -1598,8 +1598,8 @@ void InvidoGfx::ALG_Play() {
 }
 
 void InvidoGfx::ALG_HaveToRespond() {
-    TRACE("%s %s\n", lpszCST_SU,
-          m_pLangMgr->GetStringId(Languages::ID_CP_RISP1).c_str());
+    TRACE_DEBUG("%s %s\n", lpszCST_SU,
+                m_pLangMgr->GetStringId(Languages::ID_CP_RISP1).c_str());
     enableCmds();
 }
 
@@ -1611,11 +1611,11 @@ void InvidoGfx::ALG_PlayerHasSaid(int iPlayerIx, eSayPlayer SaySomeThing) {
         // in echo
         Player* pPlayer = m_pInvidoCore->GetPlayer(iPlayerIx);
         STRING lpsNameSay = m_Map_fb_Say[SaySomeThing];
-        TRACE("%s %s %s %s:  %s\n", lpszCST_INFO,
-              m_pLangMgr->GetStringId(Languages::ID_CP_PLAYER).c_str(),
-              pPlayer->GetName(),
-              m_pLangMgr->GetStringId(Languages::ID_CP_DICE).c_str(),
-              lpsNameSay.c_str());
+        TRACE_DEBUG("%s %s %s %s:  %s\n", lpszCST_INFO,
+                    m_pLangMgr->GetStringId(Languages::ID_CP_PLAYER).c_str(),
+                    pPlayer->GetName(),
+                    m_pLangMgr->GetStringId(Languages::ID_CP_DICE).c_str(),
+                    lpsNameSay.c_str());
 
         m_pbalGfx->StartShow(lpsNameSay.c_str());
         if (g_Options.All.bSoundEffect) {
@@ -1634,8 +1634,9 @@ void InvidoGfx::ALG_PlayerHasVadoDentro(int iPlayerIx) {
         m_CardVadoDentroIndex < NUM_CARDS_HAND) {
         if (m_aPlayerCards[m_CardVadoDentroIndex].State ==
             CardGfx::CSW_ST_VISIBLE) {
-            TRACE("card played %s\n",
-                  m_aPlayerCards[m_CardVadoDentroIndex].cardSpec.GetName());
+            TRACE_DEBUG(
+                "card played %s\n",
+                m_aPlayerCards[m_CardVadoDentroIndex].cardSpec.GetName());
 
             drawVadoDentroCard(&m_aPlayerCards[m_CardVadoDentroIndex]);
         }
@@ -1652,14 +1653,14 @@ void InvidoGfx::ALG_PlayerHasVadoDentro(int iPlayerIx) {
 }
 
 void InvidoGfx::opponentHasPlayedCard(CardSpec& Card, bool vadoDentro) {
-    bool bFound = FALSE;
+    bool bFound = false;
     for (int iIndex = 0; !bFound && iIndex < NUM_CARDS_HAND; iIndex++) {
         if (m_aOpponentCards[iIndex].State == CardGfx::CSW_ST_BACK) {
             if (vadoDentro) {
-                TRACE("Opponent va dentro, draw it\n");
+                TRACE_DEBUG("Opponent va dentro, draw it\n");
                 drawVadoDentroCard(&m_aOpponentCards[iIndex]);
             } else {
-                TRACE("card played %s\n", Card.GetName());
+                TRACE_DEBUG("card played %s\n", Card.GetName());
                 m_aOpponentCards[iIndex].State = CardGfx::CSW_ST_VISIBLE;
                 m_aOpponentCards[iIndex].cardSpec = Card;
                 drawPlayedCard(&m_aOpponentCards[iIndex]);
@@ -1669,8 +1670,8 @@ void InvidoGfx::opponentHasPlayedCard(CardSpec& Card, bool vadoDentro) {
     }
     SDL_assert(bFound);
     Player* pPlayer = m_pInvidoCore->GetPlayer(m_iOpponentIndex);
-    TRACE("%s %s ha giocato %s\n", lpszCST_INFO, pPlayer->GetName(),
-          Card.GetName());
+    TRACE_DEBUG("%s %s ha giocato %s\n", lpszCST_INFO, pPlayer->GetName(),
+                Card.GetName());
     int iNumCardPlayed = m_pMatchPoints->GetCurrNumCardPlayed();
     if (iNumCardPlayed == 1) {
         // first card played from opponent, don't need a delay
@@ -1709,7 +1710,7 @@ void InvidoGfx::ALG_PlayerHasPlayed(int iPlayerIx, const CARDINFO* pCard) {
         // HMI has played correctly
         for (int iIndex = 0; !bFound && iIndex < NUM_CARDS_HAND; iIndex++) {
             if (m_aPlayerCards[iIndex].cardSpec == Card) {
-                TRACE("card played %s\n", Card.GetName());
+                TRACE_DEBUG("card played %s\n", Card.GetName());
 
                 drawPlayedCard(&m_aPlayerCards[iIndex]);
                 bFound = true;
@@ -1731,8 +1732,8 @@ void InvidoGfx::ALG_PlayerHasPlayed(int iPlayerIx, const CARDINFO* pCard) {
 
 void InvidoGfx::ALG_NewGiocata(const CARDINFO* pCardArray, int iNumOfCards,
                                int iPlayerIx) {
-    TRACE("ALG_NewGiocata\n");
-    m_bPlayerCanPlay = FALSE;
+    TRACE_DEBUG("ALG_NewGiocata\n");
+    m_bPlayerCanPlay = false;
 
     SDL_assert(iNumOfCards == NUM_CARDS_HAND);
 
@@ -1765,7 +1766,7 @@ void InvidoGfx::ALG_NewGiocata(const CARDINFO* pCardArray, int iNumOfCards,
 
 void InvidoGfx::ALG_ManoEnd(I_MatchScore* pScore) {
     SDL_assert(pScore);
-    m_bPlayerCanPlay = FALSE;
+    m_bPlayerCanPlay = false;
 
     int iPlayerIx = pScore->GetManoWinner();
     int iManoNum = pScore->GetManoNum();
@@ -1782,18 +1783,18 @@ void InvidoGfx::ALG_ManoEnd(I_MatchScore* pScore) {
         Player* pPlayer = pTable->GetPlayerIndex(m_iPlayerThatHaveMarkup);
 
         // Mano patada, tocca a
-        TRACE("%s %s %s\n", lpszCST_INFO,
-              m_pLangMgr->GetStringId(Languages::ID_CP_MANOPATA).c_str(),
-              pPlayer->GetName());
+        TRACE_DEBUG("%s %s %s\n", lpszCST_INFO,
+                    m_pLangMgr->GetStringId(Languages::ID_CP_MANOPATA).c_str(),
+                    pPlayer->GetName());
 
         // animation of pata, use an index outside the player table
         animateManoEnd(21);
     } else {
         Player* pPlayer = m_pInvidoCore->GetPlayer(iPlayerIx);
         // Mano vinta da
-        TRACE("%s %s %s\n", lpszCST_INFO,
-              m_pLangMgr->GetStringId(Languages::ID_CP_MANOVINTA).c_str(),
-              pPlayer->GetName());
+        TRACE_DEBUG("%s %s %s\n", lpszCST_INFO,
+                    m_pLangMgr->GetStringId(Languages::ID_CP_MANOVINTA).c_str(),
+                    pPlayer->GetName());
 
         animateManoEnd(iPlayerIx);
         m_iPlayerThatHaveMarkup = iPlayerIx;
@@ -1814,20 +1815,22 @@ void InvidoGfx::ALG_GiocataEnd(I_MatchScore* pScore) {
     STRING strMsgFinGiocata;
     if (bIsPata) {
         // giocata patada
-        TRACE("%s %s\n", lpszCST_INFO,
-              m_pLangMgr->GetStringId(Languages::ID_CP_GIOCATAPATA).c_str());
+        TRACE_DEBUG(
+            "%s %s\n", lpszCST_INFO,
+            m_pLangMgr->GetStringId(Languages::ID_CP_GIOCATAPATA).c_str());
         strMsgFinGiocata =
             m_pLangMgr->GetStringId(Languages::ID_CP_GIOCATAPATA);
     } else if (pScore->IsGiocataMonte()) {
         // giocata a monte
-        TRACE("%s %s\n", lpszCST_INFO,
-              m_pLangMgr->GetStringId(Languages::ID_CP_GIOCATAMONTE).c_str());
+        TRACE_DEBUG(
+            "%s %s\n", lpszCST_INFO,
+            m_pLangMgr->GetStringId(Languages::ID_CP_GIOCATAMONTE).c_str());
         strMsgFinGiocata =
             m_pLangMgr->GetStringId(Languages::ID_CP_GIOCATAMONTE);
-        bIsPata = TRUE;
+        bIsPata = true;
     } else {
         // giocata with a winner
-        CHAR buffText[512];
+        char buffText[512];
 
         int iPlayLoser;
         if (iPlayerIx == m_PlayerGuiIndex) {
@@ -1839,26 +1842,28 @@ void InvidoGfx::ALG_GiocataEnd(I_MatchScore* pScore) {
         Player* pPlLoser = m_pInvidoCore->GetPlayer(iPlayLoser);
 
         // Giocata vinta da
-        TRACE("%s %s %s (%s %d)\n", lpszCST_INFO,
-              m_pLangMgr->GetStringId(Languages::ID_CP_GIOCATAVINTA).c_str(),
-              pPlayer->GetName(),
-              m_pLangMgr->GetStringId(Languages::ID_CP_PUNTI).c_str(),
-              pScore->GetCurrScore());
+        TRACE_DEBUG(
+            "%s %s %s (%s %d)\n", lpszCST_INFO,
+            m_pLangMgr->GetStringId(Languages::ID_CP_GIOCATAVINTA).c_str(),
+            pPlayer->GetName(),
+            m_pLangMgr->GetStringId(Languages::ID_CP_PUNTI).c_str(),
+            pScore->GetCurrScore());
         sprintf(buffText, "%s \"%s\" (%s %d)",
                 m_pLangMgr->GetStringId(Languages::ID_CP_GIOCATAVINTA).c_str(),
                 pPlayer->GetName(),
                 m_pLangMgr->GetStringId(Languages::ID_CP_PUNTI).c_str(),
                 pScore->GetCurrScore());
         // punti
-        TRACE("%s %s %s %d, %s %s %d\n", lpszCST_SCORE, pPlayer->GetName(),
-              m_pLangMgr->GetStringId(Languages::ID_CP_PUNTI).c_str(),
-              pScore->GetPointsPlayer(iPlayerIx), pPlLoser->GetName(),
-              m_pLangMgr->GetStringId(Languages::ID_CP_PUNTI).c_str(),
-              pScore->GetPointsPlayer(iPlayLoser));
+        TRACE_DEBUG("%s %s %s %d, %s %s %d\n", lpszCST_SCORE,
+                    pPlayer->GetName(),
+                    m_pLangMgr->GetStringId(Languages::ID_CP_PUNTI).c_str(),
+                    pScore->GetPointsPlayer(iPlayerIx), pPlLoser->GetName(),
+                    m_pLangMgr->GetStringId(Languages::ID_CP_PUNTI).c_str(),
+                    pScore->GetPointsPlayer(iPlayLoser));
 
         strMsgFinGiocata = buffText;
     }
-    m_bPlayerCanPlay = FALSE;
+    m_bPlayerCanPlay = false;
     drawStaticScene();
     animGiocataEnd(iPlayerIx, bIsPata);
     showOkMsgBox(strMsgFinGiocata.c_str());
@@ -1874,10 +1879,10 @@ void InvidoGfx::ALG_MatchEnd(I_MatchScore* pScore) {
     }
     Player* pPlayer = m_pInvidoCore->GetPlayer(iPlayerIx);
     Player* pPlLoser = m_pInvidoCore->GetPlayer(iPlayLoser);
-    m_bPlayerCanPlay = FALSE;
+    m_bPlayerCanPlay = false;
 
     // partita finita. player vince x:x
-    CHAR buff[256];
+    char buff[256];
     sprintf(buff, "%s. %s %s  %d : %d.",
             m_pLangMgr->GetStringId(Languages::ID_CP_PARTITAFIN).c_str(),
             pPlayer->GetName(),
@@ -1885,28 +1890,28 @@ void InvidoGfx::ALG_MatchEnd(I_MatchScore* pScore) {
             pScore->GetPointsPlayer(iPlayerIx),
             pScore->GetPointsPlayer(iPlayLoser));
 
-    TRACE("%s %s\n", lpszCST_INFO, buff);
+    TRACE_DEBUG("%s %s\n", lpszCST_INFO, buff);
 
     drawStaticScene();
 
     showOkMsgBox(buff);
 
-    m_bMatchTerminated = TRUE;
+    m_bMatchTerminated = true;
 }
 
 void InvidoGfx::ALG_GicataScoreChange(eGiocataScoreState eNewScore) {
     STRING lpsNamePoints = m_MapPunti[eNewScore];
     // Punteggio della giocata ora �:
-    TRACE("%s %s: %s\n", lpszCST_INFO,
-          m_pLangMgr->GetStringId(Languages::ID_CP_NOWPOINTS).c_str(),
-          lpsNamePoints.c_str());
+    TRACE_DEBUG("%s %s: %s\n", lpszCST_INFO,
+                m_pLangMgr->GetStringId(Languages::ID_CP_NOWPOINTS).c_str(),
+                lpsNamePoints.c_str());
 }
 
 void InvidoGfx::ALG_PlayerSaidWrong(int iPlayerIx) {
     if (iPlayerIx == m_PlayerGuiIndex) {
         // Quello che hai chiamato non � corretto
-        TRACE("%s, %s\n", lpszCST_SU,
-              m_pLangMgr->GetStringId(Languages::ID_CP_BUIADA).c_str());
+        TRACE_DEBUG("%s, %s\n", lpszCST_SU,
+                    m_pLangMgr->GetStringId(Languages::ID_CP_BUIADA).c_str());
     }
 }
 

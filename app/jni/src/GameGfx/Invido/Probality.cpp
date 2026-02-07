@@ -1,12 +1,4 @@
-
-
-// Probality.cpp
-
 #include "Probality.h"
-
-////////////////////////////////////////////////////////////////
-//   *******************      Probality CLASS ******************
-////////////////////////////////////////////////////////////////
 
 void Probality::SvilCombiHands(VCT_MAZZO& vct_Mazzo,
                                MTX_HANDCOMBI& mtx_Result) {
