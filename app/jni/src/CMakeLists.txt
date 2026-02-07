@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.20)
 
-if(INVIDO)
-  add_compile_definitions(INVIDO)
+if(INVIDOPRJ)
+  add_compile_definitions(INVIDOPRJ)
 endif()
 
 # Don't mistake osx for unix

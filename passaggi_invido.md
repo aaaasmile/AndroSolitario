@@ -8,7 +8,7 @@ Il software usa l'extension clangd che è molto diversa da quella di Visual Stud
 I comandi da usare sono:
 
     rm -r buildinvido
-    cmake -S app/jni/ -B buildinvido  -DSDL_WAYLAND=OFF -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DINVIDO=ON
+    cmake -S app/jni/ -B buildinvido  -DSDL_WAYLAND=OFF -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DINVIDOPRJ=ON
     cmake --build buildinvido
     cd buildinvido 
     .\invido.exe

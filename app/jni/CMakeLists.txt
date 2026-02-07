@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.20)
 
-option(INVIDO "Build Invido instead of Solitario" OFF)
+option(INVIDOPRJ "Build Invido" OFF)
 
-if(INVIDO)
+if(INVIDOPRJ)
     project(invido VERSION 3.0.13 LANGUAGES C CXX)
 else()
     project(solitario VERSION 3.0.13 LANGUAGES C CXX)
