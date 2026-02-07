@@ -26,7 +26,7 @@ class Partita {
     InvidoCore* m_pInvidoCore;
     Giocata* m_pGiocata;
     long m_lGiocStart;
-    eFN_ACTION m_eNextAction;
+    eFN_ACTION _eNextAction;
 };
 
 #endif

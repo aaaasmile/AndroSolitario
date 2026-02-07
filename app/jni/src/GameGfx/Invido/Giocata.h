@@ -13,9 +13,9 @@ enum eFN_ACTION_GIO { GIOC_START, GIOC_END, GIOC_NO_ACTION };
 
 class ActionItemGio {
    public:
-    ActionItemGio() { m_eNextAction = GIOC_NO_ACTION; }
+    ActionItemGio() { _eNextAction = GIOC_NO_ACTION; }
 
-    eFN_ACTION_GIO m_eNextAction;
+    eFN_ACTION_GIO _eNextAction;
     VCT_LONG m_vct_lArg;
 };
 

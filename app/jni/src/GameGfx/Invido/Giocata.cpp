@@ -18,7 +18,7 @@ void Giocata::NewGiocata(long lPlayerIx) {
         m_eGiocataStatus = GIOCATA_ONGOING;
         // next action
         Action.m_vct_lArg.push_back(lPlayerIx);
-        Action.m_eNextAction = GIOC_START;
+        Action._eNextAction = GIOC_START;
         m_deqNextAction.push_back(Action);
     } else {
         m_pInvidoCore->RaiseError("Giocata state not right\n");
@@ -35,7 +35,7 @@ void Giocata::NextAction() {
     ActionItemGio Action = m_deqNextAction.front();
     m_deqNextAction.pop_front();
 
-    switch (Action.m_eNextAction) {
+    switch (Action._eNextAction) {
         case GIOC_START:
             // gioca is started
             SDL_assert(Action.m_vct_lArg.size() > 0);
@@ -69,7 +69,7 @@ void Giocata::Update_Giocata(long lPlayerIx, I_MatchScore* pIScore) {
     if (pIScore->IsGiocatEnd()) {
         // giocata is terminated
         m_eGiocataStatus = WAIT_NEW_GIOCATA;
-        Action.m_eNextAction = GIOC_END;
+        Action._eNextAction = GIOC_END;
         m_deqNextAction.push_back(Action);
     } else {
         m_pMano->NewMano(lPlayerIx);

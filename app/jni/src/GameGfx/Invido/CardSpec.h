@@ -15,26 +15,26 @@ class CardSpec {
     CardSpec();
     virtual ~CardSpec() {};
     void SetCardIndex(int itmpIndex);
-    int GetCardIndex() { return m_CardInfo.byIndex; }
-    eSUIT GetSuit() { return m_CardInfo.eSuit; }
-    LPCSTR GetName() { return m_CardInfo.CardName.c_str(); }
+    int GetCardIndex() { return _cardInfo.byIndex; }
+    eSUIT GetSuit() { return _cardInfo.eSuit; }
+    LPCSTR GetName() { return _cardInfo.CardName.c_str(); }
     void operator=(const CardSpec& r);
     bool operator==(const CardSpec& r) {
-        return m_CardInfo.byIndex == r.m_CardInfo.byIndex;
+        return _cardInfo.byIndex == r._cardInfo.byIndex;
     }
     bool operator!=(const CardSpec& r) {
-        return m_CardInfo.byIndex != r.m_CardInfo.byIndex;
+        return _cardInfo.byIndex != r._cardInfo.byIndex;
     }
     void Reset();
-    void SetSymbol(int iVal) { m_CardInfo.byIndex = iVal; }
-    int GetSymbol() { return m_CardInfo.byIndex; }
-    CARDINFO* GetCardInfo() { return &m_CardInfo; }
+    void SetSymbol(int iVal) { _cardInfo.byIndex = iVal; }
+    int GetSymbol() { return _cardInfo.byIndex; }
+    CARDINFO* GetCardInfo() { return &_cardInfo; }
     void SetCardInfo(const CARDINFO& Card);
     void FillInfo(CARDINFO* pCardInfo);
     int GetPoints();
 
    private:
-    CARDINFO m_CardInfo;
+    CARDINFO _cardInfo;
 };
 
 typedef std::vector<CardSpec> VCT_CARDSPEC;

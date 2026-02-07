@@ -22,14 +22,14 @@ class InvidoCore : public I_CORE_Game {
     void Create(Player* pHmiPlayer, int iNumPlayers);
     bool WhoWonsTheGame(Player** ppPlayer);
     bool GetPlayerInPlaying(Player** ppPlayer);
-    void SetGameType(eGameType eVal) { m_eGameType = eVal; }
+    void SetGameType(eGameType eVal) { _eGameType = eVal; }
     Player* GetPlayer(int iIndex) {
-        return m_PlayersOnTable.GetPlayerIndex(iIndex);
+        return _playersOnTable.GetPlayerIndex(iIndex);
     }
     void RaiseError(const std::string& errorMsg);
-    int GetNumOfPlayers() { return m_lNumPlayers; }
-    MatchPoints* GetMatchPointsObj() { return &m_MatchPoints; }
-    PlayersOnTable* GetTable() { return &m_PlayersOnTable; }
+    int GetNumOfPlayers() { return _numPlayers; }
+    MatchPoints* GetMatchPointsObj() { return &_matchPoints; }
+    PlayersOnTable* GetTable() { return &_playersOnTable; }
 
     // functions related to the script engine
     void NotifyScript(eScriptNotification eVal);
@@ -74,20 +74,20 @@ class InvidoCore : public I_CORE_Game {
     int getNewMatchFirstPlayer();
 
    private:
-    PlayersOnTable m_PlayersOnTable;
-    eGameType m_eGameType;
-    long m_lNumPlayers;
-    Player* m_pPlHaveToPlay;
-    Player* m_pStartPlayer;
-    eGameLevel m_eGameLevel;
-    MATCH_STATISTIC m_Match_Stat;
-    Mazzo* m_pMyMazzo;
-    Partita m_Partita;
-    Giocata m_Giocata;
-    Mano m_Mano;
-    I_ALG_Player* m_vctAlgPlayer[MAX_NUM_PLAYER];
-    MatchPoints m_MatchPoints;
-    CardSpec m_aCardInfo[NUM_CARDS_HAND * MAX_NUM_PLAYER];
+    PlayersOnTable _playersOnTable;
+    eGameType _eGameType;
+    long _numPlayers;
+    Player* _p_PlHaveToPlay;
+    Player* _p_StartPlayer;
+    eGameLevel _eGameLevel;
+    MATCH_STATISTIC _matchStat;
+    Mazzo* _p_MyMazzo;
+    Partita _partita;
+    Giocata _giocata;
+    Mano _mano;
+    I_ALG_Player* _vctpAlgPlayer[MAX_NUM_PLAYER];
+    MatchPoints _matchPoints;
+    CardSpec _cardInfos[NUM_CARDS_HAND * MAX_NUM_PLAYER];
 };
 
 #endif

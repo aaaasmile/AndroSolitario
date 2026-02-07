@@ -23,7 +23,7 @@ class PlayersOnTable {
    private:
     VCT_PLAYERS m_vctPlayers;
     long m_lCurrent;
-    long m_lNumPlayers;
+    long _numPlayers;
     long m_lFirstOnGiocata;
     long m_lFirstOnTrick;
     long m_lFirstOnMatch;

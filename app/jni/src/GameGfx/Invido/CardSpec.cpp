@@ -34,49 +34,49 @@ CardSpec::CardSpec() { Reset(); }
 void CardSpec::SetCardIndex(int itmpIndex) {
     SDL_assert(itmpIndex >= 0 && itmpIndex <= eGameConst::NUM_CARDS_MAZZBRI);
     if (itmpIndex >= 0 && itmpIndex <= eGameConst::NUM_CARDS_MAZZBRI) {
-        m_CardInfo.byIndex = itmpIndex;
+        _cardInfo.byIndex = itmpIndex;
     } else {
         return;
     }
 
     if (itmpIndex >= 0 && itmpIndex < eGameConst::NUM_CARDS_MAZZBRI) {
-        m_CardInfo.CardName = g_CardsNameX[itmpIndex];
+        _cardInfo.CardName = g_CardsNameX[itmpIndex];
     }
 
-    if (m_CardInfo.byIndex >= 0 && m_CardInfo.byIndex < 10) {
-        m_CardInfo.eSuit = eSUIT::BASTONI;
-    } else if (m_CardInfo.byIndex >= 10 && m_CardInfo.byIndex < 20) {
-        m_CardInfo.eSuit = eSUIT::COPPE;
-    } else if (m_CardInfo.byIndex >= 20 && m_CardInfo.byIndex < 30) {
-        m_CardInfo.eSuit = eSUIT::DENARI;
-    } else if (m_CardInfo.byIndex >= 30 && m_CardInfo.byIndex < 40) {
-        m_CardInfo.eSuit = eSUIT::SPADE;
+    if (_cardInfo.byIndex >= 0 && _cardInfo.byIndex < 10) {
+        _cardInfo.eSuit = eSUIT::BASTONI;
+    } else if (_cardInfo.byIndex >= 10 && _cardInfo.byIndex < 20) {
+        _cardInfo.eSuit = eSUIT::COPPE;
+    } else if (_cardInfo.byIndex >= 20 && _cardInfo.byIndex < 30) {
+        _cardInfo.eSuit = eSUIT::DENARI;
+    } else if (_cardInfo.byIndex >= 30 && _cardInfo.byIndex < 40) {
+        _cardInfo.eSuit = eSUIT::SPADE;
     }
 }
 
 void CardSpec::operator=(const CardSpec& r) {
-    m_CardInfo.CardName = r.m_CardInfo.CardName;
-    m_CardInfo.byIndex = r.m_CardInfo.byIndex;
-    m_CardInfo.eSuit = r.m_CardInfo.eSuit;
+    _cardInfo.CardName = r._cardInfo.CardName;
+    _cardInfo.byIndex = r._cardInfo.byIndex;
+    _cardInfo.eSuit = r._cardInfo.eSuit;
 }
 
 void CardSpec::Reset() {
-    m_CardInfo.byIndex = eGameConst::NOT_VALID_INDEX;
-    m_CardInfo.CardName = "";
-    m_CardInfo.eSuit = eSUIT::BASTONI;
+    _cardInfo.byIndex = eGameConst::NOT_VALID_INDEX;
+    _cardInfo.CardName = "";
+    _cardInfo.eSuit = eSUIT::BASTONI;
 }
 
 void CardSpec::SetCardInfo(const CARDINFO& Card) {
-    m_CardInfo.CardName = Card.CardName;
-    m_CardInfo.byIndex = Card.byIndex;
-    m_CardInfo.eSuit = Card.eSuit;
+    _cardInfo.CardName = Card.CardName;
+    _cardInfo.byIndex = Card.byIndex;
+    _cardInfo.eSuit = Card.eSuit;
 }
 
 void CardSpec::FillInfo(CARDINFO* pCardInfo) {
     SDL_assert(pCardInfo);
-    pCardInfo->CardName = m_CardInfo.CardName;
-    pCardInfo->byIndex = m_CardInfo.byIndex;
-    pCardInfo->eSuit = m_CardInfo.eSuit;
+    pCardInfo->CardName = _cardInfo.CardName;
+    pCardInfo->byIndex = _cardInfo.byIndex;
+    pCardInfo->eSuit = _cardInfo.eSuit;
 }
 
 int CardSpec::GetPoints() {

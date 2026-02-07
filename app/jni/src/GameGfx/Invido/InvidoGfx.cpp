@@ -6,16 +6,16 @@
 #include <time.h>
 
 #include "BalloonGfx.h"
+#include "PopUpMenuGfx.h"
+
 #include "ButtonGfx.h"
 #include "DeckType.h"
-#include "DelayNextAction.h"
 #include "GameSettings.h"
 #include "InvidoCoreEnv.h"
 #include "Languages.h"
 #include "MesgBoxGfx.h"
 #include "MusicManager.h"
-#include "PopUpMenuGfx.h"
-#include "gfx_util.h"
+#include "GfxUtil.h"
 
 static const char* lpszImageDir = DATA_PREFIX "images/invido/";
 static const char* lpszImageBack = "im000740.jpg";
@@ -226,7 +226,6 @@ void InvidoGfx::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRender,
                         80, 0, 255));
     }
 
-    // create stack regions
     createRegionsInit();
 
     _p_FontStatus = GameSettings::GetSettings()->GetFontDjvBoldBig();
