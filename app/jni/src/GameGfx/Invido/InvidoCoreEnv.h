@@ -3,7 +3,6 @@
 
 #include <SDL3/SDL.h>
 
-#include <string>
 #include <vector>
 
 const int g_PointsTable[] = {
@@ -15,22 +14,6 @@ const int g_PointsTable[] = {
     /*Sei*/ 6,   /*Sette*/ 7, /*Fante*/ 8, /*Cavallo*/ 9, /*Re*/ 10,
     /*Asso*/ 11, /*Due*/ 12,  /*Tre*/ 13,  /*Quattro*/ 4, /*cinque*/ 5,
     /*Sei*/ 6,   /*Sette*/ 7, /*Fante*/ 8, /*Cavallo*/ 9, /*Re*/ 10};
-
-const std::string g_CardsNameX[] = {
-    "Asso di bastoni",    "Due di bastoni",     "Tre di bastoni",
-    "Quattro di bastoni", "Cinque di bastoni",  "Sei di bastoni",
-    "Sette di bastoni",   "Fante di bastoni",   "Cavallo di bastoni",
-    " Re di bastoni",     "Asso di  coppe",     "Due di  coppe",
-    "Tre di  coppe",      "Quattro di  coppe",  "Cinque di  coppe",
-    "Sei di  coppe",      "Sette di  coppe",    "Fante di  coppe",
-    "Cavallo di  coppe",  " Re di  coppe",      "Asso di  denari",
-    "Due di  denari",     "Tre di  denari",     "Quattro di  denari",
-    "Cinque di  denari",  "Sei di  denari",     "Sette di  denari",
-    "Fante di  denari",   "Cavallo di  denari", " Re di  denari",
-    "Asso di  spade",     "Due di  spade",      "Tre di  spade",
-    "Quattro di  spade",  "Cinque di  spade",   "Sei di  spade",
-    "Sette di  spade",    "Fante di  spade",    "Cavallo di  spade",
-    " Re di  spade"};
 
 typedef std::vector<long> VCT_LONG;
 typedef VCT_LONG::iterator IT_VCTLONG;

@@ -8,8 +8,6 @@
 #include "InvidoCoreEnv.h"
 #include "TraceService.h"
 
-// random value between [0,x)
-
 typedef std::map<eSayPlayer, LPCSTR> _MAP_SAY;
 static _MAP_SAY g_MapSay;
 
@@ -239,7 +237,7 @@ void AlgAdvancedPlayer::PlayAsFirst() {
         }
     }
 
-    int iLoops = 0, i, maxpoints = 0, max_pos = 0, sum_points = 0, min_pos = 0;
+    int i, maxpoints = 0, max_pos = 0, sum_points = 0, min_pos = 0;
     int min_points = 20;
     int med_points = 0, med_pos = 0;
     int arrPoints[eGameConst::NUM_CARDS_HAND] = {0, 0, 0};

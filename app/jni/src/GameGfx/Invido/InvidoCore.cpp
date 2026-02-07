@@ -367,9 +367,8 @@ bool InvidoCore::Player_vaDentro(int iPlayerIx, const CARDINFO* pCardInfo) {
         // update match points
         int ixCardVaDentro = 3;
         CARDINFO cardVadodentro;  // quattro di bastoni, carta sempre perdente
-        cardVadodentro.byIndex = ixCardVaDentro;
-        cardVadodentro.CardName = g_CardsNameX[ixCardVaDentro];
-        cardVadodentro.eSuit = BASTONI;
+        cardVadodentro.byIndex = ixCardVaDentro;  // TODO check this
+        cardVadodentro.eSuit = eSUIT::BASTONI;
 
         m_MatchPoints.PlayerPlay(iPlayerIx, &cardVadodentro);
 
@@ -413,7 +412,6 @@ bool InvidoCore::Player_playCard(int iPlayerIx, const CARDINFO* pCardInfo) {
             }
         }
 
-        // reset info about played card
         resetCard(iPlayerIx, pCardplayed->GetCardInfo());
 
         bRes = true;

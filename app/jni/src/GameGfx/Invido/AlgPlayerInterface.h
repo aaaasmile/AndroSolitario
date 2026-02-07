@@ -46,7 +46,6 @@ class I_ALG_Player {
     I_ALG_Player() {}
     virtual void ALG_SetCoreInterface(I_CORE_Game* pCore) = 0;
     virtual void ALG_SetPlayerIndex(int iIndex) = 0;
-    // iOpponentNr is the ordinal number of opponent
     virtual void ALG_SetOpponentIndex(int iIndex, int iOpponentNr) = 0;
     virtual void ALG_SetAssociateIndex(int iIndex) = 0;
     virtual void ALG_NewMatch(int iNumPlayer) = 0;
