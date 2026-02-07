@@ -31,9 +31,6 @@ typedef std::map<eManoStatus, eFN_MANOACTION> MAP_STATUS_ACTION;
 typedef std::map<eGiocataScoreState, eGiocataScoreState> MAP_SCORE_SCORENEXT;
 typedef std::deque<eManoStatus> DEQ_TABLESTATE;
 
-//////////////////////////////////////////////////////////////////////
-/** pendi question information
- */
 class PendQuestion {
    public:
     PendQuestion() {
@@ -59,8 +56,7 @@ typedef std::deque<PendQuestion> DEQ_PENDQUESTION;
 #ifndef VCT_INT
 typedef std::vector<int> VCT_INT;
 #endif
-/** action item in the queue
- */
+
 class ActionItem {
    public:
     ActionItem() { _eNextAction = MANO_NO_ACTION; }
@@ -140,7 +136,6 @@ class Mano {
     int _playerChangeScore;
     MAP_SCORE_SCORENEXT _mapScoreScNext;
     MAP_SCORE_SAY _mapScoreSay;
-    TraceService* _p_Tracer;
 };
 
 #endif

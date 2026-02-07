@@ -19,20 +19,7 @@ enum {
     CRD_MAZZO_PLAYER1,
     CRD_MAZZO_PLAYER2,
 };
-struct DRAGCARD {
-    int x;
-    int y;
-    int width;
-    int height;
-};
 
-// card sybols
-const unsigned int CRD_NSYMBOL = 0;
-const unsigned int CRD_XSYMBOL = 1;
-const unsigned int CRD_OSYMBOL = 2;
-const unsigned int CRD_HSYMBOL = 3;
-
-class AppGfx;
 class InvidoCore;
 class DeckType;
 class ButtonGfx;
@@ -46,7 +33,7 @@ typedef std::map<eSayPlayer, int> MAP_INTID;
 typedef std::vector<int> VCT_INT;
 
 class InvidoGfx : public I_ALG_Player {
-   public:
+   private:
     enum {
         IMG_TOCCA_PLAYER,
         IMG_LEDGREEN_OFF,
@@ -68,13 +55,13 @@ class InvidoGfx : public I_ALG_Player {
     };
     enum { NUMOFBUTTON = 6 };
 
-    InvidoGfx(AppGfx* pApp);
+   public:
+    InvidoGfx();
     ~InvidoGfx();
     void Initialize(SDL_Surface* s, SDL_Renderer* pRender,
                     SDL_Texture* pScreenTexture);
     void MatchLoop();
     void InitInvidoVsCPU();
-    void SetMainApp(AppGfx* pVal) { _p_App = pVal; }
     void INP_PlayerSay(eSayPlayer eSay);
     void ButCmdClicked(int iButID);
     void NtfyTermEff(int iCh);
@@ -153,8 +140,6 @@ class InvidoGfx : public I_ALG_Player {
     TTF_Font* _p_FontText;
     SDL_Surface* _p_Surf_Bar;
     InvidoCore* _p_InvidoCore;
-    AppGfx* _p_App;
-    bool _isStartdrag;
     int _cardWidth;
     int _cardHeight;
     int _symbolWidth;

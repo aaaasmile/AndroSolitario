@@ -5,16 +5,6 @@
 
 #include <vector>
 
-const int g_PointsTable[] = {
-    /*Asso*/ 11, /*Due*/ 12,  /*Tre*/ 13,  /*Quattro*/ 4, /*cinque*/ 5,
-    /*Sei*/ 6,   /*Sette*/ 7, /*Fante*/ 8, /*Cavallo*/ 9, /*Re*/ 10,
-    /*Asso*/ 11, /*Due*/ 12,  /*Tre*/ 13,  /*Quattro*/ 4, /*cinque*/ 5,
-    /*Sei*/ 6,   /*Sette*/ 7, /*Fante*/ 8, /*Cavallo*/ 9, /*Re*/ 10,
-    /*Asso*/ 11, /*Due*/ 12,  /*Tre*/ 13,  /*Quattro*/ 4, /*cinque*/ 5,
-    /*Sei*/ 6,   /*Sette*/ 7, /*Fante*/ 8, /*Cavallo*/ 9, /*Re*/ 10,
-    /*Asso*/ 11, /*Due*/ 12,  /*Tre*/ 13,  /*Quattro*/ 4, /*cinque*/ 5,
-    /*Sei*/ 6,   /*Sette*/ 7, /*Fante*/ 8, /*Cavallo*/ 9, /*Re*/ 10};
-
 typedef std::vector<long> VCT_LONG;
 typedef VCT_LONG::iterator IT_VCTLONG;
 enum eGameConst {
@@ -80,20 +70,20 @@ enum eScriptNotification {
 };
 
 enum eSayPlayer {
-    AMONTE = 0,
-    INVIDO = 1,
-    TRASMAS = 2,
-    TRASMASNOEF = 3,
-    FUERAJEUQ = 4,
-    PARTIDA = 5,
-    VABENE = 6,
-    VADOVIA = 7,
-    CHIAMADIPIU = 8,
-    NO = 9,
-    VADODENTRO = 10,
-    GIOCA = 11,
-    CHIAMA_BORTOLO = 12,
-    NOTHING = 13
+    SP_AMONTE = 0,
+    SP_INVIDO = 1,
+    SP_TRASMAS = 2,
+    SP_TRASMASNOEF = 3,
+    SP_FUERAJEUQ = 4,
+    SP_PARTIDA = 5,
+    SP_VABENE = 6,
+    SP_VADOVIA = 7,
+    SP_CHIAMADIPIU = 8,
+    SP_NO = 9,
+    SP_VADODENTRO = 10,
+    SP_GIOCA = 11,
+    SP_CHIAMA_BORTOLO = 12,
+    SP_NOTHING = 13
 };
 
 enum eGiocataScoreState {

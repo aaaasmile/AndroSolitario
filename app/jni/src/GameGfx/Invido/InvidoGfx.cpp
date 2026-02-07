@@ -5,12 +5,12 @@
 #include <stdio.h>
 #include <time.h>
 
-#include "AppGfx.h"
 #include "BalloonGfx.h"
 #include "ButtonGfx.h"
 #include "DeckType.h"
 #include "DelayNextAction.h"
 #include "GameSettings.h"
+#include "InvidoCoreEnv.h"
 #include "Languages.h"
 #include "MesgBoxGfx.h"
 #include "MusicManager.h"
@@ -19,7 +19,7 @@
 
 static const char* lpszImageDir = DATA_PREFIX "images/invido/";
 static const char* lpszImageBack = "im000740.jpg";
-static const char* lpszaImage_filenames[InvidoGfx::NUM_ANIMAGES] = {
+static const char* lpszaImage_filenames[] = {
     DATA_PREFIX "images/invido/tocca.png",
     DATA_PREFIX "images/invido/LedOff.bmp",
     DATA_PREFIX "images/invido/LedOn.bmp",
@@ -51,29 +51,25 @@ static const char* lpszCST_SU = "[SU]";
 //     g_stacInvidoGfx->NtfyTermEff(iCh);
 // }
 
-InvidoGfx::InvidoGfx(AppGfx* pApp) {
+InvidoGfx::InvidoGfx() {
     _p_Scene_background = 0;
     _p_FontText = 0;
     _p_Surf_Bar = 0;
-    _p_App = pApp;
-    _isStartdrag = false;
 
-    _symbolWidth = 84;
-    _symbolHeigth = 144;
     _p_Deck = 0;
     _p_Symbols = 0;
     _p_FontStatus = 0;
     _p_DeckType = 0;
 
-    for (int i = 0; i < NUM_ANIMAGES; i++) {
+    for (int i = 0; i < InvidoGfx::NUM_ANIMAGES; i++) {
         _p_AnImages[i] = 0;
     }
     _p_MatchPoints = 0;
     _p_InvidoCore = 0;
     _isPlayerCanPlay = false;
     _playerThatHaveMarkup = 0;
-    for (int j = 0; j < NUMOFBUTTON; j++) {
-        _p_btArrayCmd[0] = 0;
+    for (int j = 0; j < InvidoGfx::NUMOFBUTTON; j++) {
+        _p_btArrayCmd[j] = 0;
     }
     _p_LangMgr = 0;
     _p_MusicMgr = 0;
@@ -93,7 +89,8 @@ void InvidoGfx::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRender,
     cleanup();
     char ErrBuff[512];
 
-    Languages* pLangMgr = _p_App->GetLanguageMan();
+    GameSettings* pGameSettings = GameSettings::GetSettings();
+    Languages* pLangMgr = pGameSettings->GetLanguageMan();
     _p_LangMgr = pLangMgr;
 
     // points name
@@ -112,83 +109,95 @@ void InvidoGfx::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRender,
         pLangMgr->GetStringId(Languages::ID_S_PARTIDA).c_str();
 
     // buttons  strings
-    _Map_bt_Say[AMONTE] =
+    _Map_bt_Say[eSayPlayer::SP_AMONTE] =
         pLangMgr->GetStringId(Languages::ID_S_BT_AMONTE).c_str();
-    _Map_bt_Say[INVIDO] =
+    _Map_bt_Say[eSayPlayer::SP_INVIDO] =
         pLangMgr->GetStringId(Languages::ID_S_BT_INVIDO).c_str();
-    _Map_bt_Say[TRASMAS] =
+    _Map_bt_Say[eSayPlayer::SP_TRASMAS] =
         pLangMgr->GetStringId(Languages::ID_S_BT_TRASMAS).c_str();
-    _Map_bt_Say[TRASMASNOEF] =
+    _Map_bt_Say[eSayPlayer::SP_TRASMASNOEF] =
         pLangMgr->GetStringId(Languages::ID_S_BT_TRASMASNOEF).c_str();
-    _Map_bt_Say[FUERAJEUQ] =
+    _Map_bt_Say[eSayPlayer::SP_FUERAJEUQ] =
         pLangMgr->GetStringId(Languages::ID_S_BT_FUERAJEUQ).c_str();
-    _Map_bt_Say[PARTIDA] =
+    _Map_bt_Say[eSayPlayer::SP_PARTIDA] =
         pLangMgr->GetStringId(Languages::ID_S_BT_PARTIDA).c_str();
-    _Map_bt_Say[VABENE] =
+    _Map_bt_Say[eSayPlayer::SP_VABENE] =
         pLangMgr->GetStringId(Languages::ID_S_BT_VABENE).c_str();
-    _Map_bt_Say[VADOVIA] =
+    _Map_bt_Say[eSayPlayer::SP_VADOVIA] =
         pLangMgr->GetStringId(Languages::ID_S_BT_VADOVIA).c_str();
-    _Map_bt_Say[CHIAMADIPIU] =
+    _Map_bt_Say[eSayPlayer::SP_CHIAMADIPIU] =
         pLangMgr->GetStringId(Languages::ID_S_BT_CHIAMADIPIU).c_str();
-    _Map_bt_Say[NO] = pLangMgr->GetStringId(Languages::ID_S_BT_NO).c_str();
-    _Map_bt_Say[GIOCA] =
+    _Map_bt_Say[eSayPlayer::SP_NO] =
+        pLangMgr->GetStringId(Languages::ID_S_BT_NO).c_str();
+    _Map_bt_Say[eSayPlayer::SP_GIOCA] =
         pLangMgr->GetStringId(Languages::ID_S_BT_GIOCA).c_str();
-    _Map_bt_Say[VADODENTRO] =
+    _Map_bt_Say[eSayPlayer::SP_VADODENTRO] =
         pLangMgr->GetStringId(Languages::ID_S_BT_VADODENTRO).c_str();
-    _Map_bt_Say[CHIAMA_BORTOLO] =
+    _Map_bt_Say[eSayPlayer::SP_CHIAMA_BORTOLO] =
         pLangMgr->GetStringId(Languages::ID_S_BT_CHIAMA_BORTOLO).c_str();
-    _Map_bt_Say[NOTHING] = "";
+    _Map_bt_Say[eSayPlayer::SP_NOTHING] = "";
 
     // say strings
-    _Map_fb_Say[AMONTE] = pLangMgr->GetStringId(Languages::ID_S_AMONTE).c_str();
-    _Map_fb_Say[INVIDO] = pLangMgr->GetStringId(Languages::ID_S_INVIDO).c_str();
-    _Map_fb_Say[TRASMAS] =
+    _Map_fb_Say[eSayPlayer::SP_AMONTE] =
+        pLangMgr->GetStringId(Languages::ID_S_AMONTE).c_str();
+    _Map_fb_Say[eSayPlayer::SP_INVIDO] =
+        pLangMgr->GetStringId(Languages::ID_S_INVIDO).c_str();
+    _Map_fb_Say[eSayPlayer::SP_TRASMAS] =
         pLangMgr->GetStringId(Languages::ID_S_TRASMAS).c_str();
-    _Map_fb_Say[TRASMASNOEF] =
+    _Map_fb_Say[eSayPlayer::SP_TRASMASNOEF] =
         pLangMgr->GetStringId(Languages::ID_S_TRASMASNOEF).c_str();
-    _Map_fb_Say[FUERAJEUQ] =
+    _Map_fb_Say[eSayPlayer::SP_FUERAJEUQ] =
         pLangMgr->GetStringId(Languages::ID_S_FUERAJEUQ).c_str();
-    _Map_fb_Say[PARTIDA] =
+    _Map_fb_Say[eSayPlayer::SP_PARTIDA] =
         pLangMgr->GetStringId(Languages::ID_S_PARTIDA).c_str();
-    _Map_fb_Say[VABENE] = pLangMgr->GetStringId(Languages::ID_S_VABENE).c_str();
-    _Map_fb_Say[VADOVIA] =
+    _Map_fb_Say[eSayPlayer::SP_VABENE] =
+        pLangMgr->GetStringId(Languages::ID_S_VABENE).c_str();
+    _Map_fb_Say[eSayPlayer::SP_VADOVIA] =
         pLangMgr->GetStringId(Languages::ID_S_VADOVIA).c_str();
-    _Map_fb_Say[CHIAMADIPIU] =
+    _Map_fb_Say[eSayPlayer::SP_CHIAMADIPIU] =
         pLangMgr->GetStringId(Languages::ID_S_CHIAMADIPIU).c_str();
-    _Map_fb_Say[NO] = pLangMgr->GetStringId(Languages::ID_S_NO).c_str();
-    _Map_fb_Say[GIOCA] = pLangMgr->GetStringId(Languages::ID_S_GIOCA).c_str();
-    _Map_fb_Say[VADODENTRO] =
+    _Map_fb_Say[eSayPlayer::SP_NO] =
+        pLangMgr->GetStringId(Languages::ID_S_NO).c_str();
+    _Map_fb_Say[eSayPlayer::SP_GIOCA] =
+        pLangMgr->GetStringId(Languages::ID_S_GIOCA).c_str();
+    _Map_fb_Say[eSayPlayer::SP_VADODENTRO] =
         pLangMgr->GetStringId(Languages::ID_S_VADODENTRO).c_str();
 
     // sound call echo player
-    _Map_id_EchoSay[AMONTE] = MusicManager::SND_IG_MONTE_NORM;
-    _Map_id_EchoSay[INVIDO] = MusicManager::SND_IG_INV_NORM;
-    _Map_id_EchoSay[TRASMAS] = MusicManager::SND_IG_TRASMAS;
-    _Map_id_EchoSay[TRASMASNOEF] = MusicManager::SND_IG_TRASNOEF;
-    _Map_id_EchoSay[FUERAJEUQ] = MusicManager::SND_IG_FUORIGIOCO;
-    _Map_id_EchoSay[PARTIDA] = MusicManager::SND_IG_PARTIDA;
-    _Map_id_EchoSay[VABENE] = MusicManager::SND_IG_VABENE;
-    _Map_id_EchoSay[VADOVIA] = MusicManager::SND_IG_VUVIA;
-    _Map_id_EchoSay[CHIAMADIPIU] = MusicManager::SND_IG_CHIAMAPIU;
-    _Map_id_EchoSay[NO] = MusicManager::SND_IG_NO;
-    _Map_id_EchoSay[GIOCA] = MusicManager::SND_IG_GIOCA;
-    _Map_id_EchoSay[CHIAMA_BORTOLO] = MusicManager::SND_IG_BORTOLO;
+    _Map_id_EchoSay[eSayPlayer::SP_AMONTE] = MusicManager::SND_IG_MONTE_NORM;
+    _Map_id_EchoSay[eSayPlayer::SP_INVIDO] = MusicManager::SND_IG_INV_NORM;
+    _Map_id_EchoSay[eSayPlayer::SP_TRASMAS] = MusicManager::SND_IG_TRASMAS;
+    _Map_id_EchoSay[eSayPlayer::SP_TRASMASNOEF] = MusicManager::SND_IG_TRASNOEF;
+    _Map_id_EchoSay[eSayPlayer::SP_FUERAJEUQ] = MusicManager::SND_IG_FUORIGIOCO;
+    _Map_id_EchoSay[eSayPlayer::SP_PARTIDA] = MusicManager::SND_IG_PARTIDA;
+    _Map_id_EchoSay[eSayPlayer::SP_VABENE] = MusicManager::SND_IG_VABENE;
+    _Map_id_EchoSay[eSayPlayer::SP_VADOVIA] = MusicManager::SND_IG_VUVIA;
+    _Map_id_EchoSay[eSayPlayer::SP_CHIAMADIPIU] =
+        MusicManager::SND_IG_CHIAMAPIU;
+    _Map_id_EchoSay[eSayPlayer::SP_NO] = MusicManager::SND_IG_NO;
+    _Map_id_EchoSay[eSayPlayer::SP_GIOCA] = MusicManager::SND_IG_GIOCA;
+    _Map_id_EchoSay[eSayPlayer::SP_CHIAMA_BORTOLO] =
+        MusicManager::SND_IG_BORTOLO;
     // sound synth opponent
-    _Map_idSynth_Say[AMONTE] = MusicManager::SND_WAV_SYF_MONTE;
-    _Map_idSynth_Say[INVIDO] = MusicManager::SND_WAV_SYF_INVIDO;
-    _Map_idSynth_Say[TRASMAS] = MusicManager::SND_WAV_SYF_TRASMAS;
-    _Map_idSynth_Say[TRASMASNOEF] = MusicManager::SND_WAV_SYF_NOEF;
-    _Map_idSynth_Say[FUERAJEUQ] = MusicManager::SND_WAV_SYF_FUORIGI;
-    _Map_idSynth_Say[PARTIDA] = MusicManager::SND_WAV_SYF_PARTIDA;
-    _Map_idSynth_Say[VABENE] = MusicManager::SND_WAV_SYF_VABENE;
-    _Map_idSynth_Say[VADOVIA] = MusicManager::SND_WAV_SYF_VUVIA;
-    _Map_idSynth_Say[CHIAMADIPIU] = MusicManager::SND_WAV_SYF_CHIADIPIU;
+    _Map_idSynth_Say[eSayPlayer::SP_AMONTE] = MusicManager::SND_WAV_SYF_MONTE;
+    _Map_idSynth_Say[eSayPlayer::SP_INVIDO] = MusicManager::SND_WAV_SYF_INVIDO;
+    _Map_idSynth_Say[eSayPlayer::SP_TRASMAS] =
+        MusicManager::SND_WAV_SYF_TRASMAS;
+    _Map_idSynth_Say[eSayPlayer::SP_TRASMASNOEF] =
+        MusicManager::SND_WAV_SYF_NOEF;
+    _Map_idSynth_Say[eSayPlayer::SP_FUERAJEUQ] =
+        MusicManager::SND_WAV_SYF_FUORIGI;
+    _Map_idSynth_Say[eSayPlayer::SP_PARTIDA] =
+        MusicManager::SND_WAV_SYF_PARTIDA;
+    _Map_idSynth_Say[eSayPlayer::SP_VABENE] = MusicManager::SND_WAV_SYF_VABENE;
+    _Map_idSynth_Say[eSayPlayer::SP_VADOVIA] = MusicManager::SND_WAV_SYF_VUVIA;
+    _Map_idSynth_Say[eSayPlayer::SP_CHIAMADIPIU] =
+        MusicManager::SND_WAV_SYF_CHIADIPIU;
 
-    _Map_idSynth_Say[NO] = MusicManager::SND_WAV_SYF_NO;
-    _Map_idSynth_Say[GIOCA] = MusicManager::SND_WAV_SYF_GIOCA;
+    _Map_idSynth_Say[eSayPlayer::SP_NO] = MusicManager::SND_WAV_SYF_NO;
+    _Map_idSynth_Say[eSayPlayer::SP_GIOCA] = MusicManager::SND_WAV_SYF_GIOCA;
 
-    _p_DeckType = new DeckType;
-    // _p_DeckType->SetTypeIndex(g_Options.All.iTipoMazzo); // g_Options missing
+    _p_DeckType = new DeckType();
     _p_DeckType->SetTypeIndex(0);  // Default to first deck
 
     initDeck();
@@ -196,7 +205,6 @@ void InvidoGfx::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRender,
     std::string strFileName;
 
     // load background
-    // if (g_Options.All.bFotoBack) { // g_Options missing
     if (false) {
         strFileName = lpszImageDir;
         strFileName += lpszImageBack;
@@ -205,7 +213,6 @@ void InvidoGfx::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRender,
         if (srcBack == 0) {
             sprintf(ErrBuff, "Unable to load %s background image",
                     strFileName.c_str());
-            // throw Error::Init(ErrBuff);
             return;
         }
         _p_Scene_background = IMG_Load_IO(srcBack, true);
@@ -255,22 +262,22 @@ void InvidoGfx::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRender,
     }
 
     // command buttons
-    // command buttons
-    if (_p_btArrayCmd[0] == 0) {
-        SDL_Rect rctBt;
-        rctBt.w = 120;
-        rctBt.h = 28;
-        rctBt.y = _p_Screen->h - 155 - rctBt.h - 20;
-        int iXButInit = _p_Screen->w - rctBt.w - 20;
+    // TODO
+    // if (_p_btArrayCmd[0] == 0) {
+    //     SDL_Rect rctBt;
+    //     rctBt.w = 120;
+    //     rctBt.h = 28;
+    //     rctBt.y = _p_Screen->h - 155 - rctBt.h - 20;
+    //     int iXButInit = _p_Screen->w - rctBt.w - 20;
 
-        for (i = 0; i < NUMOFBUTTON; i++) {
-            rctBt.x = iXButInit - i * (rctBt.w + 10);
-            _p_btArrayCmd[i] = new ButtonGfx;
-            ClickCb cb = MakeDelegate(this, &InvidoGfx::ButCmdClicked);
-            _p_btArrayCmd[i]->Initialize(&rctBt, _p_Screen, _p_FontStatus, i,
-                                         cb);
-        }
-    }
+    //     for (i = 0; i < InvidoGfx::NUMOFBUTTON; i++) {
+    //         rctBt.x = iXButInit - i * (rctBt.w + 10);
+    //         _p_btArrayCmd[i] = new ButtonGfx;
+    //         ClickCb cb = MakeDelegate(this, &InvidoGfx::ButCmdClicked);
+    //         _p_btArrayCmd[i]->Initialize(&rctBt, _p_Screen, _p_FontStatus, i,
+    //                                      cb);
+    //     }
+    // }
 
     // balloon
     SDL_Rect destWIN;
@@ -278,12 +285,11 @@ void InvidoGfx::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRender,
     destWIN.y = 100;
     destWIN.w = _p_AnImages[IMG_BALLOON]->w;
     destWIN.h = _p_AnImages[IMG_BALLOON]->h;
-    _p_balGfx = new BalloonGfx;
+    _p_balGfx = new BalloonGfx();
     _p_balGfx->Init(destWIN, _p_AnImages[IMG_BALLOON], _p_FontStatus, 200);
     _p_balGfx->SetStyle(BalloonGfx::ARROW_UP, _p_AnImages[IMG_BALL_ARROW_UP]);
 
-    // music manager
-    _p_MusicMgr = _p_App->GetMusicManager();
+    _p_MusicMgr = pGameSettings->GetMusicManager();
 
     // messagebox background surface
     _p_AlphaDisplay =
@@ -292,12 +298,12 @@ void InvidoGfx::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRender,
 
 void InvidoGfx::cleanup() {
     if (_p_Scene_background) {
-        SDL_FreeSurface(_p_Scene_background);
+        SDL_DestroySurface(_p_Scene_background);
         _p_Scene_background = NULL;
     }
 
     if (m_pSurf_Bar) {
-        SDL_FreeSurface(m_pSurf_Bar);
+        SDL_DestroySurface(m_pSurf_Bar);
         m_pSurf_Bar = NULL;
     }
     if (m_pDeckType) {
@@ -305,7 +311,7 @@ void InvidoGfx::cleanup() {
         m_pDeckType = NULL;
     }
     if (m_pAlphaDisplay) {
-        SDL_FreeSurface(m_pAlphaDisplay);
+        SDL_DestroySurface(m_pAlphaDisplay);
         m_pAlphaDisplay = NULL;
     }
 }
@@ -675,7 +681,7 @@ void InvidoGfx::animateManoEnd(int iPlayerIx) {
         //} while (uiTickTot < 2000 && !bEnd);
     } while (!bEnd);
 
-    SDL_FreeSurface(pCurrentDisplay);
+    SDL_DestroySurface(pCurrentDisplay);
 }
 
 void InvidoGfx::animGiocataEnd(int iPlayerIx, bool bIsPata) {

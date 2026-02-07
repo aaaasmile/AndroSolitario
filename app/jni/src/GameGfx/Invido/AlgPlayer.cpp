@@ -16,7 +16,7 @@ AlgAdvancedPlayer::AlgAdvancedPlayer() {
     m_pCoreGame = 0;
     m_iOppIndex = NOT_VALID_INDEX;
     m_itrChan = 3;
-    g_MapSay[AMONTE] = "A monte";
+    g_MapSay[SP_AMONTE] = "A monte";
     g_MapSay[INVIDO] = "Invido";
     g_MapSay[TRASMAS] = "Tras mas";
     g_MapSay[TRASMASNOEF] = "Tras mas noef";
@@ -198,7 +198,7 @@ bool AlgAdvancedPlayer::Cagna(int lastNumChiamate) {
 bool AlgAdvancedPlayer::ChiamaAMonte(int lastNumChiamate) {
     m_iNumChiamateMonte += 1;
     if (m_iNumChiamateMonte < 4) {
-        Chiama(eSayPlayer::AMONTE, lastNumChiamate);
+        Chiama(eSayPlayer::SP_AMONTE, lastNumChiamate);
         return true;
     }
     return false;
@@ -610,7 +610,8 @@ void AlgAdvancedPlayer::PlayAsSecond() {
                m_WonFirstHand) {
         // terza posso pattare e la prima è mia, si vice sicuro, quindi chiama
         // di più
-        if ((SDL_rand(30 - pointsFirstCard) > 3) || (m_MyLastSay == AMONTE)) {
+        if ((SDL_rand(30 - pointsFirstCard) > 3) ||
+            (m_MyLastSay == SP_AMONTE)) {
             if (result != NULL && ChiamaDiPiu(lastNumChiamate)) {
                 TRACE_DEBUG("[TRALG]PL2nd_R3B_pata_chiama\n");
                 result = NULL;
@@ -750,7 +751,7 @@ void AlgAdvancedPlayer::ALG_HaveToRespond() {
     TRACE_DEBUG("[TRALG] have to respond");
     CardSpec cardUndef;
     int lastNumChiamate = m_iNumChiamateInGiocata;
-    if (m_OpponentSay == AMONTE && m_sayMyRisp == NO) {
+    if (m_OpponentSay == SP_AMONTE && m_sayMyRisp == NO) {
         // a monte was called and it was responded NO, don't change idea
         Chiama(m_sayMyRisp, lastNumChiamate);
         TRACE_DEBUG("[TRALG] Say R1");
@@ -794,7 +795,7 @@ void AlgAdvancedPlayer::ALG_HaveToRespond() {
     if (m_OpponentSay >= INVIDO && m_OpponentSay <= PARTIDA) {
         handleSayPopints(curr_mano, pointsFirstCard, lastNumChiamate, maxpoints,
                          sum_points);
-    } else if (m_OpponentSay == AMONTE) {
+    } else if (m_OpponentSay == SP_AMONTE) {
         handleSayAmonte(curr_mano, pointsFirstCard, lastNumChiamate, maxpoints,
                         sum_points);
     } else {
