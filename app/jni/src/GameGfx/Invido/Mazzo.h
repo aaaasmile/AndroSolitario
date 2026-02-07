@@ -28,7 +28,7 @@ class Mazzo {
     void SetIndexRaw(int iIndex, long lVal);
     void SetRandomSeed(int iVal) {
         _rndSeed = iVal;
-        srand(_rndSeed);
+        SDL_srand(_rndSeed);
     }
 
    private:

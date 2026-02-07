@@ -46,8 +46,11 @@ bool Mazzo::Shuffle() {
     it_tmp = _vctCards.begin();
     // Leave the deck card to the first position
 
-    // use the rand() function to shuffle the pool (deck is not shuffled)
-    std::random_shuffle(it_tmp, _vctCards.end());
+    // use SDL_rand to shuffle the pool
+    for (size_t i = _vctCards.size() - 1; i > 0; --i) {
+        size_t j = SDL_rand((Uint32)(i + 1));
+        std::swap(_vctCards[i], _vctCards[j]);
+    }
 
 #ifndef SERVER_PRG
     if (g_Options.All.iDebugLevel > 3) {

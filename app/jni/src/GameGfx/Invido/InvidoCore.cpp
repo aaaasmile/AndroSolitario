@@ -50,7 +50,7 @@ bool InvidoCore::WhoWonsTheGame(Player** ppPlayer) {
     return true;
 }
 
-int InvidoCore::getNewMatchFirstPlayer() { return CASO(m_lNumPlayers); }
+int InvidoCore::getNewMatchFirstPlayer() { return SDL_rand(m_lNumPlayers); }
 
 void InvidoCore::NewMatch() {
     NotifyScript(SCR_NFY_NEWMATCH);

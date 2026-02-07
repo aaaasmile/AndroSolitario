@@ -1,6 +1,8 @@
 #ifndef _C_COREINVIDOENV_H_
 #define _C_COREINVIDOENV_H_
 
+#include <SDL3/SDL.h>
+
 #include <string>
 #include <vector>
 

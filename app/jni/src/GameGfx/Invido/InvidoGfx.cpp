@@ -766,7 +766,7 @@ void InvidoGfx::animGiocataEnd(int iPlayerIx, bool bIsPata) {
 }
 
 int InvidoGfx::animateCards() {
-    srand((unsigned)time(NULL));
+    SDL_srand(0);
 
     int rot;
     int xspeed;
@@ -778,11 +778,11 @@ int InvidoGfx::animateCards() {
     CardGfx cardGfx;
 
     do {
-        rot = rand() % 2;
-        cardGfx.cardSpec.SetCardIndex(rand() % 40);
+        rot = SDL_rand(2);
+        cardGfx.cardSpec.SetCardIndex(SDL_rand(40));
 
-        cardGfx.m_iX = rand() % m_pScreen->w;
-        cardGfx.m_iY = rand() % m_pScreen->h / 2;
+        cardGfx.m_iX = SDL_rand(m_pScreen->w);
+        cardGfx.m_iY = SDL_rand(m_pScreen->h / 2);
 
         if (rot) {
             xspeed = -4;

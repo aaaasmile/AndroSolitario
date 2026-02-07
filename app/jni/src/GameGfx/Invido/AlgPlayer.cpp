@@ -9,7 +9,6 @@
 #include "TraceService.h"
 
 // random value between [0,x)
-#define CASO(x) (x * rand()) / RAND_MAX
 
 typedef std::map<eSayPlayer, LPCSTR> _MAP_SAY;
 static _MAP_SAY g_MapSay;
@@ -188,7 +187,7 @@ bool AlgAdvancedPlayer::Cagna(int lastNumChiamate) {
 
         int iTry = 0;
         do {
-            size_t iRndIndex = CASO(iNumCmds);
+            size_t iRndIndex = SDL_rand(iNumCmds);
             eSay = vct_cmd[iRndIndex];
             iTry++;
         } while (eSay == eSayPlayer::VADOVIA && iTry < 5);
@@ -233,7 +232,7 @@ void AlgAdvancedPlayer::PlayAsFirst() {
     CARDINFO* result = NULL;
     CardSpec cardUndef{};  // TODO: check if this is correct
     int curr_mano = NumMano();
-    if (CASO(40) >= 35 && !m_bIamCalledPoints) {
+    if (SDL_rand(40) >= 35 && !m_bIamCalledPoints) {
         if (Cagna(lastNumChiamate)) {
             TRACE_DEBUG("[TRALG]PLF_R1cagna\n");
             return;
@@ -290,13 +289,13 @@ void AlgAdvancedPlayer::PlayAsFirst() {
         TRACE_DEBUG("[TRALG]Vado dentro? maxpoints is %d\n", maxpoints);
         if (maxpoints == 13) {
             // tre in mano che vince sicuro
-            if (CASO(10) != 9) {
+            if (SDL_rand(10) != 9) {
                 TRACE_DEBUG("[TRALG]Dentro per win\n");
                 doVadoDentro(min_pos);
                 return;
             }
         } else if (maxpoints > 10) {
-            if (CASO(maxpoints) > 9) {
+            if (SDL_rand(maxpoints) > 9) {
                 TRACE_DEBUG("[TRALG]Dentro per win con rischio\n");
                 doVadoDentro(min_pos);
                 return;
@@ -305,7 +304,7 @@ void AlgAdvancedPlayer::PlayAsFirst() {
             TRACE_DEBUG("[TRALG]Dentro per bluf\n");
             doVadoDentro(min_pos);
             return;
-        } else if (CASO(3) == 1 && m_eScoreCurrent <= SC_INVIDO) {
+        } else if (SDL_rand(3) == 1 && m_eScoreCurrent <= SC_INVIDO) {
             if (result != NULL && ChiamaDiPiu(lastNumChiamate)) {
                 TRACE_DEBUG("[TRALG]PLF_R5_primavinta\n");
                 result = NULL;
@@ -327,7 +326,7 @@ void AlgAdvancedPlayer::PlayAsFirst() {
         result = m_vct_Cards_CPU[med_pos].GetCardInfo();
         TRACE_DEBUG("[TRALG]PLF_cand_med_pos: %s\n", result->CardName.c_str());
     } else if (curr_mano == 1 && maxpoints >= 11 && med_points < 10) {
-        if (CASO(10) > 5) {
+        if (SDL_rand(10) > 5) {
             result = m_vct_Cards_CPU[med_pos].GetCardInfo();
             TRACE_DEBUG("[TRALG]PLF_cand_med_pos Brnd: %s\n",
                         result->CardName.c_str());
@@ -351,19 +350,19 @@ void AlgAdvancedPlayer::PlayAsFirst() {
             }
         } else if ((maxpoints == 12 || maxpoints == 11) &&
                    m_eScoreCurrent <= SC_INVIDO) {
-            if (CASO(30) < maxpoints && result != NULL &&
+            if (SDL_rand(30) < maxpoints && result != NULL &&
                 ChiamaDiPiu(lastNumChiamate)) {
                 TRACE_DEBUG("[TRALG]PLF_R2C_manopatada\n");
                 result = NULL;
             }
         }
-    } else if (maxpoints == 13 && sum_points > 21 && CASO(10) > 6 &&
+    } else if (maxpoints == 13 && sum_points > 21 && SDL_rand(10) > 6 &&
                m_eScoreCurrent <= SC_INVIDO) {
         if (result != NULL && ChiamaDiPiu(lastNumChiamate)) {
             TRACE_DEBUG("[TRALG]PLF_R3_tre\n");
             result = NULL;
         }
-    } else if (sum_points < 15 && curr_mano == 1 && CASO(2) == 1) {
+    } else if (sum_points < 15 && curr_mano == 1 && SDL_rand(2) == 1) {
         // mano scarsa
         if (result != NULL && ChiamaAMonte(lastNumChiamate)) {
             TRACE_DEBUG("[TRALG]PLF_R4_poco\n");
@@ -372,7 +371,7 @@ void AlgAdvancedPlayer::PlayAsFirst() {
     } else if (curr_mano == 3 && m_arrIxPlayerWonHand[0] == m_iMyIndex) {
         // terza mano prima mia
         if (maxpoints == 13) {
-            if (CASO(20) > 16) {
+            if (SDL_rand(20) > 16) {
                 // bluff
                 if (result != NULL && ChiamaAMonte(lastNumChiamate)) {
                     result = NULL;
@@ -385,31 +384,31 @@ void AlgAdvancedPlayer::PlayAsFirst() {
                 }
             }
         } else if (maxpoints == 12) {
-            if (CASO(20) > 14) {
+            if (SDL_rand(20) > 14) {
                 if (result != NULL && ChiamaAMonte(lastNumChiamate)) {
                     TRACE_DEBUG("[TRALG]PLF_R9_bluffcoldue\n");
                     result = NULL;
                 }
-            } else if (CASO(2) == 1 && m_eScoreCurrent <= SC_INVIDO) {
+            } else if (SDL_rand(2) == 1 && m_eScoreCurrent <= SC_INVIDO) {
                 if (result != NULL && ChiamaDiPiu(lastNumChiamate)) {
                     TRACE_DEBUG("[TRALG]PLF_R10_due\n");
                     result = NULL;
                 }
             }
         } else if (maxpoints == 10 || maxpoints == 9) {
-            if (CASO(20) > 11) {
+            if (SDL_rand(20) > 11) {
                 if (result != NULL && ChiamaAMonte(lastNumChiamate)) {
                     TRACE_DEBUG("[TRALG]PLF_R11_poco\n");
                     result = NULL;
                 }
-            } else if (CASO(20) > 15 && m_eScoreCurrent <= SC_INVIDO) {
+            } else if (SDL_rand(20) > 15 && m_eScoreCurrent <= SC_INVIDO) {
                 if (result != NULL && ChiamaDiPiu(lastNumChiamate)) {
                     TRACE_DEBUG("[TRALG]PLF_R12_bluffconpoco\n");
                     result = NULL;
                 }
             }
         } else {
-            if (CASO(20) > 7) {
+            if (SDL_rand(20) > 7) {
                 if (result != NULL && ChiamaAMonte(lastNumChiamate)) {
                     TRACE_DEBUG("[TRALG]PLF_R13_amonte\n");
                     result = NULL;
@@ -420,25 +419,25 @@ void AlgAdvancedPlayer::PlayAsFirst() {
     } else if (curr_mano == 3 && m_arrIxPlayerWonHand[0] == m_iOppIndex) {
         // terza mano, prima vinta dall'avversario
         if (maxpoints == 13) {
-            if (CASO(20) > 15) {
+            if (SDL_rand(20) > 15) {
                 // bluff
                 if (result != NULL && ChiamaAMonte(lastNumChiamate)) {
                     TRACE_DEBUG("[TRALG]PLF_R14_bluffcoltre\n");
                     result = NULL;
                 }
-            } else if (CASO(20) > 9 && m_eScoreCurrent <= SC_INVIDO) {
+            } else if (SDL_rand(20) > 9 && m_eScoreCurrent <= SC_INVIDO) {
                 if (result != NULL && ChiamaDiPiu(lastNumChiamate)) {
                     TRACE_DEBUG("[TRALG]PLF_R15_tre\n");
                     result = NULL;
                 }
             }
         } else if (maxpoints == 12) {
-            if (CASO(20) > 12) {
+            if (SDL_rand(20) > 12) {
                 if (result != NULL && ChiamaAMonte(lastNumChiamate)) {
                     TRACE_DEBUG("[TRALG]PLF_R16_montecoldue\n");
                     result = NULL;
                 }
-            } else if (CASO(3) == 1) {
+            } else if (SDL_rand(3) == 1) {
                 if (result != NULL && ChiamaDiPiu(lastNumChiamate) &&
                     m_eScoreCurrent <= SC_INVIDO) {
                     TRACE_DEBUG("[TRALG]PLF_R17_rilanciodue\n");
@@ -446,12 +445,12 @@ void AlgAdvancedPlayer::PlayAsFirst() {
                 }
             }
         } else if (maxpoints == 10 || maxpoints == 9) {
-            if (CASO(20) > 9) {
+            if (SDL_rand(20) > 9) {
                 if (result != NULL && ChiamaAMonte(lastNumChiamate)) {
                     TRACE_DEBUG("[TRALG]PLF_R17_montecolre\n");
                     result = NULL;
                 }
-            } else if (CASO(20) > 17) {
+            } else if (SDL_rand(20) > 17) {
                 if (result != NULL && ChiamaDiPiu(lastNumChiamate) &&
                     m_eScoreCurrent <= SC_INVIDO) {
                     TRACE_DEBUG("[TRALG]PLF_R18_rilanciocolre\n");
@@ -459,7 +458,7 @@ void AlgAdvancedPlayer::PlayAsFirst() {
                 }
             }
         } else {
-            if (CASO(20) > 5) {
+            if (SDL_rand(20) > 5) {
                 if (result != NULL && ChiamaAMonte(lastNumChiamate)) {
                     TRACE_DEBUG("[TRALG]PLF_R19_monte\n");
                     result = NULL;
@@ -468,7 +467,7 @@ void AlgAdvancedPlayer::PlayAsFirst() {
         }
     }
 
-    if (CASO(40) > 37) {
+    if (SDL_rand(40) > 37) {
         // chiamata a monte rara
         if (result != NULL && ChiamaAMonte(lastNumChiamate)) {
             TRACE_DEBUG("[TRALG]PLF_R20_monteraro\n");
@@ -492,7 +491,7 @@ void AlgAdvancedPlayer::PlayAsFirst() {
 
 void AlgAdvancedPlayer::GiocaACaso() {
     CardSpec cardUndef;
-    int iCartaPos = CASO(3);
+    int iCartaPos = SDL_rand(3);
     int iLoops = 0;
     while (m_vct_Cards_CPU[iCartaPos] == cardUndef && iLoops < NUM_CARDS_HAND) {
         iCartaPos++;
@@ -575,7 +574,7 @@ void AlgAdvancedPlayer::PlayAsSecond() {
         // play the min card and say nothing
     } else if (pointsFirstCard > maxpoints && m_iNumManiWon == 0 &&
                curr_mano > 1) {
-        if (CASO(20) < 16) {
+        if (SDL_rand(20) < 16) {
             if (result != NULL && ChiamaAMonte(lastNumChiamate)) {
                 TRACE_DEBUG("[TRALG]PL2nd_R1_monte\n");
                 result = NULL;
@@ -598,7 +597,7 @@ void AlgAdvancedPlayer::PlayAsSecond() {
         }
     } else if (first_take_pos != -1 && m_bLastManoPatada) {
         int rest = pointsFirstCard >= 12 ? 15 : 35;
-        if (CASO(40) > rest) {
+        if (SDL_rand(40) > rest) {
             if (result != NULL && ChiamaAMonte(lastNumChiamate)) {
                 TRACE_DEBUG("[TRALG]PL2nd_R2A_monte_cagna\n");
                 result = NULL;
@@ -613,7 +612,7 @@ void AlgAdvancedPlayer::PlayAsSecond() {
                m_WonFirstHand) {
         // terza posso pattare e la prima è mia, si vice sicuro, quindi chiama
         // di più
-        if ((CASO(30 - pointsFirstCard) > 3) || (m_MyLastSay == AMONTE)) {
+        if ((SDL_rand(30 - pointsFirstCard) > 3) || (m_MyLastSay == AMONTE)) {
             if (result != NULL && ChiamaDiPiu(lastNumChiamate)) {
                 TRACE_DEBUG("[TRALG]PL2nd_R3B_pata_chiama\n");
                 result = NULL;
@@ -625,7 +624,7 @@ void AlgAdvancedPlayer::PlayAsSecond() {
             }
         }
     } else if (curr_mano == 3 && first_take_pos != -1 && m_iNumManiWon == 1) {
-        if (CASO(40) > 35 && pointsFirstCard >= 10 &&
+        if (SDL_rand(40) > 35 && pointsFirstCard >= 10 &&
             m_eScoreCurrent <= SC_TRASMAS) {
             if (result != NULL && ChiamaAMonte(lastNumChiamate)) {
                 TRACE_DEBUG("[TRALG]PL2nd_R2B_monte_cagna\n");
@@ -647,12 +646,12 @@ void AlgAdvancedPlayer::PlayAsSecond() {
         result = m_vct_Cards_CPU[same_points_pos].GetCardInfo();
         TRACE_DEBUG("[TRALG]PL2nd_cand_same_points_pos: %s\n",
                     result->CardName.c_str());
-        if (CASO(20) > 5) {
+        if (SDL_rand(20) > 5) {
             if (result != NULL && ChiamaDiPiu(lastNumChiamate)) {
                 result = NULL;
                 TRACE_DEBUG("[TRALG]PL2nd_R4A_dipiu\n");
             }
-        } else if (CASO(20) > 17) {
+        } else if (SDL_rand(20) > 17) {
             if (result != NULL && ChiamaAMonte(lastNumChiamate)) {
                 TRACE_DEBUG("[TRALG]PL2nd_R4B_monte\n");
                 result = NULL;
@@ -660,7 +659,7 @@ void AlgAdvancedPlayer::PlayAsSecond() {
         }
     } else if (pointsFirstCard > maxpoints) {
         // si perde la mano
-        if (CASO(20) > 15 || (curr_mano == 3 && m_iNumManiWon == 1) ||
+        if (SDL_rand(20) > 15 || (curr_mano == 3 && m_iNumManiWon == 1) ||
             (curr_mano == 2 && m_iNumManiWon == 0)) {
             if (result != NULL && ChiamaAMonte(lastNumChiamate)) {
                 TRACE_DEBUG("[TRALG]PL2nd_R5_monte\n");
@@ -801,7 +800,7 @@ void AlgAdvancedPlayer::ALG_HaveToRespond() {
         handleSayAmonte(curr_mano, pointsFirstCard, lastNumChiamate, maxpoints,
                         sum_points);
     } else {
-        iRndIndex = CASO(iNumCmds);
+        iRndIndex = SDL_rand(iNumCmds);
         Chiama(vct_cmd[iRndIndex], lastNumChiamate);
         TRACE_DEBUG("[TRALG] Say R18");
     }
@@ -819,7 +818,7 @@ void AlgAdvancedPlayer::handleSayPopints(int curr_mano, int pointsFirstCard,
         }
     } else if ((curr_mano == 1 && sum_points > 22 && maxpoints >= 12) ||
                (maxpoints >= 12 && m_iNumManiWon == 1)) {
-        if (CASO(40) > 32) {
+        if (SDL_rand(40) > 32) {
             if (!ChiamaDiPiu(lastNumChiamate)) {
                 Chiama(GIOCA, lastNumChiamate);
                 TRACE_DEBUG("[TRALG] Say Pt R002");
@@ -827,7 +826,7 @@ void AlgAdvancedPlayer::handleSayPopints(int curr_mano, int pointsFirstCard,
                 TRACE_DEBUG("[TRALG] Say Pt R003");
             }
         } else {
-            if (!m_bIamCalledPoints && CASO(35) > 28) {
+            if (!m_bIamCalledPoints && SDL_rand(35) > 28) {
                 if (!ChiamaAMonte(lastNumChiamate)) {
                     Chiama(GIOCA, lastNumChiamate);
                     TRACE_DEBUG("[TRALG] Say Pt R004");
@@ -841,7 +840,7 @@ void AlgAdvancedPlayer::handleSayPopints(int curr_mano, int pointsFirstCard,
         }
     } else if (m_iPlayerOnTurn != m_iMyIndex && pointsFirstCard < 10 &&
                curr_mano == 3) {
-        if (CASO(2) == 1) {
+        if (SDL_rand(2) == 1) {
             if (!ChiamaAMonte(lastNumChiamate)) {
                 Chiama(eSayPlayer::VADOVIA, lastNumChiamate);
                 TRACE_DEBUG("[TRALG] Say Pt R007");
@@ -855,14 +854,14 @@ void AlgAdvancedPlayer::handleSayPopints(int curr_mano, int pointsFirstCard,
     } else if (curr_mano > 1 && m_iNumManiWon == 0 &&
                m_iPlayerOnTurn == m_iMyIndex && pointsFirstCard > maxpoints) {
         // persa a tutte le maniere
-        if (CASO(2) == 1) {
+        if (SDL_rand(2) == 1) {
             if (!ChiamaAMonte(lastNumChiamate)) {
                 Chiama(eSayPlayer::VADOVIA, lastNumChiamate);
                 TRACE_DEBUG("[TRALG] Say Pt R010");
             } else {
                 TRACE_DEBUG("[TRALG] Say Pt R011");
             }
-        } else if (CASO(40) > 36) {
+        } else if (SDL_rand(40) > 36) {
             // bluff spudorato
             if (!ChiamaDiPiu(lastNumChiamate)) {
                 Chiama(eSayPlayer::VADOVIA, lastNumChiamate);
@@ -879,7 +878,7 @@ void AlgAdvancedPlayer::handleSayPopints(int curr_mano, int pointsFirstCard,
         TRACE_DEBUG("[TRALG] Say Pt R015");
     } else if (pointsFirstCard == 11 && curr_mano == 1 &&
                m_iPlayerOnTurn == m_iOppIndex && maxpoints <= 11) {
-        if (CASO(10) > 2) {
+        if (SDL_rand(10) > 2) {
             if (!ChiamaAMonte(lastNumChiamate)) {
                 Chiama(eSayPlayer::VADOVIA, lastNumChiamate);
                 TRACE_DEBUG("[TRALG] Say Pt R016");
@@ -922,7 +921,7 @@ void AlgAdvancedPlayer::handleSayPopints(int curr_mano, int pointsFirstCard,
         Chiama(GIOCA, lastNumChiamate);
         TRACE_DEBUG("[TRALG] Say Pt R025");
     } else if (curr_mano == 1 && maxpoints < 11 && pointsFirstCard == -1) {
-        if (CASO(10) > 4) {
+        if (SDL_rand(10) > 4) {
             if (!ChiamaAMonte(lastNumChiamate)) {
                 Chiama(eSayPlayer::VADOVIA, lastNumChiamate);
                 TRACE_DEBUG("[TRALG] Say Pt R026");
@@ -933,7 +932,7 @@ void AlgAdvancedPlayer::handleSayPopints(int curr_mano, int pointsFirstCard,
         }
     } else if (curr_mano == 1 && maxpoints <= pointsFirstCard &&
                pointsFirstCard < 11 && m_iPlayerOnTurn == m_iOppIndex) {
-        if (CASO(10) > 4) {
+        if (SDL_rand(10) > 4) {
             if (!ChiamaAMonte(lastNumChiamate)) {
                 Chiama(eSayPlayer::VADOVIA, lastNumChiamate);
                 TRACE_DEBUG("[TRALG] Say Pt R028");
@@ -946,7 +945,7 @@ void AlgAdvancedPlayer::handleSayPopints(int curr_mano, int pointsFirstCard,
                (maxpoints < pointsFirstCard ||
                 (pointsFirstCard == -1 && maxpoints < 11)) &&
                m_iNumManiWon == 0) {
-        if (CASO(10) > 4) {
+        if (SDL_rand(10) > 4) {
             if (!ChiamaAMonte(lastNumChiamate)) {
                 Chiama(eSayPlayer::VADOVIA, lastNumChiamate);
                 TRACE_DEBUG("[TRALG] Say Pt R030");
@@ -994,10 +993,10 @@ void AlgAdvancedPlayer::handleSayPopints(int curr_mano, int pointsFirstCard,
             "vinte %d \n",
             curr_mano, maxpoints, pointsFirstCard, m_iPlayerOnTurn,
             m_WonFirstHand, m_iNumManiWon);
-        if (CASO(10) > 5) {
+        if (SDL_rand(10) > 5) {
             Chiama(eSayPlayer::GIOCA, lastNumChiamate);
             TRACE_DEBUG("[TRALG] Say Pt R040");
-        } else if (CASO(10) > 4) {
+        } else if (SDL_rand(10) > 4) {
             if (!ChiamaAMonte(lastNumChiamate)) {
                 Chiama(eSayPlayer::GIOCA, lastNumChiamate);
                 TRACE_DEBUG("[TRALG] Say Pt R041");
@@ -1045,7 +1044,7 @@ void AlgAdvancedPlayer::handleSayAmonte(int curr_mano, int pointsFirstCard,
         TRACE_DEBUG("[TRALG] Say MonteRispv R15B");
     } else if (m_iNumManiWon == 1 && maxpoints < 10 &&
                m_iPlayerOnTurn == m_iMyIndex) {
-        if (CASO(20) > 15) {
+        if (SDL_rand(20) > 15) {
             Chiama(eSayPlayer::NO, lastNumChiamate);
             TRACE_DEBUG("[TRALG] Say MonteRisp R15C");
         } else {
