@@ -4,7 +4,7 @@
 
 #include <map>
 
-#include "Probality.h"
+#include "Probability.h"
 #include "TraceService.h"
 
 // random value between [0,x)

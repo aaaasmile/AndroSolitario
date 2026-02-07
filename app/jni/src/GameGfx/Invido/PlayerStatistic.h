@@ -1,7 +1,8 @@
 #ifndef _______PLAYER_STATISTIC_H
 #define _______PLAYER_STATISTIC_H
 
-#include "AlgPlayerInterface.h"
+#include <iostream>
+
 #include "InvidoCoreEnv.h"
 
 class PlayerStatistic {

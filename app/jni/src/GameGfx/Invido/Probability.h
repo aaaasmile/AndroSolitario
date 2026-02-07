@@ -7,9 +7,9 @@
 
 typedef std::vector<VCT_SINGLECARD> MTX_HANDCOMBI;
 
-class Probality {
+class Probability {
    public:
-    Probality() {
+    Probability() {
         _indexNotInit = true;
         _cardOnHand = 3;
     }

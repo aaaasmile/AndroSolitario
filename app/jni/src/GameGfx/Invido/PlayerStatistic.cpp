@@ -1,5 +1,7 @@
 #include "PlayerStatistic.h"
 
+#include <SDL3/SDL.h>
+
 PlayerStatistic::PlayerStatistic() { Reset(); }
 
 void PlayerStatistic::Reset() {

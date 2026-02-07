@@ -1,7 +1,12 @@
-#include "Probality.h"
+#include "Probability.h"
 
-void Probality::SvilCombiHands(VCT_MAZZO& vct_Mazzo,
-                               MTX_HANDCOMBI& mtx_Result) {
+#include <SDL3/SDL.h>
+
+#include <iostream>
+
+
+void Probability::SvilCombiHands(VCT_MAZZO& vct_Mazzo,
+                                 MTX_HANDCOMBI& mtx_Result) {
     long lNumCard = (long)vct_Mazzo.size();
     mtx_Result.clear();
 
@@ -61,7 +66,7 @@ void Probality::SvilCombiHands(VCT_MAZZO& vct_Mazzo,
     // Utility::SaveItemToFile(mtx_Result, DEF_path_s, "allhands.txt");
 }
 
-double Probality::BinomialCoef(long lN, long lK) {
+double Probability::BinomialCoef(long lN, long lK) {
     double dResult = 0.0;
     double dNum, dDen;
 
@@ -73,7 +78,7 @@ double Probality::BinomialCoef(long lN, long lK) {
     return dResult;
 }
 
-double Probality::Fattorial(long lN) {
+double Probability::Fattorial(long lN) {
     double dResult = 1.0;
 
     for (long i = 0; i < lN - 1; i++) {

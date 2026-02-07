@@ -1,36 +1,10 @@
 #ifndef _ALG_PLAYER_H__
 #define _ALG_PLAYER_H__
 
-#include <functional>
-
 #include "AlgPlayerInterface.h"
 #include "CardSpec.h"
 #include "InvidoCoreEnv.h"
 
-class TraceService;
-class cmpHandValue : public std::unary_function<cmpHandValue, bool> {
-   private:
-    int m_lValRef;
-
-   public:
-    // constructor
-    explicit cmpHandValue() {}
-    // operator ()
-    bool operator()(const VCT_SINGLECARD& o1, const VCT_SINGLECARD& o2) {
-        int iPoints2 = 0;
-        int iPoints1 = 0;
-        size_t iNumCards = o1.size();
-        if (iPoints1 >= iPoints2) {
-            // no swap
-            return false;
-        } else {
-            // swap
-            return true;
-        }
-    }
-};
-/** class that implement a dummy player
- */
 class AlgAdvancedPlayer : public I_ALG_Player {
    public:
     AlgAdvancedPlayer();
@@ -82,7 +56,6 @@ class AlgAdvancedPlayer : public I_ALG_Player {
     eSayPlayer m_sayOppRisp;
     eSayPlayer m_MyLastSay;
     eSayPlayer m_sayMyRisp;
-    TraceService* m_pTracer;
     int m_arrIxPlayerWonHand[NUM_CARDS_HAND];
     bool m_bLastManoPatada;
     int m_iNumChiamateMonte;

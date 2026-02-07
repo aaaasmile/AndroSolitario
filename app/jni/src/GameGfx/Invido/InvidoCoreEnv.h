@@ -4,7 +4,6 @@
 #include <string>
 #include <vector>
 
-
 const int g_PointsTable[] = {
     /*Asso*/ 11, /*Due*/ 12,  /*Tre*/ 13,  /*Quattro*/ 4, /*cinque*/ 5,
     /*Sei*/ 6,   /*Sette*/ 7, /*Fante*/ 8, /*Cavallo*/ 9, /*Re*/ 10,
@@ -124,5 +123,7 @@ enum eGiocataScoreState {
     SC_FUERAJEUQ = 12,
     SC_PARTIDA = 24,
 };
+
+typedef std::vector<eSayPlayer> VCT_COMMANDS;
 
 #endif
