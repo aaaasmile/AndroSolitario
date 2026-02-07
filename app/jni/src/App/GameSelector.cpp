@@ -1,15 +1,21 @@
 #include "GameSelector.h"
 
 #include "Config.h"
+#include "GameGfx/Invido/InvidoGfx.h"
 #include "GameGfx/Solitario/SolitarioGfx.h"
 #include "GameSettings.h"
 
-
-GameSelector::GameSelector() { _p_SolitarioGfx = NULL; }
+GameSelector::GameSelector() {
+    _p_SolitarioGfx = NULL;
+    _p_InvidoGfx = NULL;
+}
 
 GameSelector::~GameSelector() {
     if (_p_SolitarioGfx != NULL) {
         delete _p_SolitarioGfx;
+    }
+    if (_p_InvidoGfx != NULL) {
+        delete _p_InvidoGfx;
     }
 }
 
@@ -20,6 +26,9 @@ LPErrInApp fncBind_HandleEvent(void* self, SDL_Event* pEvent,
     if (pGameSettings->GetGameTypeGfx() == GameTypeEnum::Solitario) {
         SolitarioGfx* pSolitarioGfx = (SolitarioGfx*)self;
         return pSolitarioGfx->HandleEvent(pEvent, targetPos);
+    } else if (pGameSettings->GetGameTypeGfx() == GameTypeEnum::Invido) {
+        InvidoGfx* pInvidoGfx = (InvidoGfx*)self;
+        return pInvidoGfx->HandleEvent(pEvent, targetPos);
     }
     return ERR_UTIL::ErrorCreate("fncBind_HandleEvent without type");
 }
@@ -30,6 +39,9 @@ LPErrInApp fncBind_HandleIterate(void* self, bool& done) {
     if (pGameSettings->GetGameTypeGfx() == GameTypeEnum::Solitario) {
         SolitarioGfx* pSolitarioGfx = (SolitarioGfx*)self;
         return pSolitarioGfx->HandleIterate(done);
+    } else if (pGameSettings->GetGameTypeGfx() == GameTypeEnum::Invido) {
+        InvidoGfx* pInvidoGfx = (InvidoGfx*)self;
+        return pInvidoGfx->HandleIterate(done);
     }
     return ERR_UTIL::ErrorCreate("fncBind_HandleIterate without type");
 }
@@ -45,6 +57,10 @@ LPErrInApp fncBind_Initialize(void* self, SDL_Surface* pScreen,
         SolitarioGfx* pSolitarioGfx = (SolitarioGfx*)self;
         return pSolitarioGfx->Initialize(pScreen, fnUpdateScreen, pWindow,
                                          pSceneBackground, fnHighScore);
+    } else if (pGameSettings->GetGameTypeGfx() == GameTypeEnum::Invido) {
+        InvidoGfx* pInvidoGfx = (InvidoGfx*)self;
+        return pInvidoGfx->Initialize(pScreen, fnUpdateScreen, pWindow,
+                                      pSceneBackground, fnHighScore);
     }
     return ERR_UTIL::ErrorCreate("fncBind_Initialize without type");
 }
@@ -437,6 +453,9 @@ LPErrInApp fncBind_Show(void* self) {
     if (pGameSettings->GetGameTypeGfx() == GameTypeEnum::Solitario) {
         SolitarioGfx* pSolitarioGfx = (SolitarioGfx*)self;
         return pSolitarioGfx->Show();
+    } else if (pGameSettings->GetGameTypeGfx() == GameTypeEnum::Invido) {
+        InvidoGfx* pInvidoGfx = (InvidoGfx*)self;
+        return pInvidoGfx->Show();
     }
     return ERR_UTIL::ErrorCreate("fncBind_Show without type");
 }
@@ -447,6 +466,9 @@ LPErrInApp fncBind_OnResize(void* self, SDL_Surface* pScreen) {
     if (pGameSettings->GetGameTypeGfx() == GameTypeEnum::Solitario) {
         SolitarioGfx* pSolitarioGfx = (SolitarioGfx*)self;
         return pSolitarioGfx->OnResize(pScreen);
+    } else if (pGameSettings->GetGameTypeGfx() == GameTypeEnum::Invido) {
+        InvidoGfx* pInvidoGfx = (InvidoGfx*)self;
+        return pInvidoGfx->OnResize(pScreen);
     }
     return ERR_UTIL::ErrorCreate("fncBind_OnResize without type");
 }
@@ -464,6 +486,17 @@ GameGfxCb GameSelector::PrepGameGfx() {
                                       .Show = (&fncBind_Show),
                                       .OnResize = (&fncBind_OnResize)};
         return (GameGfxCb){.tc = &tc, .self = _p_SolitarioGfx};
+    } else if (pGameSettings->GetGameTypeGfx() == GameTypeEnum::Invido) {
+        if (_p_InvidoGfx != NULL) {
+            delete _p_InvidoGfx;
+        }
+        _p_InvidoGfx = new InvidoGfx();
+        static VGameGfxCb const tc = {.HandleEvent = (&fncBind_HandleEvent),
+                                      .HandleIterate = (&fncBind_HandleIterate),
+                                      .Initialize = (&fncBind_Initialize),
+                                      .Show = (&fncBind_Show),
+                                      .OnResize = (&fncBind_OnResize)};
+        return (GameGfxCb){.tc = &tc, .self = _p_InvidoGfx};
     }
 
     return (GameGfxCb){.tc = NULL, .self = NULL};
@@ -481,6 +514,8 @@ GameHelpPagesCb GameSelector::PrepareGameHelpPages() {
                 .GetHelpPages = (&fncBind_GetHelpPagesSolitarioITA)};
             return (GameHelpPagesCb){.tc = &tc, .self = this};
         }
+    } else if (pGameSettings->GetGameTypeGfx() == GameTypeEnum::Invido) {
+        // TODO show the help pages for Invido
     }
 
     return (GameHelpPagesCb){.tc = NULL, .self = NULL};

@@ -38,28 +38,27 @@ set(SOURCES App/MusicManager.cpp
             CompGfx/LabelGfx.cpp
             CompGfx/TextInputGfx.cpp
             CompGfx/KeyboardGfx.cpp)
+# Invido Sources
+list(APPEND SOURCES
+        GameGfx/Invido/AlgPlayer.cpp
+        GameGfx/Invido/CardSpec.cpp
+        GameGfx/Invido/Giocata.cpp
+        GameGfx/Invido/InvidoCore.cpp
+        GameGfx/Invido/InvidoGfx.cpp
+        GameGfx/Invido/Mano.cpp
+        GameGfx/Invido/MatchPoints.cpp
+        GameGfx/Invido/Partita.cpp
+        GameGfx/Invido/Mazzo.cpp
+        GameGfx/Invido/Player.cpp
+        GameGfx/Invido/PlayersOnTable.cpp
+        GameGfx/Invido/PlayerStatistic.cpp
+        GameGfx/Invido/Probability.cpp)
+# Solitario Sources
+list(APPEND SOURCES
+        GameGfx/Solitario/CardRegionGfx.cpp
+        GameGfx/Solitario/CardStackGfx.cpp
+        GameGfx/Solitario/SolitarioGfx.cpp)
 
-if(INVIDO)
-    list(APPEND SOURCES
-            GameGfx/Invido/AlgPlayer.cpp
-            GameGfx/Invido/CardSpec.cpp
-            GameGfx/Invido/Giocata.cpp
-            GameGfx/Invido/InvidoCore.cpp
-            GameGfx/Invido/InvidoGfx.cpp
-            GameGfx/Invido/Mano.cpp
-            GameGfx/Invido/MatchPoints.cpp
-            GameGfx/Invido/Partita.cpp
-            GameGfx/Invido/Mazzo.cpp
-            GameGfx/Invido/Player.cpp
-            GameGfx/Invido/PlayersOnTable.cpp
-            GameGfx/Invido/PlayerStatistic.cpp
-            GameGfx/Invido/Probability.cpp)
-else()
-    list(APPEND SOURCES
-            GameGfx/Solitario/CardRegionGfx.cpp
-            GameGfx/Solitario/CardStackGfx.cpp
-            GameGfx/Solitario/SolitarioGfx.cpp)
-endif()
 if (${UNIX_SYS})
     set(SOURCES2 UnixSys/UnixsysTrace.cpp)
 endif()

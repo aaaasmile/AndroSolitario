@@ -6,6 +6,7 @@
 using namespace traits;
 
 class SolitarioGfx;
+class InvidoGfx;
 
 class GameSelector {
    public:
@@ -16,6 +17,7 @@ class GameSelector {
 
    private:
     SolitarioGfx* _p_SolitarioGfx;
+    InvidoGfx* _p_InvidoGfx;
 };
 
 #endif

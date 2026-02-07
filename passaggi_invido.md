@@ -15,3 +15,4 @@ I comandi da usare sono:
     ninja
 Nota che -DCMAKE_EXPORT_COMPILE_COMMANDS=ON è fondamentale per l'estension clangd in quanto non 
 usa configurazioni come quelle descritte in c_cpp_properties.json, ma deve essere dentro la directory build.
+Con il progetto solitario compilo anche i sorgenti del solitario.

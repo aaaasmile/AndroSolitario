@@ -12,7 +12,7 @@
 
 enum BackgroundTypeEnum { Commessaggio = 0, Mantova = 1, Black = 2 };
 enum InputTypeEnum { Mouse = 0, TouchWithoutMouse = 1 };
-enum GameTypeEnum { Solitario };
+enum GameTypeEnum { Solitario, Invido };
 
 class MusicManager;
 
