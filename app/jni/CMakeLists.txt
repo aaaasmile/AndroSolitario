@@ -1,6 +1,12 @@
 cmake_minimum_required(VERSION 3.20)
 
-project(solitario)
+option(INVIDO "Build Invido instead of Solitario" OFF)
+
+if(INVIDO)
+    project(invido VERSION 3.0.13 LANGUAGES C CXX)
+else()
+    project(solitario VERSION 3.0.13 LANGUAGES C CXX)
+endif()
 
 # armeabi-v7a requires cpufeatures library
 # include(AndroidNdkModules)

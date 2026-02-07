@@ -2,6 +2,7 @@ build
 build-web
 build-webrel
 buildrelease
+buildinvido
 .gradle
 app/src/main/assets
 *.o

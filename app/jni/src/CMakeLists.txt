@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.20)
-project(solitario VERSION 3.0.13 LANGUAGES C CXX)
+
+if(INVIDO)
+  add_compile_definitions(INVIDO)
+endif()
 
 # Don't mistake osx for unix
 if(UNIX AND NOT ANDROID AND NOT APPLE AND NOT RISCOS)
@@ -34,10 +37,29 @@ set(SOURCES App/MusicManager.cpp
             CompGfx/MesgBoxGfx.cpp
             CompGfx/LabelGfx.cpp
             CompGfx/TextInputGfx.cpp
-            CompGfx/KeyboardGfx.cpp
+            CompGfx/KeyboardGfx.cpp)
+
+if(INVIDO)
+    list(APPEND SOURCES
+            GameGfx/Invido/AlgPlayer.cpp
+            GameGfx/Invido/CardSpec.cpp
+            GameGfx/Invido/Giocata.cpp
+            GameGfx/Invido/InvidoCore.cpp
+            GameGfx/Invido/InvidoGfx.cpp
+            GameGfx/Invido/Mano.cpp
+            GameGfx/Invido/MatchPoints.cpp
+            GameGfx/Invido/Partita.cpp
+            GameGfx/Invido/Mazzo.cpp
+            GameGfx/Invido/Player.cpp
+            GameGfx/Invido/PlayersOnTable.cpp
+            GameGfx/Invido/PlayerStatistic.cpp
+            GameGfx/Invido/Probability.cpp)
+else()
+    list(APPEND SOURCES
             GameGfx/Solitario/CardRegionGfx.cpp
             GameGfx/Solitario/CardStackGfx.cpp
             GameGfx/Solitario/SolitarioGfx.cpp)
+endif()
 if (${UNIX_SYS})
     set(SOURCES2 UnixSys/UnixsysTrace.cpp)
 endif()
@@ -89,8 +111,8 @@ if(CMAKE_SYSTEM MATCHES Windows)
             SDL3_mixer::SDL3_mixer  
             SDL3_ttf::SDL3_ttf
         )
-        set_target_properties(solitario PROPERTIES
-            OUTPUT_NAME "solitario"
+        set_target_properties(${PROJECT_NAME} PROPERTIES
+            OUTPUT_NAME "${PROJECT_NAME}"
             DEBUG_POSTFIX ".debug"
             RELEASE_POSTFIX ""
             RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
@@ -136,8 +158,8 @@ else()
         )
         # Add any WSL2-specific configurations here
         # Set a new output name and different postfixes for Debug/Release builds
-        set_target_properties(solitario PROPERTIES
-            OUTPUT_NAME "solitario"
+        set_target_properties(${PROJECT_NAME} PROPERTIES
+            OUTPUT_NAME "${PROJECT_NAME}"
             DEBUG_POSTFIX ".debug"
             RELEASE_POSTFIX ""
             RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
@@ -195,7 +217,7 @@ else()
       endif()
       # Add any Emscripten-specific configurations here
       # Set a new output name and different postfixes for Debug/Release builds
-      set_target_properties(solitario PROPERTIES
+      set_target_properties(${PROJECT_NAME} PROPERTIES
           OUTPUT_NAME "${PROJECT_NAME}_${PROJECT_VERSION}"
           DEBUG_POSTFIX ".debug"
           RELEASE_POSTFIX ""
