@@ -34,7 +34,7 @@ const unsigned int CRD_HSYMBOL = 3;
 
 class AppGfx;
 class InvidoCore;
-class TipoDiMazzo;
+class DeckType;
 class ButtonGfx;
 class BalloonGfx;
 class Languages;
@@ -148,7 +148,7 @@ class InvidoGfx : public I_ALG_Player {
     SDL_Surface* _p_Symbols;
     SDL_Rect _SrcBack;
     SDL_Rect _SrcCard;
-    TipoDiMazzo* _p_DeckType;
+    DeckType* _p_DeckType;
     TTF_Font* _p_FontStatus;
     TTF_Font* _p_FontText;
     SDL_Surface* _p_Surf_Bar;

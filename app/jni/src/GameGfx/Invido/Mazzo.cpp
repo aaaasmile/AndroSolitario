@@ -1,7 +1,6 @@
 #include "Mazzo.h"
 
 #include "InvidoCore.h"
-#include "InvidoSettings.h"
 
 Mazzo::Mazzo() {
     _nextCard = 0;
@@ -51,12 +50,6 @@ bool Mazzo::Shuffle() {
         size_t j = SDL_rand((Uint32)(i + 1));
         std::swap(_vctCards[i], _vctCards[j]);
     }
-
-#ifndef SERVER_PRG
-    if (g_Options.All.iDebugLevel > 3) {
-        Utility::TraceContainer(_vctCards, "Cards mazzo");
-    }
-#endif
 
     // call a callback in python script for shuffle deck
     _p_CoreGame->NotifyScript(SCR_NFY_SHUFFLEDECK);
@@ -112,7 +105,7 @@ long Mazzo::ThrowTableCard() {
     return lResult;
 }
 
-void Mazzo::TraceIt() { Utility::TraceContainer(_vctCards, "Cards mazzo"); }
+void Mazzo::TraceIt() {}
 
 bool Mazzo::IsMoreCards() {
     bool bRet = false;
