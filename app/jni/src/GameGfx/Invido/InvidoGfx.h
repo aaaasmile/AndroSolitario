@@ -9,6 +9,11 @@
 #include "AlgPlayerInterface.h"
 #include "CardGfx.h"
 #include "InvidoCore.h"
+#include "Traits.h"
+#include "Config.h"
+#include "ErrorInfo.h"
+
+using namespace traits;
 
 enum {
     CRD_MAZZOALTRECARTE = 0,
@@ -58,8 +63,14 @@ class InvidoGfx : public I_ALG_Player {
    public:
     InvidoGfx();
     ~InvidoGfx();
-    void Initialize(SDL_Surface* s, SDL_Renderer* pRender,
-                    SDL_Texture* pScreenTexture);
+    LPErrInApp Initialize(SDL_Surface* pScreen, UpdateScreenCb& fnUpdateScreen,
+                          SDL_Window* pWindow, SDL_Surface* pSceneBackground,
+                          UpdateHighScoreCb& fnUpdateHighScore);
+    LPErrInApp OnResize(SDL_Surface* pScreen);
+    LPErrInApp HandleEvent(SDL_Event* pEvent, const SDL_Point& targetPos);
+    LPErrInApp HandleIterate(bool& done);
+    LPErrInApp Show();
+
     void MatchLoop();
     void InitInvidoVsCPU();
     void INP_PlayerSay(eSayPlayer eSay);
