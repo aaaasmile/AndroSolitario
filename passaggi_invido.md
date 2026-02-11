@@ -16,3 +16,10 @@ I comandi da usare sono:
 Nota che -DCMAKE_EXPORT_COMPILE_COMMANDS=ON è fondamentale per l'estension clangd in quanto non 
 usa configurazioni come quelle descritte in c_cpp_properties.json, ma deve essere dentro la directory build.
 Con il progetto solitario compilo anche i sorgenti del solitario.
+
+## Compilazione con WSL2
+
+    rm -r -R buildinvido
+    mkdir buildinvido && cd buildinvido
+    cmake ../app/jni/  -DSDL_WAYLAND=OFF -DINVIDOPRJ=ON
+    cmake --build .

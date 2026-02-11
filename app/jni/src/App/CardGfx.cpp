@@ -30,7 +30,6 @@ CardGfx::CardGfx() {
     _scaleFactor = 0.0;
     State = CSW_ST_VISIBLE;
     m_iZOrder = 0;
-    cardSpec.Reset();
 }
 
 void CardGfx::DrawCardBack(SDL_Surface* s) {
@@ -87,7 +86,6 @@ void CardGfx::Copy(CardGfx* pSrc) {
     State = pSrc->State;
     _scaleFactor = pSrc->_scaleFactor;
     _name = pSrc->_name;
-    cardSpec = pSrc->cardSpec;
     m_iZOrder = pSrc->m_iZOrder;
 }
 

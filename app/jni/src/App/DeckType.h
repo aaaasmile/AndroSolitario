@@ -5,6 +5,8 @@
 
 #include "ErrorInfo.h"
 
+enum eSUIT { BASTONI = 0, COPPE = 1, DENARI = 2, SPADE = 3 };
+
 enum eDeckType {
     PIACENTINA = 0,
     BERGAMO,

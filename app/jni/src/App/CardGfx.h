@@ -5,7 +5,6 @@
 
 #include <vector>
 
-#include "CardSpec.h"
 #include "Config.h"
 #include "DeckType.h"
 #include "ErrorInfo.h"
@@ -75,14 +74,12 @@ class CardGfx {
     void SetSymbSurf(SDL_Surface* pSurf, int w, int h);
     void Copy(CardGfx* pSrc);
     bool MouseInCard(int x, int y) { return PtInCard(x, y); }
-    void SetSymbolTocard(int iVal) { cardSpec.SetSymbol(iVal); }
 
     int _x;
     int _y;
     int _vx;
     int _vy;
     eCardState State;
-    CardSpec cardSpec;
     int m_iZOrder;
 
    private:
