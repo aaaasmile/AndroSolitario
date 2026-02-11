@@ -1,7 +1,6 @@
 #include "Player.h"
 
-#include "AlgAdvancedPlayer.h"
-#include "AlgDummyPlayer.h"
+#include "AlgPlayer.h"
 
 Player::Player() {
     _index = NOT_VALID_INDEX;

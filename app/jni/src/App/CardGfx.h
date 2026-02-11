@@ -5,14 +5,19 @@
 
 #include <vector>
 
+#include "CardSpec.h"
 #include "Config.h"
 #include "DeckType.h"
 #include "ErrorInfo.h"
 
-enum eSUIT { BASTONI = 0, COPPE = 1, DENARI = 2, SPADE = 3 };
-
 class CardGfx {
    public:
+    enum eCardState {
+        CSW_ST_INVISIBLE = 0,
+        CSW_ST_SYMBOL,
+        CSW_ST_VISIBLE,
+        CSW_ST_BACK
+    };
     CardGfx();
     eSUIT Suit() const { return _eSuit; }
     const char* SuitStr();
@@ -64,18 +69,35 @@ class CardGfx {
     void SetScaleFactor(float factor) { _scaleFactor = factor; }
     float ScaleFactor() { return _scaleFactor; }
 
+    void DrawCard(SDL_Surface* s) { DrawCardPac(s); }
+    void DrawCardBack(SDL_Surface* s);
+    void DrawSymbol(SDL_Surface* s);
+    void SetSymbSurf(SDL_Surface* pSurf, int w, int h);
+    void Copy(CardGfx* pSrc);
+    bool MouseInCard(int x, int y) { return PtInCard(x, y); }
+    void SetSymbolTocard(int iVal) { cardSpec.SetSymbol(iVal); }
+
+    int _x;
+    int _y;
+    int _vx;
+    int _vy;
+    eCardState State;
+    CardSpec cardSpec;
+    int m_iZOrder;
+
    private:
     bool _faceUp;
     eSUIT _eSuit;
     int _rank;
 
-    int _x;
-    int _y;
     int _idx;
     int _width;
     int _height;
 
     SDL_Surface* _pPacDeck;
+    SDL_Surface* _pSymbSurf;
+    int _symbWidth;
+    int _symbHeigth;
     DeckType _deckType;
     STRING _name;
     STRING _nameFull;

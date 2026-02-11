@@ -22,6 +22,19 @@ class MusicManager {
         SND_WAV_SYF_CHIADIPIU,
         SND_WAV_SYF_NO,
         SND_WAV_SYF_GIOCA,
+        SND_IG_MONTE_NORM,
+        SND_IG_INV_NORM,
+        SND_IG_TRASMAS,
+        SND_IG_TRASNOEF,
+        SND_IG_FUORIGIOCO,
+        SND_IG_PARTIDA,
+        SND_IG_VABENE,
+        SND_IG_VUVIA,
+        SND_IG_CHIAMAPIU,
+        SND_IG_NO,
+        SND_IG_GIOCA,
+        SND_IG_BORTOLO,
+        SND_EFC_CLICK,
         NUM_OF_WAV
     };
     MusicManager();

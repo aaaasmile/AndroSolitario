@@ -23,8 +23,72 @@ CardGfx::CardGfx() {
     _rank = 0;
     _eSuit = eSUIT::BASTONI;
     _x = _y = _width = _height = 0;
+    _vx = _vy = 0;
     _pPacDeck = 0;
+    _pSymbSurf = 0;
+    _symbWidth = _symbHeigth = 0;
     _scaleFactor = 0.0;
+    State = CSW_ST_VISIBLE;
+    m_iZOrder = 0;
+    cardSpec.Reset();
+}
+
+void CardGfx::DrawCardBack(SDL_Surface* s) {
+    SDL_Rect srcBack;
+    srcBack.x = 0;
+    srcBack.y = 0;
+    srcBack.w = _width;
+    srcBack.h = _height;
+
+    SDL_Rect dest;
+    dest.x = _x;
+    dest.y = _y;
+
+    SDL_BlitSurface(_pPacDeck, &srcBack, s, &dest);
+}
+
+void CardGfx::DrawSymbol(SDL_Surface* s) {
+    if (!_pSymbSurf)
+        return;
+    SDL_Rect srcSym;
+    srcSym.x = 0;
+    srcSym.y = 0;
+    srcSym.w = _symbWidth;
+    srcSym.h = _symbHeigth;
+
+    SDL_Rect dest;
+    dest.x = _x;
+    dest.y = _y;
+
+    SDL_BlitSurface(_pSymbSurf, &srcSym, s, &dest);
+}
+
+void CardGfx::SetSymbSurf(SDL_Surface* pSurf, int w, int h) {
+    _pSymbSurf = pSurf;
+    _symbWidth = w;
+    _symbHeigth = h;
+}
+
+void CardGfx::Copy(CardGfx* pSrc) {
+    _idx = pSrc->_idx;
+    _faceUp = pSrc->_faceUp;
+    _rank = pSrc->_rank;
+    _eSuit = pSrc->_eSuit;
+    _x = pSrc->_x;
+    _y = pSrc->_y;
+    _vx = pSrc->_vx;
+    _vy = pSrc->_vy;
+    _width = pSrc->_width;
+    _height = pSrc->_height;
+    _pPacDeck = pSrc->_pPacDeck;
+    _pSymbSurf = pSrc->_pSymbSurf;
+    _symbWidth = pSrc->_symbWidth;
+    _symbHeigth = pSrc->_symbHeigth;
+    State = pSrc->State;
+    _scaleFactor = pSrc->_scaleFactor;
+    _name = pSrc->_name;
+    cardSpec = pSrc->cardSpec;
+    m_iZOrder = pSrc->m_iZOrder;
 }
 
 LPCSTR CardGfx::String() {
@@ -131,7 +195,8 @@ LPErrInApp CardGfx::DrawCardPac(SDL_Surface* s) {
         dest.h = (int)srcCard.h * _scaleFactor;
         dest.w = (int)srcCard.w * _scaleFactor;
         // TRACE_DEBUG(
-        //     "[DrawCardPac] scaling tarock height from %d to %d and width %d to "
+        //     "[DrawCardPac] scaling tarock height from %d to %d and width %d
+        //     to "
         //     "%d \n",
         //     srcCard.h, dest.h, srcCard.w, dest.w);
         // NOte: I can't get SDL_SCALEMODE_LINEAR working

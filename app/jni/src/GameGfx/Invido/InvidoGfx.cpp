@@ -40,15 +40,30 @@ static const char* lpszCST_INFO = "[INFO]";
 static const char* lpszCST_SCORE = "[SCORE]";
 static const char* lpszCST_SU = "[SU]";
 
-// InvidoCore* g_pInvidoCore;
+#define FPS 60
 
-// static InvidoGfx* g_stacInvidoGfx = 0;
+static InvidoGfx* g_stacInvidoGfx = 0;
 
-// void fnEffectTer(int iCh) {
-//     // do something
-//     SDL_assert(g_stacInvidoGfx);
-//     g_stacInvidoGfx->NtfyTermEff(iCh);
-// }
+void fnEffectTer(int iCh) {
+    if (g_stacInvidoGfx) {
+        g_stacInvidoGfx->NtfyTermEff(iCh);
+    }
+}
+
+static void fncBind_ButtonClicked(void* self, int iVal) {
+    InvidoGfx* pInvidoGfx = (InvidoGfx*)self;
+    pInvidoGfx->ButCmdClicked(iVal);
+}
+
+static void fncBind_UpdateScreen(void* self, SDL_Surface* pScreen) {
+    InvidoGfx* pInvidoGfx = (InvidoGfx*)self;
+    pInvidoGfx->MatchLoop();  // or some other appropriate redraw?
+                              // Wait, usually it's just a redraw call.
+}
+
+static void fncBind_RenderTexture(void* self, SDL_Texture* pTexture) {
+    // optional
+}
 
 InvidoGfx::InvidoGfx() {
     _p_Scene_background = 0;
@@ -72,7 +87,7 @@ InvidoGfx::InvidoGfx() {
     }
     _p_LangMgr = 0;
     _p_MusicMgr = 0;
-    // g_stacInvidoGfx = this;
+    g_stacInvidoGfx = this;
     _isMatchTerminated = false;
     _p_AlphaDisplay = 0;
 }
@@ -304,12 +319,184 @@ InvidoGfx::~InvidoGfx() { cleanup(); }
 //         SDL_PIXELFORMAT_XRGB8888);
 // }
 
-LPErrInApp InvidoGfx::Initialize(SDL_Surface* pScreen,
+LPErrInApp InvidoGfx::Initialize(SDL_Surface* pScreen, SDL_Renderer* pRender,
+                                 SDL_Texture* pScreenTexture,
                                  UpdateScreenCb& fnUpdateScreen,
                                  SDL_Window* pWindow,
                                  SDL_Surface* pSceneBackground,
                                  UpdateHighScoreCb& fnUpdateHighScore) {
+    _p_sdlRenderer = pRender;
+    _p_Screen = pScreen;
+    _p_ScreenTexture = pScreenTexture;
+
+    cleanup();
+
+    GameSettings* pGameSettings = GameSettings::GetSettings();
+    Languages* pLangMgr = pGameSettings->GetLanguageMan();
+    _p_LangMgr = pLangMgr;
+
+    // points name
+    _MapPunti[SC_PATTA] = pLangMgr->GetStringId(Languages::ID_S_PATA);
+    _MapPunti[SC_CANELA] = pLangMgr->GetStringId(Languages::ID_S_CANELA);
+    _MapPunti[SC_INVIDO] = pLangMgr->GetStringId(Languages::ID_S_INVIDO);
+    _MapPunti[SC_TRASMAS] = pLangMgr->GetStringId(Languages::ID_S_TRASMAS);
+    _MapPunti[SC_TRASMASNOEF] =
+        pLangMgr->GetStringId(Languages::ID_S_TRASMASNOEF);
+    _MapPunti[SC_FUERAJEUQ] = pLangMgr->GetStringId(Languages::ID_S_FUERAJEUQ);
+    _MapPunti[SC_PARTIDA] = pLangMgr->GetStringId(Languages::ID_S_PARTIDA);
+
+    // buttons  strings
+    _Map_bt_Say[eSayPlayer::SP_AMONTE] =
+        pLangMgr->GetStringId(Languages::ID_S_BT_AMONTE);
+    _Map_bt_Say[eSayPlayer::SP_INVIDO] =
+        pLangMgr->GetStringId(Languages::ID_S_BT_INVIDO);
+    _Map_bt_Say[eSayPlayer::SP_TRASMAS] =
+        pLangMgr->GetStringId(Languages::ID_S_BT_TRASMAS);
+    _Map_bt_Say[eSayPlayer::SP_TRASMASNOEF] =
+        pLangMgr->GetStringId(Languages::ID_S_BT_TRASMASNOEF);
+    _Map_bt_Say[eSayPlayer::SP_FUERAJEUQ] =
+        pLangMgr->GetStringId(Languages::ID_S_BT_FUERAJEUQ);
+    _Map_bt_Say[eSayPlayer::SP_PARTIDA] =
+        pLangMgr->GetStringId(Languages::ID_S_BT_PARTIDA);
+    _Map_bt_Say[eSayPlayer::SP_VABENE] =
+        pLangMgr->GetStringId(Languages::ID_S_BT_VABENE);
+    _Map_bt_Say[eSayPlayer::SP_VADOVIA] =
+        pLangMgr->GetStringId(Languages::ID_S_BT_VADOVIA);
+    _Map_bt_Say[eSayPlayer::SP_CHIAMADIPIU] =
+        pLangMgr->GetStringId(Languages::ID_S_BT_CHIAMADIPIU);
+    _Map_bt_Say[eSayPlayer::SP_NO] =
+        pLangMgr->GetStringId(Languages::ID_S_BT_NO);
+    _Map_bt_Say[eSayPlayer::SP_GIOCA] =
+        pLangMgr->GetStringId(Languages::ID_S_BT_GIOCA);
+    _Map_bt_Say[eSayPlayer::SP_VADODENTRO] =
+        pLangMgr->GetStringId(Languages::ID_S_BT_VADODENTRO);
+    _Map_bt_Say[eSayPlayer::SP_CHIAMA_BORTOLO] =
+        pLangMgr->GetStringId(Languages::ID_S_BT_CHIAMA_BORTOLO);
+    _Map_bt_Say[eSayPlayer::SP_NOTHING] = "";
+
+    // say strings
+    _Map_fb_Say[eSayPlayer::SP_AMONTE] =
+        pLangMgr->GetStringId(Languages::ID_S_AMONTE);
+    _Map_fb_Say[eSayPlayer::SP_INVIDO] =
+        pLangMgr->GetStringId(Languages::ID_S_INVIDO);
+    _Map_fb_Say[eSayPlayer::SP_TRASMAS] =
+        pLangMgr->GetStringId(Languages::ID_S_TRASMAS);
+    _Map_fb_Say[eSayPlayer::SP_TRASMASNOEF] =
+        pLangMgr->GetStringId(Languages::ID_S_TRASMASNOEF);
+    _Map_fb_Say[eSayPlayer::SP_FUERAJEUQ] =
+        pLangMgr->GetStringId(Languages::ID_S_FUERAJEUQ);
+    _Map_fb_Say[eSayPlayer::SP_PARTIDA] =
+        pLangMgr->GetStringId(Languages::ID_S_PARTIDA);
+    _Map_fb_Say[eSayPlayer::SP_VABENE] =
+        pLangMgr->GetStringId(Languages::ID_S_VABENE);
+    _Map_fb_Say[eSayPlayer::SP_VADOVIA] =
+        pLangMgr->GetStringId(Languages::ID_S_VADOVIA);
+    _Map_fb_Say[eSayPlayer::SP_CHIAMADIPIU] =
+        pLangMgr->GetStringId(Languages::ID_S_CHIAMADIPIU);
+    _Map_fb_Say[eSayPlayer::SP_NO] = pLangMgr->GetStringId(Languages::ID_S_NO);
+    _Map_fb_Say[eSayPlayer::SP_GIOCA] =
+        pLangMgr->GetStringId(Languages::ID_S_GIOCA);
+    _Map_fb_Say[eSayPlayer::SP_VADODENTRO] =
+        pLangMgr->GetStringId(Languages::ID_S_VADODENTRO);
+
+    // sound call echo player
+    _Map_id_EchoSay[eSayPlayer::SP_AMONTE] = MusicManager::SND_IG_MONTE_NORM;
+    _Map_id_EchoSay[eSayPlayer::SP_INVIDO] = MusicManager::SND_IG_INV_NORM;
+    _Map_id_EchoSay[eSayPlayer::SP_TRASMAS] = MusicManager::SND_IG_TRASMAS;
+    _Map_id_EchoSay[eSayPlayer::SP_TRASMASNOEF] = MusicManager::SND_IG_TRASNOEF;
+    _Map_id_EchoSay[eSayPlayer::SP_FUERAJEUQ] = MusicManager::SND_IG_FUORIGIOCO;
+    _Map_id_EchoSay[eSayPlayer::SP_PARTIDA] = MusicManager::SND_IG_PARTIDA;
+    _Map_id_EchoSay[eSayPlayer::SP_VABENE] = MusicManager::SND_IG_VABENE;
+    _Map_id_EchoSay[eSayPlayer::SP_VADOVIA] = MusicManager::SND_IG_VUVIA;
+    _Map_id_EchoSay[eSayPlayer::SP_CHIAMADIPIU] =
+        MusicManager::SND_IG_CHIAMAPIU;
+    _Map_id_EchoSay[eSayPlayer::SP_NO] = MusicManager::SND_IG_NO;
+    _Map_id_EchoSay[eSayPlayer::SP_GIOCA] = MusicManager::SND_IG_GIOCA;
+    _Map_id_EchoSay[eSayPlayer::SP_CHIAMA_BORTOLO] =
+        MusicManager::SND_IG_BORTOLO;
+    // sound synth opponent
+    _Map_idSynth_Say[eSayPlayer::SP_AMONTE] = MusicManager::SND_WAV_SYF_MONTE;
+    _Map_idSynth_Say[eSayPlayer::SP_INVIDO] = MusicManager::SND_WAV_SYF_INVIDO;
+    _Map_idSynth_Say[eSayPlayer::SP_TRASMAS] =
+        MusicManager::SND_WAV_SYF_TRASMAS;
+    _Map_idSynth_Say[eSayPlayer::SP_TRASMASNOEF] =
+        MusicManager::SND_WAV_SYF_NOEF;
+    _Map_idSynth_Say[eSayPlayer::SP_FUERAJEUQ] =
+        MusicManager::SND_WAV_SYF_FUORIGI;
+    _Map_idSynth_Say[eSayPlayer::SP_PARTIDA] =
+        MusicManager::SND_WAV_SYF_PARTIDA;
+    _Map_idSynth_Say[eSayPlayer::SP_VABENE] = MusicManager::SND_WAV_SYF_VABENE;
+    _Map_idSynth_Say[eSayPlayer::SP_VADOVIA] = MusicManager::SND_WAV_SYF_VUVIA;
+    _Map_idSynth_Say[eSayPlayer::SP_CHIAMADIPIU] =
+        MusicManager::SND_WAV_SYF_CHIADIPIU;
+
+    _Map_idSynth_Say[eSayPlayer::SP_NO] = MusicManager::SND_WAV_SYF_NO;
+    _Map_idSynth_Say[eSayPlayer::SP_GIOCA] = MusicManager::SND_WAV_SYF_GIOCA;
+
+    _p_DeckType = new DeckType();
+    _p_DeckType->SetTypeIndex(0);  // Default to first deck
+
+    initDeck();
+
+    _p_Scene_background = pSceneBackground;
+
+    createRegionsInit();
+
+    _p_FontStatus = GameSettings::GetSettings()->GetFontDjvBoldBig();
+    _p_FontText = pGameSettings->GetFontDjvSmall();
+
+    // load images for animation stuff
+    for (int i = 0; i < NUM_ANIMAGES; i++) {
+        _p_AnImages[i] = IMG_Load(lpszaImage_filenames[i]);
+    }
+
+    _p_MusicMgr = pGameSettings->GetMusicManager();
+
+    _fnUpdateScreen = fnUpdateScreen;
+
+    // command buttons
+    SDL_Rect rctBt;
+    rctBt.w = 120;
+    rctBt.h = 28;
+    rctBt.y = _p_Screen->h - 155 - rctBt.h - 20;
+    int iXButInit = _p_Screen->w - rctBt.w - 20;
+
+    ClickCb cbBtClicked = prepClickCb();
+    for (int i = 0; i < InvidoGfx::NUMOFBUTTON; i++) {
+        rctBt.x = iXButInit - i * (rctBt.w + 10);
+        _p_btArrayCmd[i] = new ButtonGfx;
+        _p_btArrayCmd[i]->Initialize(&rctBt, _p_Screen, _p_FontStatus, i,
+                                     cbBtClicked);
+    }
+
+    // balloon
+    SDL_Rect rctBall;
+    rctBall.x = 320;
+    rctBall.y = 100;
+    rctBall.w = _p_AnImages[IMG_BALLOON]->w;
+    rctBall.h = _p_AnImages[IMG_BALLOON]->h;
+    _p_balGfx = new BalloonGfx();
+    _p_balGfx->Initialize(&rctBall, _p_AnImages[IMG_BALLOON], _p_FontStatus,
+                          200);
+    _p_balGfx->SetStyle(BalloonGfx::ARROW_UP, _p_AnImages[IMG_BALL_ARROW_UP]);
+
+    // messagebox background surface
+    _p_AlphaDisplay =
+        SDL_CreateSurface(_p_Screen->w, _p_Screen->h, SDL_PIXELFORMAT_XRGB8888);
+
     return NULL;
+}
+
+ClickCb InvidoGfx::prepClickCb() {
+    static VClickCb const tc = {.Click = (&fncBind_ButtonClicked)};
+    return (ClickCb){.tc = &tc, .self = this};
+}
+
+UpdateScreenCb InvidoGfx::prepUpdateScreenCb() {
+    static VUpdateScreenCb const tc = {
+        .UpdateScreen = (&fncBind_UpdateScreen),
+        .RenderTexture = (&fncBind_RenderTexture)};
+    return (UpdateScreenCb){.tc = &tc, .self = this};
 }
 
 LPErrInApp InvidoGfx::OnResize(SDL_Surface* pScreen) { return NULL; }
@@ -322,28 +509,27 @@ LPErrInApp InvidoGfx::HandleIterate(bool& done) { return NULL; }
 
 LPErrInApp InvidoGfx::Show() { return NULL; }
 
-
 void InvidoGfx::cleanup() {
     if (_p_Scene_background) {
         SDL_DestroySurface(_p_Scene_background);
         _p_Scene_background = NULL;
     }
 
-    if (m_pSurf_Bar) {
-        SDL_DestroySurface(m_pSurf_Bar);
-        m_pSurf_Bar = NULL;
+    if (_p_Surf_Bar) {
+        SDL_DestroySurface(_p_Surf_Bar);
+        _p_Surf_Bar = NULL;
     }
-    if (m_pDeckType) {
-        delete m_pDeckType;
-        m_pDeckType = NULL;
+    if (_p_DeckType) {
+        delete _p_DeckType;
+        _p_DeckType = NULL;
     }
-    if (m_pAlphaDisplay) {
-        SDL_DestroySurface(m_pAlphaDisplay);
-        m_pAlphaDisplay = NULL;
+    if (_p_AlphaDisplay) {
+        SDL_DestroySurface(_p_AlphaDisplay);
+        _p_AlphaDisplay = NULL;
     }
     for (int i = 0; i < InvidoGfx::NUM_ANIMAGES; i++) {
-        if (_p_AnImages[i] != NULL){
-            SDL_DestroySurface(_p_AnImages);
+        if (_p_AnImages[i] != NULL) {
+            SDL_DestroySurface(_p_AnImages[i]);
             _p_AnImages[i] = NULL;
         }
     }
@@ -351,18 +537,18 @@ void InvidoGfx::cleanup() {
 
 void InvidoGfx::drawStaticScene() {
     if (_p_Scene_background) {
-        SDL_BlitSurface(_p_Scene_background, NULL, m_pScreen, NULL);
+        SDL_BlitSurface(_p_Scene_background, NULL, _p_Screen, NULL);
     }
 
     for (int i = 0; i < NUM_CARDS_HAND; i++) {
-        renderCard(&m_aOpponentCards[i]);
-        renderCard(&m_aPlayerCards[i]);
+        renderCard(&_aOpponentCards[i]);
+        renderCard(&_aPlayerCards[i]);
     }
     for (int k = 0; k < NUM_CARDS_PLAYED; k++) {
-        renderCard(&m_CardsTable[k]);
+        renderCard(&_CardsTable[k]);
     }
 
-    showPlayerMarkup(m_iPlayerThatHaveMarkup);
+    showPlayerMarkup(_playerThatHaveMarkup);
 
     // shows names
     renderPlayerName(PLAYER1);
@@ -373,109 +559,118 @@ void InvidoGfx::drawStaticScene() {
 
     // draw command buttons
     for (int j = 0; j < NUMOFBUTTON; j++) {
-        m_pbtArrayCmd[j]->DrawButton(m_pScreen);
+        _p_btArrayCmd[j]->DrawButton(_p_Screen);
     }
 
     // ballon
-    m_pbalGfx->Draw(m_pScreen);
+    _p_balGfx->Draw(_p_Screen);
 
-    SDL_RenderClear(m_psdlRenderer);
-    SDL_UpdateTexture(m_pScreenTexture, NULL, m_pScreen->pixels,
-                      m_pScreen->pitch);  // sdl 2.0
-    SDL_RenderCopy(m_psdlRenderer, m_pScreenTexture, NULL, NULL);
-    SDL_RenderPresent(m_psdlRenderer);
+    SDL_RenderClear(_p_sdlRenderer);
+    SDL_UpdateTexture(_p_ScreenTexture, NULL, _p_Screen->pixels,
+                      _p_Screen->pitch);  // sdl 2.0
+    SDL_RenderTexture(_p_sdlRenderer, _p_ScreenTexture, NULL, NULL);
+    SDL_RenderPresent(_p_sdlRenderer);
 }
 
 void InvidoGfx::renderCard(CardGfx* pCard) {
     if (pCard->State == CardGfx::CSW_ST_INVISIBLE) {
         return;
     } else if (pCard->State == CardGfx::CSW_ST_SYMBOL) {
-        pCard->DrawSymbol(m_pScreen);
+        pCard->DrawSymbol(_p_Screen);
     } else if (pCard->State == CardGfx::CSW_ST_VISIBLE) {
-        pCard->DrawCard(m_pScreen);
+        pCard->DrawCard(_p_Screen);
     } else if (pCard->State == CardGfx::CSW_ST_BACK) {
-        pCard->DrawCardBack(m_pScreen);
+        pCard->DrawCardBack(_p_Screen);
     } else {
         SDL_assert(0);
     }
 }
 
 void InvidoGfx::renderPlayerName(int iPlayerIx) {
-    Player* pPlayer = m_pInvidoCore->GetPlayer(iPlayerIx);
+    Player* pPlayer = _p_InvidoCore->GetPlayer(iPlayerIx);
 
     char txt_to_render[256];
-    static char un_char = ' ';
 
     if (iPlayerIx == PLAYER2) {
         sprintf(txt_to_render, "%s", pPlayer->GetName());
-        GFX_UTIL::DrawStaticSpriteEx(m_pScreen, 0, 0, 150, 25, 310, 17,
-                                     m_pSurf_Bar);
-        GFX_UTIL::DrawString(m_pScreen, txt_to_render, 315, 21,
-                             GFX_UTIL_COLOR::White, _p_FontText, false);
+        GFX_UTIL::DrawStaticSpriteEx(_p_Screen, 0, 0, 150, 25, 310, 17,
+                                     _p_Surf_Bar);
+        GFX_UTIL::DrawString(_p_Screen, txt_to_render, 315, 21,
+                             GFX_UTIL_COLOR::White, _p_FontText);
     } else if (iPlayerIx == PLAYER1) {
         sprintf(txt_to_render, "%s", pPlayer->GetName());
-        GFX_UTIL::DrawStaticSpriteEx(m_pScreen, 0, 0, 150, 25, 310,
-                                     m_pScreen->h - 35, m_pSurf_Bar);
-        GFX_UTIL::DrawString(m_pScreen, txt_to_render, 315, m_pScreen->h - 31,
-                             GFX_UTIL_COLOR::White, _p_FontText, true);
+        GFX_UTIL::DrawStaticSpriteEx(_p_Screen, 0, 0, 150, 25, 310,
+                                     _p_Screen->h - 35, _p_Surf_Bar);
+        GFX_UTIL::DrawString(_p_Screen, txt_to_render, 315, _p_Screen->h - 31,
+                             GFX_UTIL_COLOR::White, _p_FontText);
     } else {
         SDL_assert(0);
     }
 }
 
-int InvidoGfx::initDeck() {
+LPErrInApp InvidoGfx::initDeck() {
     // load deck from pac file
-    if (m_pDeck == NULL) {
-        loadCardPac();
+    if (_p_Deck == NULL) {
+        LPErrInApp err = loadCardPac();
+        if (err != NULL)
+            return err;
     }
 
     // use SDL_assert because if loadCardPac failed an exception is thrown
-    SDL_assert(m_pDeck)
+    SDL_assert(_p_Deck);
 
-        m_SrcBack.x = 0;
-    m_SrcBack.y = 0;
+    _SrcBack.x = 0;
+    _SrcBack.y = 0;
 
-    m_SrcCard.y = 0;
-    m_SrcCard.w = m_iCardWidth;
-    m_SrcCard.h = m_iCardHeight;
+    _SrcCard.y = 0;
+    _SrcCard.w = _cardWidth;
+    _SrcCard.h = _cardHeight;
 
     // symbols
 
-    std::string strFileSymbName = lpszMazziDir;
-    strFileSymbName += m_pDeckType->GetSymbolFileName();
+    std::string strFileSymbName =
+        lpszImageDir;  // lpszMazziDir was not defined, using lpszImageDir
+    strFileSymbName += _p_DeckType->GetSymbolFileName();
 
-    m_pSymbols = SDL_LoadBMP(strFileSymbName.c_str());
+    _p_Symbols = SDL_LoadBMP(strFileSymbName.c_str());
 
-    if (m_pSymbols == 0) {
+    if (_p_Symbols == 0) {
         char ErrBuff[512];
         sprintf(ErrBuff, "Error on load deck file (symbols) %s",
                 strFileSymbName.c_str());
-        throw Error::Init(ErrBuff);
+        // throw Error::Init(ErrBuff);
+        return ERR_UTIL::ErrorCreate(ErrBuff);
     }
 
-    if (m_pDeckType->GetSymbolFileName() == "symb_336.bmp") {
-        SDL_SetColorKey(
-            m_pSymbols, TRUE,
-            SDL_MapRGB(m_pSymbols->format, 242, 30, 206));  // SDL 2.0
+    if (_p_DeckType->GetSymbolFileName() == "symb_336.bmp") {
+        SDL_SetSurfaceColorKey(
+            _p_Symbols, true,
+            SDL_MapRGB(SDL_GetPixelFormatDetails(_p_Symbols->format), NULL, 242,
+                       30, 206));  // SDL 3.0
     } else {
-        SDL_SetColorKey(m_pSymbols, TRUE,
-                        SDL_MapRGB(m_pSymbols->format, 0, 128, 0));  // SDL 2.0
+        SDL_SetSurfaceColorKey(
+            _p_Symbols, true,
+            SDL_MapRGB(SDL_GetPixelFormatDetails(_p_Symbols->format), NULL, 0,
+                       128, 0));  // SDL 3.0
     }
 
-    m_iSymbolWidth = m_pSymbols->w / 4;
-    m_iSymbolHeigth = m_pSymbols->h;
+    _symbolWidth = _p_Symbols->w / 4;
+    _symbolHeigth = _p_Symbols->h;
 
-    m_SrcBack.w = m_iSymbolWidth;
-    m_SrcBack.h = m_iSymbolHeigth;
+    _SrcBack.w = _symbolWidth;
+    _SrcBack.h = _symbolHeigth;
 
-    SDL_SetSurfaceBlendMode(m_pSymbols, SDL_BLENDMODE_BLEND);
+    SDL_SetSurfaceBlendMode(_p_Symbols, SDL_BLENDMODE_BLEND);
 
     // black bar surface
-    m_pSurf_Bar = SDL_CreateRGBSurface(SDL_SWSURFACE, m_pScreen->w,
-                                       m_pScreen->h, 32, 0, 0, 0, 0);
-    SDL_FillRect(m_pSurf_Bar, NULL, SDL_MapRGBA(m_pScreen->format, 0, 0, 0, 0));
-    SDL_SetSurfaceBlendMode(m_pSurf_Bar, SDL_BLENDMODE_BLEND);
-    SDL_SetSurfaceAlphaMod(m_pSurf_Bar, 127);  // SDL 2.0
+    _p_Surf_Bar = GFX_UTIL::SDL_CreateRGBSurface(_p_Screen->w, _p_Screen->h, 32,
+                                                 0, 0, 0, 0);
+    SDL_FillSurfaceRect(
+        _p_Surf_Bar, NULL,
+        SDL_MapRGBA(SDL_GetPixelFormatDetails(_p_Screen->format), NULL, 0, 0, 0,
+                    0));
+    SDL_SetSurfaceBlendMode(_p_Surf_Bar, SDL_BLENDMODE_BLEND);
+    SDL_SetSurfaceAlphaMod(_p_Surf_Bar, 127);  // SDL 2.0
 
     return 0;
 }
@@ -483,93 +678,92 @@ int InvidoGfx::initDeck() {
 void InvidoGfx::createRegionsInit() {
     // opponent cards
     for (int i = 0; i < NUM_CARDS_HAND; i++) {
-        m_aOpponentCards[i].m_iX = (m_iCardWidth * i) + ((i + 1) * 17);
-        m_aOpponentCards[i].m_iY = 10;
-        m_aOpponentCards[i].SetDeckSurface(m_pDeck, m_iCardWidth,
-                                           m_iCardHeight);
-        m_aOpponentCards[i].SetSymbSurf(m_pSymbols, m_iSymbolWidth,
-                                        m_iSymbolHeigth);
+        _aOpponentCards[i]._x = (_cardWidth * i) + ((i + 1) * 17);
+        _aOpponentCards[i]._y = 10;
+        _aOpponentCards[i].SetDeckSurface(_p_Deck);
+        _aOpponentCards[i].SetWidth(_cardWidth);
+        _aOpponentCards[i].SetHeight(_cardHeight);
+        _aOpponentCards[i].SetSymbSurf(_p_Symbols, _symbolWidth, _symbolHeigth);
     }
 
     // player cards
     for (int k = 0; k < NUM_CARDS_HAND; k++) {
-        m_aPlayerCards[k].m_iX = (m_iCardWidth * k) + ((k + 1) * 17);
-        m_aPlayerCards[k].m_iY = m_iCardHeight * 3 + 10;
-        m_aPlayerCards[k].SetCardInfo(k, m_iCardWidth, m_iCardHeight);
-        m_aPlayerCards[k].SetDeckSurface(m_pDeck, m_iCardWidth, m_iCardHeight);
-        m_aPlayerCards[k].SetSymbSurf(m_pSymbols, m_iSymbolWidth,
-                                      m_iSymbolHeigth);
+        _aPlayerCards[k]._x = (_cardWidth * k) + ((k + 1) * 17);
+        _aPlayerCards[k]._y = _cardHeight * 3 + 10;
+        _aPlayerCards[k].SetWidth(_cardWidth);
+        _aPlayerCards[k].SetHeight(_cardHeight);
+        _aPlayerCards[k].SetDeckSurface(_p_Deck);
+        _aPlayerCards[k].SetSymbSurf(_p_Symbols, _symbolWidth, _symbolHeigth);
     }
 
     // cards played
     for (int g = 0; g < NUM_CARDS_PLAYED; g++) {
-        m_CardsTable[g].m_iX = (m_iCardWidth * (2 - 1)) + ((2 + g * 3) * 17);
-        m_CardsTable[g].m_iY = m_iCardHeight * 2 - m_iCardHeight / 2 + 10;
-        m_CardsTable[g].State = CardGfx::CSW_ST_INVISIBLE;
-        m_CardsTable[g].SetDeckSurface(m_pDeck, m_iCardWidth, m_iCardHeight);
-        m_CardsTable[g].SetSymbSurf(m_pSymbols, m_iSymbolWidth,
-                                    m_iSymbolHeigth);
+        _CardsTable[g]._x = (_cardWidth * (2 - 1)) + ((2 + g * 3) * 17);
+        _CardsTable[g]._y = _cardHeight * 2 - _cardHeight / 2 + 10;
+        _CardsTable[g].State = CardGfx::CSW_ST_INVISIBLE;
+        _CardsTable[g].SetDeckSurface(_p_Deck);
+        _CardsTable[g].SetWidth(_cardWidth);
+        _CardsTable[g].SetHeight(_cardHeight);
+        _CardsTable[g].SetSymbSurf(_p_Symbols, _symbolWidth, _symbolHeigth);
     }
 }
 
 void InvidoGfx::animateBeginGiocata() {
     TRACE_DEBUG("animateBeginGiocata - begin\n");
     Uint32 uiTickTot = 0;
-    Uint32 uiInitialTick = SDL_GetTicks();
-    Uint32 uiLast_time = uiInitialTick;
+    Uint64 uiInitialTick = SDL_GetTicks();
+    Uint64 uiLast_time = uiInitialTick;
     CardGfx cardTmp[NUM_CARDS_HAND];
     for (int i = 0; i < NUM_CARDS_HAND; i++) {
-        cardTmp[i].Copy(&m_aPlayerCards[i]);
-        cardTmp[i].m_iY = 40;
-        cardTmp[i].SetDeckSurface(m_pDeck, m_iCardWidth, m_iCardHeight);
+        cardTmp[i].Copy(&_aPlayerCards[i]);
+        cardTmp[i]._y = 40;
+        cardTmp[i].SetDeckSurface(_p_Deck);
     }
-    cardTmp[0].m_iX = 10;
-    cardTmp[1].m_iX = 10;
-    cardTmp[2].m_iX = 10;
+    cardTmp[0]._x = 10;
+    cardTmp[1]._x = 10;
+    cardTmp[2]._x = 10;
     int yspeed = 0;
     int xspeed = 0;
     int GRAVITY = 1;
-    bool bEnd = false;
     do {
         // clear screen
-        SDL_BlitSurface(_p_Scene_background, NULL, m_pScreen, NULL);
+        SDL_BlitSurface(_p_Scene_background, NULL, _p_Screen, NULL);
 
         for (int iManoNum = 0; iManoNum < NUM_CARDS_HAND; iManoNum++) {
             if (iManoNum == 0) {
-                if (cardTmp[iManoNum].m_iX >
-                    m_aPlayerCards[NUM_CARDS_HAND - 1].m_iX +
-                        m_aPlayerCards[NUM_CARDS_HAND - 1].m_iWidth) {
+                if (cardTmp[iManoNum]._x >
+                    _aPlayerCards[NUM_CARDS_HAND - 1]._x +
+                        _aPlayerCards[NUM_CARDS_HAND - 1].Width()) {
                     // go back on x
                     xspeed = -6;
                 }
                 yspeed = yspeed + GRAVITY;
                 xspeed = xspeed + GRAVITY;
             }
-            cardTmp[iManoNum].m_iX += xspeed;
-            cardTmp[iManoNum].m_iY += yspeed;
+            cardTmp[iManoNum]._x += xspeed;
+            cardTmp[iManoNum]._y += yspeed;
 
-            if (cardTmp[iManoNum].m_iY >= m_aPlayerCards[iManoNum].m_iY) {
+            if (cardTmp[iManoNum]._y >= _aPlayerCards[iManoNum]._y) {
                 // ok the card reach the position
-                cardTmp[iManoNum].m_iY = m_aPlayerCards[iManoNum].m_iY;
-                cardTmp[iManoNum].m_iX = m_aPlayerCards[iManoNum].m_iX;
+                cardTmp[iManoNum]._y = _aPlayerCards[iManoNum]._y;
+                cardTmp[iManoNum]._x = _aPlayerCards[iManoNum]._x;
                 // uiTickTot
-                bEnd = true;
             }
 
             // update card position
-            cardTmp[iManoNum].DrawCard(m_pScreen);
+            cardTmp[iManoNum].DrawCard(_p_Screen);
         }
-        SDL_UpdateTexture(m_pScreenTexture, NULL, m_pScreen->pixels,
-                          m_pScreen->pitch);  // sdl 2.0
-        SDL_RenderClear(m_psdlRenderer);
-        SDL_RenderCopy(m_psdlRenderer, m_pScreenTexture, NULL, NULL);
-        SDL_RenderPresent(m_psdlRenderer);
+        SDL_UpdateTexture(_p_ScreenTexture, NULL, _p_Screen->pixels,
+                          _p_Screen->pitch);  // sdl 2.0
+        SDL_RenderClear(_p_sdlRenderer);
+        SDL_RenderTexture(_p_sdlRenderer, _p_ScreenTexture, NULL, NULL);
+        SDL_RenderPresent(_p_sdlRenderer);
 
         // synch to frame rate
-        Uint32 uiNowTime = SDL_GetTicks();
-        uiTickTot = uiNowTime - uiInitialTick;
-        if (uiNowTime < uiLast_time + FPS) {
-            SDL_Delay(uiLast_time + FPS - uiNowTime);
+        Uint64 uiNowTime = SDL_GetTicks();
+        uiTickTot = (Uint32)(uiNowTime - uiInitialTick);
+        if (uiNowTime < uiLast_time + (1000 / FPS)) {
+            SDL_Delay((Uint32)(uiLast_time + (1000 / FPS) - uiNowTime));
             uiLast_time = uiNowTime;
         }
     } while (uiTickTot < 1500);
@@ -582,118 +776,94 @@ void InvidoGfx::animateBeginGiocata() {
 
 void InvidoGfx::animateManoEnd(int iPlayerIx) {
     Uint32 uiTickTot = 0;
-    Uint32 uiInitialTick = SDL_GetTicks();
-    Uint32 uiLast_time = uiInitialTick;
+    Uint64 uiInitialTick = SDL_GetTicks();
+    Uint64 uiLast_time = uiInitialTick;
     Uint32 uiFrameRate = 3;
     CardGfx cardTmp[NUM_CARDS_PLAYED];
     for (int i = 0; i < NUM_CARDS_PLAYED; i++) {
-        cardTmp[i].Copy(&m_CardsTable[i]);
-        cardTmp[i].SetDeckSurface(m_pDeck, m_iCardWidth, m_iCardHeight);
+        cardTmp[i].Copy(&_CardsTable[i]);
+        cardTmp[i].SetDeckSurface(_p_Deck);
     }
 
     int iPhase1Speed = 2;
     int iPhase2Speed = 1;
 
-    switch (g_Options.All.iAniSpeedLevel) {
-        case 0:
-            iPhase1Speed = 1;
-            iPhase2Speed = 1;
-            break;
-        case 1:
-            iPhase1Speed = 2;
-            iPhase2Speed = 2;
-            break;
-        case 2:
-            iPhase1Speed = 3;
-            iPhase2Speed = 3;
-            break;
-        case 3:
-            iPhase1Speed = 5;
-            iPhase2Speed = 5;
-            break;
-        case 4:
-            iPhase1Speed = 7;
-            iPhase2Speed = 7;
-            break;
-        case 5:
-            iPhase1Speed = 10;
-            iPhase2Speed = 10;
-            break;
-
-        default:
-            iPhase1Speed = 2;
-            iPhase2Speed = 1;
-            break;
-    }
+    // switch (g_Options.All.iAniSpeedLevel) { // Options logic seems missing or
+    // changed
+    //     case 0: iPhase1Speed = 1; iPhase2Speed = 1; break;
+    //     case 1: iPhase1Speed = 2; iPhase2Speed = 2; break;
+    //     case 2: iPhase1Speed = 3; iPhase2Speed = 3; break;
+    //     case 3: iPhase1Speed = 5; iPhase2Speed = 5; break;
+    //     case 4: iPhase1Speed = 7; iPhase2Speed = 7; break;
+    //     case 5: iPhase1Speed = 10; iPhase2Speed = 10; break;
+    //     default: iPhase1Speed = 2; iPhase2Speed = 1; break;
+    // }
 
     // move on x
-    cardTmp[0].m_iVy = 0;
-    cardTmp[0].m_iVx = +iPhase1Speed;
-    cardTmp[1].m_iVy = 0;
-    cardTmp[1].m_iVx = -iPhase1Speed;
+    cardTmp[0]._vy = 0;
+    cardTmp[0]._vx = +iPhase1Speed;
+    cardTmp[1]._vy = 0;
+    cardTmp[1]._vx = -iPhase1Speed;
 
     // freeze the current display used as background
-    SDL_Surface* pCurrentDisplay = SDL_CreateRGBSurface(
-        SDL_SWSURFACE, m_pScreen->w, m_pScreen->h, 32, 0, 0, 0, 0);
+    SDL_Surface* pCurrentDisplay = GFX_UTIL::SDL_CreateRGBSurface(
+        _p_Screen->w, _p_Screen->h, 32, 0, 0, 0, 0);
 
-    SDL_BlitSurface(m_pScreen, NULL, pCurrentDisplay, NULL);
+    SDL_BlitSurface(_p_Screen, NULL, pCurrentDisplay, NULL);
 
     bool bEnd = false;
     bool bPhase1_X = false;
     int loopCount = 0;
-    SDL_Texture* pTextureAlphaDisplay =
-        SDL_CreateTextureFromSurface(m_psdlRenderer, m_pAlphaDisplay);
     do {
         // clear screen
-        SDL_BlitSurface(pCurrentDisplay, NULL, m_pAlphaDisplay, NULL);
+        SDL_BlitSurface(pCurrentDisplay, NULL, _p_AlphaDisplay, NULL);
 
         for (int iCardPlayedIndex = 0; iCardPlayedIndex < NUM_CARDS_PLAYED;
              iCardPlayedIndex++) {
-            cardTmp[iCardPlayedIndex].m_iX += cardTmp[iCardPlayedIndex].m_iVx;
-            cardTmp[iCardPlayedIndex].m_iY += cardTmp[iCardPlayedIndex].m_iVy;
+            cardTmp[iCardPlayedIndex]._x += cardTmp[iCardPlayedIndex]._vx;
+            cardTmp[iCardPlayedIndex]._y += cardTmp[iCardPlayedIndex]._vy;
 
             if (cardTmp[iCardPlayedIndex].State == CardGfx::CSW_ST_VISIBLE) {
                 // update card position
-                cardTmp[iCardPlayedIndex].DrawCard(m_pAlphaDisplay);
+                cardTmp[iCardPlayedIndex].DrawCard(_p_AlphaDisplay);
             }
         }
-        if (!bPhase1_X && cardTmp[1].m_iX <= cardTmp[0].m_iX) {
+        if (!bPhase1_X && cardTmp[1]._x <= cardTmp[0]._x) {
             // ok the card reach the central position
-            cardTmp[0].m_iVx = 0;
-            cardTmp[1].m_iVx = 0;
+            cardTmp[0]._vx = 0;
+            cardTmp[1]._vx = 0;
             bPhase1_X = true;
         }
 
-        SDL_BlitSurface(m_pAlphaDisplay, NULL, m_pScreen, NULL);
-        // SDL_Flip(m_pScreen); //SDL 1.2
-        SDL_UpdateTexture(m_pScreenTexture, NULL, m_pScreen->pixels,
-                          m_pScreen->pitch);  // sdl 2.0
-        SDL_RenderCopy(m_psdlRenderer, m_pScreenTexture, NULL, NULL);
-        SDL_RenderPresent(m_psdlRenderer);
+        SDL_BlitSurface(_p_AlphaDisplay, NULL, _p_Screen, NULL);
+        SDL_UpdateTexture(_p_ScreenTexture, NULL, _p_Screen->pixels,
+                          _p_Screen->pitch);  // sdl 2.0
+        SDL_RenderTexture(_p_sdlRenderer, _p_ScreenTexture, NULL, NULL);
+        SDL_RenderPresent(_p_sdlRenderer);
 
         int iIncVel = iPhase2Speed;
 
         if (bPhase1_X) {
             // second step, move cards to the trick winner
             if (iPlayerIx == 0) {
-                cardTmp[0].m_iVy += iIncVel;
-                cardTmp[1].m_iVy += iIncVel;
-                if (cardTmp[1].m_iY >= m_pScreen->h) {
+                cardTmp[0]._vy += iIncVel;
+                cardTmp[1]._vy += iIncVel;
+                if (cardTmp[1]._y >= _p_Screen->h) {
                     // cards outside of the screen
                     bEnd = true;
                 }
             } else if (iPlayerIx == 1) {
-                cardTmp[0].m_iVy -= iIncVel;
-                cardTmp[1].m_iVy -= iIncVel;
-                if (cardTmp[0].m_iY <= 0) {
+                cardTmp[0]._vy -= iIncVel;
+                cardTmp[1]._vy -= iIncVel;
+                if (cardTmp[0]._y <= 0) {
                     // cards outside of the screen
                     bEnd = true;
                 }
             } else {
                 // patada
-                cardTmp[0].m_iVx -= iIncVel;
-                cardTmp[1].m_iVx -= iIncVel;
-                if (cardTmp[1].m_iX <= 0) {
+                cardTmp[0]._vx -= iIncVel;
+                cardTmp[1]._vx -= iIncVel;
+                if (cardTmp[1]._x <= 0) {
                     // cards outside of the screen
                     bEnd = true;
                 }
@@ -701,17 +871,16 @@ void InvidoGfx::animateManoEnd(int iPlayerIx) {
         }
 
         // synch to frame rate
-        Uint32 uiNowTime = SDL_GetTicks();
-        uiTickTot = uiNowTime - uiInitialTick;
+        Uint64 uiNowTime = SDL_GetTicks();
+        uiTickTot = (Uint32)(uiNowTime - uiInitialTick);
         if (uiNowTime < uiLast_time + uiFrameRate) {
-            SDL_Delay(uiLast_time + uiFrameRate - uiNowTime);
+            SDL_Delay((Uint32)(uiLast_time + uiFrameRate - uiNowTime));
             uiLast_time = uiNowTime;
         }
         loopCount += 1;
-        if (loopCount > 100) {
+        if (loopCount > 1000) {
             bEnd = true;
         }
-        //} while (uiTickTot < 2000 && !bEnd);
     } while (!bEnd);
 
     SDL_DestroySurface(pCurrentDisplay);
@@ -723,8 +892,7 @@ void InvidoGfx::animGiocataEnd(int iPlayerIx, bool bIsPata) {
     SDL_Rect destWIN;
     SDL_Rect destLOS;
     bool bFlash = true;
-    int iCooYA = m_pScreen->h - 30;
-    ;
+    int iCooYA = _p_Screen->h - 30;
     int iCooYB = 20;
 
     if (iPlayerIx == PLAYER1) {
@@ -735,8 +903,8 @@ void InvidoGfx::animGiocataEnd(int iPlayerIx, bool bIsPata) {
         destLOS.y = iCooYA;
     }
 
-    int iInitialTick = SDL_GetTicks();
-    int iFlashTickStart = iInitialTick;
+    uint64_t iInitialTick = SDL_GetTicks();
+    uint64_t iFlashTickStart = iInitialTick;
     do {
         for (int iManoNum = 0; iManoNum < NUM_CARDS_HAND; iManoNum++) {
             SDL_PumpEvents();
@@ -750,60 +918,61 @@ void InvidoGfx::animGiocataEnd(int iPlayerIx, bool bIsPata) {
 
             if (bFlash) {
                 // winner is  ON
-                destWIN.w = m_pAnImages[IMG_LEDGREEN_ON]->w;
-                destWIN.h = m_pAnImages[IMG_LEDGREEN_ON]->h;
-                SDL_BlitSurface(m_pAnImages[IMG_LEDGREEN_ON], NULL, m_pScreen,
+                destWIN.w = _p_AnImages[IMG_LEDGREEN_ON]->w;
+                destWIN.h = _p_AnImages[IMG_LEDGREEN_ON]->h;
+                SDL_BlitSurface(_p_AnImages[IMG_LEDGREEN_ON], NULL, _p_Screen,
                                 &destWIN);
 
             } else {
                 // winner  off for flashing
-                destWIN.w = m_pAnImages[IMG_LEDGREEN_OFF]->w;
-                destWIN.h = m_pAnImages[IMG_LEDGREEN_OFF]->h;
-                SDL_BlitSurface(m_pAnImages[IMG_LEDGREEN_OFF], NULL, m_pScreen,
+                destWIN.w = _p_AnImages[IMG_LEDGREEN_OFF]->w;
+                destWIN.h = _p_AnImages[IMG_LEDGREEN_OFF]->h;
+                SDL_BlitSurface(_p_AnImages[IMG_LEDGREEN_OFF], NULL, _p_Screen,
                                 &destWIN);
             }
 
             if (!bIsPata) {
                 // loser is red, not flash
-                destLOS.w = m_pAnImages[IMG_LED_REDON]->w;
-                destLOS.h = m_pAnImages[IMG_LED_REDON]->h;
-                SDL_BlitSurface(m_pAnImages[IMG_LED_REDON], NULL, m_pScreen,
+                destLOS.w = _p_AnImages[IMG_LED_REDON]->w;
+                destLOS.h = _p_AnImages[IMG_LED_REDON]->h;
+                SDL_BlitSurface(_p_AnImages[IMG_LED_REDON], NULL, _p_Screen,
                                 &destLOS);
             } else {
                 // giocata patada
                 if (bFlash) {
                     // players are  ON
-                    destLOS.w = m_pAnImages[IMG_LED_BLUEON]->w;
-                    destLOS.h = m_pAnImages[IMG_LED_BLUEON]->h;
-                    SDL_BlitSurface(m_pAnImages[IMG_LED_BLUEON], NULL,
-                                    m_pScreen, &destLOS);
+                    destLOS.w = _p_AnImages[IMG_LED_BLUEON]->w;
+                    destLOS.h = _p_AnImages[IMG_LED_BLUEON]->h;
+                    SDL_BlitSurface(_p_AnImages[IMG_LED_BLUEON], NULL,
+                                    _p_Screen, &destLOS);
 
-                    destWIN.w = m_pAnImages[IMG_LED_BLUEON]->w;
-                    destWIN.h = m_pAnImages[IMG_LED_BLUEON]->h;
-                    SDL_BlitSurface(m_pAnImages[IMG_LED_BLUEON], NULL,
-                                    m_pScreen, &destWIN);
+                    destWIN.w = _p_AnImages[IMG_LED_BLUEON]->w;
+                    destWIN.h = _p_AnImages[IMG_LED_BLUEON]->h;
+                    SDL_BlitSurface(_p_AnImages[IMG_LED_BLUEON], NULL,
+                                    _p_Screen, &destWIN);
 
                 } else {
                     // players also off
-                    destLOS.w = m_pAnImages[IMG_LEDGREEN_OFF]->w;
-                    destLOS.h = m_pAnImages[IMG_LEDGREEN_OFF]->h;
-                    SDL_BlitSurface(m_pAnImages[IMG_LEDGREEN_OFF], NULL,
-                                    m_pScreen, &destLOS);
+                    destLOS.w = _p_AnImages[IMG_LEDGREEN_OFF]->w;
+                    destLOS.h = _p_AnImages[IMG_LEDGREEN_OFF]->h;
+                    SDL_BlitSurface(_p_AnImages[IMG_LEDGREEN_OFF], NULL,
+                                    _p_Screen, &destLOS);
                 }
             }
         }
-        SDL_UpdateTexture(m_pScreenTexture, NULL, m_pScreen->pixels,
-                          m_pScreen->pitch);  // sdl 2.0
-        SDL_RenderCopy(m_psdlRenderer, m_pScreenTexture, NULL, NULL);
-        SDL_RenderPresent(m_psdlRenderer);
+        SDL_UpdateTexture(_p_ScreenTexture, NULL, _p_Screen->pixels,
+                          _p_Screen->pitch);  // sdl 2.0
+        SDL_RenderClear(_p_sdlRenderer);
+        SDL_RenderTexture(_p_sdlRenderer, _p_ScreenTexture, NULL, NULL);
+        SDL_RenderPresent(_p_sdlRenderer);
 
-        int iNowTick = SDL_GetTicks();
-        iTickFlashDiff = iNowTick - iFlashTickStart;
+        uint64_t iNowTick = SDL_GetTicks();
+        iTickFlashDiff = (int)(iNowTick - iFlashTickStart);
         if (iTickFlashDiff > 90) {
-            bFlash = bFlash ? FALSE : true;
+            bFlash = !bFlash;
             iFlashTickStart = iNowTick;
         }
-        iTickTot = iNowTick - iInitialTick;
+        iTickTot = (int)(iNowTick - iInitialTick);
     } while (iTickTot < 1000);
 }
 
@@ -815,16 +984,16 @@ int InvidoGfx::animateCards() {
     int yspeed;
 
     int GRAVITY = 1;
-    int MAXY = m_pScreen->h;
+    int MAXY = _p_Screen->h;
     float BOUNCE = 0.8f;
     CardGfx cardGfx;
 
     do {
-        rot = SDL_rand(2);
-        cardGfx.cardSpec.SetCardIndex(SDL_rand(40));
+        rot = (int)SDL_rand(2);
+        cardGfx.cardSpec.SetCardIndex((int)SDL_rand(40));
 
-        cardGfx.m_iX = SDL_rand(m_pScreen->w);
-        cardGfx.m_iY = SDL_rand(m_pScreen->h / 2);
+        cardGfx._x = (int)SDL_rand(_p_Screen->w);
+        cardGfx._y = (int)SDL_rand(_p_Screen->h / 2);
 
         if (rot) {
             xspeed = -4;
@@ -834,27 +1003,28 @@ int InvidoGfx::animateCards() {
 
         yspeed = 0;
 
-        do  // while card is within the m_pScreen
+        do  // while card is within the _p_Screen
         {
             SDL_PumpEvents();
             if (SDL_GetMouseState(NULL, NULL))
                 return -1;  // stop the animation
 
             yspeed = yspeed + GRAVITY;
-            cardGfx.m_iX += xspeed;
-            cardGfx.m_iY += yspeed;
+            cardGfx._x += xspeed;
+            cardGfx._y += yspeed;
 
-            if (cardGfx.m_iY + m_iCardHeight > MAXY) {
-                cardGfx.m_iY = MAXY - m_iCardHeight;
-                yspeed = int(-yspeed * BOUNCE);
+            if (cardGfx._y + _cardHeight > MAXY) {
+                cardGfx._y = MAXY - _cardHeight;
+                yspeed = (int)(-yspeed * BOUNCE);
             }
 
-            cardGfx.DrawCard(m_pScreen);
-            SDL_UpdateTexture(m_pScreenTexture, NULL, m_pScreen->pixels,
-                              m_pScreen->pitch);  // sdl 2.0
-            SDL_RenderCopy(m_psdlRenderer, m_pScreenTexture, NULL, NULL);
-            SDL_RenderPresent(m_psdlRenderer);
-        } while ((cardGfx.m_iX + 73 > 0) && (cardGfx.m_iX < m_pScreen->w));
+            cardGfx.DrawCard(_p_Screen);
+            SDL_UpdateTexture(_p_ScreenTexture, NULL, _p_Screen->pixels,
+                              _p_Screen->pitch);  // sdl 2.0
+            SDL_RenderClear(_p_sdlRenderer);
+            SDL_RenderTexture(_p_sdlRenderer, _p_ScreenTexture, NULL, NULL);
+            SDL_RenderPresent(_p_sdlRenderer);
+        } while ((cardGfx._x + 73 > 0) && (cardGfx._x < _p_Screen->w));
     } while (1);
 
     return 0;
@@ -864,186 +1034,190 @@ void InvidoGfx::showOkMsgBox(LPCSTR strText) {
     // prepare the size of the box
     MesgBoxGfx MsgBox;
     SDL_Rect rctBox;
-    rctBox.w = m_pScreen->w - 100;
+    rctBox.w = _p_Screen->w - 100;
     rctBox.h = 130;
-    rctBox.y = (m_pScreen->h - rctBox.h) / 2;
-    rctBox.x = (m_pScreen->w - rctBox.w) / 2;
+    rctBox.y = (_p_Screen->h - rctBox.h) / 2;
+    rctBox.x = (_p_Screen->w - rctBox.w) / 2;
 
-    MsgBox.Init(&rctBox, m_pScreen, m_pFontStatus, MesgBoxGfx::MBOK,
-                m_psdlRenderer);
-    MsgBox.Show(m_pScreen, "Ok", "", strText);
+    UpdateScreenCb fnUp = prepUpdateScreenCb();
+    MsgBox.Initialize(&rctBox, _p_Screen, _p_FontStatus, MesgBoxGfx::TY_MBOK,
+                      fnUp);
+    MsgBox.Show(_p_Scene_background, "Ok", "", strText);
 }
 
-int InvidoGfx::loadCardPac() {
+LPErrInApp InvidoGfx::loadCardPac() {
     Uint32 timetag;
     char describtion[100];
     Uint8 num_anims;
     Uint16 w, h;
     Uint16 frames;
 
-    int FRAMETICKS = (1000 / FPS);
-    int THINKINGS_PER_TICK = 1;
+    // int FRAMETICKS = (1000 / FPS);
+    // int THINKINGS_PER_TICK = 1;
 
-    std::string strFileName = lpszMazziDir;
-    strFileName += m_pDeckType->GetResFileName();
+    std::string strFileName = lpszImageDir;
+    strFileName += _p_DeckType->GetResFileName();
 
-    SDL_RWops* src = SDL_RWFromFile(strFileName.c_str(), "rb");
+    SDL_IOStream* src = SDL_IOFromFile(strFileName.c_str(), "rb");
     if (src == 0) {
         char ErrBuff[512];
         sprintf(ErrBuff, "Error on load deck file %s", strFileName.c_str());
-        throw Error::Init(ErrBuff);
+        return ERR_UTIL::ErrorCreate(ErrBuff);
     }
-    SDL_RWread(src, describtion, 100, 1);
-    timetag = SDL_ReadLE32(src);
-    SDL_RWread(src, &num_anims, 1, 1);
+    SDL_ReadIO(src, describtion, 100);
+    SDL_ReadU32LE(src, &timetag);
+    SDL_ReadU8(src, &num_anims);
     // witdh of the picture (pac of 4 cards)
-    w = SDL_ReadLE16(src);
+    SDL_ReadU16LE(src, &w);
     // height of the picture (pac of 10 rows of cards)
-    h = SDL_ReadLE16(src);
-    frames = SDL_ReadLE16(src);
+    SDL_ReadU16LE(src, &h);
+    SDL_ReadU16LE(src, &frames);
 
     for (int i = 0; i < frames; i++) {
-        SDL_ReadLE16(src);
+        Uint16 dummy;
+        SDL_ReadU16LE(src, &dummy);
     }
 
-    m_pDeck = IMG_LoadPNG_RW(src);
-    if (!m_pDeck) {
+    _p_Deck = IMG_Load_IO(src, true);
+    if (!_p_Deck) {
         fprintf(stderr, "Cannot create deck: %s\n", SDL_GetError());
         exit(1);
     }
 
-    SDL_SetColorKey(m_pDeck, TRUE,
-                    SDL_MapRGB(m_pDeck->format, 0, 128, 0));  // SDL 2.0
+    SDL_SetSurfaceColorKey(
+        _p_Deck, true,
+        SDL_MapRGB(SDL_GetPixelFormatDetails(_p_Deck->format), NULL, 0, 128,
+                   0));  // SDL 3.0
 
-    m_iCardWidth = w / 4;
-    m_iCardHeight = h / 10;
+    _cardWidth = w / 4;
+    _cardHeight = h / 10;
 
     return 0;
 }
 
 int InvidoGfx::showYesNoMsgBox(LPCSTR strText) {
-    SDL_assert(m_pAlphaDisplay);
+    SDL_assert(_p_AlphaDisplay);
 
     // prepare the size of the box
     MesgBoxGfx MsgBox;
     SDL_Rect rctBox;
-    rctBox.w = m_pScreen->w - 100;
+    rctBox.w = _p_Screen->w - 100;
     rctBox.h = 130;
-    rctBox.y = (m_pScreen->h - rctBox.h) / 2;
-    rctBox.x = (m_pScreen->w - rctBox.w) / 2;
+    rctBox.y = (_p_Screen->h - rctBox.h) / 2;
+    rctBox.x = (_p_Screen->w - rctBox.w) / 2;
 
     // show a mesage box with alpha
-    MsgBox.Init(&rctBox, m_pScreen, m_pFontStatus, MesgBoxGfx::MB_YES_NO,
-                m_psdlRenderer);
-    SDL_BlitSurface(m_pScreen, NULL, m_pAlphaDisplay, NULL);
+    UpdateScreenCb fnUp = prepUpdateScreenCb();
+    MsgBox.Initialize(&rctBox, _p_Screen, _p_FontStatus,
+                      MesgBoxGfx::TY_MB_YES_NO, fnUp);
+    SDL_BlitSurface(_p_Screen, NULL, _p_AlphaDisplay, NULL);
 
-    STRING strTextYes = m_pLangMgr->GetStringId(Languages::ID_YES);
-    STRING strTextNo = m_pLangMgr->GetStringId(Languages::ID_NO);
-    int iRes = MsgBox.Show(m_pAlphaDisplay, strTextYes.c_str(),
-                           strTextNo.c_str(), strText);
+    std::string strTextYes = _p_LangMgr->GetStringId(Languages::ID_YES);
+    std::string strTextNo = _p_LangMgr->GetStringId(Languages::ID_NO);
+    LPErrInApp err = MsgBox.Show(_p_AlphaDisplay, strTextYes.c_str(),
+                                 strTextNo.c_str(), strText);
 
-    return iRes;
+    return (int)MsgBox.GetResult();
 }
 
 void InvidoGfx::InitInvidoVsCPU() {
-    if (m_pInvidoCore) {
-        delete m_pInvidoCore;
-        m_pInvidoCore = 0;
+    if (_p_InvidoCore) {
+        delete _p_InvidoCore;
+        _p_InvidoCore = 0;
     }
-    m_pInvidoCore = new InvidoCore();
-    m_pInvidoCore->Create(NULL, 2);
-    g_pInvidoCore = m_pInvidoCore;
+    _p_InvidoCore = new InvidoCore();
+    _p_InvidoCore->Create(NULL, 2);
+    // g_pInvidoCore = _p_InvidoCore; // remove global g_pInvidoCore
 
-    m_pInvidoCore->SetRandomSeed((unsigned)time(NULL));
+    _p_InvidoCore->SetRandomSeed((unsigned)time(NULL));
 
-    Player* pPlayer1 = m_pInvidoCore->GetPlayer(PLAYER1);
-    Player* pPlayer2 = m_pInvidoCore->GetPlayer(PLAYER2);
+    Player* pPlayer1 = _p_InvidoCore->GetPlayer(PLAYER1);
+    Player* pPlayer2 = _p_InvidoCore->GetPlayer(PLAYER2);
 
     pPlayer1->SetType(PT_LOCAL);
-    pPlayer1->SetName(g_Options.All.strPlayerName.c_str());
+    pPlayer1->SetName(GameSettings::GetSettings()->PlayerName.c_str());
     pPlayer1->SetLevel(HMI, this);
 
     pPlayer2->SetType(PT_MACHINE);
     pPlayer2->SetName("Re Adlinvidu");
     pPlayer2->SetLevel(ADVANCED, NULL);
-    m_pMatchPoints = m_pInvidoCore->GetMatchPointsObj();
+    _p_MatchPoints = _p_InvidoCore->GetMatchPointsObj();
 
     TRACE_DEBUG("Partita tra %s e %s", pPlayer1->GetName(),
                 pPlayer2->GetName());
 
-    m_bMatchTerminated = false;
+    _isMatchTerminated = false;
 }
 
 void InvidoGfx::MatchLoop() {
     Mix_ChannelFinished(fnEffectTer);
-    m_pInvidoCore->NewMatch();
+    _p_InvidoCore->NewMatch();
     drawStaticScene();
 
     SDL_Event event;
     int done = 0;
-    Uint32 uiLast_time;
-    Uint32 uiFrame = 0;
-    Uint32 uiNowTime = 0;
-    m_DelayAction.Reset();
+    uint64_t uiLast_time;
+    // uint32_t uiFrame = 0;
+    uint64_t uiNowTime = 0;
+    _DelayAction.Reset();
 
     uiLast_time = SDL_GetTicks();
-    STRING strTextTmp;
+    std::string strTextTmp;
     TRACE_DEBUG("Inizio partita loop \n");
-    while (done == 0 && m_bMatchTerminated == FALSE) {
-        uiFrame++;
+    while (done == 0 && _isMatchTerminated == false) {
+        // uiFrame++;
 
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
-                case SDL_QUIT:
+                case SDL_EVENT_QUIT:
                     // user want to exit the match
                     // show a messagebox for confirm
-                    strTextTmp =
-                        m_pLangMgr->GetStringId(Languages::ID_MATCHENDQUESTION);
+                    strTextTmp = _p_LangMgr->GetStringId(Languages::ASK_QUIT);
                     if (showYesNoMsgBox(strTextTmp.c_str()) ==
-                        MesgBoxGfx::MB_RES_YES) {
+                        MesgBoxGfx::RES_YES) {
                         TRACE_DEBUG("Partita finita per scelta utente\n");
                         return;
                     }
                     break;
 
-                case SDL_KEYDOWN:
-                    if (event.key.keysym.sym == SDLK_ESCAPE) {
+                case SDL_EVENT_KEY_DOWN:
+                    if (event.key.key == SDLK_ESCAPE) {
                         done = 1;
                     }
                     handleKeyDownEvent(event);
                     break;
 
-                case SDL_MOUSEBUTTONDOWN:
+                case SDL_EVENT_MOUSE_BUTTON_DOWN:
                     handleMouseDownEvent(event);
                     break;
 
-                case SDL_MOUSEMOTION:
+                case SDL_EVENT_MOUSE_MOTION:
                     handleMouseMoveEvent(event);
                     break;
 
-                case SDL_MOUSEBUTTONUP:
+                case SDL_EVENT_MOUSE_BUTTON_UP:
                     handleMouseUpEvent(event);
                     break;
             }
         }
 
         uiNowTime = SDL_GetTicks();
-        if (uiNowTime > uiLast_time + FPS) {
+        if (uiNowTime > uiLast_time + (1000 / FPS)) {
             drawStaticScene();
             uiLast_time = uiNowTime;
         }
 
         // next action on the game
-        if (m_DelayAction.CanStart()) {
-            m_pInvidoCore->NextAction();
+        if (_DelayAction.CanStart()) {
+            _p_InvidoCore->NextAction();
         }
 
-        // SDL 2.0
-        SDL_UpdateTexture(m_pScreenTexture, NULL, m_pScreen->pixels,
-                          m_pScreen->pitch);
-        SDL_RenderClear(m_psdlRenderer);
-        SDL_RenderCopy(m_psdlRenderer, m_pScreenTexture, NULL, NULL);
-        SDL_RenderPresent(m_psdlRenderer);
+        // SDL 3.0
+        SDL_UpdateTexture(_p_ScreenTexture, NULL, _p_Screen->pixels,
+                          _p_Screen->pitch);
+        SDL_RenderClear(_p_sdlRenderer);
+        SDL_RenderTexture(_p_sdlRenderer, _p_ScreenTexture, NULL, NULL);
+        SDL_RenderPresent(_p_sdlRenderer);
     }
 }
 
@@ -1053,7 +1227,7 @@ void InvidoGfx::handleMouseDownEvent(SDL_Event& event) {
         // check if the player have to play a card
         for (i = 0; i < NUM_CARDS_HAND; i++) {
             // check if a card was clicked
-            if (m_aPlayerCards[i].MouseInCard(event.button.x, event.button.y)) {
+            if (_aPlayerCards[i].MouseInCard(event.button.x, event.button.y)) {
                 // click on player card
                 clickOnPlayerCard(i);
             }
@@ -1061,21 +1235,21 @@ void InvidoGfx::handleMouseDownEvent(SDL_Event& event) {
     } else if (event.button.button == SDL_BUTTON_RIGHT) {
         // mouse right
         // use the right button to show a popup menu
-        if (m_bPlayerCanPlay) {
+        if (_isPlayerCanPlay) {
             for (i = 0; i < NUM_CARDS_HAND; i++) {
-                if (m_aPlayerCards[i].State == CardGfx::CSW_ST_VISIBLE &&
-                    m_aPlayerCards[i].MouseInCard(event.button.x,
-                                                  event.button.y)) {
+                if (_aPlayerCards[i].State == CardGfx::CSW_ST_VISIBLE &&
+                    _aPlayerCards[i].MouseInCard(event.button.x,
+                                                 event.button.y)) {
                     // take care of Zorder
                     int iIndex_1 = i;
                     int iIndex_2 = i + 1;
-                    int iZor_1 = m_aPlayerCards[iIndex_1].m_iZOrder;
+                    int iZor_1 = _aPlayerCards[iIndex_1].m_iZOrder;
                     int iZor_2 = -1;
                     if (iIndex_2 < NUM_CARDS_HAND) {
-                        if (m_aPlayerCards[iIndex_2].MouseInCard(
+                        if (_aPlayerCards[iIndex_2].MouseInCard(
                                 event.button.x, event.button.y)) {
                             // overlap the second card
-                            iZor_2 = m_aPlayerCards[iIndex_2].m_iZOrder;
+                            iZor_2 = _aPlayerCards[iIndex_2].m_iZOrder;
                         }
                     }
                     int iIndexCardSelected = iIndex_1;
@@ -1083,20 +1257,26 @@ void InvidoGfx::handleMouseDownEvent(SDL_Event& event) {
                         iIndexCardSelected = iIndex_2;
                     }
 
-                    eSayPlayer eSay = NOTHING;
+                    eSayPlayer eSay = SP_NOTHING;
                     showPopUpCallMenu(
-                        m_aPlayerCards[iIndexCardSelected].cardSpec,
+                        _aPlayerCards[iIndexCardSelected].cardSpec,
                         event.button.x, event.button.y, &eSay);
-                    if (eSay != NOTHING) {
-                        if (eSay == VADODENTRO) {
+                    if (eSay != SP_NOTHING) {
+                        if (eSay == SP_VADODENTRO) {
                             vadoDentro(iIndexCardSelected);
                         } else {
                             INP_PlayerSay(eSay);
-                            if (g_Options.All.bMyCallEcho) {
-                                int iMusId = m_Map_id_EchoSay[eSay];
-                                if (m_pMusicMgr->PlayEffect(iMusId)) {
-                                    m_DelayAction.CheckPoint(
-                                        2260, DelayNextAction::CHANGE_AVAIL);
+                            if (GameSettings::GetSettings()
+                                    ->MusicEnabled) {  // Use MusicEnabled or
+                                                       // something? Wait, check
+                                                       // bMyCallEcho
+                                // if
+                                // (GameSettings::GetSettings()->All.bMyCallEcho)
+                                // // g_Options.All.bMyCallEcho
+                                int iMusId = _Map_id_EchoSay[eSay];
+                                if (_p_MusicMgr->PlayEffect(iMusId)) {
+                                    //_DelayAction.CheckPoint(
+                                    //    2260, DelayNextAction::CHANGE_AVAIL);
                                 }
                             }
                         }
@@ -1114,42 +1294,72 @@ void InvidoGfx::showPopUpCallMenu(CardSpec& cardClicked, int iX, int iY,
                                   eSayPlayer* peSay) {
     TRACE_DEBUG("show popup menu\n");
     SDL_assert(peSay);
-    SDL_assert(m_pAlphaDisplay);
-    *peSay = NOTHING;
+    SDL_assert(_p_AlphaDisplay);
+    *peSay = SP_NOTHING;
     VCT_COMMANDS vct_cmd;
-    SDL_assert(m_pInvidoCore);
-    m_pInvidoCore->GetMoreCommands(vct_cmd, m_PlayerGuiIndex);
-    vct_cmd.push_back(NOTHING);
+    SDL_assert(_p_InvidoCore);
+    _p_InvidoCore->GetMoreCommands(vct_cmd, _playerGuiIndex);
+    vct_cmd.push_back(SP_NOTHING);
 
     size_t iNumCmdsAval = vct_cmd.size();
 
     // prepare the size of the box
     PopUpMenuGfx PopUpMenu;
     SDL_Rect rctBox;
-    rctBox.w = m_pScreen->w;  // max value, width is autocalculated
-    rctBox.h = m_pScreen->h;  // max value hight is autocalculated
+    rctBox.w = _p_Screen->w;  // max value, width is autocalculated
+    rctBox.h = _p_Screen->h;  // max value hight is autocalculated
     rctBox.y = iY;
     rctBox.x = iX;
 
     // show a mesage box
-    PopUpMenu.Init(&rctBox, m_pScreen, _p_FontText, m_psdlRenderer);
-    SDL_BlitSurface(m_pScreen, NULL, m_pAlphaDisplay, NULL);
+    PopUpMenu.Show(&rctBox, _p_Screen, _p_FontText);
+    SDL_BlitSurface(_p_Screen, NULL, _p_AlphaDisplay, NULL);
 
     for (size_t i = 0; i < iNumCmdsAval; i++) {
         eSayPlayer eSay = vct_cmd[i];
-        STRING strTmp = m_Map_bt_Say[eSay];
+        std::string strTmp = _Map_bt_Say[eSay];
 
         PopUpMenu.AddLineText(strTmp.c_str());
     }
 
-    PopUpMenu.Show(m_pAlphaDisplay);
+    // Modal loop for the popup menu
+    bool bDone = false;
+    while (!bDone) {
+        SDL_Event event;
+        while (SDL_PollEvent(&event)) {
+            float mx, my;
+            SDL_GetMouseState(&mx, &my);
+            SDL_Point mousePos;
+            mousePos.x = (int)mx;
+            mousePos.y = (int)my;
+            PopUpMenu.HandleEvent(&event, mousePos);
+            if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN ||
+                (event.type == SDL_EVENT_KEY_DOWN &&
+                 (event.key.key == SDLK_RETURN ||
+                  event.key.key == SDLK_ESCAPE))) {
+                bDone = true;
+            }
+        }
+        SDL_BlitSurface(_p_AlphaDisplay, NULL, _p_Screen, NULL);
+        PopUpMenu.DrawCtrl(_p_Screen);
+
+        SDL_UpdateTexture(_p_ScreenTexture, NULL, _p_Screen->pixels,
+                          _p_Screen->pitch);
+        SDL_RenderClear(_p_sdlRenderer);
+        SDL_RenderTexture(_p_sdlRenderer, _p_ScreenTexture, NULL, NULL);
+        SDL_RenderPresent(_p_sdlRenderer);
+        SDL_Delay(10);
+    }
+
     // menu is terminated
     if (PopUpMenu.MenuIsSelected()) {
         // the user choice a menu
         int iIndexSel = PopUpMenu.GetSlectedIndex();
-        *peSay = vct_cmd[iIndexSel];
+        if (iIndexSel >= 0 && (size_t)iIndexSel < vct_cmd.size()) {
+            *peSay = vct_cmd[iIndexSel];
+        }
     } else {
-        *peSay = NOTHING;
+        *peSay = SP_NOTHING;
     }
 
     TRACE_DEBUG("END popup menu\n");
@@ -1158,43 +1368,42 @@ void InvidoGfx::showPopUpCallMenu(CardSpec& cardClicked, int iX, int iY,
 
 void InvidoGfx::clickOnPlayerCard(int iIndex) {
     TRACE_DEBUG("card clicked %d\n", iIndex);
-    if (m_bPlayerCanPlay &&
-        (m_aPlayerCards[iIndex].State == CardGfx::CSW_ST_VISIBLE)) {
-        m_pInvidoCore->Player_playCard(
-            PLAYER_ME, m_aPlayerCards[iIndex].cardSpec.GetCardInfo());
-        m_bPlayerCanPlay = false;
+    if (_isPlayerCanPlay &&
+        (_aPlayerCards[iIndex].State == CardGfx::CSW_ST_VISIBLE)) {
+        _p_InvidoCore->Player_playCard(
+            PLAYER_ME, _aPlayerCards[iIndex].cardSpec.GetCardInfo());
+        _isPlayerCanPlay = false;
     }
 }
 
 void InvidoGfx::vadoDentro(int cardIx) {
     TRACE_DEBUG("Card vado dentro %d\n", cardIx);
-    if (m_bPlayerCanPlay &&
-        (m_aPlayerCards[cardIx].State == CardGfx::CSW_ST_VISIBLE)) {
-        m_CardVadoDentroIndex = cardIx;
-        m_pInvidoCore->Player_vaDentro(
-            PLAYER_ME, m_aPlayerCards[cardIx].cardSpec.GetCardInfo());
-        m_bPlayerCanPlay = false;
+    if (_isPlayerCanPlay &&
+        (_aPlayerCards[cardIx].State == CardGfx::CSW_ST_VISIBLE)) {
+        _cardVadoDentroIndex = cardIx;
+        _p_InvidoCore->Player_vaDentro(
+            PLAYER_ME, _aPlayerCards[cardIx].cardSpec.GetCardInfo());
+        _isPlayerCanPlay = false;
     }
 }
 
 void InvidoGfx::renderScreen() {
-    SDL_UpdateTexture(m_pScreenTexture, NULL, m_pScreen->pixels,
-                      m_pScreen->pitch);  // sdl 2.0
-    SDL_RenderCopy(m_psdlRenderer, m_pScreenTexture, NULL, NULL);
-    SDL_RenderPresent(m_psdlRenderer);
+    SDL_UpdateTexture(_p_ScreenTexture, NULL, _p_Screen->pixels,
+                      _p_Screen->pitch);  // sdl 2.0
+    SDL_RenderTexture(_p_sdlRenderer, _p_ScreenTexture, NULL, NULL);
+    SDL_RenderPresent(_p_sdlRenderer);
 }
 
 void InvidoGfx::drawVadoDentroCard(CardGfx* pCard) {
     drawStaticScene();
-    pCard->SetSymbolTocard(CardGfx::SYMBOL_BRISCNET, m_iCardWidth,
-                           m_iCardHeight, m_pScreen);
+    pCard->SetSymbolTocard(CardGfx::CSW_ST_SYMBOL);
     renderCard(pCard);
     renderScreen();
 }
 
 void InvidoGfx::drawPlayedCard(CardGfx* pCard) {
     int iIndexToUse = 0;
-    if (m_CardsTable[0].State == CardGfx::CSW_ST_INVISIBLE) {
+    if (_CardsTable[0].State == CardGfx::CSW_ST_INVISIBLE) {
         // first card  played
         iIndexToUse = 0;
     } else {
@@ -1203,10 +1412,8 @@ void InvidoGfx::drawPlayedCard(CardGfx* pCard) {
     }
     drawStaticScene();
 
-    m_CardsTable[iIndexToUse].CopyButNoPosition(pCard);
-    renderCard(&m_CardsTable[iIndexToUse]);
-    pCard->SetSymbolTocard(CardGfx::SYMBOL_BRISCNET, m_iCardWidth,
-                           m_iCardHeight, m_pScreen);
+    _CardsTable[iIndexToUse].Copy(pCard);
+    renderCard(&_CardsTable[iIndexToUse]);
     renderCard(pCard);
     renderScreen();
 }
@@ -1214,29 +1421,34 @@ void InvidoGfx::drawPlayedCard(CardGfx* pCard) {
 ////////////////////////////////////////
 //       HandleMouseMoveEvent
 void InvidoGfx::handleMouseMoveEvent(SDL_Event& event) {
+    SDL_Point mousePos;
+    mousePos.x = (int)event.motion.x;
+    mousePos.y = (int)event.motion.y;
     for (int i = 0; i < NUMOFBUTTON; i++) {
-        m_pbtArrayCmd[i]->MouseMove(event, m_pScreen, _p_Scene_background,
-                                    m_pScreenTexture);
+        _p_btArrayCmd[i]->MouseMove(&event, mousePos);
     }
 }
 
 ////////////////////////////////////////
 //       HandleMouseUpEvent
 void InvidoGfx::handleMouseUpEvent(SDL_Event& event) {
+    SDL_Point mousePos;
+    mousePos.x = (int)event.button.x;
+    mousePos.y = (int)event.button.y;
     for (int i = 0; i < NUMOFBUTTON; i++) {
-        m_pbtArrayCmd[i]->MouseUp(event);
+        _p_btArrayCmd[i]->MouseUp(&event, mousePos);
     }
 }
 
 void InvidoGfx::handleKeyDownEvent(SDL_Event& event) {
-    if (event.key.keysym.sym == SDLK_n) {
+    if (event.key.key == SDLK_n) {
         // startNewMatch();
         drawStaticScene();
     }
-    if (event.key.keysym.sym == SDLK_a) {
+    if (event.key.key == SDLK_a) {
         animateCards();
     };  // Test animation
-    if (event.key.keysym.sym == SDLK_r) {
+    if (event.key.key == SDLK_r) {
         // refresh
         drawStaticScene();
     };  // Refresh
@@ -1253,9 +1465,9 @@ void InvidoGfx::showPlayerMarkup(int iPlayerIx) {
     } else {
         SDL_assert(0);
     }
-    dest.w = m_pAnImages[IMG_TOCCA_PLAYER]->w;
-    dest.h = m_pAnImages[IMG_TOCCA_PLAYER]->h;
-    SDL_BlitSurface(m_pAnImages[IMG_TOCCA_PLAYER], NULL, m_pScreen, &dest);
+    dest.w = _p_AnImages[IMG_TOCCA_PLAYER]->w;
+    dest.h = _p_AnImages[IMG_TOCCA_PLAYER]->h;
+    SDL_BlitSurface(_p_AnImages[IMG_TOCCA_PLAYER], NULL, _p_Screen, &dest);
 }
 
 void InvidoGfx::showPointsPlayer(int iPlayerIx, VCT_INT& vct_Points) {
@@ -1290,35 +1502,35 @@ void InvidoGfx::showPointsPlayer(int iPlayerIx, VCT_INT& vct_Points) {
                         iY_NextCanela = iY_NextEgg;
                     } else {
                         iY_NextCanela =
-                            iY_NextEgg + m_pAnImages[IMG_UOVO]->h + 3;
+                            iY_NextEgg + _p_AnImages[IMG_UOVO]->h + 3;
                     }
                 }
 
                 dest.y = iY_NextCanela;
-                dest.w = m_pAnImages[IMG_CANELA]->w;
-                dest.h = m_pAnImages[IMG_CANELA]->h;
-                SDL_BlitSurface(m_pAnImages[IMG_CANELA], NULL, m_pScreen,
+                dest.w = _p_AnImages[IMG_CANELA]->w;
+                dest.h = _p_AnImages[IMG_CANELA]->h;
+                SDL_BlitSurface(_p_AnImages[IMG_CANELA], NULL, _p_Screen,
                                 &dest);
 
                 iY_NextCanela += iCanelaInterl;
             } else if (iCaneliOnLine == 2) {
                 dest.y = iY_NextCanela;
-                dest.w = m_pAnImages[IMG_CANELA]->w;
-                dest.h = m_pAnImages[IMG_CANELA]->h;
-                SDL_BlitSurface(m_pAnImages[IMG_CANELA], NULL, m_pScreen,
+                dest.w = _p_AnImages[IMG_CANELA]->w;
+                dest.h = _p_AnImages[IMG_CANELA]->h;
+                SDL_BlitSurface(_p_AnImages[IMG_CANELA], NULL, _p_Screen,
                                 &dest);
 
                 iY_NextCanela -= iCanelaInterl;
             } else if (iCaneliOnLine == 3) {
                 dest.y = iY_NextCanela;
-                dest.w = m_pAnImages[IMG_CANELA_OBL]->w;
-                dest.h = m_pAnImages[IMG_CANELA_OBL]->h;
-                SDL_BlitSurface(m_pAnImages[IMG_CANELA_OBL], NULL, m_pScreen,
+                dest.w = _p_AnImages[IMG_CANELA_OBL]->w;
+                dest.h = _p_AnImages[IMG_CANELA_OBL]->h;
+                SDL_BlitSurface(_p_AnImages[IMG_CANELA_OBL], NULL, _p_Screen,
                                 &dest);
                 if (iEggOnLine != 1) {
                     iY_NextCanela += dest.h + 3;
                 } else {
-                    iY_NextCanela = iY_NextEgg + m_pAnImages[IMG_UOVO]->h + 3;
+                    iY_NextCanela = iY_NextEgg + _p_AnImages[IMG_UOVO]->h + 3;
                 }
                 iCaneliOnLine = 0;
             } else {
@@ -1335,14 +1547,14 @@ void InvidoGfx::showPointsPlayer(int iPlayerIx, VCT_INT& vct_Points) {
                     }
                 } else if (iCaneliOnLine == 1) {
                     int iPossY =
-                        iY_NextCanela + m_pAnImages[IMG_CANELA_OBL]->h + 3;
+                        iY_NextCanela + _p_AnImages[IMG_CANELA_OBL]->h + 3;
                     if (iY_NextEgg < iPossY) {
                         iY_NextEgg = iPossY;
                     }
                 } else {
                     // 2 caneli drawn
                     int iPossY =
-                        iY_NextCanela + m_pAnImages[IMG_CANELA_OBL]->h + 3;
+                        iY_NextCanela + _p_AnImages[IMG_CANELA_OBL]->h + 3;
                     if (iY_NextEgg < iPossY) {
                         iY_NextEgg = iPossY;
                     }
@@ -1356,12 +1568,12 @@ void InvidoGfx::showPointsPlayer(int iPlayerIx, VCT_INT& vct_Points) {
                 iEggOnLine = 0;
                 dest.y = iY_NextEgg;
                 dest.x = iX_NextEgg;
-                iY_NextEgg += m_pAnImages[IMG_UOVO]->h + 3;
+                iY_NextEgg += _p_AnImages[IMG_UOVO]->h + 3;
                 iX_NextEgg = iInitial_X;
             }
-            dest.w = m_pAnImages[IMG_UOVO]->w;
-            dest.h = m_pAnImages[IMG_UOVO]->h;
-            SDL_BlitSurface(m_pAnImages[IMG_UOVO], NULL, m_pScreen, &dest);
+            dest.w = _p_AnImages[IMG_UOVO]->w;
+            dest.h = _p_AnImages[IMG_UOVO]->h;
+            SDL_BlitSurface(_p_AnImages[IMG_UOVO], NULL, _p_Screen, &dest);
         } else {
             SDL_assert(0);
         }
@@ -1374,7 +1586,7 @@ void InvidoGfx::showManoScore(bool bIsPlayed, int iPlayerIx, bool bIsPata,
     SDL_Rect destOff;
     dest.x = 400 + 16 * iManoNum;
     destOff.x = dest.x;
-    int iCooYA = m_pScreen->h - 30;
+    int iCooYA = _p_Screen->h - 30;
     int iCooYB = 20;
 
     if (iPlayerIx == PLAYER1 || !bIsPlayed || bIsPata) {
@@ -1388,53 +1600,55 @@ void InvidoGfx::showManoScore(bool bIsPlayed, int iPlayerIx, bool bIsPata,
     }
     if (bIsPlayed) {
         // winner is ON
-        dest.w = m_pAnImages[IMG_LEDGREEN_ON]->w;
-        dest.h = m_pAnImages[IMG_LEDGREEN_ON]->h;
-        SDL_BlitSurface(m_pAnImages[IMG_LEDGREEN_ON], NULL, m_pScreen, &dest);
+        dest.w = _p_AnImages[IMG_LEDGREEN_ON]->w;
+        dest.h = _p_AnImages[IMG_LEDGREEN_ON]->h;
+        SDL_BlitSurface(_p_AnImages[IMG_LEDGREEN_ON], NULL, _p_Screen, &dest);
         if (bIsPata) {
             // patada, both blue
-            destOff.w = m_pAnImages[IMG_LED_BLUEON]->w;
-            destOff.h = m_pAnImages[IMG_LED_BLUEON]->h;
-            SDL_BlitSurface(m_pAnImages[IMG_LED_BLUEON], NULL, m_pScreen,
+            destOff.w = _p_AnImages[IMG_LED_BLUEON]->w;
+            destOff.h = _p_AnImages[IMG_LED_BLUEON]->h;
+            SDL_BlitSurface(_p_AnImages[IMG_LED_BLUEON], NULL, _p_Screen,
                             &destOff);
 
-            dest.w = m_pAnImages[IMG_LED_BLUEON]->w;
-            dest.h = m_pAnImages[IMG_LED_BLUEON]->h;
-            SDL_BlitSurface(m_pAnImages[IMG_LED_BLUEON], NULL, m_pScreen,
+            dest.w = _p_AnImages[IMG_LED_BLUEON]->w;
+            dest.h = _p_AnImages[IMG_LED_BLUEON]->h;
+            SDL_BlitSurface(_p_AnImages[IMG_LED_BLUEON], NULL, _p_Screen,
                             &dest);
         } else {
             // loser is red
-            destOff.w = m_pAnImages[IMG_LED_REDON]->w;
-            destOff.h = m_pAnImages[IMG_LED_REDON]->h;
-            SDL_BlitSurface(m_pAnImages[IMG_LED_REDON], NULL, m_pScreen,
+            destOff.w = _p_AnImages[IMG_LED_REDON]->w;
+            destOff.h = _p_AnImages[IMG_LED_REDON]->h;
+            SDL_BlitSurface(_p_AnImages[IMG_LED_REDON], NULL, _p_Screen,
                             &destOff);
         }
     } else {
         // mano was not played (both off)
-        dest.w = m_pAnImages[IMG_LEDGREEN_OFF]->w;
-        dest.h = m_pAnImages[IMG_LEDGREEN_OFF]->h;
-        SDL_BlitSurface(m_pAnImages[IMG_LEDGREEN_OFF], NULL, m_pScreen, &dest);
-        destOff.w = m_pAnImages[IMG_LEDGREEN_OFF]->w;
-        destOff.h = m_pAnImages[IMG_LEDGREEN_OFF]->h;
-        SDL_BlitSurface(m_pAnImages[IMG_LEDGREEN_OFF], NULL, m_pScreen,
+        dest.w = _p_AnImages[IMG_LEDGREEN_OFF]->w;
+        dest.h = _p_AnImages[IMG_LEDGREEN_OFF]->h;
+        SDL_BlitSurface(_p_AnImages[IMG_LEDGREEN_OFF], NULL, _p_Screen, &dest);
+        destOff.w = _p_AnImages[IMG_LEDGREEN_OFF]->w;
+        destOff.h = _p_AnImages[IMG_LEDGREEN_OFF]->h;
+        SDL_BlitSurface(_p_AnImages[IMG_LEDGREEN_OFF], NULL, _p_Screen,
                         &destOff);
     }
 }
 
 void InvidoGfx::guiPlayerTurn(int iPlayer) {
-    SDL_assert(m_pMatchPoints);
-    m_bPlayerCanPlay = true;
+    SDL_assert(_p_MatchPoints);
+    _isPlayerCanPlay = true;
 
-    m_iPlayerThatHaveMarkup = iPlayer;
+    _playerThatHaveMarkup = iPlayer;
 
     // update the screen
     drawStaticScene();
 
-    Player* pPlayer = m_pInvidoCore->GetPlayer(iPlayer);
+    Player* pPlayer = _p_InvidoCore->GetPlayer(iPlayer);
 
-    if (g_Options.All.iVerbose > 5) {
-        TRACE_DEBUG("%s Player che deve giocare %d: %s\n", lpszCST_INFO,
-                    iPlayer, pPlayer->GetName());
+    if (GameSettings::GetSettings()
+            ->MusicEnabled) {  // Verify if this is the right field for
+                               // verbosity/logging
+        TRACE_DEBUG("Player che deve giocare %d: %s\n", iPlayer,
+                    pPlayer->GetName());
     }
 }
 
@@ -1444,7 +1658,7 @@ void InvidoGfx::showCurrentScore() {
         bool bIsPata;
         bool bIsPlayed;
         int iPlayerIx;
-        m_pMatchPoints->GetManoInfo(iManoNum, &iPlayerIx, &bIsPlayed, &bIsPata);
+        _p_MatchPoints->GetManoInfo(iManoNum, &iPlayerIx, &bIsPlayed, &bIsPata);
         showManoScore(bIsPlayed, iPlayerIx, bIsPata, iManoNum);
     }
 
@@ -1460,84 +1674,84 @@ void InvidoGfx::showCurrentScore() {
 
     // score background
     GFX_UTIL::DrawStaticSpriteEx(
-        m_pScreen, 0, 0, iX_end - iX1 + iBackOff, iY_end - iY1 + iBackOff + 30,
-        iX1 - iBackOff / 2, iY1 - iBackOff / 2, m_pSurf_Bar);
+        _p_Screen, 0, 0, iX_end - iX1 + iBackOff, iY_end - iY1 + iBackOff + 30,
+        iX1 - iBackOff / 2, iY1 - iBackOff / 2, _p_Surf_Bar);
 
     SDL_Rect dest;
 
     // vertical line
     int i;
-    for (i = iY1; i < iY_end; i += m_pAnImages[IMG_VERTICAL]->h) {
+    for (i = iY1; i < iY_end; i += _p_AnImages[IMG_VERTICAL]->h) {
         dest.x = iX_vertical - 2;
         dest.y = i;
-        dest.w = m_pAnImages[IMG_VERTICAL]->w;
-        dest.h = m_pAnImages[IMG_VERTICAL]->h;
+        dest.w = _p_AnImages[IMG_VERTICAL]->w;
+        dest.h = _p_AnImages[IMG_VERTICAL]->h;
 
-        SDL_BlitSurface(m_pAnImages[IMG_VERTICAL], NULL, m_pScreen, &dest);
+        SDL_BlitSurface(_p_AnImages[IMG_VERTICAL], NULL, _p_Screen, &dest);
     }
     // horizontal
-    dest.w = m_pAnImages[IMG_HORIZONTAL]->w;
-    dest.h = m_pAnImages[IMG_HORIZONTAL]->h;
-    for (i = iX1; i < iX_end; i += m_pAnImages[IMG_HORIZONTAL]->w) {
+    dest.w = _p_AnImages[IMG_HORIZONTAL]->w;
+    dest.h = _p_AnImages[IMG_HORIZONTAL]->h;
+    for (i = iX1; i < iX_end; i += _p_AnImages[IMG_HORIZONTAL]->w) {
         dest.x = i;
         dest.y = iY_oriz;
 
-        SDL_BlitSurface(m_pAnImages[IMG_HORIZONTAL], NULL, m_pScreen, &dest);
+        SDL_BlitSurface(_p_AnImages[IMG_HORIZONTAL], NULL, _p_Screen, &dest);
     }
 
     // name on grid - player 1
-    Player* pPlayer = m_pInvidoCore->GetPlayer(PLAYER1);
+    Player* pPlayer = _p_InvidoCore->GetPlayer(PLAYER1);
     STRING strTmp = pPlayer->GetName();
     int iLenName = (int)strTmp.length();
-    GFX_UTIL::DrawString(m_pScreen, pPlayer->GetName(),
+    GFX_UTIL::DrawString(_p_Screen, pPlayer->GetName(),
                          iX_vertical - (9 * iLenName), iY1,
-                         GFX_UTIL_COLOR::White, _p_FontText, true);
+                         GFX_UTIL_COLOR::White, _p_FontText);
     // player 2
-    pPlayer = m_pInvidoCore->GetPlayer(PLAYER2);
-    GFX_UTIL::DrawString(m_pScreen, pPlayer->GetName(), iX_vertical + 10, iY1,
-                         GFX_UTIL_COLOR::White, _p_FontText, false);
+    pPlayer = _p_InvidoCore->GetPlayer(PLAYER2);
+    GFX_UTIL::DrawString(_p_Screen, pPlayer->GetName(), iX_vertical + 10, iY1,
+                         GFX_UTIL_COLOR::White, _p_FontText);
 
     // current giocata score
-    eGiocataScoreState eCurrScore = m_pMatchPoints->GetCurrScore();
-    STRING lpsNamePoints = m_MapPunti[eCurrScore];
-    if (m_pMatchPoints->IsGiocataMonte()) {
-        lpsNamePoints = m_pLangMgr->GetStringId(Languages::ID_S_AMONTE).c_str();
+    eGiocataScoreState eCurrScore = _p_MatchPoints->GetCurrScore();
+    STRING lpsNamePoints = _MapPunti[eCurrScore];
+    if (_p_MatchPoints->IsGiocataMonte()) {
+        lpsNamePoints = _p_LangMgr->GetStringId(Languages::ID_S_AMONTE).c_str();
     }
     char buffTmp[256];
     sprintf(buffTmp, "%s: %s",
-            m_pLangMgr->GetStringId(Languages::ID_STA_PTCURRENT).c_str(),
+            _p_LangMgr->GetStringId(Languages::ID_SCORE).c_str(),
             lpsNamePoints.c_str());
     int tx, ty;
-    TTF_SizeText(_p_FontText, buffTmp, &tx, &ty);
+    TTF_GetStringSize(_p_FontText, buffTmp, 0, &tx, &ty);
     int iX_posCurrScore = iX_vertical - tx / 2;
     int iY_posCurrScore = iY_end + 10;
-    GFX_UTIL::DrawString(m_pScreen, buffTmp, iX_posCurrScore, iY_posCurrScore,
-                         GFX_UTIL_COLOR::White, _p_FontText, false);
+    GFX_UTIL::DrawString(_p_Screen, buffTmp, iX_posCurrScore, iY_posCurrScore,
+                         GFX_UTIL_COLOR::White, _p_FontText);
 
     // player score
-    int iNumGiocate = m_pMatchPoints->GetNumGiocateInCurrMatch();
+    int iNumGiocate = _p_MatchPoints->GetNumGiocateInCurrMatch();
     VCT_INT vct_Point_pl1;
     for (int j = 0; j < NUM_PLAY_INVIDO_2; j++) {
         vct_Point_pl1.clear();
         for (int iNumGio = 0; iNumGio < iNumGiocate; iNumGio++) {
             GiocataInfo GioInfo;
-            m_pMatchPoints->GetGiocataInfo(iNumGio, &GioInfo);
+            _p_MatchPoints->GetGiocataInfo(iNumGio, &GioInfo);
 
-            if (GioInfo.eScore > 0) {
-                if (GioInfo.iPlayerIndex == j) {
-                    if (GioInfo.eScore == SC_TRASMAS) {
+            if (GioInfo.score > 0) {
+                if (GioInfo.playerIndex == j) {
+                    if (GioInfo.score == SC_TRASMAS) {
                         vct_Point_pl1.push_back(3);
                         vct_Point_pl1.push_back(3);
-                    } else if (GioInfo.eScore == SC_TRASMASNOEF) {
-                        vct_Point_pl1.push_back(3);
-                        vct_Point_pl1.push_back(3);
-                        vct_Point_pl1.push_back(3);
-                    } else if (GioInfo.eScore == SC_FUERAJEUQ) {
+                    } else if (GioInfo.score == SC_TRASMASNOEF) {
                         vct_Point_pl1.push_back(3);
                         vct_Point_pl1.push_back(3);
                         vct_Point_pl1.push_back(3);
+                    } else if (GioInfo.score == SC_FUERAJEUQ) {
                         vct_Point_pl1.push_back(3);
-                    } else if (GioInfo.eScore == SC_PARTIDA) {
+                        vct_Point_pl1.push_back(3);
+                        vct_Point_pl1.push_back(3);
+                        vct_Point_pl1.push_back(3);
+                    } else if (GioInfo.score == SC_PARTIDA) {
                         vct_Point_pl1.push_back(3);
                         vct_Point_pl1.push_back(3);
                         vct_Point_pl1.push_back(3);
@@ -1547,7 +1761,7 @@ void InvidoGfx::showCurrentScore() {
                         vct_Point_pl1.push_back(3);
                         vct_Point_pl1.push_back(3);
                     } else {
-                        vct_Point_pl1.push_back(GioInfo.eScore);
+                        vct_Point_pl1.push_back(GioInfo.score);
                     }
                 }
             }
@@ -1558,8 +1772,8 @@ void InvidoGfx::showCurrentScore() {
 
 void InvidoGfx::enableCmds() {
     VCT_COMMANDS vct_cmd;
-    SDL_assert(m_pInvidoCore);
-    m_pInvidoCore->GetAdmittedCommands(vct_cmd, m_PlayerGuiIndex);
+    SDL_assert(_p_InvidoCore);
+    _p_InvidoCore->GetAdmittedCommands(vct_cmd, _playerGuiIndex);
 
     // reset button to default strings
     size_t iNumCmd = vct_cmd.size();
@@ -1568,35 +1782,33 @@ void InvidoGfx::enableCmds() {
     for (size_t i = 0; i < iNumCmd; i++) {
         // set the command with the new command
         eSayPlayer eSay = vct_cmd[i];
-        STRING strTmp = m_Map_bt_Say[eSay];
+        STRING strTmp = _Map_bt_Say[eSay];
         setCmdButton(i, eSay, strTmp.c_str());
     }
 }
 
 void InvidoGfx::enableOnlyCmdButtons(size_t iNumButt) {
     int i, j;
-    for (i = 0; i < iNumButt; i++) {
+    for (i = 0; i < (int)iNumButt; i++) {
         // enable buttons with commands
-        m_pbtArrayCmd[i]->EnableWindow(TRUE);
-        m_pbtArrayCmd[i]->SetState(ButtonGfx::VISIBLE);
+        _p_btArrayCmd[i]->Enable(true);
+        _p_btArrayCmd[i]->SetVisibleState(ButtonGfx::VISIBLE);
     }
     for (j = i; j < NUMOFBUTTON; j++) {
         // the rest of buttons are disabled
-        m_pbtArrayCmd[j]->EnableWindow(FALSE);
-        m_pbtArrayCmd[j]->SetState(ButtonGfx::INVISIBLE);
-        m_pbtArrayCmd[j]->SetWindowText("-");
-        m_pbtArrayCmd[j]->RedrawButton(m_pScreen, _p_Scene_background,
-                                       m_pScreenTexture);
+        _p_btArrayCmd[j]->Enable(false);
+        _p_btArrayCmd[j]->SetVisibleState(ButtonGfx::INVISIBLE);
+        _p_btArrayCmd[j]->SetButtonText("-");
+        _p_btArrayCmd[j]->DrawButton(_p_Screen);
     }
 }
 
 void InvidoGfx::setCmdButton(size_t iButtonIndex, eSayPlayer eSay,
                              LPCSTR strCaption) {
     if (iButtonIndex >= 0 && iButtonIndex < NUMOFBUTTON) {
-        m_pbtArrayCmd[iButtonIndex]->SetWindowText(strCaption);
-        m_CmdDet[iButtonIndex] = eSay;
-        m_pbtArrayCmd[iButtonIndex]->RedrawButton(
-            m_pScreen, _p_Scene_background, m_pScreenTexture);
+        _p_btArrayCmd[iButtonIndex]->SetButtonText(strCaption);
+        _CmdDet[iButtonIndex] = eSay;
+        _p_btArrayCmd[iButtonIndex]->DrawButton(_p_Screen);
     } else {
         SDL_assert(0);
     }
@@ -1605,61 +1817,57 @@ void InvidoGfx::setCmdButton(size_t iButtonIndex, eSayPlayer eSay,
 void InvidoGfx::ButCmdClicked(int iButID) {
     if (iButID >= 0 && iButID < NUMOFBUTTON) {
         // first 6 ids are say commands buttons
-        eSayPlayer eSay = m_CmdDet[iButID];
-        if (m_pInvidoCore->Player_saySomething(m_PlayerGuiIndex, eSay)) {
+        eSayPlayer eSay = _CmdDet[iButID];
+        if (_p_InvidoCore->Player_saySomething(_playerGuiIndex, eSay)) {
             // said something admitted
             // disable all buttons
             enableOnlyCmdButtons(0);
             drawStaticScene();
             // play what i say (echo mode)
-            if (g_Options.All.bMyCallEcho) {
-                int iMusId = m_Map_id_EchoSay[eSay];
-                if (m_pMusicMgr->PlayEffect(iMusId)) {
-                    m_DelayAction.CheckPoint(2260,
-                                             DelayNextAction::CHANGE_AVAIL);
+            if (GameSettings::GetSettings()->MusicEnabled) {
+                int iMusId = _Map_id_EchoSay[eSay];
+                if (_p_MusicMgr->PlayEffect(iMusId)) {
+                    _DelayAction.CheckPoint(2260,
+                                            DelayNextAction::CHANGE_AVAIL);
                 }
             }
         }
     }
 }
 
-void InvidoGfx::NtfyTermEff(int iCh) { m_DelayAction.ChangeCurrDelay(50); }
+void InvidoGfx::NtfyTermEff(int iCh) { _DelayAction.ChangeCurrDelay(50); }
 
 // ***************************************************
 //********  interface invido core  callback **********
 // ***************************************************
 
 void InvidoGfx::ALG_Play() {
-    guiPlayerTurn(m_PlayerGuiIndex);
+    guiPlayerTurn(_playerGuiIndex);
     enableCmds();
 }
 
 void InvidoGfx::ALG_HaveToRespond() {
-    TRACE_DEBUG("%s %s\n", lpszCST_SU,
-                m_pLangMgr->GetStringId(Languages::ID_CP_RISP1).c_str());
+    TRACE_DEBUG("%s\n", _p_LangMgr->GetStringId(Languages::ID_SCORE).c_str());
     enableCmds();
 }
 
 void InvidoGfx::ALG_PlayerHasSaid(int iPlayerIx, eSayPlayer SaySomeThing) {
-    m_pbalGfx->Disable();
+    _p_balGfx->StartShow("", 0);
 
-    if (iPlayerIx == m_iOpponentIndex) {
+    if (iPlayerIx == _opponentIndex) {
         // viene solo ripetuta la voce dell'avversario. Quella del giocatore è
         // in echo
-        Player* pPlayer = m_pInvidoCore->GetPlayer(iPlayerIx);
-        STRING lpsNameSay = m_Map_fb_Say[SaySomeThing];
-        TRACE_DEBUG("%s %s %s %s:  %s\n", lpszCST_INFO,
-                    m_pLangMgr->GetStringId(Languages::ID_CP_PLAYER).c_str(),
-                    pPlayer->GetName(),
-                    m_pLangMgr->GetStringId(Languages::ID_CP_DICE).c_str(),
+        Player* pPlayer = _p_InvidoCore->GetPlayer(iPlayerIx);
+        STRING lpsNameSay = _Map_fb_Say[SaySomeThing];
+        TRACE_DEBUG("Player: %s, Said: %s\n", pPlayer->GetName(),
                     lpsNameSay.c_str());
 
-        m_pbalGfx->StartShow(lpsNameSay.c_str());
-        if (g_Options.All.bSoundEffect) {
+        _p_balGfx->StartShow(lpsNameSay.c_str());
+        if (GameSettings::GetSettings()->MusicEnabled) {
             // say also with music
-            int iMusId = m_Map_idSynth_Say[SaySomeThing];
-            m_pMusicMgr->PlayEffect(iMusId);
-            m_DelayAction.CheckPoint(60, DelayNextAction::CHANGE_AVAIL);
+            int iMusId = _Map_idSynth_Say[SaySomeThing];
+            _p_MusicMgr->PlayEffect(iMusId);
+            //_DelayAction.CheckPoint(60, DelayNextAction::CHANGE_AVAIL);
         }
     } else {
         enableCmds();
@@ -1667,23 +1875,22 @@ void InvidoGfx::ALG_PlayerHasSaid(int iPlayerIx, eSayPlayer SaySomeThing) {
 }
 
 void InvidoGfx::ALG_PlayerHasVadoDentro(int iPlayerIx) {
-    if (iPlayerIx == m_PlayerGuiIndex && m_CardVadoDentroIndex >= 0 &&
-        m_CardVadoDentroIndex < NUM_CARDS_HAND) {
-        if (m_aPlayerCards[m_CardVadoDentroIndex].State ==
+    if (iPlayerIx == _playerGuiIndex && _cardVadoDentroIndex >= 0 &&
+        _cardVadoDentroIndex < NUM_CARDS_HAND) {
+        if (_aPlayerCards[_cardVadoDentroIndex].State ==
             CardGfx::CSW_ST_VISIBLE) {
-            TRACE_DEBUG(
-                "card played %s\n",
-                m_aPlayerCards[m_CardVadoDentroIndex].cardSpec.GetName());
+            TRACE_DEBUG("card played %s\n",
+                        _aPlayerCards[_cardVadoDentroIndex].cardSpec.GetName());
 
-            drawVadoDentroCard(&m_aPlayerCards[m_CardVadoDentroIndex]);
+            drawVadoDentroCard(&_aPlayerCards[_cardVadoDentroIndex]);
         }
-        m_DelayAction.CheckPoint(600, DelayNextAction::NOCHANGE);
-    } else if (iPlayerIx == m_iOpponentIndex) {
-        STRING lpsNameSay = m_Map_fb_Say[VADODENTRO];
-        m_pbalGfx->StartShow(lpsNameSay.c_str());
+        //_DelayAction.CheckPoint(600, DelayNextAction::NOCHANGE);
+    } else if (iPlayerIx == _opponentIndex) {
+        std::string lpsNameSay = _Map_fb_Say[SP_VADODENTRO];
+        _p_balGfx->StartShow(lpsNameSay.c_str());
         CardSpec Card;
         Card.SetCardIndex(3);
-        opponentHasPlayedCard(Card, TRUE);
+        opponentHasPlayedCard(Card, true);
     } else {
         SDL_assert(0);
     }
@@ -1692,38 +1899,38 @@ void InvidoGfx::ALG_PlayerHasVadoDentro(int iPlayerIx) {
 void InvidoGfx::opponentHasPlayedCard(CardSpec& Card, bool vadoDentro) {
     bool bFound = false;
     for (int iIndex = 0; !bFound && iIndex < NUM_CARDS_HAND; iIndex++) {
-        if (m_aOpponentCards[iIndex].State == CardGfx::CSW_ST_BACK) {
+        if (_aOpponentCards[iIndex].State == CardGfx::CSW_ST_BACK) {
             if (vadoDentro) {
                 TRACE_DEBUG("Opponent va dentro, draw it\n");
-                drawVadoDentroCard(&m_aOpponentCards[iIndex]);
+                drawVadoDentroCard(&_aOpponentCards[iIndex]);
             } else {
                 TRACE_DEBUG("card played %s\n", Card.GetName());
-                m_aOpponentCards[iIndex].State = CardGfx::CSW_ST_VISIBLE;
-                m_aOpponentCards[iIndex].cardSpec = Card;
-                drawPlayedCard(&m_aOpponentCards[iIndex]);
+                _aOpponentCards[iIndex].State = CardGfx::CSW_ST_VISIBLE;
+                _aOpponentCards[iIndex].cardSpec = Card;
+                drawPlayedCard(&_aOpponentCards[iIndex]);
             }
             bFound = true;
         }
     }
     SDL_assert(bFound);
-    Player* pPlayer = m_pInvidoCore->GetPlayer(m_iOpponentIndex);
+    Player* pPlayer = _p_InvidoCore->GetPlayer(_opponentIndex);
     TRACE_DEBUG("%s %s ha giocato %s\n", lpszCST_INFO, pPlayer->GetName(),
                 Card.GetName());
-    int iNumCardPlayed = m_pMatchPoints->GetCurrNumCardPlayed();
+    int iNumCardPlayed = _p_MatchPoints->GetCurrNumCardPlayed();
     if (iNumCardPlayed == 1) {
         // first card played from opponent, don't need a delay
-        m_DelayAction.CheckPoint(50, DelayNextAction::NOCHANGE);
+        //_DelayAction.CheckPoint(50, DelayNextAction::NOCHANGE);
 
     } else {
         // opponent was not the first, delay action to show a little the current
         // table
-        m_DelayAction.CheckPoint(600, DelayNextAction::NOCHANGE);
+        //_DelayAction.CheckPoint(600, DelayNextAction::NOCHANGE);
     }
 }
 
 void InvidoGfx::ALG_PlayerHasPlayed(int iPlayerIx, const CARDINFO* pCard) {
     // disable ballon
-    m_pbalGfx->Disable();
+    _p_balGfx->StartShow("", 0);
 
     CardSpec Card;
     Card.SetCardInfo(*pCard);
@@ -1731,30 +1938,30 @@ void InvidoGfx::ALG_PlayerHasPlayed(int iPlayerIx, const CARDINFO* pCard) {
     // markup player that have to play
     Player* pPlayer = 0;
 
-    m_pInvidoCore->GetPlayerInPlaying(&pPlayer);
+    _p_InvidoCore->GetPlayerInPlaying(&pPlayer);
     SDL_assert(pPlayer);
 
     if (pPlayer) {
-        m_iPlayerThatHaveMarkup = pPlayer->GetIndex();
+        _playerThatHaveMarkup = pPlayer->GetIndex();
     }
 
     bool bFound = false;
-    if (iPlayerIx == m_iOpponentIndex) {
+    if (iPlayerIx == _opponentIndex) {
         // opponent play a card
-        opponentHasPlayedCard(Card, FALSE);
+        opponentHasPlayedCard(Card, false);
 
-    } else if (iPlayerIx == m_PlayerGuiIndex) {
+    } else if (iPlayerIx == _playerGuiIndex) {
         // HMI has played correctly
         for (int iIndex = 0; !bFound && iIndex < NUM_CARDS_HAND; iIndex++) {
-            if (m_aPlayerCards[iIndex].cardSpec == Card) {
+            if (_aPlayerCards[iIndex].cardSpec == Card) {
                 TRACE_DEBUG("card played %s\n", Card.GetName());
 
-                drawPlayedCard(&m_aPlayerCards[iIndex]);
+                drawPlayedCard(&_aPlayerCards[iIndex]);
                 bFound = true;
             }
         }
         // min dealy before cpu play
-        m_DelayAction.CheckPoint(600, DelayNextAction::NOCHANGE);
+        //_DelayAction.CheckPoint(600, DelayNextAction::NOCHANGE);
 
         SDL_assert(bFound);
     } else {
@@ -1763,14 +1970,14 @@ void InvidoGfx::ALG_PlayerHasPlayed(int iPlayerIx, const CARDINFO* pCard) {
     if (bFound) {
         // card was played correctly
         // make a feedback
-        m_pMusicMgr->PlayEffect(MusicManager::SND_EFC_CLICK);
+        _p_MusicMgr->PlayEffect(MusicManager::SND_EFC_CLICK);
     }
 }
 
 void InvidoGfx::ALG_NewGiocata(const CARDINFO* pCardArray, int iNumOfCards,
                                int iPlayerIx) {
     TRACE_DEBUG("ALG_NewGiocata\n");
-    m_bPlayerCanPlay = false;
+    _isPlayerCanPlay = false;
 
     SDL_assert(iNumOfCards == NUM_CARDS_HAND);
 
@@ -1783,19 +1990,19 @@ void InvidoGfx::ALG_NewGiocata(const CARDINFO* pCardArray, int iNumOfCards,
     CardSpec tmpCardSpec;
     for (int i = 0; i < NUM_CARDS_HAND; i++) {
         tmpCardSpec.SetCardInfo(pCardArray[i]);
-        m_aPlayerCards[i].cardSpec = tmpCardSpec;  // overloaded operator = that
-                                                   // copy all important fields
-        m_aPlayerCards[i].State = CardGfx::CSW_ST_VISIBLE;
+        _aPlayerCards[i].cardSpec = tmpCardSpec;  // overloaded operator = that
+                                                  // copy all important fields
+        _aPlayerCards[i].State = CardGfx::CSW_ST_VISIBLE;
     }
 
     // opponent
     for (int j = 0; j < NUM_CARDS_HAND; j++) {
-        m_aOpponentCards[j].State = CardGfx::CSW_ST_BACK;
+        _aOpponentCards[j].State = CardGfx::CSW_ST_BACK;
     }
 
     // cards played
     for (int k = 0; k < NUM_CARDS_PLAYED; k++) {
-        m_CardsTable[k].State = CardGfx::CSW_ST_INVISIBLE;
+        _CardsTable[k].State = CardGfx::CSW_ST_INVISIBLE;
     }
 
     animateBeginGiocata();
@@ -1803,10 +2010,9 @@ void InvidoGfx::ALG_NewGiocata(const CARDINFO* pCardArray, int iNumOfCards,
 
 void InvidoGfx::ALG_ManoEnd(I_MatchScore* pScore) {
     SDL_assert(pScore);
-    m_bPlayerCanPlay = false;
+    _isPlayerCanPlay = false;
 
     int iPlayerIx = pScore->GetManoWinner();
-    int iManoNum = pScore->GetManoNum();
 
     // necessary to show the cards played on the table
     SDL_Delay(500);
@@ -1814,32 +2020,32 @@ void InvidoGfx::ALG_ManoEnd(I_MatchScore* pScore) {
     // update the screen
     drawStaticScene();
     if (pScore->IsManoPatada()) {
-        PlayersOnTable* pTable = m_pInvidoCore->GetTable();
+        PlayersOnTable* pTable = _p_InvidoCore->GetTable();
 
-        m_iPlayerThatHaveMarkup = pTable->GetFirstOnTrick();
-        Player* pPlayer = pTable->GetPlayerIndex(m_iPlayerThatHaveMarkup);
+        _playerThatHaveMarkup = pTable->GetFirstOnTrick();
+        Player* pPlayer = pTable->GetPlayerIndex(_playerThatHaveMarkup);
 
         // Mano patada, tocca a
         TRACE_DEBUG("%s %s %s\n", lpszCST_INFO,
-                    m_pLangMgr->GetStringId(Languages::ID_CP_MANOPATA).c_str(),
+                    _p_LangMgr->GetStringId(Languages::ID_SCORE).c_str(),
                     pPlayer->GetName());
 
         // animation of pata, use an index outside the player table
         animateManoEnd(21);
     } else {
-        Player* pPlayer = m_pInvidoCore->GetPlayer(iPlayerIx);
+        Player* pPlayer = _p_InvidoCore->GetPlayer(iPlayerIx);
         // Mano vinta da
         TRACE_DEBUG("%s %s %s\n", lpszCST_INFO,
-                    m_pLangMgr->GetStringId(Languages::ID_CP_MANOVINTA).c_str(),
+                    _p_LangMgr->GetStringId(Languages::ID_SCORE).c_str(),
                     pPlayer->GetName());
 
         animateManoEnd(iPlayerIx);
-        m_iPlayerThatHaveMarkup = iPlayerIx;
+        _playerThatHaveMarkup = iPlayerIx;
     }
 
     // cards played
     for (int k = 0; k < NUM_CARDS_PLAYED; k++) {
-        m_CardsTable[k].State = CardGfx::CSW_ST_INVISIBLE;
+        _CardsTable[k].State = CardGfx::CSW_ST_INVISIBLE;
     }
 
     drawStaticScene();
@@ -1852,55 +2058,50 @@ void InvidoGfx::ALG_GiocataEnd(I_MatchScore* pScore) {
     STRING strMsgFinGiocata;
     if (bIsPata) {
         // giocata patada
-        TRACE_DEBUG(
-            "%s %s\n", lpszCST_INFO,
-            m_pLangMgr->GetStringId(Languages::ID_CP_GIOCATAPATA).c_str());
-        strMsgFinGiocata =
-            m_pLangMgr->GetStringId(Languages::ID_CP_GIOCATAPATA);
+        TRACE_DEBUG("%s %s\n", lpszCST_INFO,
+                    _p_LangMgr->GetStringId(Languages::ID_SCORE).c_str());
+        strMsgFinGiocata = _p_LangMgr->GetStringId(Languages::ID_SCORE);
     } else if (pScore->IsGiocataMonte()) {
         // giocata a monte
-        TRACE_DEBUG(
-            "%s %s\n", lpszCST_INFO,
-            m_pLangMgr->GetStringId(Languages::ID_CP_GIOCATAMONTE).c_str());
-        strMsgFinGiocata =
-            m_pLangMgr->GetStringId(Languages::ID_CP_GIOCATAMONTE);
+        TRACE_DEBUG("%s %s\n", lpszCST_INFO,
+                    _p_LangMgr->GetStringId(Languages::ID_SCORE).c_str());
+        strMsgFinGiocata = _p_LangMgr->GetStringId(Languages::ID_SCORE);
         bIsPata = true;
     } else {
         // giocata with a winner
         char buffText[512];
 
         int iPlayLoser;
-        if (iPlayerIx == m_PlayerGuiIndex) {
-            iPlayLoser = m_iOpponentIndex;
+        if (iPlayerIx == _playerGuiIndex) {
+            iPlayLoser = _opponentIndex;
         } else {
-            iPlayLoser = m_PlayerGuiIndex;
+            iPlayLoser = _playerGuiIndex;
         }
-        Player* pPlayer = m_pInvidoCore->GetPlayer(iPlayerIx);
-        Player* pPlLoser = m_pInvidoCore->GetPlayer(iPlayLoser);
+        Player* pPlayer = _p_InvidoCore->GetPlayer(iPlayerIx);
+        Player* pPlLoser = _p_InvidoCore->GetPlayer(iPlayLoser);
 
         // Giocata vinta da
-        TRACE_DEBUG(
-            "%s %s %s (%s %d)\n", lpszCST_INFO,
-            m_pLangMgr->GetStringId(Languages::ID_CP_GIOCATAVINTA).c_str(),
-            pPlayer->GetName(),
-            m_pLangMgr->GetStringId(Languages::ID_CP_PUNTI).c_str(),
-            pScore->GetCurrScore());
+        TRACE_DEBUG("%s %s %s (%s %d)\n", lpszCST_INFO,
+                    _p_LangMgr->GetStringId(Languages::ID_SCORE).c_str(),
+                    pPlayer->GetName(),
+                    _p_LangMgr->GetStringId(Languages::ID_SCORE).c_str(),
+                    pScore->GetCurrScore());
         sprintf(buffText, "%s \"%s\" (%s %d)",
-                m_pLangMgr->GetStringId(Languages::ID_CP_GIOCATAVINTA).c_str(),
+                _p_LangMgr->GetStringId(Languages::ID_SCORE).c_str(),
                 pPlayer->GetName(),
-                m_pLangMgr->GetStringId(Languages::ID_CP_PUNTI).c_str(),
+                _p_LangMgr->GetStringId(Languages::ID_SCORE).c_str(),
                 pScore->GetCurrScore());
         // punti
         TRACE_DEBUG("%s %s %s %d, %s %s %d\n", lpszCST_SCORE,
                     pPlayer->GetName(),
-                    m_pLangMgr->GetStringId(Languages::ID_CP_PUNTI).c_str(),
+                    _p_LangMgr->GetStringId(Languages::ID_SCORE).c_str(),
                     pScore->GetPointsPlayer(iPlayerIx), pPlLoser->GetName(),
-                    m_pLangMgr->GetStringId(Languages::ID_CP_PUNTI).c_str(),
+                    _p_LangMgr->GetStringId(Languages::ID_SCORE).c_str(),
                     pScore->GetPointsPlayer(iPlayLoser));
 
         strMsgFinGiocata = buffText;
     }
-    m_bPlayerCanPlay = false;
+    _isPlayerCanPlay = false;
     drawStaticScene();
     animGiocataEnd(iPlayerIx, bIsPata);
     showOkMsgBox(strMsgFinGiocata.c_str());
@@ -1909,21 +2110,20 @@ void InvidoGfx::ALG_GiocataEnd(I_MatchScore* pScore) {
 void InvidoGfx::ALG_MatchEnd(I_MatchScore* pScore) {
     int iPlayerIx = pScore->GetMatchWinner();
     int iPlayLoser;
-    if (iPlayerIx == m_PlayerGuiIndex) {
-        iPlayLoser = m_iOpponentIndex;
+    if (iPlayerIx == _playerGuiIndex) {
+        iPlayLoser = _opponentIndex;
     } else {
-        iPlayLoser = m_PlayerGuiIndex;
+        iPlayLoser = _playerGuiIndex;
     }
-    Player* pPlayer = m_pInvidoCore->GetPlayer(iPlayerIx);
-    Player* pPlLoser = m_pInvidoCore->GetPlayer(iPlayLoser);
-    m_bPlayerCanPlay = false;
+    Player* pPlayer = _p_InvidoCore->GetPlayer(iPlayerIx);
+    _isPlayerCanPlay = false;
 
     // partita finita. player vince x:x
     char buff[256];
     sprintf(buff, "%s. %s %s  %d : %d.",
-            m_pLangMgr->GetStringId(Languages::ID_CP_PARTITAFIN).c_str(),
+            _p_LangMgr->GetStringId(Languages::ID_SCORE).c_str(),
             pPlayer->GetName(),
-            m_pLangMgr->GetStringId(Languages::ID_CP_VINCE).c_str(),
+            _p_LangMgr->GetStringId(Languages::ID_SCORE).c_str(),
             pScore->GetPointsPlayer(iPlayerIx),
             pScore->GetPointsPlayer(iPlayLoser));
 
@@ -1933,25 +2133,25 @@ void InvidoGfx::ALG_MatchEnd(I_MatchScore* pScore) {
 
     showOkMsgBox(buff);
 
-    m_bMatchTerminated = true;
+    _isMatchTerminated = true;
 }
 
 void InvidoGfx::ALG_GicataScoreChange(eGiocataScoreState eNewScore) {
-    STRING lpsNamePoints = m_MapPunti[eNewScore];
+    STRING lpsNamePoints = _MapPunti[eNewScore];
     // Punteggio della giocata ora è:
     TRACE_DEBUG("%s %s: %s\n", lpszCST_INFO,
-                m_pLangMgr->GetStringId(Languages::ID_CP_NOWPOINTS).c_str(),
+                _p_LangMgr->GetStringId(Languages::ID_SCORE).c_str(),
                 lpsNamePoints.c_str());
 }
 
 void InvidoGfx::ALG_PlayerSaidWrong(int iPlayerIx) {
-    if (iPlayerIx == m_PlayerGuiIndex) {
+    if (iPlayerIx == _playerGuiIndex) {
         // Quello che hai chiamato non è corretto
         TRACE_DEBUG("%s, %s\n", lpszCST_SU,
-                    m_pLangMgr->GetStringId(Languages::ID_CP_BUIADA).c_str());
+                    _p_LangMgr->GetStringId(Languages::ID_SCORE).c_str());
     }
 }
 
 void InvidoGfx::INP_PlayerSay(eSayPlayer eSay) {
-    m_pInvidoCore->Player_saySomething(m_PlayerGuiIndex, eSay);
+    _p_InvidoCore->Player_saySomething(_playerGuiIndex, eSay);
 }
