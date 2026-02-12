@@ -29,58 +29,34 @@ static const int g_PointsTable[] = {
     /*Asso*/ 11, /*Due*/ 12,  /*Tre*/ 13,  /*Quattro*/ 4, /*cinque*/ 5,
     /*Sei*/ 6,   /*Sette*/ 7, /*Fante*/ 8, /*Cavallo*/ 9, /*Re*/ 10};
 
-CardSpec::CardSpec() { Reset(); }
+CardSpec::CardSpec() {
+    SetCardIndex(0);
+}
 
-void CardSpec::SetCardIndex(int itmpIndex) {
-    SDL_assert(itmpIndex >= 0 && itmpIndex <= eGameConst::NUM_CARDS_MAZZBRI);
-    if (itmpIndex >= 0 && itmpIndex <= eGameConst::NUM_CARDS_MAZZBRI) {
-        _cardInfo.byIndex = itmpIndex;
+void CardSpec::SetCardIndex(Uint8 index) {
+    SDL_assert(index >= 0 && index <= eGameConst::NUM_CARDS_MAZZBRI);
+    if (index >= 0 && index <= eGameConst::NUM_CARDS_MAZZBRI) {
+        _index = index;
     } else {
         return;
     }
 
-    if (itmpIndex >= 0 && itmpIndex < eGameConst::NUM_CARDS_MAZZBRI) {
-        _cardInfo.CardName = g_CardsNameX[itmpIndex];
+    if (_index >= 0 && _index < eGameConst::NUM_CARDS_MAZZBRI) {
+        _cardName = std::string(g_CardsNameX[_index]);
     }
 
-    if (_cardInfo.byIndex >= 0 && _cardInfo.byIndex < 10) {
-        _cardInfo.eSuit = eSUIT::BASTONI;
-    } else if (_cardInfo.byIndex >= 10 && _cardInfo.byIndex < 20) {
-        _cardInfo.eSuit = eSUIT::COPPE;
-    } else if (_cardInfo.byIndex >= 20 && _cardInfo.byIndex < 30) {
-        _cardInfo.eSuit = eSUIT::DENARI;
-    } else if (_cardInfo.byIndex >= 30 && _cardInfo.byIndex < 40) {
-        _cardInfo.eSuit = eSUIT::SPADE;
+    if (_index >= 0 && _index < 10) {
+        _eSuit = eSUIT::BASTONI;
+    } else if (_index >= 10 && _index < 20) {
+        _eSuit = eSUIT::COPPE;
+    } else if (_index >= 20 && _index < 30) {
+        _eSuit = eSUIT::DENARI;
+    } else if (_index >= 30 && _index < 40) {
+        _eSuit = eSUIT::SPADE;
     }
-}
-
-void CardSpec::operator=(const CardSpec& r) {
-    _cardInfo.CardName = r._cardInfo.CardName;
-    _cardInfo.byIndex = r._cardInfo.byIndex;
-    _cardInfo.eSuit = r._cardInfo.eSuit;
-}
-
-void CardSpec::Reset() {
-    _cardInfo.byIndex = eGameConst::NOT_VALID_INDEX;
-    _cardInfo.CardName = "";
-    _cardInfo.eSuit = eSUIT::BASTONI;
-}
-
-void CardSpec::SetCardInfo(const CARDINFO& Card) {
-    _cardInfo.CardName = Card.CardName;
-    _cardInfo.byIndex = Card.byIndex;
-    _cardInfo.eSuit = Card.eSuit;
-}
-
-void CardSpec::FillInfo(CARDINFO* pCardInfo) {
-    SDL_assert(pCardInfo);
-    pCardInfo->CardName = _cardInfo.CardName;
-    pCardInfo->byIndex = _cardInfo.byIndex;
-    pCardInfo->eSuit = _cardInfo.eSuit;
 }
 
 int CardSpec::GetPoints() {
-    int ix = GetCardIndex();
-    SDL_assert(ix >= 0 && ix < 40);
-    return g_PointsTable[ix];
+    SDL_assert(_index >= 0 && _index < eGameConst::NUM_CARDS_MAZZBRI);
+    return g_PointsTable[_index];
 }

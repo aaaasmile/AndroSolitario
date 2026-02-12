@@ -1,40 +1,22 @@
 #ifndef ___CARDSPEC_H_
 #define ___CARDSPEC_H_
 
-#include "CardGfx.h"
-#include "Config.h"
-
-typedef struct _CardInfo {
-    int byIndex;
-    eSUIT eSuit;
-    std::string CardName;
-} CARDINFO;
-
 class CardSpec {
    public:
     CardSpec();
-    virtual ~CardSpec() {};
-    void SetCardIndex(int itmpIndex);
-    int GetCardIndex() { return _cardInfo.byIndex; }
-    eSUIT GetSuit() { return _cardInfo.eSuit; }
-    LPCSTR GetName() { return _cardInfo.CardName.c_str(); }
+    void SetCardIndex(Uint8 index);
+    int GetCardIndex() { return _index; }
+    eSUIT GetSuit() { return _eSuit; }
+    LPCSTR GetName() { return _cardName.c_str(); }
     void operator=(const CardSpec& r);
-    bool operator==(const CardSpec& r) {
-        return _cardInfo.byIndex == r._cardInfo.byIndex;
-    }
-    bool operator!=(const CardSpec& r) {
-        return _cardInfo.byIndex != r._cardInfo.byIndex;
-    }
-    void Reset();
-    void SetSymbol(int iVal) { _cardInfo.byIndex = iVal; }
-    int GetSymbol() { return _cardInfo.byIndex; }
-    CARDINFO* GetCardInfo() { return &_cardInfo; }
-    void SetCardInfo(const CARDINFO& Card);
-    void FillInfo(CARDINFO* pCardInfo);
+    bool operator==(const CardSpec& r) { return _index == r._index; }
+    bool operator!=(const CardSpec& r) { return _index != r._index; }
     int GetPoints();
 
    private:
-    CARDINFO _cardInfo;
+    Uint8 _index;
+    eSUIT _eSuit;
+    std::string _cardName;
 };
 
 typedef std::vector<CardSpec> VCT_CARDSPEC;
