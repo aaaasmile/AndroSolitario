@@ -1,20 +1,24 @@
 #include "DeckLoader.h"
-#include "Config.h"
+
 #include <SDL3_image/SDL_image.h>
+
+#include "Config.h"
 
 static const char* g_lpszDeckDir = DATA_PREFIX "decks/";
 static const char* g_lpszSymbDir = DATA_PREFIX "images/";
 
-DeckLoader::DeckLoader(){
+DeckLoader::DeckLoader() {
     _p_Deck = NULL;
     _p_Symbols = NULL;
     _CardWidth = 0;
     _CardHeight = 0;
     _SymbolWidth = 0;
     _SymbolHeight = 0;
+    _PacWidth = 0;
+    _PacHeight = 0;
 }
 
-DeckLoader::~DeckLoader(){
+DeckLoader::~DeckLoader() {
     if (_p_Deck != NULL) {
         SDL_DestroySurface(_p_Deck);
         _p_Deck = NULL;
@@ -25,7 +29,7 @@ DeckLoader::~DeckLoader(){
     }
 }
 
-LPErrInApp DeckLoader::LoadCardPac(DeckType& deckType){
+LPErrInApp DeckLoader::LoadCardPac(DeckType& deckType) {
     Uint16 w, h;
     LPErrInApp err = loadCardPac(&_p_Deck, deckType, &w, &h);
     if (err != NULL) {
@@ -34,12 +38,13 @@ LPErrInApp DeckLoader::LoadCardPac(DeckType& deckType){
     TRACE("Pac size  w = %d, h = %d\n", w, h);
     _CardWidth = w / 4;
     _CardHeight = h / deckType.GetNumCardInSuit();
+    _PacWidth = w;
+    _PacHeight = h;
     return NULL;
 }
 
-
 LPErrInApp DeckLoader::loadCardPac(SDL_Surface** pp_Deck, DeckType& deckType,
-                                 Uint16* pac_w, Uint16* pac_h) {
+                                   Uint16* pac_w, Uint16* pac_h) {
     TRACE("Load card Pac %s\n", deckType.GetDeckName().c_str());
     Uint32 timetag;
     char description[100];
@@ -136,4 +141,3 @@ LPErrInApp DeckLoader::LoadSymbolsForPac(DeckType& deckType) {
 
     return NULL;
 }
-

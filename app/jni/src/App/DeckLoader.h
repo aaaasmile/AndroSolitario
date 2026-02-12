@@ -17,6 +17,8 @@ class DeckLoader {
     int GetCardHeight() { return _CardHeight; }
     int GetSymbolWidth() { return _SymbolWidth; }
     int GetSymbolHeight() { return _SymbolHeight; }
+    int GetPacWidth() { return _PacWidth; }
+    int GetPacHeight() { return _PacHeight; }
     SDL_Surface* GetDeckSurface() { return _p_Deck; }
     SDL_Surface* GetSymbolSurface() { return _p_Symbols; }
 
@@ -32,6 +34,8 @@ class DeckLoader {
     int _CardHeight;
     int _SymbolWidth;
     int _SymbolHeight;
+    int _PacWidth;
+    int _PacHeight;
 };
 
 #endif

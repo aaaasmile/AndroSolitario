@@ -2,6 +2,7 @@
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
 
+#include "DeckLoader.h"
 #include "ErrorInfo.h"
 #include "GfxUtil.h"
 
@@ -32,12 +33,15 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[]) {
                                      SDL_LOGICAL_PRESENTATION_LETTERBOX);
 
     g_deckType.SetType(eDeckType::TAROCK_PIEMONT);
-    LPErrInApp err =
-        GFX_UTIL::LoadCardPac(&pDeckSurf, g_deckType, &g_pac_w, &g_pac_h);
+    DeckLoader* pDeckLoader = new DeckLoader();
+    LPErrInApp err = pDeckLoader->LoadCardPac(g_deckType);
     if (err != NULL) {
         SDL_Log("error: %s", err->ErrorText.c_str());
         return SDL_APP_FAILURE;
     }
+    pDeckSurf = pDeckLoader->GetDeckSurface();
+    g_pac_w = pDeckLoader->GetPacWidth();
+    g_pac_h = pDeckLoader->GetPacHeight();
 
     g_pTexture = SDL_CreateTextureFromSurface(g_pRenderer, pDeckSurf);
     if (g_pTexture == NULL) {
