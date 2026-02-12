@@ -135,26 +135,24 @@ class InvidoGfx : public I_ALG_Player {
     void showPopUpCallMenu(CardSpec& cardClicked, int iX, int iY,
                            eSayPlayer* peSay);
     void opponentHasPlayedCard(CardSpec& Card, bool vadoDentro);
+    ClickCb prepClickCb();
+    void updateTextureAsFlipScreen();
+    void setDeckType(DeckType& dt) { _deckType.CopyFrom(dt); }
+    void setMapValues();
 
    private:
     SDL_Surface* _p_Screen;
-    SDL_Renderer* _p_sdlRenderer;
-    SDL_Texture* _p_ScreenTexture;
     SDL_Surface* _p_Scene_background;
     SDL_Surface* _p_AlphaDisplay;
     SDL_Surface* _p_Deck;
     SDL_Surface* _p_Symbols;
     SDL_Rect _SrcBack;
     SDL_Rect _SrcCard;
-    DeckType* _p_DeckType;
+    DeckType _deckType;
     TTF_Font* _p_FontStatus;
     TTF_Font* _p_FontText;
     SDL_Surface* _p_Surf_Bar;
     InvidoCore* _p_InvidoCore;
-    int _cardWidth;
-    int _cardHeight;
-    int _symbolWidth;
-    int _symbolHeigth;
     CardGfx _aPlayerCards[NUM_CARDS_HAND];
     CardGfx _aOpponentCards[NUM_CARDS_HAND];
     CardGfx _CardsTakenPla;
@@ -175,9 +173,10 @@ class InvidoGfx : public I_ALG_Player {
     ButtonGfx* _p_btArrayCmd[NUMOFBUTTON];
     eSayPlayer _CmdDet[NUMOFBUTTON];
     BalloonGfx* _p_balGfx;
-    Languages* _p_LangMgr;
     MusicManager* _p_MusicMgr;
     bool _isMatchTerminated;
+    UpdateScreenCb _fnUpdateScreen;
+    SDL_Window* _p_Window;
 };
 
 #endif

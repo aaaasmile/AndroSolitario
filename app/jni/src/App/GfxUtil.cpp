@@ -7,8 +7,6 @@
 
 #include "Config.h"
 
-const char* g_lpszDeckDir = DATA_PREFIX "decks/";
-
 SDL_Color GFX_UTIL_COLOR::White = {255, 255, 255, 0};
 SDL_Color GFX_UTIL_COLOR::Gray = {128, 128, 128, 0};
 SDL_Color GFX_UTIL_COLOR::Red = {255, 0, 0, 0};
@@ -212,64 +210,6 @@ void GFX_UTIL::FillRect(SDL_Surface* screen, int x0, int y0, int width,
                         int height, Uint32 color) {
     SDL_Rect rect = {x0, y0, width, height};
     SDL_FillSurfaceRect(screen, &rect, color);
-}
-
-LPErrInApp GFX_UTIL::LoadCardPac(SDL_Surface** pp_Deck, DeckType& deckType,
-                                 Uint16* pac_w, Uint16* pac_h) {
-    TRACE("Load card Pac %s\n", deckType.GetDeckName().c_str());
-    Uint32 timetag;
-    char description[100];
-    Uint8 num_anims;
-    Uint16 w, h;
-    Uint16 frames;
-    Uint16 ignore;
-
-    std::string strFileName = g_lpszDeckDir;
-    strFileName += deckType.GetResFileName();
-
-    SDL_IOStream* src = SDL_IOFromFile(strFileName.c_str(), "rb");
-    if (src == 0) {
-        return ERR_UTIL::ErrorCreate(
-            "SDL_RWFromFile on pac file error (file %s): %s\n",
-            strFileName.c_str(), SDL_GetError());
-    }
-    SDL_ReadIO(src, description, 100);
-    SDL_ReadU32LE(src, &timetag);
-    // TRACE_DEBUG("Timetag is %d\n", timetag);
-    SDL_ReadIO(src, &num_anims, 1);
-    // width of the picture (pac of 4 cards)
-    SDL_ReadU16LE(src, &w);
-    // height of the picture (pac of 10 rows of cards)
-    SDL_ReadU16LE(src, &h);
-    SDL_ReadU16LE(src, &frames);
-
-    for (int i = 0; i < frames; i++) {
-        SDL_ReadU16LE(src, &ignore);
-    }
-
-    *pp_Deck = IMG_LoadTyped_IO(src, false, "PNG");
-    if (!*pp_Deck) {
-        SDL_CloseIO(src);
-        return ERR_UTIL::ErrorCreate(
-            "IMG_LoadPNG_RW on pac file error (file %s): %s\n",
-            strFileName.c_str(), SDL_GetError());
-    }
-    Uint8 red_trasp = 0, green_trasp = 128, blue_trasp = 0;
-    if (deckType.GetType() == eDeckType::TAROCK_PIEMONT) {
-        red_trasp = 248;
-        green_trasp = 0;
-        blue_trasp = 241;
-    }
-    SDL_SetSurfaceColorKey(
-        *pp_Deck, true,
-        SDL_MapRGB(SDL_GetPixelFormatDetails((*pp_Deck)->format),
-                   SDL_GetSurfacePalette(*pp_Deck), red_trasp, green_trasp,
-                   blue_trasp));
-    *pac_h = h;
-    *pac_w = w;
-
-    SDL_CloseIO(src);
-    return NULL;
 }
 
 void GFX_UTIL::DrawStaticBrokenLine(SDL_Surface* screen, int x0, int y0, int x1,

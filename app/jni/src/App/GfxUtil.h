@@ -34,8 +34,6 @@ void DrawStaticBrokenLine(SDL_Surface* screen, int x0, int y0, int x1, int y1,
 void DrawRect(SDL_Surface* screen, int x, int y, int dx, int dy, SDL_Color c);
 void FillRect(SDL_Surface* screen, int x0, int y0, int width, int height,
               Uint32 color);
-LPErrInApp LoadCardPac(SDL_Surface** pp_Deck, DeckType& deckType, Uint16* pac_w,
-                       Uint16* pac_h);
 SDL_Surface* SDL_CreateRGBSurface(int width, int height, int depth,
                                   Uint32 Rmask, Uint32 Gmask, Uint32 Bmask,
                                   Uint32 Amask);

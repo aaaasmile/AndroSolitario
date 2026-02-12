@@ -17,6 +17,7 @@ class HighScore;
 class MusicManager;
 class FadeAction;
 class MesgBoxGfx;
+class DeckLoader;
 
 typedef std::vector<CardRegionGfx>::iterator regionVI;
 
@@ -148,9 +149,6 @@ class SolitarioGfx {
 
     LPErrInApp VictoryAnimationIterate();
 
-    LPErrInApp LoadCardPac();
-    LPErrInApp LoadSymbolsForPac();
-
     void SetSymbol(int regionNo, int symbol) {
         _cardRegionList[regionNo].SetSymbol(symbol);
     }
@@ -249,8 +247,6 @@ class SolitarioGfx {
     int _oldx;
     int _oldy;
 
-    SDL_Surface* _p_Deck;
-    SDL_Surface* _p_Symbols;
     DeckType _deckType;
 
     bool _startdrag;
@@ -281,6 +277,7 @@ class SolitarioGfx {
     bool _isInitDrag;
     int _doubleTapWait;
     float _scaleFactor;
+    DeckLoader *_p_DeckLoader;
 };
 
 #endif

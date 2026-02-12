@@ -16,6 +16,7 @@ set(SOURCES App/MusicManager.cpp
             App/AppGfx.cpp
             App/CardGfx.cpp
             App/DeckType.cpp
+            App/DeckLoader.cpp
             App/GameSettings.cpp
             App/GfxUtil.cpp
             App/Languages.cpp
