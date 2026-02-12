@@ -8,10 +8,10 @@
 
 #include "AlgPlayerInterface.h"
 #include "CardGfx.h"
-#include "InvidoCore.h"
-#include "Traits.h"
 #include "Config.h"
 #include "ErrorInfo.h"
+#include "InvidoCore.h"
+#include "Traits.h"
 
 using namespace traits;
 
@@ -32,6 +32,7 @@ class BalloonGfx;
 class Languages;
 class MusicManager;
 class DeckLoader;
+class MesgBoxGfx;
 
 typedef std::map<eGiocataScoreState, STRING> MAP_SCORE;
 typedef std::map<eSayPlayer, STRING> MAP_SAY;
@@ -72,13 +73,11 @@ class InvidoGfx : public I_ALG_Player {
     LPErrInApp HandleIterate(bool& done);
     LPErrInApp Show();
 
-    void MatchLoop();
     void InitInvidoVsCPU();
     void INP_PlayerSay(eSayPlayer eSay);
     void ButCmdClicked(int iButID);
-    void NtfyTermEff(int iCh);
     Player* GetPlayer(int iIndex) { return _p_InvidoCore->GetPlayer(iIndex); }
-
+    // TODO here I_Match_Observer trait. I_ALG_Player should be for CPU and UI user.    
     // Interface I_ALG_Player (callback functions from core invido engine)
     virtual void ALG_SetCoreInterface(I_CORE_Game* pCore) {}
     virtual void ALG_SetPlayerIndex(int iIndex) { _playerGuiIndex = iIndex; }
@@ -133,7 +132,7 @@ class InvidoGfx : public I_ALG_Player {
     void showOkMsgBox(LPCSTR strText);
     int showYesNoMsgBox(LPCSTR strText);
     void animateManoEnd(int iPlayerIx);
-    void showPopUpCallMenu(CardSpec& cardClicked, int iX, int iY,
+    void showPopUpCallMenu(int iX, int iY,
                            eSayPlayer* peSay);
     void opponentHasPlayedCard(CardSpec& Card, bool vadoDentro);
     ClickCb prepClickCb();
@@ -178,7 +177,8 @@ class InvidoGfx : public I_ALG_Player {
     bool _isMatchTerminated;
     UpdateScreenCb _fnUpdateScreen;
     SDL_Window* _p_Window;
-    DeckLoader *_p_DeckLoader;
+    DeckLoader* _p_DeckLoader;
+    MesgBoxGfx* _p_MsgBox;
 };
 
 #endif

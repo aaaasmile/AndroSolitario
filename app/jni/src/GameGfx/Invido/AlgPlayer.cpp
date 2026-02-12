@@ -48,7 +48,6 @@ void AlgAdvancedPlayer::ALG_NewMatch(int iNumPlayer) {}
 void AlgAdvancedPlayer::ALG_NewGiocata(const CARDINFO* pCardArray,
                                        int iNumOfCards, int iPlayerIx) {
     SDL_assert(iNumOfCards == NUM_CARDS_HAND);
-    CardSpec cardUndef;
     int i;
     m_iNumManiWon = 0;
     m_iNumChiamateMonte = 0;
@@ -118,7 +117,6 @@ void AlgAdvancedPlayer::ALG_PlayerHasPlayed(int iPlayerIx,
                                             const CARDINFO* pCard) {
     SDL_assert(pCard);
     SDL_assert(pCard->byIndex != eGameConst::NOT_VALID_INDEX);
-    CardSpec cardUndef;
     int i;
     if (iPlayerIx == m_iMyIndex) {
         CardSpec Card;

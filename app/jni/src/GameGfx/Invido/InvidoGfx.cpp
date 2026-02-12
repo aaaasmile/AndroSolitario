@@ -7,6 +7,7 @@
 
 #include "BalloonGfx.h"
 #include "ButtonGfx.h"
+#include "DeckLoader.h"
 #include "DeckType.h"
 #include "GameSettings.h"
 #include "GfxUtil.h"
@@ -15,7 +16,6 @@
 #include "MesgBoxGfx.h"
 #include "MusicManager.h"
 #include "PopUpMenuGfx.h"
-#include "DeckLoader.h"
 
 static const char* lpszImageDir = DATA_PREFIX "images/invido/";
 static const char* lpszImageBack = "im000740.jpg";
@@ -46,34 +46,33 @@ static void fncBind_ButtonClicked(void* self, int iVal) {
     pInvidoGfx->ButCmdClicked(iVal);
 }
 
-
 InvidoGfx::InvidoGfx() {
-    _p_Scene_background = 0;
-    _p_FontText = 0;
-    _p_Surf_Bar = 0;
+    _p_Scene_background = NULL;
+    _p_MsgBox = NULL;
+    _p_FontText = NULL;
+    _p_Surf_Bar = NULL;
 
-    _p_Deck = 0;
-    _p_Symbols = 0;
-    _p_FontStatus = 0;
+    _p_Deck = NULL;
+    _p_Symbols = NULL;
+    _p_FontStatus = NULL;
 
     for (int i = 0; i < InvidoGfx::NUM_ANIMAGES; i++) {
-        _p_AnImages[i] = 0;
+        _p_AnImages[i] = NULL;
     }
-    _p_MatchPoints = 0;
-    _p_InvidoCore = 0;
+    _p_MatchPoints = NULL;
+    _p_InvidoCore = NULL;
     _isPlayerCanPlay = false;
     _playerThatHaveMarkup = 0;
     for (int j = 0; j < InvidoGfx::NUMOFBUTTON; j++) {
-        _p_btArrayCmd[j] = 0;
+        _p_btArrayCmd[j] = NULL;
     }
-    _p_MusicMgr = 0;
+    _p_MusicMgr = NULL;
     _isMatchTerminated = false;
-    _p_AlphaDisplay = 0;
+    _p_AlphaDisplay = NULL;
     _p_DeckLoader = new DeckLoader();
 }
 
 InvidoGfx::~InvidoGfx() { cleanup(); }
-
 
 LPErrInApp InvidoGfx::Initialize(SDL_Surface* pScreen,
                                  UpdateScreenCb& fnUpdateScreen,
@@ -90,7 +89,7 @@ LPErrInApp InvidoGfx::Initialize(SDL_Surface* pScreen,
 
     GameSettings* pGameSettings = GameSettings::GetSettings();
     setDeckType(pGameSettings->DeckTypeVal);
-   
+
     if (_deckType.IsPacType()) {
         TRACE("Deck Pac stuff\n");
         err = _p_DeckLoader->LoadCardPac(_deckType);
@@ -152,7 +151,7 @@ LPErrInApp InvidoGfx::Initialize(SDL_Surface* pScreen,
     return NULL;
 }
 
-void InvidoGfx::setMapValues(){
+void InvidoGfx::setMapValues() {
     GameSettings* pGameSettings = GameSettings::GetSettings();
     Languages* pLangMgr = pGameSettings->GetLanguageMan();
     // points name
@@ -254,7 +253,6 @@ void InvidoGfx::setMapValues(){
     _Map_idSynth_Say[eSayPlayer::SP_GIOCA] = MusicManager::SND_WAV_SYF_GIOCA;
 }
 
-
 ClickCb InvidoGfx::prepClickCb() {
     static VClickCb const tc = {.Click = (&fncBind_ButtonClicked)};
     return (ClickCb){.tc = &tc, .self = this};
@@ -267,8 +265,6 @@ LPErrInApp InvidoGfx::HandleEvent(SDL_Event* pEvent,
     return NULL;
 }
 LPErrInApp InvidoGfx::HandleIterate(bool& done) { return NULL; }
-
-LPErrInApp InvidoGfx::Show() { return NULL; }
 
 void InvidoGfx::cleanup() {
     if (_p_Scene_background) {
@@ -311,19 +307,15 @@ void InvidoGfx::drawStaticScene() {
 
     showPlayerMarkup(_playerThatHaveMarkup);
 
-    // shows names
     renderPlayerName(PLAYER1);
     renderPlayerName(PLAYER2);
 
-    // show score (leds and points)
     showCurrentScore();
 
-    // draw command buttons
     for (int j = 0; j < NUMOFBUTTON; j++) {
         _p_btArrayCmd[j]->DrawButton(_p_Screen);
     }
 
-    // ballon
     _p_balGfx->Draw(_p_Screen);
 
     updateTextureAsFlipScreen();
@@ -334,6 +326,7 @@ void InvidoGfx::updateTextureAsFlipScreen() {
 }
 
 void InvidoGfx::renderCard(CardGfx* pCard) {
+    // TODO should be pCard->Render(_p_Screen)
     if (pCard->State == CardGfx::CSW_ST_INVISIBLE) {
         return;
     } else if (pCard->State == CardGfx::CSW_ST_SYMBOL) {
@@ -372,41 +365,47 @@ void InvidoGfx::renderPlayerName(int iPlayerIx) {
 void InvidoGfx::createRegionsInit() {
     // opponent cards
     for (int i = 0; i < NUM_CARDS_HAND; i++) {
-        _aOpponentCards[i]._x = (_cardWidth * i) + ((i + 1) * 17);
+        _aOpponentCards[i]._x =
+            (_p_DeckLoader->GetCardWidth() * i) + ((i + 1) * 17);
         _aOpponentCards[i]._y = 10;
         _aOpponentCards[i].SetDeckSurface(_p_Deck);
-        _aOpponentCards[i].SetWidth(_cardWidth);
-        _aOpponentCards[i].SetHeight(_cardHeight);
-        _aOpponentCards[i].SetSymbSurf(_p_Symbols, _symbolWidth, _symbolHeigth);
+        _aOpponentCards[i].SetWidth(_p_DeckLoader->GetCardWidth());
+        _aOpponentCards[i].SetHeight(_p_DeckLoader->GetCardHeight());
+        _aOpponentCards[i].SetSymbSurf(_p_Symbols,
+                                       _p_DeckLoader->GetSymbolWidth(),
+                                       _p_DeckLoader->GetSymbolHeight());
     }
 
     // player cards
     for (int k = 0; k < NUM_CARDS_HAND; k++) {
-        _aPlayerCards[k]._x = (_cardWidth * k) + ((k + 1) * 17);
-        _aPlayerCards[k]._y = _cardHeight * 3 + 10;
-        _aPlayerCards[k].SetWidth(_cardWidth);
-        _aPlayerCards[k].SetHeight(_cardHeight);
+        _aPlayerCards[k]._x =
+            (_p_DeckLoader->GetCardWidth() * k) + ((k + 1) * 17);
+        _aPlayerCards[k]._y = _p_DeckLoader->GetCardHeight() * 3 + 10;
+        _aPlayerCards[k].SetWidth(_p_DeckLoader->GetCardWidth());
+        _aPlayerCards[k].SetHeight(_p_DeckLoader->GetCardHeight());
         _aPlayerCards[k].SetDeckSurface(_p_Deck);
-        _aPlayerCards[k].SetSymbSurf(_p_Symbols, _symbolWidth, _symbolHeigth);
+        _aPlayerCards[k].SetSymbSurf(_p_Symbols,
+                                     _p_DeckLoader->GetSymbolWidth(),
+                                     _p_DeckLoader->GetSymbolHeight());
     }
 
     // cards played
     for (int g = 0; g < NUM_CARDS_PLAYED; g++) {
-        _CardsTable[g]._x = (_cardWidth * (2 - 1)) + ((2 + g * 3) * 17);
-        _CardsTable[g]._y = _cardHeight * 2 - _cardHeight / 2 + 10;
+        _CardsTable[g]._x =
+            (_p_DeckLoader->GetCardWidth() * (2 - 1)) + ((2 + g * 3) * 17);
+        _CardsTable[g]._y = _p_DeckLoader->GetCardHeight() * 2 -
+                            _p_DeckLoader->GetCardHeight() / 2 + 10;
         _CardsTable[g].State = CardGfx::CSW_ST_INVISIBLE;
         _CardsTable[g].SetDeckSurface(_p_Deck);
-        _CardsTable[g].SetWidth(_cardWidth);
-        _CardsTable[g].SetHeight(_cardHeight);
-        _CardsTable[g].SetSymbSurf(_p_Symbols, _symbolWidth, _symbolHeigth);
+        _CardsTable[g].SetWidth(_p_DeckLoader->GetCardWidth());
+        _CardsTable[g].SetHeight(_p_DeckLoader->GetCardHeight());
+        _CardsTable[g].SetSymbSurf(_p_Symbols, _p_DeckLoader->GetSymbolWidth(),
+                                   _p_DeckLoader->GetSymbolHeight());
     }
 }
 
 void InvidoGfx::animateBeginGiocata() {
     TRACE_DEBUG("animateBeginGiocata - begin\n");
-    Uint32 uiTickTot = 0;
-    Uint64 uiInitialTick = SDL_GetTicks();
-    Uint64 uiLast_time = uiInitialTick;
     CardGfx cardTmp[NUM_CARDS_HAND];
     for (int i = 0; i < NUM_CARDS_HAND; i++) {
         cardTmp[i].Copy(&_aPlayerCards[i]);
@@ -419,48 +418,34 @@ void InvidoGfx::animateBeginGiocata() {
     int yspeed = 0;
     int xspeed = 0;
     int GRAVITY = 1;
-    do {
-        // clear screen
-        SDL_BlitSurface(_p_Scene_background, NULL, _p_Screen, NULL);
+    // clear screen
+    SDL_BlitSurface(_p_Scene_background, NULL, _p_Screen, NULL);
 
-        for (int iManoNum = 0; iManoNum < NUM_CARDS_HAND; iManoNum++) {
-            if (iManoNum == 0) {
-                if (cardTmp[iManoNum]._x >
-                    _aPlayerCards[NUM_CARDS_HAND - 1]._x +
-                        _aPlayerCards[NUM_CARDS_HAND - 1].Width()) {
-                    // go back on x
-                    xspeed = -6;
-                }
-                yspeed = yspeed + GRAVITY;
-                xspeed = xspeed + GRAVITY;
+    for (int iManoNum = 0; iManoNum < NUM_CARDS_HAND; iManoNum++) {
+        if (iManoNum == 0) {
+            if (cardTmp[iManoNum]._x >
+                _aPlayerCards[NUM_CARDS_HAND - 1]._x +
+                    _aPlayerCards[NUM_CARDS_HAND - 1].Width()) {
+                // go back on x
+                xspeed = -6;
             }
-            cardTmp[iManoNum]._x += xspeed;
-            cardTmp[iManoNum]._y += yspeed;
-
-            if (cardTmp[iManoNum]._y >= _aPlayerCards[iManoNum]._y) {
-                // ok the card reach the position
-                cardTmp[iManoNum]._y = _aPlayerCards[iManoNum]._y;
-                cardTmp[iManoNum]._x = _aPlayerCards[iManoNum]._x;
-                // uiTickTot
-            }
-
-            // update card position
-            cardTmp[iManoNum].DrawCard(_p_Screen);
+            yspeed = yspeed + GRAVITY;
+            xspeed = xspeed + GRAVITY;
         }
-        SDL_UpdateTexture(_p_ScreenTexture, NULL, _p_Screen->pixels,
-                          _p_Screen->pitch);  // sdl 2.0
-        SDL_RenderClear(_p_sdlRenderer);
-        SDL_RenderTexture(_p_sdlRenderer, _p_ScreenTexture, NULL, NULL);
-        SDL_RenderPresent(_p_sdlRenderer);
+        cardTmp[iManoNum]._x += xspeed;
+        cardTmp[iManoNum]._y += yspeed;
 
-        // synch to frame rate
-        Uint64 uiNowTime = SDL_GetTicks();
-        uiTickTot = (Uint32)(uiNowTime - uiInitialTick);
-        if (uiNowTime < uiLast_time + (1000 / FPS)) {
-            SDL_Delay((Uint32)(uiLast_time + (1000 / FPS) - uiNowTime));
-            uiLast_time = uiNowTime;
+        if (cardTmp[iManoNum]._y >= _aPlayerCards[iManoNum]._y) {
+            // ok the card reach the position
+            cardTmp[iManoNum]._y = _aPlayerCards[iManoNum]._y;
+            cardTmp[iManoNum]._x = _aPlayerCards[iManoNum]._x;
+            // uiTickTot
         }
-    } while (uiTickTot < 1500);
+
+        // update card position
+        cardTmp[iManoNum].DrawCard(_p_Screen);
+    }
+    updateTextureAsFlipScreen();
 
     TRACE_DEBUG("animateBeginGiocata - end\n");
 
@@ -482,107 +467,72 @@ void InvidoGfx::animateManoEnd(int iPlayerIx) {
     int iPhase1Speed = 2;
     int iPhase2Speed = 1;
 
-    // switch (g_Options.All.iAniSpeedLevel) { // Options logic seems missing or
-    // changed
-    //     case 0: iPhase1Speed = 1; iPhase2Speed = 1; break;
-    //     case 1: iPhase1Speed = 2; iPhase2Speed = 2; break;
-    //     case 2: iPhase1Speed = 3; iPhase2Speed = 3; break;
-    //     case 3: iPhase1Speed = 5; iPhase2Speed = 5; break;
-    //     case 4: iPhase1Speed = 7; iPhase2Speed = 7; break;
-    //     case 5: iPhase1Speed = 10; iPhase2Speed = 10; break;
-    //     default: iPhase1Speed = 2; iPhase2Speed = 1; break;
-    // }
-
     // move on x
     cardTmp[0]._vy = 0;
     cardTmp[0]._vx = +iPhase1Speed;
     cardTmp[1]._vy = 0;
     cardTmp[1]._vx = -iPhase1Speed;
 
-    // freeze the current display used as background
-    SDL_Surface* pCurrentDisplay = GFX_UTIL::SDL_CreateRGBSurface(
-        _p_Screen->w, _p_Screen->h, 32, 0, 0, 0, 0);
-
-    SDL_BlitSurface(_p_Screen, NULL, pCurrentDisplay, NULL);
-
     bool bEnd = false;
     bool bPhase1_X = false;
     int loopCount = 0;
-    do {
-        // clear screen
-        SDL_BlitSurface(pCurrentDisplay, NULL, _p_AlphaDisplay, NULL);
+    SDL_BlitSurface(_p_Screen, NULL, _p_AlphaDisplay, NULL);
 
-        for (int iCardPlayedIndex = 0; iCardPlayedIndex < NUM_CARDS_PLAYED;
-             iCardPlayedIndex++) {
-            cardTmp[iCardPlayedIndex]._x += cardTmp[iCardPlayedIndex]._vx;
-            cardTmp[iCardPlayedIndex]._y += cardTmp[iCardPlayedIndex]._vy;
+    for (int iCardPlayedIndex = 0; iCardPlayedIndex < NUM_CARDS_PLAYED;
+         iCardPlayedIndex++) {
+        cardTmp[iCardPlayedIndex]._x += cardTmp[iCardPlayedIndex]._vx;
+        cardTmp[iCardPlayedIndex]._y += cardTmp[iCardPlayedIndex]._vy;
 
-            if (cardTmp[iCardPlayedIndex].State == CardGfx::CSW_ST_VISIBLE) {
-                // update card position
-                cardTmp[iCardPlayedIndex].DrawCard(_p_AlphaDisplay);
+        if (cardTmp[iCardPlayedIndex].State == CardGfx::CSW_ST_VISIBLE) {
+            // update card position
+            cardTmp[iCardPlayedIndex].DrawCard(_p_AlphaDisplay);
+        }
+    }
+    if (!bPhase1_X && cardTmp[1]._x <= cardTmp[0]._x) {
+        // ok the card reach the central position
+        cardTmp[0]._vx = 0;
+        cardTmp[1]._vx = 0;
+        bPhase1_X = true;
+    }
+
+    int iIncVel = iPhase2Speed;
+
+    if (bPhase1_X) {
+        // second step, move cards to the trick winner
+        if (iPlayerIx == 0) {
+            cardTmp[0]._vy += iIncVel;
+            cardTmp[1]._vy += iIncVel;
+            if (cardTmp[1]._y >= _p_Screen->h) {
+                // cards outside of the screen
+                bEnd = true;
+            }
+        } else if (iPlayerIx == 1) {
+            cardTmp[0]._vy -= iIncVel;
+            cardTmp[1]._vy -= iIncVel;
+            if (cardTmp[0]._y <= 0) {
+                // cards outside of the screen
+                bEnd = true;
+            }
+        } else {
+            // patada
+            cardTmp[0]._vx -= iIncVel;
+            cardTmp[1]._vx -= iIncVel;
+            if (cardTmp[1]._x <= 0) {
+                // cards outside of the screen
+                bEnd = true;
             }
         }
-        if (!bPhase1_X && cardTmp[1]._x <= cardTmp[0]._x) {
-            // ok the card reach the central position
-            cardTmp[0]._vx = 0;
-            cardTmp[1]._vx = 0;
-            bPhase1_X = true;
-        }
+    }
 
-        SDL_BlitSurface(_p_AlphaDisplay, NULL, _p_Screen, NULL);
-        SDL_UpdateTexture(_p_ScreenTexture, NULL, _p_Screen->pixels,
-                          _p_Screen->pitch);  // sdl 2.0
-        SDL_RenderTexture(_p_sdlRenderer, _p_ScreenTexture, NULL, NULL);
-        SDL_RenderPresent(_p_sdlRenderer);
-
-        int iIncVel = iPhase2Speed;
-
-        if (bPhase1_X) {
-            // second step, move cards to the trick winner
-            if (iPlayerIx == 0) {
-                cardTmp[0]._vy += iIncVel;
-                cardTmp[1]._vy += iIncVel;
-                if (cardTmp[1]._y >= _p_Screen->h) {
-                    // cards outside of the screen
-                    bEnd = true;
-                }
-            } else if (iPlayerIx == 1) {
-                cardTmp[0]._vy -= iIncVel;
-                cardTmp[1]._vy -= iIncVel;
-                if (cardTmp[0]._y <= 0) {
-                    // cards outside of the screen
-                    bEnd = true;
-                }
-            } else {
-                // patada
-                cardTmp[0]._vx -= iIncVel;
-                cardTmp[1]._vx -= iIncVel;
-                if (cardTmp[1]._x <= 0) {
-                    // cards outside of the screen
-                    bEnd = true;
-                }
-            }
-        }
-
-        // synch to frame rate
-        Uint64 uiNowTime = SDL_GetTicks();
-        uiTickTot = (Uint32)(uiNowTime - uiInitialTick);
-        if (uiNowTime < uiLast_time + uiFrameRate) {
-            SDL_Delay((Uint32)(uiLast_time + uiFrameRate - uiNowTime));
-            uiLast_time = uiNowTime;
-        }
-        loopCount += 1;
-        if (loopCount > 1000) {
-            bEnd = true;
-        }
-    } while (!bEnd);
-
-    SDL_DestroySurface(pCurrentDisplay);
+    loopCount += 1;
+    if (loopCount > 1000) {
+        bEnd = true;
+    }
+    SDL_BlitSurface(_p_AlphaDisplay, NULL, _p_Screen, NULL);
+    updateTextureAsFlipScreen();
 }
 
 void InvidoGfx::animGiocataEnd(int iPlayerIx, bool bIsPata) {
-    int iTickTot = 0;
-    int iTickFlashDiff = 0;
     SDL_Rect destWIN;
     SDL_Rect destLOS;
     bool bFlash = true;
@@ -597,80 +547,60 @@ void InvidoGfx::animGiocataEnd(int iPlayerIx, bool bIsPata) {
         destLOS.y = iCooYA;
     }
 
-    uint64_t iInitialTick = SDL_GetTicks();
-    uint64_t iFlashTickStart = iInitialTick;
-    do {
-        for (int iManoNum = 0; iManoNum < NUM_CARDS_HAND; iManoNum++) {
-            SDL_PumpEvents();
-            if (SDL_GetMouseState(NULL, NULL)) {
-                return;  // stop the animation
-            }
+    for (int iManoNum = 0; iManoNum < NUM_CARDS_HAND; iManoNum++) {
+        // this is the only value to be changed if leds are moved
+        destWIN.x = 400 + 16 * iManoNum;
+        destLOS.x = destWIN.x;
 
-            // this is the only value to be changed if leds are moved
-            destWIN.x = 400 + 16 * iManoNum;
-            destLOS.x = destWIN.x;
+        if (bFlash) {
+            // winner is  ON
+            destWIN.w = _p_AnImages[IMG_LEDGREEN_ON]->w;
+            destWIN.h = _p_AnImages[IMG_LEDGREEN_ON]->h;
+            SDL_BlitSurface(_p_AnImages[IMG_LEDGREEN_ON], NULL, _p_Screen,
+                            &destWIN);
 
+        } else {
+            // winner  off for flashing
+            destWIN.w = _p_AnImages[IMG_LEDGREEN_OFF]->w;
+            destWIN.h = _p_AnImages[IMG_LEDGREEN_OFF]->h;
+            SDL_BlitSurface(_p_AnImages[IMG_LEDGREEN_OFF], NULL, _p_Screen,
+                            &destWIN);
+        }
+
+        if (!bIsPata) {
+            // loser is red, not flash
+            destLOS.w = _p_AnImages[IMG_LED_REDON]->w;
+            destLOS.h = _p_AnImages[IMG_LED_REDON]->h;
+            SDL_BlitSurface(_p_AnImages[IMG_LED_REDON], NULL, _p_Screen,
+                            &destLOS);
+        } else {
+            // giocata patada
             if (bFlash) {
-                // winner is  ON
-                destWIN.w = _p_AnImages[IMG_LEDGREEN_ON]->w;
-                destWIN.h = _p_AnImages[IMG_LEDGREEN_ON]->h;
-                SDL_BlitSurface(_p_AnImages[IMG_LEDGREEN_ON], NULL, _p_Screen,
-                                &destWIN);
-
-            } else {
-                // winner  off for flashing
-                destWIN.w = _p_AnImages[IMG_LEDGREEN_OFF]->w;
-                destWIN.h = _p_AnImages[IMG_LEDGREEN_OFF]->h;
-                SDL_BlitSurface(_p_AnImages[IMG_LEDGREEN_OFF], NULL, _p_Screen,
-                                &destWIN);
-            }
-
-            if (!bIsPata) {
-                // loser is red, not flash
-                destLOS.w = _p_AnImages[IMG_LED_REDON]->w;
-                destLOS.h = _p_AnImages[IMG_LED_REDON]->h;
-                SDL_BlitSurface(_p_AnImages[IMG_LED_REDON], NULL, _p_Screen,
+                // players are  ON
+                destLOS.w = _p_AnImages[IMG_LED_BLUEON]->w;
+                destLOS.h = _p_AnImages[IMG_LED_BLUEON]->h;
+                SDL_BlitSurface(_p_AnImages[IMG_LED_BLUEON], NULL, _p_Screen,
                                 &destLOS);
+
+                destWIN.w = _p_AnImages[IMG_LED_BLUEON]->w;
+                destWIN.h = _p_AnImages[IMG_LED_BLUEON]->h;
+                SDL_BlitSurface(_p_AnImages[IMG_LED_BLUEON], NULL, _p_Screen,
+                                &destWIN);
+
             } else {
-                // giocata patada
-                if (bFlash) {
-                    // players are  ON
-                    destLOS.w = _p_AnImages[IMG_LED_BLUEON]->w;
-                    destLOS.h = _p_AnImages[IMG_LED_BLUEON]->h;
-                    SDL_BlitSurface(_p_AnImages[IMG_LED_BLUEON], NULL,
-                                    _p_Screen, &destLOS);
-
-                    destWIN.w = _p_AnImages[IMG_LED_BLUEON]->w;
-                    destWIN.h = _p_AnImages[IMG_LED_BLUEON]->h;
-                    SDL_BlitSurface(_p_AnImages[IMG_LED_BLUEON], NULL,
-                                    _p_Screen, &destWIN);
-
-                } else {
-                    // players also off
-                    destLOS.w = _p_AnImages[IMG_LEDGREEN_OFF]->w;
-                    destLOS.h = _p_AnImages[IMG_LEDGREEN_OFF]->h;
-                    SDL_BlitSurface(_p_AnImages[IMG_LEDGREEN_OFF], NULL,
-                                    _p_Screen, &destLOS);
-                }
+                // players also off
+                destLOS.w = _p_AnImages[IMG_LEDGREEN_OFF]->w;
+                destLOS.h = _p_AnImages[IMG_LEDGREEN_OFF]->h;
+                SDL_BlitSurface(_p_AnImages[IMG_LEDGREEN_OFF], NULL, _p_Screen,
+                                &destLOS);
             }
         }
-        SDL_UpdateTexture(_p_ScreenTexture, NULL, _p_Screen->pixels,
-                          _p_Screen->pitch);  // sdl 2.0
-        SDL_RenderClear(_p_sdlRenderer);
-        SDL_RenderTexture(_p_sdlRenderer, _p_ScreenTexture, NULL, NULL);
-        SDL_RenderPresent(_p_sdlRenderer);
-
-        uint64_t iNowTick = SDL_GetTicks();
-        iTickFlashDiff = (int)(iNowTick - iFlashTickStart);
-        if (iTickFlashDiff > 90) {
-            bFlash = !bFlash;
-            iFlashTickStart = iNowTick;
-        }
-        iTickTot = (int)(iNowTick - iInitialTick);
-    } while (iTickTot < 1000);
+    }
+    updateTextureAsFlipScreen();
 }
 
 int InvidoGfx::animateCards() {
+    // TODO animation with state
     SDL_srand(0);
 
     int rot;
@@ -682,146 +612,110 @@ int InvidoGfx::animateCards() {
     float BOUNCE = 0.8f;
     CardGfx cardGfx;
 
-    do {
-        rot = (int)SDL_rand(2);
-        cardGfx.cardSpec.SetCardIndex((int)SDL_rand(40));
+    rot = (int)SDL_rand(2);
+    cardGfx.SetIdx((int)SDL_rand(40));
 
-        cardGfx._x = (int)SDL_rand(_p_Screen->w);
-        cardGfx._y = (int)SDL_rand(_p_Screen->h / 2);
+    cardGfx._x = (int)SDL_rand(_p_Screen->w);
+    cardGfx._y = (int)SDL_rand(_p_Screen->h / 2);
 
-        if (rot) {
-            xspeed = -4;
-        } else {
-            xspeed = 4;
-        }
+    if (rot) {
+        xspeed = -4;
+    } else {
+        xspeed = 4;
+    }
 
-        yspeed = 0;
+    yspeed = 0;
 
-        do  // while card is within the _p_Screen
-        {
-            SDL_PumpEvents();
-            if (SDL_GetMouseState(NULL, NULL))
-                return -1;  // stop the animation
+    yspeed = yspeed + GRAVITY;
+    cardGfx._x += xspeed;
+    cardGfx._y += yspeed;
 
-            yspeed = yspeed + GRAVITY;
-            cardGfx._x += xspeed;
-            cardGfx._y += yspeed;
+    if (cardGfx._y + _p_DeckLoader->GetCardHeight() > MAXY) {
+        cardGfx._y = MAXY - _p_DeckLoader->GetCardHeight();
+        yspeed = (int)(-yspeed * BOUNCE);
+    }
 
-            if (cardGfx._y + _cardHeight > MAXY) {
-                cardGfx._y = MAXY - _cardHeight;
-                yspeed = (int)(-yspeed * BOUNCE);
-            }
+    cardGfx.DrawCard(_p_Screen);
 
-            cardGfx.DrawCard(_p_Screen);
-            SDL_UpdateTexture(_p_ScreenTexture, NULL, _p_Screen->pixels,
-                              _p_Screen->pitch);  // sdl 2.0
-            SDL_RenderClear(_p_sdlRenderer);
-            SDL_RenderTexture(_p_sdlRenderer, _p_ScreenTexture, NULL, NULL);
-            SDL_RenderPresent(_p_sdlRenderer);
-        } while ((cardGfx._x + 73 > 0) && (cardGfx._x < _p_Screen->w));
-    } while (1);
+    if ((cardGfx._x + 73 > 0) && (cardGfx._x < _p_Screen->w)) {
+        // TODO set animateCards state end
+    }
 
     return 0;
 }
 
 void InvidoGfx::showOkMsgBox(LPCSTR strText) {
-    // prepare the size of the box
-    MesgBoxGfx MsgBox;
+    LPGameSettings pGameSettings = GameSettings::GetSettings();
+    LPLanguages pLanguages = pGameSettings->GetLanguageMan();
+    if (_p_MsgBox != NULL) {
+        delete _p_MsgBox;
+    }
+    _p_MsgBox = new MesgBoxGfx();
+
+    int offsetW = 100;
+    int offsetH = 130;
     SDL_Rect rctBox;
-    rctBox.w = _p_Screen->w - 100;
-    rctBox.h = 130;
+    rctBox.w = _p_Screen->w - offsetW;
+    rctBox.h = offsetH;
     rctBox.y = (_p_Screen->h - rctBox.h) / 2;
     rctBox.x = (_p_Screen->w - rctBox.w) / 2;
 
-    UpdateScreenCb fnUp = prepUpdateScreenCb();
-    MsgBox.Initialize(&rctBox, _p_Screen, _p_FontStatus, MesgBoxGfx::TY_MBOK,
-                      fnUp);
-    MsgBox.Show(_p_Scene_background, "Ok", "", strText);
-}
+    _p_MsgBox->ChangeAlpha(150);
+    _p_MsgBox->Initialize(&rctBox, _p_Screen, pGameSettings->GetFontDjvMedium(),
+                          MesgBoxGfx::TY_MBOK, _fnUpdateScreen);
 
-LPErrInApp InvidoGfx::loadCardPac() {
-    Uint32 timetag;
-    char describtion[100];
-    Uint8 num_anims;
-    Uint16 w, h;
-    Uint16 frames;
+    SDL_Rect clipRect;
+    SDL_GetSurfaceClipRect(_p_AlphaDisplay, &clipRect);
+    SDL_FillSurfaceRect(
+        _p_AlphaDisplay, &clipRect,
+        SDL_MapRGB(SDL_GetPixelFormatDetails(_p_AlphaDisplay->format), NULL, 0,
+                   0, 0));
 
-    // int FRAMETICKS = (1000 / FPS);
-    // int THINKINGS_PER_TICK = 1;
+    SDL_BlitSurface(_p_Screen, NULL, _p_AlphaDisplay, NULL);
 
-    std::string strFileName = lpszImageDir;
-    strFileName += _p_DeckType->GetResFileName();
-
-    SDL_IOStream* src = SDL_IOFromFile(strFileName.c_str(), "rb");
-    if (src == 0) {
-        char ErrBuff[512];
-        sprintf(ErrBuff, "Error on load deck file %s", strFileName.c_str());
-        return ERR_UTIL::ErrorCreate(ErrBuff);
-    }
-    SDL_ReadIO(src, describtion, 100);
-    SDL_ReadU32LE(src, &timetag);
-    SDL_ReadU8(src, &num_anims);
-    // witdh of the picture (pac of 4 cards)
-    SDL_ReadU16LE(src, &w);
-    // height of the picture (pac of 10 rows of cards)
-    SDL_ReadU16LE(src, &h);
-    SDL_ReadU16LE(src, &frames);
-
-    for (int i = 0; i < frames; i++) {
-        Uint16 dummy;
-        SDL_ReadU16LE(src, &dummy);
-    }
-
-    _p_Deck = IMG_Load_IO(src, true);
-    if (!_p_Deck) {
-        fprintf(stderr, "Cannot create deck: %s\n", SDL_GetError());
-        exit(1);
-    }
-
-    SDL_SetSurfaceColorKey(
-        _p_Deck, true,
-        SDL_MapRGB(SDL_GetPixelFormatDetails(_p_Deck->format), NULL, 0, 128,
-                   0));  // SDL 3.0
-
-    _cardWidth = w / 4;
-    _cardHeight = h / 10;
-
-    return 0;
+    STRING strTextOk = pLanguages->GetStringId(Languages::ID_OK);
+    _p_MsgBox->Show(_p_AlphaDisplay, strTextOk.c_str(), "", strText);
 }
 
 int InvidoGfx::showYesNoMsgBox(LPCSTR strText) {
-    SDL_assert(_p_AlphaDisplay);
-
-    // prepare the size of the box
-    MesgBoxGfx MsgBox;
+    LPGameSettings pGameSettings = GameSettings::GetSettings();
+    LPLanguages pLanguages = pGameSettings->GetLanguageMan();
+    if (_p_MsgBox != NULL) {
+        delete _p_MsgBox;
+    }
+    _p_MsgBox = new MesgBoxGfx();
+    int offsetW = 100;
+    int offsetH = 130;
     SDL_Rect rctBox;
-    rctBox.w = _p_Screen->w - 100;
-    rctBox.h = 130;
+    rctBox.w = _p_Screen->w - offsetW;
+    rctBox.h = offsetH;
     rctBox.y = (_p_Screen->h - rctBox.h) / 2;
     rctBox.x = (_p_Screen->w - rctBox.w) / 2;
 
-    // show a mesage box with alpha
-    UpdateScreenCb fnUp = prepUpdateScreenCb();
-    MsgBox.Initialize(&rctBox, _p_Screen, _p_FontStatus,
-                      MesgBoxGfx::TY_MB_YES_NO, fnUp);
+    _p_MsgBox->ChangeAlpha(150);
+    _p_MsgBox->Initialize(&rctBox, _p_Screen, pGameSettings->GetFontDjvMedium(),
+                          MesgBoxGfx::TY_MB_YES_NO, _fnUpdateScreen);
+    SDL_Rect clipRect;
+    SDL_GetSurfaceClipRect(_p_AlphaDisplay, &clipRect);
+    SDL_FillSurfaceRect(
+        _p_AlphaDisplay, &clipRect,
+        SDL_MapRGB(SDL_GetPixelFormatDetails(_p_AlphaDisplay->format), NULL, 0,
+                   0, 0));
+
     SDL_BlitSurface(_p_Screen, NULL, _p_AlphaDisplay, NULL);
 
-    std::string strTextYes = _p_LangMgr->GetStringId(Languages::ID_YES);
-    std::string strTextNo = _p_LangMgr->GetStringId(Languages::ID_NO);
-    LPErrInApp err = MsgBox.Show(_p_AlphaDisplay, strTextYes.c_str(),
-                                 strTextNo.c_str(), strText);
-
-    return (int)MsgBox.GetResult();
+    STRING strTextYes = pLanguages->GetStringId(Languages::ID_YES);
+    STRING strTextNo = pLanguages->GetStringId(Languages::ID_NO);
+    _p_MsgBox->Show(_p_AlphaDisplay, strTextYes.c_str(), strTextNo.c_str(),
+                    strText);
 }
 
 void InvidoGfx::InitInvidoVsCPU() {
     if (_p_InvidoCore) {
         delete _p_InvidoCore;
-        _p_InvidoCore = 0;
     }
     _p_InvidoCore = new InvidoCore();
     _p_InvidoCore->Create(NULL, 2);
-    // g_pInvidoCore = _p_InvidoCore; // remove global g_pInvidoCore
 
     _p_InvidoCore->SetRandomSeed((unsigned)time(NULL));
 
@@ -843,76 +737,46 @@ void InvidoGfx::InitInvidoVsCPU() {
     _isMatchTerminated = false;
 }
 
-void InvidoGfx::MatchLoop() {
-    Mix_ChannelFinished(fnEffectTer);
+LPErrInApp InvidoGfx::Show() {
+    // Mix_ChannelFinished(fnEffectTer);
+    InitInvidoVsCPU();
     _p_InvidoCore->NewMatch();
     drawStaticScene();
 
-    SDL_Event event;
-    int done = 0;
-    uint64_t uiLast_time;
-    // uint32_t uiFrame = 0;
-    uint64_t uiNowTime = 0;
-    _DelayAction.Reset();
-
-    uiLast_time = SDL_GetTicks();
     std::string strTextTmp;
     TRACE_DEBUG("Inizio partita loop \n");
-    while (done == 0 && _isMatchTerminated == false) {
-        // uiFrame++;
 
-        while (SDL_PollEvent(&event)) {
-            switch (event.type) {
-                case SDL_EVENT_QUIT:
-                    // user want to exit the match
-                    // show a messagebox for confirm
-                    strTextTmp = _p_LangMgr->GetStringId(Languages::ASK_QUIT);
-                    if (showYesNoMsgBox(strTextTmp.c_str()) ==
-                        MesgBoxGfx::RES_YES) {
-                        TRACE_DEBUG("Partita finita per scelta utente\n");
-                        return;
-                    }
-                    break;
-
-                case SDL_EVENT_KEY_DOWN:
-                    if (event.key.key == SDLK_ESCAPE) {
-                        done = 1;
-                    }
-                    handleKeyDownEvent(event);
-                    break;
-
-                case SDL_EVENT_MOUSE_BUTTON_DOWN:
-                    handleMouseDownEvent(event);
-                    break;
-
-                case SDL_EVENT_MOUSE_MOTION:
-                    handleMouseMoveEvent(event);
-                    break;
-
-                case SDL_EVENT_MOUSE_BUTTON_UP:
-                    handleMouseUpEvent(event);
-                    break;
+    switch (event.type) {
+        case SDL_EVENT_QUIT:
+            // user want to exit the match
+            // show a messagebox for confirm
+            strTextTmp = _p_LangMgr->GetStringId(Languages::ASK_QUIT);
+            if (showYesNoMsgBox(strTextTmp.c_str()) == MesgBoxGfx::RES_YES) {
+                TRACE_DEBUG("Partita finita per scelta utente\n");
+                return;
             }
-        }
+            break;
 
-        uiNowTime = SDL_GetTicks();
-        if (uiNowTime > uiLast_time + (1000 / FPS)) {
-            drawStaticScene();
-            uiLast_time = uiNowTime;
-        }
+        case SDL_EVENT_KEY_DOWN:
+            if (event.key.key == SDLK_ESCAPE) {
+                done = 1;
+            }
+            handleKeyDownEvent(event);
+            break;
 
-        // next action on the game
-        if (_DelayAction.CanStart()) {
-            _p_InvidoCore->NextAction();
-        }
+        case SDL_EVENT_MOUSE_BUTTON_DOWN:
+            handleMouseDownEvent(event);
+            break;
 
-        // SDL 3.0
-        SDL_UpdateTexture(_p_ScreenTexture, NULL, _p_Screen->pixels,
-                          _p_Screen->pitch);
-        SDL_RenderClear(_p_sdlRenderer);
-        SDL_RenderTexture(_p_sdlRenderer, _p_ScreenTexture, NULL, NULL);
-        SDL_RenderPresent(_p_sdlRenderer);
+        case SDL_EVENT_MOUSE_MOTION:
+            handleMouseMoveEvent(event);
+            break;
+
+        case SDL_EVENT_MOUSE_BUTTON_UP:
+            handleMouseUpEvent(event);
+            break;
     }
+    _p_InvidoCore->NextAction();
 }
 
 void InvidoGfx::handleMouseDownEvent(SDL_Event& event) {
@@ -952,9 +816,7 @@ void InvidoGfx::handleMouseDownEvent(SDL_Event& event) {
                     }
 
                     eSayPlayer eSay = SP_NOTHING;
-                    showPopUpCallMenu(
-                        _aPlayerCards[iIndexCardSelected].cardSpec,
-                        event.button.x, event.button.y, &eSay);
+                    showPopUpCallMenu(event.button.x, event.button.y, &eSay);
                     if (eSay != SP_NOTHING) {
                         if (eSay == SP_VADODENTRO) {
                             vadoDentro(iIndexCardSelected);
@@ -983,9 +845,7 @@ void InvidoGfx::handleMouseDownEvent(SDL_Event& event) {
     }
 }
 
-// showPopUpCallMenu
-void InvidoGfx::showPopUpCallMenu(CardSpec& cardClicked, int iX, int iY,
-                                  eSayPlayer* peSay) {
+void InvidoGfx::showPopUpCallMenu(int iX, int iY, eSayPlayer* peSay) {
     TRACE_DEBUG("show popup menu\n");
     SDL_assert(peSay);
     SDL_assert(_p_AlphaDisplay);
@@ -1017,33 +877,18 @@ void InvidoGfx::showPopUpCallMenu(CardSpec& cardClicked, int iX, int iY,
     }
 
     // Modal loop for the popup menu
-    bool bDone = false;
-    while (!bDone) {
-        SDL_Event event;
-        while (SDL_PollEvent(&event)) {
-            float mx, my;
-            SDL_GetMouseState(&mx, &my);
-            SDL_Point mousePos;
-            mousePos.x = (int)mx;
-            mousePos.y = (int)my;
-            PopUpMenu.HandleEvent(&event, mousePos);
-            if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN ||
-                (event.type == SDL_EVENT_KEY_DOWN &&
-                 (event.key.key == SDLK_RETURN ||
-                  event.key.key == SDLK_ESCAPE))) {
-                bDone = true;
-            }
-        }
-        SDL_BlitSurface(_p_AlphaDisplay, NULL, _p_Screen, NULL);
-        PopUpMenu.DrawCtrl(_p_Screen);
-
-        SDL_UpdateTexture(_p_ScreenTexture, NULL, _p_Screen->pixels,
-                          _p_Screen->pitch);
-        SDL_RenderClear(_p_sdlRenderer);
-        SDL_RenderTexture(_p_sdlRenderer, _p_ScreenTexture, NULL, NULL);
-        SDL_RenderPresent(_p_sdlRenderer);
-        SDL_Delay(10);
+    SDL_GetMouseState(&mx, &my);
+    SDL_Point mousePos;
+    mousePos.x = (int)mx;
+    mousePos.y = (int)my;
+    PopUpMenu.HandleEvent(&event, mousePos);
+    if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN ||
+        (event.type == SDL_EVENT_KEY_DOWN &&
+         (event.key.key == SDLK_RETURN || event.key.key == SDLK_ESCAPE))) {
+        bDone = true;
     }
+    SDL_BlitSurface(_p_AlphaDisplay, NULL, _p_Screen, NULL);
+    PopUpMenu.DrawCtrl(_p_Screen);
 
     // menu is terminated
     if (PopUpMenu.MenuIsSelected()) {
@@ -1112,8 +957,6 @@ void InvidoGfx::drawPlayedCard(CardGfx* pCard) {
     renderScreen();
 }
 
-////////////////////////////////////////
-//       HandleMouseMoveEvent
 void InvidoGfx::handleMouseMoveEvent(SDL_Event& event) {
     SDL_Point mousePos;
     mousePos.x = (int)event.motion.x;
@@ -1123,8 +966,6 @@ void InvidoGfx::handleMouseMoveEvent(SDL_Event& event) {
     }
 }
 
-////////////////////////////////////////
-//       HandleMouseUpEvent
 void InvidoGfx::handleMouseUpEvent(SDL_Event& event) {
     SDL_Point mousePos;
     mousePos.x = (int)event.button.x;
@@ -1482,6 +1323,7 @@ void InvidoGfx::enableCmds() {
 }
 
 void InvidoGfx::enableOnlyCmdButtons(size_t iNumButt) {
+    // TODO rename enableOnlyCmdButtons
     int i, j;
     for (i = 0; i < (int)iNumButt; i++) {
         // enable buttons with commands
@@ -1521,15 +1363,14 @@ void InvidoGfx::ButCmdClicked(int iButID) {
             if (GameSettings::GetSettings()->MusicEnabled) {
                 int iMusId = _Map_id_EchoSay[eSay];
                 if (_p_MusicMgr->PlayEffect(iMusId)) {
-                    _DelayAction.CheckPoint(2260,
-                                            DelayNextAction::CHANGE_AVAIL);
+                    // _DelayAction.CheckPoint(2260,
+                    //                         DelayNextAction::CHANGE_AVAIL);
+                    // TODO use a state
                 }
             }
         }
     }
 }
-
-void InvidoGfx::NtfyTermEff(int iCh) { _DelayAction.ChangeCurrDelay(50); }
 
 // ***************************************************
 //********  interface invido core  callback **********
@@ -1541,7 +1382,7 @@ void InvidoGfx::ALG_Play() {
 }
 
 void InvidoGfx::ALG_HaveToRespond() {
-    TRACE_DEBUG("%s\n", _p_LangMgr->GetStringId(Languages::ID_SCORE).c_str());
+    TRACE_DEBUG("ALG_HaveToResponda\n");
     enableCmds();
 }
 
