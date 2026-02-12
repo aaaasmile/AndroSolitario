@@ -11,6 +11,7 @@
 #include "Config.h"
 #include "GfxUtil.h"
 #include "MusicManager.h"
+#include "DeckLoader.h"
 
 OptionsGfx::OptionsGfx() {
     _p_screen = NULL;
@@ -302,10 +303,15 @@ LPErrInApp OptionsGfx::initDeck(int comboOffsetX) {
         if (err != NULL) {
             return err;
         }
-        err = GFX_UTIL::LoadCardPac(&_p_deckAll[i], dt, &pac_w, &pac_h);
+        DeckLoader* pDeckLoader = new DeckLoader();
+        LPErrInApp err = pDeckLoader->LoadCardPac(dt);
         if (err != NULL) {
             return err;
         }
+        _p_deckAll[i] = pDeckLoader->GetDeckSurface();
+        pac_w = pDeckLoader->GetPacWidth();
+        pac_h = pDeckLoader->GetPacHeight();
+
         int ww = pac_w / 4;
         int hh = pac_h / dt.GetNumCardInSuit();
         if (ww <= 0) {

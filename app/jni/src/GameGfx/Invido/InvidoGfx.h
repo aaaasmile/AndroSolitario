@@ -31,6 +31,7 @@ class ButtonGfx;
 class BalloonGfx;
 class Languages;
 class MusicManager;
+class DeckLoader;
 
 typedef std::map<eGiocataScoreState, STRING> MAP_SCORE;
 typedef std::map<eSayPlayer, STRING> MAP_SAY;
@@ -177,6 +178,7 @@ class InvidoGfx : public I_ALG_Player {
     bool _isMatchTerminated;
     UpdateScreenCb _fnUpdateScreen;
     SDL_Window* _p_Window;
+    DeckLoader *_p_DeckLoader;
 };
 
 #endif

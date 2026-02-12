@@ -15,6 +15,7 @@
 #include "MesgBoxGfx.h"
 #include "MusicManager.h"
 #include "PopUpMenuGfx.h"
+#include "DeckLoader.h"
 
 static const char* lpszImageDir = DATA_PREFIX "images/invido/";
 static const char* lpszImageBack = "im000740.jpg";
@@ -68,6 +69,7 @@ InvidoGfx::InvidoGfx() {
     _p_MusicMgr = 0;
     _isMatchTerminated = false;
     _p_AlphaDisplay = 0;
+    _p_DeckLoader = new DeckLoader();
 }
 
 InvidoGfx::~InvidoGfx() { cleanup(); }
@@ -91,11 +93,11 @@ LPErrInApp InvidoGfx::Initialize(SDL_Surface* pScreen,
    
     if (_deckType.IsPacType()) {
         TRACE("Deck Pac stuff\n");
-        err = LoadCardPac();
+        err = _p_DeckLoader->LoadCardPac(_deckType);
         if (err != NULL) {
             return err;
         }
-        err = LoadSymbolsForPac();
+        err = _p_DeckLoader->LoadSymbolsForPac(_deckType);
         if (err != NULL) {
             return err;
         }
@@ -278,9 +280,9 @@ void InvidoGfx::cleanup() {
         SDL_DestroySurface(_p_Surf_Bar);
         _p_Surf_Bar = NULL;
     }
-    if (_p_DeckType) {
-        delete _p_DeckType;
-        _p_DeckType = NULL;
+    if (_p_DeckLoader) {
+        delete _p_DeckLoader;
+        _p_DeckLoader = NULL;
     }
     if (_p_AlphaDisplay) {
         SDL_DestroySurface(_p_AlphaDisplay);
