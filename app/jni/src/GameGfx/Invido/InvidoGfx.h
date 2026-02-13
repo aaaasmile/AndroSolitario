@@ -86,9 +86,8 @@ class InvidoGfx : public I_ALG_Player {
     }
     virtual void ALG_SetAssociateIndex(int iIndex) {}
     virtual void ALG_NewMatch(int iNumPlayer) {}
-    virtual void ALG_NewGiocata(const CARDINFO* pCardArray, int iNumOfCards,
-                                int iPlayerIx);
-    virtual void ALG_PlayerHasPlayed(int iPlayerIx, const CARDINFO* pCard);
+    virtual void ALG_NewGiocata(const VCT_CARDSPEC& vctCards, int iPlayerIx);
+    virtual void ALG_PlayerHasPlayed(int iPlayerIx, const CardSpec& cardSpec);
     virtual void ALG_PlayerHasSaid(int iPlayerIx, eSayPlayer eSay);
     virtual void ALG_PlayerHasVadoDentro(int iPlayerIx);
     virtual void ALG_Play();

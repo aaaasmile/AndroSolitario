@@ -59,18 +59,18 @@ class InvidoCore : public I_CORE_Game {
     void NextAction();
     void SetRandomSeed(int iVal);
 
-    bool Player_saySomething(int iPlayerIx, eSayPlayer eSay);
-    bool Player_playCard(int iPlayerIx, const CARDINFO* pCardInfo);
-    bool Player_vaDentro(int iPlayerIx, const CARDINFO* pCardInfo);
+    bool Say(int iPlayerIx, eSayPlayer eSay);
+    bool PlayCard(int iPlayerIx, const CardSpec& cardSpec);
+    bool VaDentro(int iPlayerIx, const CardSpec& cardSpec);
     void GetAdmittedCommands(VCT_COMMANDS& vct_Commands, int iPlayerIndex);
     void GetMoreCommands(VCT_COMMANDS& vct_Commands, int iPlayerIndex);
     void AbandonGame(int iPlayerIx);
 
    private:
-    CardSpec* isCardInPlayerHand(int iPlayerIx, const CARDINFO* pCardInfo);
-    CardSpec* checkValidCardPlayed(int iPlayerIx, const CARDINFO* pCardInfo);
+    CardSpec* isCardInPlayerHand(int iPlayerIx, const CardSpec& cardSpec);
+    CardSpec* checkValidCardPlayed(int iPlayerIx, const CardSpec& cardSpec);
     void resetCardInfoPlayers();
-    bool resetCard(int iPlayerIx, CARDINFO* pCardInfo);
+    bool resetCard(int iPlayerIx, const CardSpec& cardSpec);
     int getNewMatchFirstPlayer();
 
    private:

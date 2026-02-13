@@ -388,8 +388,8 @@ bool InvidoCore::Player_vaDentro(int iPlayerIx, const CARDINFO* pCardInfo) {
 
 void InvidoCore::SetRandomSeed(int iVal) { _p_MyMazzo->SetRandomSeed(iVal); }
 
-bool InvidoCore::Player_playCard(int iPlayerIx, const CARDINFO* pCardInfo) {
-    CardSpec* pCardplayed = checkValidCardPlayed(iPlayerIx, pCardInfo);
+bool InvidoCore::PlayCard(int iPlayerIx, const CardSpec& cardSpec) {
+    CardSpec* pCardplayed = checkValidCardPlayed(iPlayerIx, cardSpec);
     if (pCardplayed == NULL) {
         return false;
     }
@@ -419,7 +419,7 @@ bool InvidoCore::Player_playCard(int iPlayerIx, const CARDINFO* pCardInfo) {
     return bRes;
 }
 
-bool InvidoCore::Player_saySomething(int iPlayerIx, eSayPlayer eSay) {
+bool InvidoCore::Say(int iPlayerIx, eSayPlayer eSay) {
     bool bRes = false;
     if (_mano.Player_Say(iPlayerIx, eSay)) {
         //  what he said is acceptable on the game

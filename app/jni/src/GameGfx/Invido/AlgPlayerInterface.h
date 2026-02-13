@@ -1,15 +1,17 @@
 #ifndef ___ALGPLAYER_H_
 #define ___ALGPLAYER_H_
 
+// TODO change the name
+
 #include "CardSpec.h"
 #include "InvidoCoreEnv.h"
 
 class I_CORE_Game {
    public:
     I_CORE_Game() {}
-    virtual bool Player_saySomething(int iPlayerIx, eSayPlayer eSay) = 0;
-    virtual bool Player_playCard(int iPlayerIx, const CARDINFO* pCardInfo) = 0;
-    virtual bool Player_vaDentro(int iPlayerIx, const CARDINFO* pCardInfo) = 0;
+    virtual bool Say(int iPlayerIx, eSayPlayer eSay) = 0;
+    virtual bool PlayCard(int iPlayerIx, const CardSpec& cardSpec) = 0;
+    virtual bool VaDentro(int iPlayerIx, const CardSpec& cardSpec) = 0;
     virtual void AbandonGame(int iPlayerIx) = 0;
     virtual void GetAdmittedCommands(VCT_COMMANDS& vct_Commands,
                                      int iPlayerIndex) = 0;
@@ -49,15 +51,14 @@ class I_ALG_Player {
     virtual void ALG_SetOpponentIndex(int iIndex, int iOpponentNr) = 0;
     virtual void ALG_SetAssociateIndex(int iIndex) = 0;
     virtual void ALG_NewMatch(int iNumPlayer) = 0;
-    virtual void ALG_NewGiocata(const CARDINFO* pCardArray, int iNumOfCards,
-                                int iPlayerIx) = 0;
-    virtual void ALG_PlayerHasPlayed(int iPlayerIx, const CARDINFO* pCard) = 0;
+    virtual void ALG_NewGiocata(const VCT_CARDSPEC& vctCards, int iPlayerIx) = 0;
+    virtual void ALG_PlayerHasPlayed(int iPlayerIx, const CardSpec& cardSpec) = 0;
     virtual void ALG_PlayerHasVadoDentro(int iPlayerIx) = 0;
     virtual void ALG_PlayerHasSaid(int iPlayerIx, eSayPlayer eSay) = 0;
-    virtual void ALG_Play() = 0;
     virtual void ALG_ManoEnd(I_MatchScore* pScore) = 0;
     virtual void ALG_GiocataEnd(I_MatchScore* pScore) = 0;
     virtual void ALG_MatchEnd(I_MatchScore* pScore) = 0;
+    virtual void ALG_HaveToPlay() = 0;
     virtual void ALG_HaveToRespond() = 0;
     virtual void ALG_GicataScoreChange(eGiocataScoreState eNewScore) = 0;
     virtual void ALG_PlayerSaidWrong(int iPlayerIx) = 0;

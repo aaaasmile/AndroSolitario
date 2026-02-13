@@ -50,6 +50,9 @@ class CardGfx {
 
     int Index() { return _idx; }
     LPErrInApp SetIdx(int nIdx, DeckType& deckType);
+    void SetIndex(int ix) { _idx = ix; }
+    void SetSuit(eSUIT eSuit) { _eSuit = eSuit; }
+    void SetName(std::string name) { _name = name; }
     void SetCardLoc(int lx, int ly) {
         _x = lx;
         _y = ly;

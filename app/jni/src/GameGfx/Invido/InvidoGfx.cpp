@@ -1415,7 +1415,7 @@ void InvidoGfx::ALG_PlayerHasVadoDentro(int iPlayerIx) {
         if (_aPlayerCards[_cardVadoDentroIndex].State ==
             CardGfx::CSW_ST_VISIBLE) {
             TRACE_DEBUG("card played %s\n",
-                        _aPlayerCards[_cardVadoDentroIndex].cardSpec.GetName());
+                        _aPlayerCards[_cardVadoDentroIndex].Name());
 
             drawVadoDentroCard(&_aPlayerCards[_cardVadoDentroIndex]);
         }
@@ -1431,7 +1431,7 @@ void InvidoGfx::ALG_PlayerHasVadoDentro(int iPlayerIx) {
     }
 }
 
-void InvidoGfx::opponentHasPlayedCard(CardSpec& Card, bool vadoDentro) {
+void InvidoGfx::opponentHasPlayedCard(CardSpec& card, bool vadoDentro) {
     bool bFound = false;
     for (int iIndex = 0; !bFound && iIndex < NUM_CARDS_HAND; iIndex++) {
         if (_aOpponentCards[iIndex].State == CardGfx::CSW_ST_BACK) {
@@ -1439,9 +1439,9 @@ void InvidoGfx::opponentHasPlayedCard(CardSpec& Card, bool vadoDentro) {
                 TRACE_DEBUG("Opponent va dentro, draw it\n");
                 drawVadoDentroCard(&_aOpponentCards[iIndex]);
             } else {
-                TRACE_DEBUG("card played %s\n", Card.GetName());
+                TRACE_DEBUG("card played %s\n", card.GetName().c_str());
                 _aOpponentCards[iIndex].State = CardGfx::CSW_ST_VISIBLE;
-                _aOpponentCards[iIndex].cardSpec = Card;
+                _aOpponentCards[iIndex].SetIndex(card.GetCardIndex());
                 drawPlayedCard(&_aOpponentCards[iIndex]);
             }
             bFound = true;
@@ -1449,8 +1449,8 @@ void InvidoGfx::opponentHasPlayedCard(CardSpec& Card, bool vadoDentro) {
     }
     SDL_assert(bFound);
     Player* pPlayer = _p_InvidoCore->GetPlayer(_opponentIndex);
-    TRACE_DEBUG("%s %s ha giocato %s\n", lpszCST_INFO, pPlayer->GetName(),
-                Card.GetName());
+    TRACE_DEBUG("%s %s has played %s\n", lpszCST_INFO, pPlayer->GetName(),
+                card.GetName());
     int iNumCardPlayed = _p_MatchPoints->GetCurrNumCardPlayed();
     if (iNumCardPlayed == 1) {
         // first card played from opponent, don't need a delay
@@ -1463,12 +1463,9 @@ void InvidoGfx::opponentHasPlayedCard(CardSpec& Card, bool vadoDentro) {
     }
 }
 
-void InvidoGfx::ALG_PlayerHasPlayed(int iPlayerIx, const CARDINFO* pCard) {
+void InvidoGfx::ALG_PlayerHasPlayed(int iPlayerIx, const CardSpec& cardSpec) {
     // disable ballon
-    _p_balGfx->StartShow("", 0);
-
-    CardSpec Card;
-    Card.SetCardInfo(*pCard);
+    _p_balGfx->StartShow("", 0); // TODO use disable method
 
     // markup player that have to play
     Player* pPlayer = 0;
@@ -1482,14 +1479,13 @@ void InvidoGfx::ALG_PlayerHasPlayed(int iPlayerIx, const CARDINFO* pCard) {
 
     bool bFound = false;
     if (iPlayerIx == _opponentIndex) {
-        // opponent play a card
-        opponentHasPlayedCard(Card, false);
+        opponentHasPlayedCard(cardSpec, false);
 
     } else if (iPlayerIx == _playerGuiIndex) {
         // HMI has played correctly
         for (int iIndex = 0; !bFound && iIndex < NUM_CARDS_HAND; iIndex++) {
-            if (_aPlayerCards[iIndex].cardSpec == Card) {
-                TRACE_DEBUG("card played %s\n", Card.GetName());
+            if (_aPlayerCards[iIndex].Index() == cardSpec.GetCardIndex()) {
+                TRACE_DEBUG("card played %s\n", cardSpec.GetName());
 
                 drawPlayedCard(&_aPlayerCards[iIndex]);
                 bFound = true;
@@ -1509,24 +1505,19 @@ void InvidoGfx::ALG_PlayerHasPlayed(int iPlayerIx, const CARDINFO* pCard) {
     }
 }
 
-void InvidoGfx::ALG_NewGiocata(const CARDINFO* pCardArray, int iNumOfCards,
-                               int iPlayerIx) {
+void InvidoGfx::ALG_NewGiocata(const VCT_CARDSPEC& vctCards, int iPlayerIx) {
     TRACE_DEBUG("ALG_NewGiocata\n");
     _isPlayerCanPlay = false;
 
-    SDL_assert(iNumOfCards == NUM_CARDS_HAND);
+    SDL_assert(vctCards.size() == NUM_CARDS_HAND);
 
-    // NOTE: to set cards is better to use pCardArray.
-    // Cards of the opponent are not yet set, so we can't display it.
-    // This is correct because the Gfx engine operate like a player and not have
-    // to know the opponent cards
-
-    // player
     CardSpec tmpCardSpec;
     for (int i = 0; i < NUM_CARDS_HAND; i++) {
-        tmpCardSpec.SetCardInfo(pCardArray[i]);
-        _aPlayerCards[i].cardSpec = tmpCardSpec;  // overloaded operator = that
-                                                  // copy all important fields
+        CardSpec card = vctCards[i];
+        _aPlayerCards[i].SetIndex(card.GetCardIndex()); 
+        _aPlayerCards[i].SetName(card.GetName()); 
+        _aPlayerCards[i].SetSuit(card.GetSuit()); 
+                                                  
         _aPlayerCards[i].State = CardGfx::CSW_ST_VISIBLE;
     }
 
