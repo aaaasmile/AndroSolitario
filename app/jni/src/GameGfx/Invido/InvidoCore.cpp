@@ -3,6 +3,8 @@
 #include "Mazzo.h"
 #include "TraceService.h"
 
+using namespace invido;
+
 InvidoCore::InvidoCore() {
     _numPlayers = 0;
     _p_PlHaveToPlay = 0;

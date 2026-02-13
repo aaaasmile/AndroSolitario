@@ -2,6 +2,8 @@
 
 #include "Mano.h"
 
+using namespace invido;
+
 MatchPoints::MatchPoints() {
     _numPlayers = NUM_PLAY_INVIDO_2;
     _p_Mano = 0;

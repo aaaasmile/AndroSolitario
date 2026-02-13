@@ -3,6 +3,8 @@
 
 #include "InvidoCoreEnv.h"
 
+namespace invido {
+
 class InvidoCore;
 class Giocata;
 class I_MatchScore;
@@ -29,4 +31,5 @@ class Partita {
     eFN_ACTION _eNextAction;
 };
 
+}
 #endif

@@ -5,6 +5,8 @@
 
 #include "CardGfx.h"
 
+namespace invido {
+
 class PlayerStatistic {
    public:
     PlayerStatistic();
@@ -48,6 +50,8 @@ inline std::ostream& operator<<(std::ostream& stream,
     stream << std::endl;
 
     return stream;
+}
+
 }
 
 #endif

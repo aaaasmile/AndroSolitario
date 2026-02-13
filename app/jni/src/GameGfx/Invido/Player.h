@@ -6,6 +6,8 @@
 #include "AlgPlayerInterface.h"
 #include "InvidoCoreEnv.h"
 
+namespace invido {
+
 enum eCARDINDEX { CIX_0 = 0, CIX_1 = 1, CIX_2 = 2 };
 
 inline eCARDINDEX& operator++(eCARDINDEX& eF) {
@@ -53,6 +55,7 @@ inline std::ostream& operator<<(std::ostream& stream, const Player& o) {
     stream << o._p_PlayerName << std::endl;
 
     return stream;
+}
 }
 
 #endif

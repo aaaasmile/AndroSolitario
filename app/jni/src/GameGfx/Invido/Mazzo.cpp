@@ -2,6 +2,8 @@
 
 #include "InvidoCore.h"
 
+using namespace invido;
+
 Mazzo::Mazzo() {
     _nextCard = 0;
     _p_CoreGame = 0;

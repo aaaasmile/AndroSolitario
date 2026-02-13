@@ -4,7 +4,8 @@
 #include <deque>
 
 #include "InvidoCoreEnv.h"
-
+namespace invido {
+    
 class InvidoCore;
 class Partita;
 class Mano;
@@ -41,5 +42,6 @@ class Giocata {
     Mano* m_pMano;
     DEQ_ACTIT_GIO m_deqNextAction;
 };
+}
 
 #endif

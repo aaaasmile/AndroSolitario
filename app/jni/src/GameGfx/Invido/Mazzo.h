@@ -4,6 +4,8 @@
 #include "CardSpec.h"
 #include "InvidoCoreEnv.h"
 
+namespace invido {
+
 class InvidoCore;
 
 class Mazzo {
@@ -40,4 +42,5 @@ class Mazzo {
 
 typedef std::vector<char> VCT_MAZZO;
 
+}
 #endif

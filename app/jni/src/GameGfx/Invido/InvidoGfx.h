@@ -15,6 +15,8 @@
 
 using namespace traits;
 
+namespace invido {
+
 enum {
     CRD_MAZZOALTRECARTE = 0,
     CRD_PLAYER1,
@@ -180,4 +182,5 @@ class InvidoGfx : public I_ALG_Player {
     MesgBoxGfx* _p_MsgBox;
 };
 
+}
 #endif

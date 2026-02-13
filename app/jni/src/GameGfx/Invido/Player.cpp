@@ -2,6 +2,8 @@
 
 #include "AlgPlayer.h"
 
+using namespace invido;
+
 Player::Player() {
     _index = NOT_VALID_INDEX;
     _p_IAlgorithm = 0;

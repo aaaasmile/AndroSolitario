@@ -7,6 +7,8 @@
 #include "CardSpec.h"
 #include "InvidoCoreEnv.h"
 
+namespace invido {
+
 class Mano;
 class ManoInfo {
    public:
@@ -128,5 +130,7 @@ class MatchPoints : public I_MatchScore {
     Mano* _p_Mano;
     bool _isGameAbandoned;
 };
+
+}
 
 #endif

@@ -5,6 +5,8 @@
 #include "CardSpec.h"
 #include "InvidoCoreEnv.h"
 
+namespace invido {
+
 class AlgAdvancedPlayer : public I_ALG_Player {
    public:
     AlgAdvancedPlayer();
@@ -68,5 +70,7 @@ class AlgAdvancedPlayer : public I_ALG_Player {
     bool m_WonFirstHand;
     int m_ixCurrMano;
 };
+
+}  // namespace invido
 
 #endif

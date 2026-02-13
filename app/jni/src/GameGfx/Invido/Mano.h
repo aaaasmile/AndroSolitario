@@ -7,6 +7,8 @@
 #include "Config.h"
 #include "InvidoCoreEnv.h"
 
+namespace invido {
+
 class InvidoCore;
 class Giocata;
 class MatchPoints;
@@ -137,5 +139,7 @@ class Mano {
     MAP_SCORE_SCORENEXT _mapScoreScNext;
     MAP_SCORE_SAY _mapScoreSay;
 };
+
+}
 
 #endif

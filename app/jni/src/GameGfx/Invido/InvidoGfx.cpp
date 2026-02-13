@@ -17,6 +17,8 @@
 #include "MusicManager.h"
 #include "PopUpMenuGfx.h"
 
+using namespace invido;
+
 static const char* lpszImageDir = DATA_PREFIX "images/invido/";
 static const char* lpszImageBack = "im000740.jpg";
 static const char* lpszaImage_filenames[] = {

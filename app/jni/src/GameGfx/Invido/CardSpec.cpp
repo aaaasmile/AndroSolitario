@@ -2,6 +2,7 @@
 
 #include "CardGfx.h"
 #include "InvidoCoreEnv.h"
+using namespace invido;
 
 static const std::string g_CardsNameX[] = {
     "Asso di bastoni",    "Due di bastoni",     "Tre di bastoni",

@@ -4,6 +4,8 @@
 #include "Mano.h"
 #include "MatchPoints.h"
 
+using namespace invido;
+
 Giocata::Giocata() {
     m_pInvidoCore = NULL;
     m_pPartita = NULL;

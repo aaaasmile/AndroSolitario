@@ -6,6 +6,8 @@
 #include "CardSpec.h"
 #include "InvidoCoreEnv.h"
 
+namespace invido {
+
 class I_CORE_Game {
    public:
     I_CORE_Game() {}
@@ -64,4 +66,5 @@ class I_ALG_Player {
     virtual void ALG_PlayerSaidWrong(int iPlayerIx) = 0;
 };
 
+}
 #endif

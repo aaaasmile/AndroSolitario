@@ -8,6 +8,8 @@
 #include "InvidoCoreEnv.h"
 #include "TraceService.h"
 
+using namespace invido;
+
 typedef std::map<eSayPlayer, LPCSTR> _MAP_SAY;
 static _MAP_SAY g_MapSay;
 

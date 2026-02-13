@@ -2,7 +2,7 @@
 #define ___CARDSPEC_H_
 
 #include <vector>
-
+namespace invido {
 class CardSpec {
    public:
     CardSpec();
@@ -22,4 +22,5 @@ class CardSpec {
 };
 
 typedef std::vector<CardSpec> VCT_CARDSPEC;
+}
 #endif

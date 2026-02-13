@@ -4,6 +4,7 @@
 
 #include <iostream>
 
+using namespace invido;
 
 void Probability::SvilCombiHands(VCT_MAZZO& vct_Mazzo,
                                  MTX_HANDCOMBI& mtx_Result) {
@@ -37,7 +38,7 @@ void Probability::SvilCombiHands(VCT_MAZZO& vct_Mazzo,
         mtx_Result.push_back(vct_tmpRow);
 
         if (lCurrRow == lNumCombi - 1) {
-            // ultima colonna, non c'� bisogno di calcolare gli indici
+            // ultima colonna, non c'è bisogno di calcolare gli indici
             break;
         }
 

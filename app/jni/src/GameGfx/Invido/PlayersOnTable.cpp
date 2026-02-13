@@ -1,5 +1,7 @@
 #include "PlayersOnTable.h"
 
+using namespace invido;
+
 PlayersOnTable::PlayersOnTable() {
     m_lCurrent = 0;
     m_lNumPlayers = 0;

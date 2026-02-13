@@ -13,6 +13,8 @@
 #include "PlayerStatistic.h"
 #include "PlayersOnTable.h"
 
+namespace invido {
+
 class Mazzo;
 
 class InvidoCore : public I_CORE_Game {
@@ -89,5 +91,7 @@ class InvidoCore : public I_CORE_Game {
     MatchPoints _matchPoints;
     CardSpec _cardInfos[NUM_CARDS_HAND * MAX_NUM_PLAYER];
 };
+
+}
 
 #endif

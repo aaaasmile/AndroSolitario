@@ -5,6 +5,8 @@
 #include "InvidoCoreEnv.h"
 #include "MatchPoints.h"
 
+using namespace invido;
+
 Partita::Partita() {
     m_pGiocata = NULL;
     m_pInvidoCore = NULL;

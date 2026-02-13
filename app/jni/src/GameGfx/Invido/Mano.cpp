@@ -8,6 +8,7 @@
 #include "MatchPoints.h"
 #include "TraceService.h"
 
+using namespace invido;
 
 static const char* stalpzActionName[10] = {
     "MANO_WAITPL_TOPLAY", "MANO_WAIPL_TORESP", "MANO_SAYBUIDA",

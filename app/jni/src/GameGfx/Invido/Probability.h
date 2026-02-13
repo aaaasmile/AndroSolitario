@@ -5,6 +5,9 @@
 #include "InvidoCoreEnv.h"
 #include "Mazzo.h"
 
+namespace invido {
+
+typedef std::vector<Uint8> VCT_SINGLECARD;    
 typedef std::vector<VCT_SINGLECARD> MTX_HANDCOMBI;
 
 class Probability {
@@ -25,5 +28,7 @@ class Probability {
     VCT_LONG _vctCounter;
     int _cardOnHand;
 };
+
+}
 
 #endif

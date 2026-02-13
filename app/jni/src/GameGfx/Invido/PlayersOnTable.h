@@ -2,6 +2,8 @@
 #define __PLAYERSONTABLE_H
 
 #include "Player.h"
+
+namespace invido {
 class PlayersOnTable {
    public:
     enum eSwitchPLayer { SWITCH_TO_NEXT, NO_SWITCH };
@@ -28,5 +30,7 @@ class PlayersOnTable {
     long m_lFirstOnTrick;
     long m_lFirstOnMatch;
 };
+
+}
 
 #endif

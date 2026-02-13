@@ -5,6 +5,8 @@
 
 #include <vector>
 
+namespace invido {
+
 typedef std::vector<long> VCT_LONG;
 typedef VCT_LONG::iterator IT_VCTLONG;
 enum eGameConst {
@@ -98,5 +100,7 @@ enum eGiocataScoreState {
 };
 
 typedef std::vector<eSayPlayer> VCT_COMMANDS;
+
+}
 
 #endif
