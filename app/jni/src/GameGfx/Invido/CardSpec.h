@@ -1,7 +1,11 @@
 #ifndef ___CARDSPEC_H_
 #define ___CARDSPEC_H_
 
+#include <SDL3/SDL.h>
+
+#include "Config.h"
 #include <vector>
+
 namespace invido {
 class CardSpec {
    public:

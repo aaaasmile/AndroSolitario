@@ -2,11 +2,11 @@
 #define __GAMESELECTOR__H_
 
 #include "Traits.h"
+#include "GameGfx/Invido/InvidoGfx.h"
 
 using namespace traits;
 
 class SolitarioGfx;
-class InvidoGfx;
 
 class GameSelector {
    public:
@@ -17,7 +17,7 @@ class GameSelector {
 
    private:
     SolitarioGfx* _p_SolitarioGfx;
-    InvidoGfx* _p_InvidoGfx;
+    invido::InvidoGfx* _p_InvidoGfx;
 };
 
 #endif

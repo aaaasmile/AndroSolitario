@@ -47,9 +47,9 @@ void AlgAdvancedPlayer::ALG_SetAssociateIndex(int iIndex) {}
 
 void AlgAdvancedPlayer::ALG_NewMatch(int iNumPlayer) {}
 
-void AlgAdvancedPlayer::ALG_NewGiocata(const CARDINFO* pCardArray,
-                                       int iNumOfCards, int iPlayerIx) {
-    SDL_assert(iNumOfCards == NUM_CARDS_HAND);
+void AlgAdvancedPlayer::ALG_NewGiocata(const VCT_CARDSPEC& vctCards,
+                                       int iPlayerIx) {
+    SDL_assert(vctCards.size() == NUM_CARDS_HAND);
     int i;
     m_iNumManiWon = 0;
     m_iNumChiamateMonte = 0;
@@ -63,9 +63,11 @@ void AlgAdvancedPlayer::ALG_NewGiocata(const CARDINFO* pCardArray,
 
     TRACE_DEBUG("[TRALG]Giocata new:");
     for (i = 0; i < NUM_CARDS_HAND; i++) {
-        m_vct_Cards_CPU[i].SetCardInfo(pCardArray[i]);
+        CardSpec card = vctCards[i];
+        int ix = card.GetCardIndex();
+        m_vct_Cards_CPU[i].SetCardIndex(ix);
         m_arrIxPlayerWonHand[i] = -1;
-        TRACE_DEBUG("%d , carta: %s ", i, pCardArray[i].CardName.c_str());
+        TRACE_DEBUG("%d , carta: %s ", i, card.GetName().c_str());
     }
     TRACE_DEBUG("\n");
     for (i = 0; i < NUM_HANDS; i++) {
@@ -77,14 +79,6 @@ void AlgAdvancedPlayer::ALG_NewGiocata(const CARDINFO* pCardArray,
     m_OpponentSay = eSayPlayer::SP_VABENE;
     m_sayOppRisp = eSayPlayer::SP_VABENE;
     m_bLastManoPatada = false;
-
-    CardSpec Card;
-    TRACE_DEBUG("[TRALG]Cards of player %d are: \n", m_iMyIndex);
-    for (int i = 0; i < NUM_CARDS_HAND; i++) {
-        Card.SetCardInfo(pCardArray[i]);
-        TRACE_DEBUG("[%s] ", Card.GetName());
-    }
-    TRACE_DEBUG("\n");
 }
 
 void AlgAdvancedPlayer::ALG_PlayerHasVadoDentro(int iPlayerIx) {
@@ -116,20 +110,19 @@ void AlgAdvancedPlayer::doVadoDentro(int cardPos) {
 }
 
 void AlgAdvancedPlayer::ALG_PlayerHasPlayed(int iPlayerIx,
-                                            const CARDINFO* pCard) {
-    SDL_assert(pCard);
-    SDL_assert(pCard->byIndex != eGameConst::NOT_VALID_INDEX);
+                                            const CardSpec& cardSpec) {
+    TRACE_DEBUG("[TRALG]Player %d has played [%s]\n", iPlayerIx,
+                cardSpec.GetName().c_str());
     int i;
+    int ix = cardSpec.GetCardIndex();
     if (iPlayerIx == m_iMyIndex) {
-        CardSpec Card;
-        CardSpec CardUndef;
-        Card.SetCardInfo(*pCard);
         bool bFound = false;
         // card successfully played
         for (i = 0; !bFound && i < eGameConst::NUM_CARDS_HAND; i++) {
-            if (Card == m_vct_Cards_CPU[i]) {
+            if (ix == m_vct_Cards_CPU[i].GetCardIndex()) {
                 // card found
-                m_vct_Cards_CPU[i] = CardUndef;
+                //m_vct_Cards_CPU[i] = CardUndef;
+                // TODO remove card
                 bFound = true;
             }
         }
@@ -138,12 +131,9 @@ void AlgAdvancedPlayer::ALG_PlayerHasPlayed(int iPlayerIx,
         // oponent play
         m_OpponentSay = eSayPlayer::SP_VABENE;
     }
-    SDL_assert(pCard->byIndex != eGameConst::NOT_VALID_INDEX);
-    TRACE_DEBUG("[TRALG]Player %d has played [%s]\n", iPlayerIx,
-                pCard->CardName.c_str());
 
     CardSpec cardPlayed;
-    cardPlayed.SetCardInfo(*pCard);
+    cardPlayed.SetCardIndex(ix);
     m_vct_Cards_played[m_ixCurrMano].push_back(cardPlayed);
 
     m_iPlayerOnTurn = iPlayerIx == 0 ? 1 : 0;
@@ -792,7 +782,8 @@ void AlgAdvancedPlayer::ALG_HaveToRespond() {
     TRACE_DEBUG("[ALG] Say: points first card %d, max points %d \n",
                 pointsFirstCard, maxpoints);
 
-    if (m_OpponentSay >= eSayPlayer::SP_INVIDO && m_OpponentSay <= eSayPlayer::SP_PARTIDA) {
+    if (m_OpponentSay >= eSayPlayer::SP_INVIDO &&
+        m_OpponentSay <= eSayPlayer::SP_PARTIDA) {
         handleSayPopints(curr_mano, pointsFirstCard, lastNumChiamate, maxpoints,
                          sum_points);
     } else if (m_OpponentSay == SP_AMONTE) {

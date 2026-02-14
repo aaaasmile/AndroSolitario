@@ -50,13 +50,10 @@ void MatchPoints::GiocataStart() {
     _isGameAbandoned = false;
 }
 
-void MatchPoints::PlayerPlay(int iPlayerIx, CARDINFO* pCard) {
-    CardSpec Card;
-    SDL_assert(pCard);
-    Card.SetCardInfo(*pCard);
+void MatchPoints::PlayerPlay(int iPlayerIx, const CardSpec& cardSpec) {
     SDL_assert(_numCardsPlayed < MAX_NUM_PLAYER && _numCardsPlayed >= 0);
     _vctCardPlayed[_numCardsPlayed].playerIx = iPlayerIx;
-    _vctCardPlayed[_numCardsPlayed].cardSpec = Card;
+    _vctCardPlayed[_numCardsPlayed].cardSpec = cardSpec;
     _numCardsPlayed++;
 }
 
@@ -69,12 +66,11 @@ void MatchPoints::ManoEnd() {
     // hand is terminated
     if (_numPlayers == NUM_PLAY_INVIDO_2)  // consistency check
     {
-        int iPoints_1 =
-            g_PointsTable[_vctCardPlayed[PLAYER1].cardSpec.GetCardIndex()];
+        int iPoints_1 =_vctCardPlayed[PLAYER1].cardSpec.GetPoints();
         int iPlayer_1 = _vctCardPlayed[PLAYER1].playerIx;
-        int iPoints_2 =
-            g_PointsTable[_vctCardPlayed[PLAYER2].cardSpec.GetCardIndex()];
+        int iPoints_2 = _vctCardPlayed[PLAYER2].cardSpec.GetPoints();
         int iPlayer_2 = _vctCardPlayed[PLAYER2].playerIx;
+        
         _isManoPatatda = false;
         // mano is played
         _ManoDetailInfo[iManoTerminatedIndex].isPlayed = true;

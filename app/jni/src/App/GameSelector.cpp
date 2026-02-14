@@ -1,7 +1,6 @@
 #include "GameSelector.h"
 
 #include "Config.h"
-#include "GameGfx/Invido/InvidoGfx.h"
 #include "GameGfx/Solitario/SolitarioGfx.h"
 #include "GameSettings.h"
 
@@ -27,7 +26,7 @@ LPErrInApp fncBind_HandleEvent(void* self, SDL_Event* pEvent,
         SolitarioGfx* pSolitarioGfx = (SolitarioGfx*)self;
         return pSolitarioGfx->HandleEvent(pEvent, targetPos);
     } else if (pGameSettings->GetGameTypeGfx() == GameTypeEnum::Invido) {
-        InvidoGfx* pInvidoGfx = (InvidoGfx*)self;
+        invido::InvidoGfx* pInvidoGfx = (invido::InvidoGfx*)self;
         return pInvidoGfx->HandleEvent(pEvent, targetPos);
     }
     return ERR_UTIL::ErrorCreate("fncBind_HandleEvent without type");
@@ -40,7 +39,7 @@ LPErrInApp fncBind_HandleIterate(void* self, bool& done) {
         SolitarioGfx* pSolitarioGfx = (SolitarioGfx*)self;
         return pSolitarioGfx->HandleIterate(done);
     } else if (pGameSettings->GetGameTypeGfx() == GameTypeEnum::Invido) {
-        InvidoGfx* pInvidoGfx = (InvidoGfx*)self;
+        invido::InvidoGfx* pInvidoGfx = (invido::InvidoGfx*)self;
         return pInvidoGfx->HandleIterate(done);
     }
     return ERR_UTIL::ErrorCreate("fncBind_HandleIterate without type");
@@ -58,7 +57,7 @@ LPErrInApp fncBind_Initialize(void* self, SDL_Surface* pScreen,
         return pSolitarioGfx->Initialize(pScreen, fnUpdateScreen, pWindow,
                                          pSceneBackground, fnHighScore);
     } else if (pGameSettings->GetGameTypeGfx() == GameTypeEnum::Invido) {
-        InvidoGfx* pInvidoGfx = (InvidoGfx*)self;
+        invido::InvidoGfx* pInvidoGfx = (invido::InvidoGfx*)self;
         return pInvidoGfx->Initialize(pScreen, fnUpdateScreen, pWindow,
                                       pSceneBackground, fnHighScore);
     }
@@ -454,7 +453,7 @@ LPErrInApp fncBind_Show(void* self) {
         SolitarioGfx* pSolitarioGfx = (SolitarioGfx*)self;
         return pSolitarioGfx->Show();
     } else if (pGameSettings->GetGameTypeGfx() == GameTypeEnum::Invido) {
-        InvidoGfx* pInvidoGfx = (InvidoGfx*)self;
+        invido::InvidoGfx* pInvidoGfx = (invido::InvidoGfx*)self;
         return pInvidoGfx->Show();
     }
     return ERR_UTIL::ErrorCreate("fncBind_Show without type");
@@ -467,7 +466,7 @@ LPErrInApp fncBind_OnResize(void* self, SDL_Surface* pScreen) {
         SolitarioGfx* pSolitarioGfx = (SolitarioGfx*)self;
         return pSolitarioGfx->OnResize(pScreen);
     } else if (pGameSettings->GetGameTypeGfx() == GameTypeEnum::Invido) {
-        InvidoGfx* pInvidoGfx = (InvidoGfx*)self;
+        invido::InvidoGfx* pInvidoGfx = (invido::InvidoGfx*)self;
         return pInvidoGfx->OnResize(pScreen);
     }
     return ERR_UTIL::ErrorCreate("fncBind_OnResize without type");
@@ -490,7 +489,7 @@ GameGfxCb GameSelector::PrepGameGfx() {
         if (_p_InvidoGfx != NULL) {
             delete _p_InvidoGfx;
         }
-        _p_InvidoGfx = new InvidoGfx();
+        _p_InvidoGfx = new invido::InvidoGfx();
         static VGameGfxCb const tc = {.HandleEvent = (&fncBind_HandleEvent),
                                       .HandleIterate = (&fncBind_HandleIterate),
                                       .Initialize = (&fncBind_Initialize),

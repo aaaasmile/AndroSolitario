@@ -1664,6 +1664,10 @@ void InvidoGfx::ALG_MatchEnd(I_MatchScore* pScore) {
     _isMatchTerminated = true;
 }
 
+void InvidoGfx::ALG_HaveToPlay(){
+
+}
+
 void InvidoGfx::ALG_GicataScoreChange(eGiocataScoreState eNewScore) {
     STRING lpsNamePoints = _MapPunti[eNewScore];
     // Punteggio della giocata ora è:

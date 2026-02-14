@@ -147,4 +147,6 @@ typedef std::vector<std::string> VCT_STRING;
 #define DATA_PREFIX
 #endif
 
+enum eSUIT { BASTONI = 0, COPPE = 1, DENARI = 2, SPADE = 3 };
+
 #endif  // CONFIG_H

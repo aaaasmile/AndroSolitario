@@ -12,6 +12,7 @@
 #include "ErrorInfo.h"
 #include "InvidoCore.h"
 #include "Traits.h"
+#include "DeckType.h"
 
 using namespace traits;
 
@@ -28,7 +29,6 @@ enum {
 };
 
 class InvidoCore;
-class DeckType;
 class ButtonGfx;
 class BalloonGfx;
 class Languages;
@@ -79,8 +79,7 @@ class InvidoGfx : public I_ALG_Player {
     void INP_PlayerSay(eSayPlayer eSay);
     void ButCmdClicked(int iButID);
     Player* GetPlayer(int iIndex) { return _p_InvidoCore->GetPlayer(iIndex); }
-    // TODO here I_Match_Observer trait. I_ALG_Player should be for CPU and UI user.    
-    // Interface I_ALG_Player (callback functions from core invido engine)
+    // I_ALG_Player interface
     virtual void ALG_SetCoreInterface(I_CORE_Game* pCore) {}
     virtual void ALG_SetPlayerIndex(int iIndex) { _playerGuiIndex = iIndex; }
     virtual void ALG_SetOpponentIndex(int iIndex, int iOpponentNr) {
@@ -96,6 +95,7 @@ class InvidoGfx : public I_ALG_Player {
     virtual void ALG_ManoEnd(I_MatchScore* pScore);
     virtual void ALG_GiocataEnd(I_MatchScore* pScore);
     virtual void ALG_MatchEnd(I_MatchScore* pScore);
+    virtual void ALG_HaveToPlay();
     virtual void ALG_HaveToRespond();
     virtual void ALG_GicataScoreChange(eGiocataScoreState eNewScore);
     virtual void ALG_PlayerSaidWrong(int iPlayerIx);
@@ -103,8 +103,6 @@ class InvidoGfx : public I_ALG_Player {
    private:
     int animateCards();
     void drawStaticScene();
-    int initDeck();
-    int loadCardPac();
     void createRegionsInit();
     void renderCard(CardGfx* pCard);
     void drawPlayedCard(CardGfx* pCard);
