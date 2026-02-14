@@ -222,15 +222,11 @@ void AlgAdvancedPlayer::PlayAsFirst() {
         }
     }
 
-    int i, maxpoints = 0, max_pos = 0, sum_points = 0, min_pos = 0;
+    int i = 0, maxpoints = 0, max_pos = 0, sum_points = 0, min_pos = 0;
     int min_points = 20;
     int med_points = 0, med_pos = 0;
-    int arrPoints[eGameConst::NUM_CARDS_HAND] = {0, 0, 0};
-    for (i = 0; i < eGameConst::NUM_CARDS_HAND; i++) {
-        if (m_vct_Cards_CPU[i] == cardUndef) {
-            continue;
-        }
-        int points = m_vct_Cards_CPU[i].GetPoints();
+    for (const CardSpec& card : m_vct_Cards_CPU) {
+        int points = card.GetPoints();
         if (points > maxpoints) {
             med_points = maxpoints;
             med_pos = max_pos;
@@ -244,8 +240,8 @@ void AlgAdvancedPlayer::PlayAsFirst() {
             min_pos = i;
             min_points = points;
         }
-        arrPoints[i] = points;
         sum_points += points;
+        i++;
     }
     CardSpec result;
     bool hasCardResult = true;
@@ -475,15 +471,8 @@ void AlgAdvancedPlayer::PlayAsFirst() {
 }
 
 void AlgAdvancedPlayer::GiocaACaso() {
-    int iCartaPos = SDL_rand(3);
-    int iLoops = 0;
-    while (m_vct_Cards_CPU[iCartaPos] == cardUndef && iLoops < NUM_CARDS_HAND) {
-        iCartaPos++;
-        if (iCartaPos >= NUM_CARDS_HAND) {
-            iCartaPos = 0;
-        }
-        iLoops++;
-    }
+    SDL_assert(m_vct_Cards_CPU.size() > 0);
+    int iCartaPos = SDL_rand(m_vct_Cards_CPU.size());
     SDL_assert(m_pCoreGame);
     m_pCoreGame->PlayCard(m_iMyIndex, m_vct_Cards_CPU[iCartaPos]);
 }
