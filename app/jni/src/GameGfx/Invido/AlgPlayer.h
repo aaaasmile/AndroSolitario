@@ -7,10 +7,10 @@
 
 namespace invido {
 
-class AlgAdvancedPlayer : public I_ALG_Player {
+class AlgPlayer : public I_ALG_Player {
    public:
-    AlgAdvancedPlayer();
-    virtual ~AlgAdvancedPlayer();
+    AlgPlayer();
+    virtual ~AlgPlayer();
 
     // interface I_ALG_Player
     virtual void ALG_SetCoreInterface(I_CORE_Game* pCore);
