@@ -30,9 +30,7 @@ static const int g_PointsTable[] = {
     /*Asso*/ 11, /*Due*/ 12,  /*Tre*/ 13,  /*Quattro*/ 4, /*cinque*/ 5,
     /*Sei*/ 6,   /*Sette*/ 7, /*Fante*/ 8, /*Cavallo*/ 9, /*Re*/ 10};
 
-CardSpec::CardSpec() {
-    SetCardIndex(0);
-}
+CardSpec::CardSpec() { SetCardIndex(0); }
 
 void CardSpec::SetCardIndex(Uint8 index) {
     SDL_assert(index >= 0 && index <= eGameConst::NUM_CARDS_MAZZBRI);
@@ -57,7 +55,7 @@ void CardSpec::SetCardIndex(Uint8 index) {
     }
 }
 
-int CardSpec::GetPoints() {
+int CardSpec::GetPoints() const {
     SDL_assert(_index >= 0 && _index < eGameConst::NUM_CARDS_MAZZBRI);
     return g_PointsTable[_index];
 }

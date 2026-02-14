@@ -3,21 +3,23 @@
 
 #include <SDL3/SDL.h>
 
-#include "Config.h"
 #include <vector>
+
+#include "Config.h"
+
 
 namespace invido {
 class CardSpec {
    public:
     CardSpec();
     void SetCardIndex(Uint8 index);
-    int GetCardIndex() { return _index; }
-    eSUIT GetSuit() { return _eSuit; }
-    std::string GetName() { return _cardName; }
+    int GetCardIndex() const { return _index; }
+    eSUIT GetSuit() const { return _eSuit; }
+    std::string GetName() const { return _cardName; }
     void operator=(const CardSpec& r);
-    bool operator==(const CardSpec& r) { return _index == r._index; }
-    bool operator!=(const CardSpec& r) { return _index != r._index; }
-    int GetPoints();
+    bool operator==(const CardSpec& r) const { return _index == r._index; }
+    bool operator!=(const CardSpec& r) const { return _index != r._index; }
+    int GetPoints() const;
 
    private:
     Uint8 _index;
@@ -26,5 +28,5 @@ class CardSpec {
 };
 
 typedef std::vector<CardSpec> VCT_CARDSPEC;
-}
+}  // namespace invido
 #endif
