@@ -88,16 +88,14 @@ void AlgAdvancedPlayer::ALG_PlayerHasVadoDentro(int iPlayerIx) {
         // l'idea è quella di ritrovare la carta con la quale si è andati dentro
         // e poi di chiamare ALG_PlayerHasPlayed
         SDL_assert(m_iCPUCardDentroPos != eGameConst::NOT_VALID_INDEX);
-        SDL_assert(m_vct_Cards_CPU[m_iCPUCardDentroPos].GetCardIndex() !=
-                   eGameConst::NOT_VALID_INDEX);
         cardDentro.SetCardIndex(
             m_vct_Cards_CPU[m_iCPUCardDentroPos].GetCardIndex());
-        ALG_PlayerHasPlayed(iPlayerIx, cardDentro.GetCardInfo());
+        ALG_PlayerHasPlayed(iPlayerIx, cardDentro);
         m_iCPUCardDentroPos = eGameConst::NOT_VALID_INDEX;
     } else {
         m_opponetIsVadoDentro = true;
         cardDentro.SetCardIndex(3);
-        ALG_PlayerHasPlayed(iPlayerIx, cardDentro.GetCardInfo());
+        ALG_PlayerHasPlayed(iPlayerIx, cardDentro);
     }
 }
 
@@ -105,8 +103,7 @@ void AlgAdvancedPlayer::doVadoDentro(int cardPos) {
     CardSpec cardUndef;
     m_iCPUCardDentroPos = cardPos;
     SDL_assert(m_vct_Cards_CPU[cardPos] != cardUndef);
-    m_pCoreGame->Player_vaDentro(m_iMyIndex,
-                                 m_vct_Cards_CPU[cardPos].GetCardInfo());
+    m_pCoreGame->VaDentro(m_iMyIndex, m_vct_Cards_CPU[cardPos]);
 }
 
 void AlgAdvancedPlayer::ALG_PlayerHasPlayed(int iPlayerIx,
@@ -121,7 +118,7 @@ void AlgAdvancedPlayer::ALG_PlayerHasPlayed(int iPlayerIx,
         for (i = 0; !bFound && i < eGameConst::NUM_CARDS_HAND; i++) {
             if (ix == m_vct_Cards_CPU[i].GetCardIndex()) {
                 // card found
-                //m_vct_Cards_CPU[i] = CardUndef;
+                // m_vct_Cards_CPU[i] = CardUndef;
                 // TODO remove card
                 bFound = true;
             }
@@ -197,7 +194,7 @@ bool AlgAdvancedPlayer::ChiamaAMonte(int lastNumChiamate) {
 void AlgAdvancedPlayer::Chiama(eSayPlayer eSay, int lastChiamataNum) {
     SDL_assert(lastChiamataNum == m_iNumChiamateInGiocata);
     m_iNumChiamateInGiocata += 1;
-    m_pCoreGame->Player_saySomething(m_iMyIndex, eSay);
+    m_pCoreGame->Say(m_iMyIndex, eSay);
 }
 
 bool AlgAdvancedPlayer::ChiamaDiPiu(int lastNumChiamate) {
@@ -217,8 +214,6 @@ bool AlgAdvancedPlayer::ChiamaDiPiu(int lastNumChiamate) {
 
 void AlgAdvancedPlayer::PlayAsFirst() {
     int lastNumChiamate = m_iNumChiamateInGiocata;
-    CARDINFO* result = NULL;
-    CardSpec cardUndef{};  // TODO: check if this is correct
     int curr_mano = NumMano();
     if (SDL_rand(40) >= 35 && !m_bIamCalledPoints) {
         if (Cagna(lastNumChiamate)) {
@@ -252,19 +247,21 @@ void AlgAdvancedPlayer::PlayAsFirst() {
         arrPoints[i] = points;
         sum_points += points;
     }
+    CardSpec result;
+    bool hasCardResult = true;
     TRACE_DEBUG(
         "[1ST]Take: min pos %d (pt %d), med pos %d (pt %d), max pos %d(pt %d) "
         "\n",
         min_pos, min_points, med_pos, med_points, max_pos, maxpoints);
 
     if (curr_mano == 2 && m_iNumManiWon == 1) {
-        result = m_vct_Cards_CPU[min_pos].GetCardInfo();
+        result = m_vct_Cards_CPU[min_pos];
         TRACE_DEBUG("Candidate from min position\n");
     } else {
-        result = m_vct_Cards_CPU[max_pos].GetCardInfo();
+        result = m_vct_Cards_CPU[max_pos];
     }
     TRACE_DEBUG("[TRALG]candidate play PLF_pos: %s\n",
-                result->CardName.c_str());
+                result.GetName().c_str());
 
     if (curr_mano == 2 && m_iNumManiWon == 1) {
         int pointsCardMano1_pl1 = m_vct_Cards_played[0][0].GetPoints();
@@ -288,118 +285,118 @@ void AlgAdvancedPlayer::PlayAsFirst() {
                 doVadoDentro(min_pos);
                 return;
             }
-        } else if (result != NULL && min_points < maxPointsMano1) {
+        } else if (min_points < maxPointsMano1) {
             TRACE_DEBUG("[TRALG]Dentro per bluf\n");
             doVadoDentro(min_pos);
             return;
         } else if (SDL_rand(3) == 1 && m_eScoreCurrent <= SC_INVIDO) {
-            if (result != NULL && ChiamaDiPiu(lastNumChiamate)) {
+            if (hasCardResult && ChiamaDiPiu(lastNumChiamate)) {
                 TRACE_DEBUG("[TRALG]PLF_R5_primavinta\n");
-                result = NULL;
+                hasCardResult = false;
             }
         }
-        if (result != NULL) {
-            result = m_vct_Cards_CPU[min_pos].GetCardInfo();
+        if (hasCardResult) {
+            result = m_vct_Cards_CPU[min_pos];
             TRACE_DEBUG("[TRALG]PLF_cand_min_pos: %s\n",
-                        result->CardName.c_str());
+                        result.GetName().c_str());
         }
     } else if (m_iNumManiWon == 1 && maxpoints >= 12 &&
                m_arrIxPlayerWonHand[0] == m_iMyIndex) {
-        if (ChiamaDiPiu(lastNumChiamate)) {
+        if (hasCardResult && ChiamaDiPiu(lastNumChiamate)) {
             TRACE_DEBUG("[TRALG]PLF_R1bisFortePrimamia\n");
-            result = NULL;
+            hasCardResult = false;
         }
     } else if (curr_mano == 1 && maxpoints >= 12 && med_points < 10 &&
                med_points > 0) {
-        result = m_vct_Cards_CPU[med_pos].GetCardInfo();
-        TRACE_DEBUG("[TRALG]PLF_cand_med_pos: %s\n", result->CardName.c_str());
+        result = m_vct_Cards_CPU[med_pos];
+        TRACE_DEBUG("[TRALG]PLF_cand_med_pos: %s\n", result.GetName().c_str());
     } else if (curr_mano == 1 && maxpoints >= 11 && med_points < 10) {
         if (SDL_rand(10) > 5) {
-            result = m_vct_Cards_CPU[med_pos].GetCardInfo();
+            result = m_vct_Cards_CPU[med_pos];
             TRACE_DEBUG("[TRALG]PLF_cand_med_pos Brnd: %s\n",
-                        result->CardName.c_str());
+                        result.GetName().c_str());
         }
     } else if (m_iNumManiWon == 1 && maxpoints >= 12 &&
                m_eScoreCurrent == SC_CANELA) {
-        if (ChiamaDiPiu(lastNumChiamate)) {
+        if (hasCardResult && ChiamaDiPiu(lastNumChiamate)) {
             TRACE_DEBUG("[TRALG]PLF_R1Bvintauna\n");
-            result = NULL;
+            hasCardResult = false;
         }
     } else if (m_bLastManoPatada) {
         if (maxpoints == 13) {
-            if (result != NULL && ChiamaDiPiu(lastNumChiamate)) {
+            if (hasCardResult && ChiamaDiPiu(lastNumChiamate)) {
                 TRACE_DEBUG("[TRALG]PLF_R2A_manopatada\n");
-                result = NULL;
+                hasCardResult = false;
             }
         } else if (maxpoints <= 10) {
-            if (result != NULL && ChiamaAMonte(lastNumChiamate)) {
+            if (hasCardResult && ChiamaAMonte(lastNumChiamate)) {
                 TRACE_DEBUG("[TRALG]PLF_R2B_manopatada\n");
-                result = NULL;
+                hasCardResult = false;
             }
         } else if ((maxpoints == 12 || maxpoints == 11) &&
                    m_eScoreCurrent <= SC_INVIDO) {
-            if (SDL_rand(30) < maxpoints && result != NULL &&
+            if (SDL_rand(30) < maxpoints && hasCardResult &&
                 ChiamaDiPiu(lastNumChiamate)) {
                 TRACE_DEBUG("[TRALG]PLF_R2C_manopatada\n");
-                result = NULL;
+                hasCardResult = false;
             }
         }
     } else if (maxpoints == 13 && sum_points > 21 && SDL_rand(10) > 6 &&
                m_eScoreCurrent <= SC_INVIDO) {
-        if (result != NULL && ChiamaDiPiu(lastNumChiamate)) {
+        if (hasCardResult && ChiamaDiPiu(lastNumChiamate)) {
             TRACE_DEBUG("[TRALG]PLF_R3_tre\n");
-            result = NULL;
+            hasCardResult = false;
         }
     } else if (sum_points < 15 && curr_mano == 1 && SDL_rand(2) == 1) {
         // mano scarsa
-        if (result != NULL && ChiamaAMonte(lastNumChiamate)) {
+        if (hasCardResult && ChiamaAMonte(lastNumChiamate)) {
             TRACE_DEBUG("[TRALG]PLF_R4_poco\n");
-            result = NULL;
+            hasCardResult = false;
         }
     } else if (curr_mano == 3 && m_arrIxPlayerWonHand[0] == m_iMyIndex) {
         // terza mano prima mia
         if (maxpoints == 13) {
             if (SDL_rand(20) > 16) {
                 // bluff
-                if (result != NULL && ChiamaAMonte(lastNumChiamate)) {
-                    result = NULL;
+                if (hasCardResult && ChiamaAMonte(lastNumChiamate)) {
+                    hasCardResult = false;
                     TRACE_DEBUG("[TRALG]PLF_R7_bluff_coltre\n");
                 }
             } else {
-                if (result != NULL && ChiamaDiPiu(lastNumChiamate)) {
-                    result = NULL;
+                if (hasCardResult && ChiamaDiPiu(lastNumChiamate)) {
+                    hasCardResult = false;
                     TRACE_DEBUG("[TRALG]PLF_R8_tre\n");
                 }
             }
         } else if (maxpoints == 12) {
             if (SDL_rand(20) > 14) {
-                if (result != NULL && ChiamaAMonte(lastNumChiamate)) {
+                if (hasCardResult && ChiamaAMonte(lastNumChiamate)) {
                     TRACE_DEBUG("[TRALG]PLF_R9_bluffcoldue\n");
-                    result = NULL;
+                    hasCardResult = false;
                 }
             } else if (SDL_rand(2) == 1 && m_eScoreCurrent <= SC_INVIDO) {
-                if (result != NULL && ChiamaDiPiu(lastNumChiamate)) {
+                if (hasCardResult && ChiamaDiPiu(lastNumChiamate)) {
                     TRACE_DEBUG("[TRALG]PLF_R10_due\n");
-                    result = NULL;
+                    hasCardResult = false;
                 }
             }
         } else if (maxpoints == 10 || maxpoints == 9) {
             if (SDL_rand(20) > 11) {
-                if (result != NULL && ChiamaAMonte(lastNumChiamate)) {
+                if (hasCardResult && ChiamaAMonte(lastNumChiamate)) {
                     TRACE_DEBUG("[TRALG]PLF_R11_poco\n");
-                    result = NULL;
+                    hasCardResult = false;
                 }
             } else if (SDL_rand(20) > 15 && m_eScoreCurrent <= SC_INVIDO) {
-                if (result != NULL && ChiamaDiPiu(lastNumChiamate)) {
+                if (hasCardResult && ChiamaDiPiu(lastNumChiamate)) {
                     TRACE_DEBUG("[TRALG]PLF_R12_bluffconpoco\n");
-                    result = NULL;
+                    hasCardResult = false;
                 }
             }
         } else {
             if (SDL_rand(20) > 7) {
-                if (result != NULL && ChiamaAMonte(lastNumChiamate)) {
+                if (hasCardResult && ChiamaAMonte(lastNumChiamate)) {
                     TRACE_DEBUG("[TRALG]PLF_R13_amonte\n");
-                    result = NULL;
+                    hasCardResult = false;
                 }
             }
         }
@@ -409,47 +406,47 @@ void AlgAdvancedPlayer::PlayAsFirst() {
         if (maxpoints == 13) {
             if (SDL_rand(20) > 15) {
                 // bluff
-                if (result != NULL && ChiamaAMonte(lastNumChiamate)) {
+                if (hasCardResult && ChiamaAMonte(lastNumChiamate)) {
                     TRACE_DEBUG("[TRALG]PLF_R14_bluffcoltre\n");
-                    result = NULL;
+                    hasCardResult = false;
                 }
             } else if (SDL_rand(20) > 9 && m_eScoreCurrent <= SC_INVIDO) {
-                if (result != NULL && ChiamaDiPiu(lastNumChiamate)) {
+                if (hasCardResult && ChiamaDiPiu(lastNumChiamate)) {
                     TRACE_DEBUG("[TRALG]PLF_R15_tre\n");
-                    result = NULL;
+                    hasCardResult = false;
                 }
             }
         } else if (maxpoints == 12) {
             if (SDL_rand(20) > 12) {
-                if (result != NULL && ChiamaAMonte(lastNumChiamate)) {
+                if (hasCardResult && ChiamaAMonte(lastNumChiamate)) {
                     TRACE_DEBUG("[TRALG]PLF_R16_montecoldue\n");
-                    result = NULL;
+                    hasCardResult = false;
                 }
             } else if (SDL_rand(3) == 1) {
-                if (result != NULL && ChiamaDiPiu(lastNumChiamate) &&
+                if (hasCardResult && ChiamaDiPiu(lastNumChiamate) &&
                     m_eScoreCurrent <= SC_INVIDO) {
                     TRACE_DEBUG("[TRALG]PLF_R17_rilanciodue\n");
-                    result = NULL;
+                    hasCardResult = false;
                 }
             }
         } else if (maxpoints == 10 || maxpoints == 9) {
             if (SDL_rand(20) > 9) {
-                if (result != NULL && ChiamaAMonte(lastNumChiamate)) {
+                if (hasCardResult && ChiamaAMonte(lastNumChiamate)) {
                     TRACE_DEBUG("[TRALG]PLF_R17_montecolre\n");
-                    result = NULL;
+                    hasCardResult = false;
                 }
             } else if (SDL_rand(20) > 17) {
-                if (result != NULL && ChiamaDiPiu(lastNumChiamate) &&
+                if (hasCardResult && ChiamaDiPiu(lastNumChiamate) &&
                     m_eScoreCurrent <= SC_INVIDO) {
                     TRACE_DEBUG("[TRALG]PLF_R18_rilanciocolre\n");
-                    result = NULL;
+                    hasCardResult = false;
                 }
             }
         } else {
             if (SDL_rand(20) > 5) {
-                if (result != NULL && ChiamaAMonte(lastNumChiamate)) {
+                if (hasCardResult && ChiamaAMonte(lastNumChiamate)) {
                     TRACE_DEBUG("[TRALG]PLF_R19_monte\n");
-                    result = NULL;
+                    hasCardResult = false;
                 }
             }
         }
@@ -457,28 +454,27 @@ void AlgAdvancedPlayer::PlayAsFirst() {
 
     if (SDL_rand(40) > 37) {
         // chiamata a monte rara
-        if (result != NULL && ChiamaAMonte(lastNumChiamate)) {
+        if (hasCardResult && ChiamaAMonte(lastNumChiamate)) {
             TRACE_DEBUG("[TRALG]PLF_R20_monteraro\n");
-            result = NULL;
+            hasCardResult = false;
         }
     }
 
-    if (lastNumChiamate == m_iNumChiamateInGiocata && result == NULL) {
+    if (lastNumChiamate == m_iNumChiamateInGiocata && !hasCardResult) {
         SDL_assert(0);
         TRACE_DEBUG("[TRALG]PLF_R21_giocaacaso\n");
         GiocaACaso();
     }
 
-    if (result != NULL) {
+    if (hasCardResult) {
         SDL_assert(m_pCoreGame);
-        m_pCoreGame->Player_playCard(m_iMyIndex, result);
+        m_pCoreGame->PlayCard(m_iMyIndex, result);
     } else {
         TRACE_DEBUG("[TRALG]PLF non gioca carta per chiamata\n");
     }
 }
 
 void AlgAdvancedPlayer::GiocaACaso() {
-    CardSpec cardUndef;
     int iCartaPos = SDL_rand(3);
     int iLoops = 0;
     while (m_vct_Cards_CPU[iCartaPos] == cardUndef && iLoops < NUM_CARDS_HAND) {
@@ -489,13 +485,12 @@ void AlgAdvancedPlayer::GiocaACaso() {
         iLoops++;
     }
     SDL_assert(m_pCoreGame);
-    m_pCoreGame->Player_playCard(m_iMyIndex,
-                                 m_vct_Cards_CPU[iCartaPos].GetCardInfo());
+    m_pCoreGame->PlayCard(m_iMyIndex, m_vct_Cards_CPU[iCartaPos]);
 }
 
 void AlgAdvancedPlayer::PlayAsSecond() {
-    CARDINFO* result = NULL;
-    CardSpec cardUndef;
+    CardSpec result;
+    bool hasCardResult = true;
     SDL_assert(m_vct_Cards_played[m_ixCurrMano].size() == 1);
     CardSpec cardPlayed = m_vct_Cards_played[m_ixCurrMano].front();
 
@@ -538,24 +533,24 @@ void AlgAdvancedPlayer::PlayAsSecond() {
     if (m_opponetIsVadoDentro) {
         // Avversario è  andato dentro, quindi si gioca la carta più bassa che
         // si vince la mano
-        result = m_vct_Cards_CPU[min_pos].GetCardInfo();
+        result = m_vct_Cards_CPU[min_pos];
         TRACE_DEBUG("[TRALG]PL2nd_min_vadodentro: %s\n",
-                    result->CardName.c_str());
+                    result.GetName().c_str());
     } else if (first_take_pos != -1) {
         // si prende
-        result = m_vct_Cards_CPU[first_take_pos].GetCardInfo();
+        result = m_vct_Cards_CPU[first_take_pos];
         TRACE_DEBUG("[TRALG]PL2nd_cand_first_take_pos: %s\n",
-                    result->CardName.c_str());
+                    result.GetName().c_str());
     } else if (same_points_pos != -1) {
         // poi se patta
-        result = m_vct_Cards_CPU[same_points_pos].GetCardInfo();
+        result = m_vct_Cards_CPU[same_points_pos];
         TRACE_DEBUG("[TRALG]PL2nd_cand_same_pos: %s\n",
-                    result->CardName.c_str());
+                    result.GetName().c_str());
     } else {
         // perdo, quindi gioca la carta pi bassa
-        result = m_vct_Cards_CPU[min_pos].GetCardInfo();
+        result = m_vct_Cards_CPU[min_pos];
         TRACE_DEBUG("[TRALG]PL2nd_cand_min_pos: %s\n",
-                    result->CardName.c_str());
+                    result.GetName().c_str());
     }
 
     if (m_opponetIsVadoDentro) {
@@ -563,37 +558,37 @@ void AlgAdvancedPlayer::PlayAsSecond() {
     } else if (pointsFirstCard > maxpoints && m_iNumManiWon == 0 &&
                curr_mano > 1) {
         if (SDL_rand(20) < 16) {
-            if (result != NULL && ChiamaAMonte(lastNumChiamate)) {
+            if (hasCardResult && ChiamaAMonte(lastNumChiamate)) {
                 TRACE_DEBUG("[TRALG]PL2nd_R1_monte\n");
-                result = NULL;
+                hasCardResult = false;
             }
         }
     } else if (curr_mano == 3 && pointsFirstCard == maxpoints &&
                pointsFirstCard == 13 && m_arrIxPlayerWonHand[0] == m_iMyIndex) {
-        if (result != NULL && ChiamaAMonte(lastNumChiamate)) {
+        if (hasCardResult && ChiamaAMonte(lastNumChiamate)) {
             TRACE_DEBUG("[TRALG]PL2nd_R2_megacagna\n");
-            result = NULL;
-        } else if (result != NULL && ChiamaDiPiu(lastNumChiamate)) {
+            hasCardResult = false;
+        } else if (hasCardResult && ChiamaDiPiu(lastNumChiamate)) {
             TRACE_DEBUG("[TRALG]PL2nd_R2C_piu\n");
-            result = NULL;
+            hasCardResult = false;
         }
 
     } else if (first_take_pos == -1 && m_iNumManiWon == 0 && curr_mano > 1) {
-        if (result != NULL && ChiamaAMonte(lastNumChiamate)) {
+        if (hasCardResult && ChiamaAMonte(lastNumChiamate)) {
             TRACE_DEBUG("[TRALG]PL2nd_R1B_perdosempre\n");
-            result = NULL;
+            hasCardResult = false;
         }
     } else if (first_take_pos != -1 && m_bLastManoPatada) {
         int rest = pointsFirstCard >= 12 ? 15 : 35;
         if (SDL_rand(40) > rest) {
-            if (result != NULL && ChiamaAMonte(lastNumChiamate)) {
+            if (hasCardResult && ChiamaAMonte(lastNumChiamate)) {
                 TRACE_DEBUG("[TRALG]PL2nd_R2A_monte_cagna\n");
-                result = NULL;
+                hasCardResult = false;
             }
         } else {
-            if (result != NULL && ChiamaDiPiu(lastNumChiamate)) {
+            if (hasCardResult && ChiamaDiPiu(lastNumChiamate)) {
                 TRACE_DEBUG("[TRALG]PL2nd_R2B_chiama\n");
-                result = NULL;
+                hasCardResult = false;
             }
         }
     } else if (curr_mano == 3 && same_points_pos != -1 && m_iNumManiWon == 1 &&
@@ -602,73 +597,73 @@ void AlgAdvancedPlayer::PlayAsSecond() {
         // di più
         if ((SDL_rand(30 - pointsFirstCard) > 3) ||
             (m_MyLastSay == SP_AMONTE)) {
-            if (result != NULL && ChiamaDiPiu(lastNumChiamate)) {
+            if (hasCardResult && ChiamaDiPiu(lastNumChiamate)) {
                 TRACE_DEBUG("[TRALG]PL2nd_R3B_pata_chiama\n");
-                result = NULL;
+                hasCardResult = false;
             }
         } else {
-            if (result != NULL && ChiamaAMonte(lastNumChiamate)) {
+            if (hasCardResult && ChiamaAMonte(lastNumChiamate)) {
                 TRACE_DEBUG("[TRALG]PL2nd_R3B_pata_cagna\n");
-                result = NULL;
+                hasCardResult = false;
             }
         }
     } else if (curr_mano == 3 && first_take_pos != -1 && m_iNumManiWon == 1) {
         if (SDL_rand(40) > 35 && pointsFirstCard >= 10 &&
             m_eScoreCurrent <= SC_TRASMAS) {
-            if (result != NULL && ChiamaAMonte(lastNumChiamate)) {
+            if (hasCardResult && ChiamaAMonte(lastNumChiamate)) {
                 TRACE_DEBUG("[TRALG]PL2nd_R2B_monte_cagna\n");
-                result = NULL;
+                hasCardResult = false;
             }
         } else {
-            if (result != NULL && ChiamaDiPiu(lastNumChiamate)) {
+            if (hasCardResult && ChiamaDiPiu(lastNumChiamate)) {
                 TRACE_DEBUG("[TRALG]PL2nd_R2B_chiama\n");
-                result = NULL;
+                hasCardResult = false;
             }
         }
     } else if (curr_mano == 1 && first_take_pos != -1 &&
                pointsFirstCard <= 11) {
-        if (result != NULL && ChiamaDiPiu(lastNumChiamate)) {
+        if (hasCardResult && ChiamaDiPiu(lastNumChiamate)) {
             TRACE_DEBUG("[TRALG]PL2nd_R3A_chiama\n");
-            result = NULL;
+            hasCardResult = false;
         }
     } else if (same_points_pos != -1 && maxpoints >= 12) {
-        result = m_vct_Cards_CPU[same_points_pos].GetCardInfo();
+        result = m_vct_Cards_CPU[same_points_pos];
         TRACE_DEBUG("[TRALG]PL2nd_cand_same_points_pos: %s\n",
-                    result->CardName.c_str());
+                    result.GetName().c_str());
         if (SDL_rand(20) > 5) {
-            if (result != NULL && ChiamaDiPiu(lastNumChiamate)) {
-                result = NULL;
+            if (ChiamaDiPiu(lastNumChiamate)) {
+                hasCardResult = false;
                 TRACE_DEBUG("[TRALG]PL2nd_R4A_dipiu\n");
             }
         } else if (SDL_rand(20) > 17) {
-            if (result != NULL && ChiamaAMonte(lastNumChiamate)) {
+            if (ChiamaAMonte(lastNumChiamate)) {
                 TRACE_DEBUG("[TRALG]PL2nd_R4B_monte\n");
-                result = NULL;
+                hasCardResult = false;
             }
         }
     } else if (pointsFirstCard > maxpoints) {
         // si perde la mano
         if (SDL_rand(20) > 15 || (curr_mano == 3 && m_iNumManiWon == 1) ||
             (curr_mano == 2 && m_iNumManiWon == 0)) {
-            if (result != NULL && ChiamaAMonte(lastNumChiamate)) {
+            if (ChiamaAMonte(lastNumChiamate)) {
                 TRACE_DEBUG("[TRALG]PL2nd_R5_monte\n");
-                result = NULL;
+                hasCardResult = false;
             }
         }
-        if (result != NULL && curr_mano > 1) {
+        if (hasCardResult && curr_mano > 1) {
             // Vado dentro
             TRACE_DEBUG("[TRALG]PL2nd non prendo, quindi dentro per vergona\n");
             doVadoDentro(min_pos);
             return;
         }
-    } else if (lastNumChiamate == m_iNumChiamateInGiocata && result == NULL) {
+    } else if (lastNumChiamate == m_iNumChiamateInGiocata && !hasCardResult) {
         TRACE_DEBUG("[TRALG]PL2nd_R5_acaso\n");
         SDL_assert(0);
         GiocaACaso();
     }
 
-    if (result != NULL) {
-        m_pCoreGame->Player_playCard(m_iMyIndex, result);
+    if (hasCardResult) {
+        m_pCoreGame->PlayCard(m_iMyIndex, result);
     } else {
         TRACE_DEBUG("[TRALG]PL2nd non gioca per chiamata pending\n");
     }
