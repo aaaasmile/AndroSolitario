@@ -487,15 +487,11 @@ void AlgAdvancedPlayer::PlayAsSecond() {
     int curr_mano = NumMano();
     int lastNumChiamate = m_iNumChiamateInGiocata;
 
-    int iLoops = 0, i, maxpoints = 0, max_pos = 0, sum_points = 0, min_pos = 0;
+    int i = 0, maxpoints = 0, max_pos = 0, min_pos = 0;
     int min_points = 20, same_points_pos = -1, first_take_pos = -1,
         first_take_points = 20;
-    int arrPoints[NUM_CARDS_HAND] = {0, 0, 0};
-    for (i = 0; i < NUM_CARDS_HAND; i++) {
-        if (m_vct_Cards_CPU[i] == cardUndef) {
-            continue;
-        }
-        int points = m_vct_Cards_CPU[i].GetPoints();
+    for (const CardSpec& card : m_vct_Cards_CPU) {
+        int points = card.GetPoints();
         if (points > maxpoints) {
             maxpoints = points;
             max_pos = i;
@@ -511,8 +507,7 @@ void AlgAdvancedPlayer::PlayAsSecond() {
             first_take_pos = i;  // La carta pi� bassa che pu� prendere
             first_take_points = points;
         }
-        arrPoints[i] = points;
-        sum_points += points;
+        i++;
     }
     TRACE_DEBUG(
         "[2ND]Points played card %d, Take: min pos %d (pt %d), first_take_pos "
@@ -743,23 +738,16 @@ void AlgAdvancedPlayer::ALG_HaveToRespond() {
 
     m_pCoreGame->GetAdmittedCommands(vct_cmd, m_iMyIndex);
     size_t iNumCmds = vct_cmd.size();
-    int iLoops = 0, i, maxpoints = 0, max_pos = 0, sum_points = 0, min_pos = 0;
+    int maxpoints = 0, sum_points = 0;
     int min_points = 20;
-    int arrPoints[NUM_CARDS_HAND] = {0, 0, 0};
-    for (i = 0; i < NUM_CARDS_HAND; i++) {
-        if (m_vct_Cards_CPU[i] == cardUndef) {  // TODO check
-            continue;
-        }
-        int points = m_vct_Cards_CPU[i].GetPoints();
+    for (const CardSpec& card : m_vct_Cards_CPU) {
+        int points = card.GetPoints();
         if (points > maxpoints) {
             maxpoints = points;
-            max_pos = i;
         }
         if (points < min_points) {
-            min_pos = i;
             min_points = points;
         }
-        arrPoints[i] = points;
         sum_points += points;
     }
     int curr_mano = NumMano();
