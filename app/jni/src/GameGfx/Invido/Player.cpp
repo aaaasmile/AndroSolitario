@@ -6,7 +6,7 @@ using namespace invido;
 
 Player::Player() {
     _index = NOT_VALID_INDEX;
-    _p_IAlgorithm = 0;
+    _p_IAlgorithm = NULL;
     _eLevel = DUMMY;
 }
 
@@ -17,7 +17,7 @@ Player::~Player() {
 }
 
 Player::Player(const Player& a) {
-    strncpy(_p_PlayerName, a._p_PlayerName, BUFF_NAME);
+    _playerName = a._playerName;
     _eKind = a._eKind;
     _index = a._index;
     _p_IAlgorithm = a._p_IAlgorithm;
@@ -25,7 +25,7 @@ Player::Player(const Player& a) {
 }
 
 Player& Player::operator=(const Player& a) {
-    strncpy(_p_PlayerName, a._p_PlayerName, BUFF_NAME);
+    _playerName = a._playerName;
     _eKind = a._eKind;
     _index = a._index;
     _p_IAlgorithm = a._p_IAlgorithm;
@@ -35,16 +35,14 @@ Player& Player::operator=(const Player& a) {
 }
 
 void Player::Create() {
-    CardSpec emptyCard;
     _eKind = PT_LOCAL;
-    strcpy(_p_PlayerName, "Remigiu");
-
+    _playerName = std::string("Remigiu");
     _index = NOT_VALID_INDEX;
     _eLevel = DUMMY;
 }
 
 void Player::SetName(LPCSTR lpszName) {
-    strncpy(_p_PlayerName, lpszName, BUFF_NAME - 1);
+    _playerName = std::string(lpszName);
 }
 
 void Player::SetType(eTypeOfPLayer eVal) { _eKind = eVal; }
@@ -62,7 +60,7 @@ void Player::SetLevel(eGameLevel eNewLevel, I_ALG_Player* I_val) {
             break;
 
         case ADVANCED:
-            _p_IAlgorithm = new AlgAdvancedPlayer();
+            _p_IAlgorithm = new AlgPlayer();
             _vctAlgToDestroy.push_back(_p_IAlgorithm);
             break;
 

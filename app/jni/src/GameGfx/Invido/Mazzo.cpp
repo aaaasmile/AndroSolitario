@@ -6,8 +6,7 @@ using namespace invido;
 
 Mazzo::Mazzo() {
     _nextCard = 0;
-    _p_CoreGame = 0;
-    _rndSeed = 63200;
+    _rndSeed = 0;
 }
 
 void Mazzo::Create() {
@@ -33,6 +32,7 @@ void Mazzo::SetIndexRaw(int iIndex, long lVal) {
 }
 
 bool Mazzo::Shuffle() {
+    // use SetRandomSeed to have a reproducible sequence
     IT_VCTLONG it_tmp;
 
     _nextCard = 0;
@@ -45,21 +45,16 @@ bool Mazzo::Shuffle() {
         size_t j = SDL_rand((Uint32)(i + 1));
         std::swap(_vctCardIndex[i], _vctCardIndex[j]);
     }
-
-    _p_CoreGame->NotifyScript(SCR_NFY_SHUFFLEDECK);
-
     return true;
 }
 
-CardSpec* Mazzo::PickNextCard(bool* pIsValid) {
-    SDL_assert(pIsValid);
-    *pIsValid = false;
-    CardSpec* pRes = NULL;
+bool Mazzo::PickNextCard(CardSpec* pNextCard) {
+    SDL_assert(pNextCard);
+    bool isValid = false;
     if (_nextCard < _vctCardIndex.size()) {
-        *pIsValid = true;
-        pRes = &_arrCardSpec[_nextCard];
-        pRes->SetCardIndex(_vctCardIndex[_nextCard]);
+        isValid = true;
+        pNextCard->SetCardIndex(_vctCardIndex[_nextCard]);
         _nextCard++;
     }
-    return pRes;
+    return isValid;
 }

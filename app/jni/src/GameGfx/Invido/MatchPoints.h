@@ -60,6 +60,7 @@ class MatchPoints : public I_MatchScore {
     void GiocataStart();
     void GiocataEnd();
     void PlayerPlay(int iPlayerIx, const CardSpec& cardSpec);
+    void VaDentro(int iPlayerIx);
     void ManoEnd();
     void ChangeCurrentScore(eGiocataScoreState eVal, int iPlayer);
     void GetManoInfo(int iManoNum, int* piPlayerIx, bool* pbIsPlayed,

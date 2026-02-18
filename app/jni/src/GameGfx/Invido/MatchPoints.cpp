@@ -57,6 +57,15 @@ void MatchPoints::PlayerPlay(int iPlayerIx, const CardSpec& cardSpec) {
     _numCardsPlayed++;
 }
 
+void MatchPoints::VaDentro(int iPlayerIx){
+    CardSpec cardSpec;
+    cardSpec.SetCardIndex(4); // make sure that the card will always loose
+    SDL_assert(_numCardsPlayed < MAX_NUM_PLAYER && _numCardsPlayed >= 0);
+    _vctCardPlayed[_numCardsPlayed].playerIx = iPlayerIx;
+    _vctCardPlayed[_numCardsPlayed].cardSpec = cardSpec;
+    _numCardsPlayed++;
+}
+
 void MatchPoints::ManoEnd() {
     SDL_assert(_numCardsPlayed == _numPlayers);
     int iManoTerminatedIndex = _manoRound;

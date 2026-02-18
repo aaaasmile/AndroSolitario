@@ -31,7 +31,7 @@ class Player {
     eTypeOfPLayer GetType() { return _eKind; }
     int GetIndex() { return _index; }
     void SetIndex(int iVal) { _index = iVal; }
-    char* GetName() { return _p_PlayerName; }
+    std::string GetName() { return _playerName; }
     void SetName(LPCSTR lpszName);
     I_ALG_Player* GetAlg() { return _p_IAlgorithm; }
 
@@ -40,7 +40,7 @@ class Player {
     Player& operator=(const Player& a);
 
    private:
-    char _p_PlayerName[BUFF_NAME];
+    std::string _playerName;
     eTypeOfPLayer _eKind;
     int _index;
     I_ALG_Player* _p_IAlgorithm;
@@ -52,7 +52,7 @@ typedef std::vector<Player> VCT_PLAYERS;
 
 // operators
 inline std::ostream& operator<<(std::ostream& stream, const Player& o) {
-    stream << o._p_PlayerName << std::endl;
+    stream << o._playerName << std::endl;
 
     return stream;
 }
