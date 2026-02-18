@@ -123,47 +123,22 @@ void InvidoCore::NextAction() {
     _partita.NextAction();
 }
 
-CardSpec* InvidoCore::isCardInPlayerHand(int iPlayerIx,
-                                         const CARDINFO* pCardInfo) {
-    CardSpec* pCardSpecRes = NULL;
-    SDL_assert(pCardInfo);
-    SDL_assert(iPlayerIx >= 0 && iPlayerIx < MAX_NUM_PLAYER);
-
-    CardSpec myCard;
-    myCard.SetCardInfo(*pCardInfo);
-
-    for (int i = 0; i < NUM_CARDS_HAND; i++) {
-        int iPlayerPosIx = iPlayerIx * NUM_CARDS_HAND + i;
-        if (_cardInfos[iPlayerPosIx] == myCard) {
-            pCardSpecRes = &_cardInfos[iPlayerPosIx];
-            break;
-        }
-    }
-
-    return pCardSpecRes;
-}
-
 void InvidoCore::resetCardInfoPlayers() {
-    int iSize = NUM_CARDS_HAND * MAX_NUM_PLAYER;
-    for (int i = 0; i < iSize; i++) {
-        _cardInfos[i].Reset();
+    for (int i = 0; i < MAX_NUM_PLAYER; i++) {
+        _cardInfos[i].clear();
     }
 }
 
-bool InvidoCore::resetCard(int iPlayerIx, CARDINFO* pCardInfo) {
+bool InvidoCore::resetCard(int iPlayerIx, const CardSpec& cardSpec) {
     bool bRet = false;
-    SDL_assert(pCardInfo);
     SDL_assert(iPlayerIx >= 0 && iPlayerIx < MAX_NUM_PLAYER);
 
-    CardSpec myCard;
-    myCard.SetCardInfo(*pCardInfo);
-
-    for (int i = 0; i < NUM_CARDS_HAND; i++) {
-        int iPlayerPosIx = iPlayerIx * NUM_CARDS_HAND + i;
-        if (_cardInfos[iPlayerPosIx] == myCard) {
-            bRet = true;
-            _cardInfos[iPlayerPosIx].Reset();
-            break;
+    auto it = _cardInfos[iPlayerIx].begin();
+    while (it != _cardInfos[iPlayerIx].end()) {
+        if (it->GetCardIndex() == cardSpec.GetCardIndex()) {
+            it = _cardInfos[iPlayerIx].erase(it);  // Erase and get next
+        } else {
+            ++it;
         }
     }
 
@@ -194,7 +169,7 @@ void InvidoCore::Giocata_Start(long lPlayerIx) {
         SDL_assert(iIxCurrPLayer >= 0 && iIxCurrPLayer < _numPlayers);
 
         Player* pCurrPlayer = _playersOnTable.GetPlayerIndex(iIxCurrPLayer);
-        CARDINFO CardArray[NUM_CARDS_HAND];
+        VCT_CARDSPEC vctCardArray;
 
         TRACE_DEBUG("%s => ", pCurrPlayer->GetName());
 
@@ -202,18 +177,17 @@ void InvidoCore::Giocata_Start(long lPlayerIx) {
             // distribuite all cards on player
             _p_MyMazzo->PickNextCard(&tmpCard);
 
-            tmpCard.FillInfo(&CardArray[j]);
+            vctCardArray.push_back(tmpCard);
             TRACE_DEBUG("[%s] , ix: %d, pt: %d", tmpCard.GetName(),
                         tmpCard.GetCardIndex(), tmpCard.GetPoints());
 
             // store card information for controlling
-            int iTmpCdIndex = iIxCurrPLayer * NUM_CARDS_HAND + j;
-            _cardInfos[iTmpCdIndex] = tmpCard;
+            _cardInfos.push_back(tmpCard);
         }
         TRACE_DEBUG("\n");
         if (_vctpAlgPlayer[iIxCurrPLayer]) {
-            _vctpAlgPlayer[iIxCurrPLayer]->ALG_NewGiocata(
-                CardArray, NUM_CARDS_HAND, lPlayerIx);
+            _vctpAlgPlayer[iIxCurrPLayer]->ALG_NewGiocata(vctCardArray,
+                                                          lPlayerIx);
         }
     }
     _matchPoints.GiocataStart();
@@ -335,20 +309,16 @@ void InvidoCore::NtyPlayerSayBuiada(int iPlayerIx) {
     }
 }
 
-void InvidoCore::RaiseError(const std::string& errorMsg) {
-    SDL_assert(0);
-    TRACE_DEBUG(const_cast<char*>(errorMsg.c_str()));
-    TRACE_DEBUG("\n");
-}
 
 CardSpec* InvidoCore::checkValidCardPlayed(int iPlayerIx,
-                                           const CARDINFO* pCardInfo) {
-    CardSpec cardUndef;
-    if (cardUndef.GetCardIndex() == pCardInfo->byIndex) {
-        SDL_assert(0);
+                                           const CardSpec& cardSpec) {
+    SDL_assert(iPlayerIx >= 0 && iPlayerIx < MAX_NUM_PLAYER);
+    CardSpec* pCardplayed = NULL;
+    for (CardSpec& cardInHand : _cardInfos[iPlayerIx]) {
+        if (cardInHand == cardSpec) {
+            pCardplayed = &cardInHand;
+        }
     }
-
-    CardSpec* pCardplayed = isCardInPlayerHand(iPlayerIx, pCardInfo);
 
     return pCardplayed;
 }

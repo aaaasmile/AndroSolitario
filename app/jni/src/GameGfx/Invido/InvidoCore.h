@@ -28,7 +28,6 @@ class InvidoCore : public I_CORE_Game {
     Player* GetPlayer(int iIndex) {
         return _playersOnTable.GetPlayerIndex(iIndex);
     }
-    void RaiseError(const std::string& errorMsg);
     int GetNumOfPlayers() { return _numPlayers; }
     MatchPoints* GetMatchPointsObj() { return &_matchPoints; }
     PlayersOnTable* GetTable() { return &_playersOnTable; }
@@ -69,7 +68,6 @@ class InvidoCore : public I_CORE_Game {
     void AbandonGame(int iPlayerIx);
 
    private:
-    CardSpec* isCardInPlayerHand(int iPlayerIx, const CardSpec& cardSpec);
     CardSpec* checkValidCardPlayed(int iPlayerIx, const CardSpec& cardSpec);
     void resetCardInfoPlayers();
     bool resetCard(int iPlayerIx, const CardSpec& cardSpec);
@@ -89,7 +87,7 @@ class InvidoCore : public I_CORE_Game {
     Mano _mano;
     I_ALG_Player* _vctpAlgPlayer[MAX_NUM_PLAYER];
     MatchPoints _matchPoints;
-    CardSpec _cardInfos[NUM_CARDS_HAND * MAX_NUM_PLAYER];
+    VCT_CARDSPEC _cardInfos[MAX_NUM_PLAYER];
 };
 
 }

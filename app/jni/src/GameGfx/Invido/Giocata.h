@@ -30,7 +30,7 @@ class Giocata {
     void SetCore(InvidoCore* pVal) { m_pInvidoCore = pVal; }
     void SetPartita(Partita* pVal) { m_pPartita = pVal; }
     void SetMano(Mano* pVal) { m_pMano = pVal; }
-    void NewGiocata(long lPlayerIx);
+    LPErrInApp NewGiocata(long lPlayerIx);
     void Update_Giocata(long lPlayerIx, I_MatchScore* pIScore);
     void Reset();
     void NextAction();

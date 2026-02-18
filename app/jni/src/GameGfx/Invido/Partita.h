@@ -18,8 +18,8 @@ class Partita {
    public:
     void SetCore(InvidoCore* pVal) { m_pInvidoCore = pVal; }
     void SetGiocata(Giocata* pVal) { m_pGiocata = pVal; }
-    void NewPartita(long lPlayerIx);
-    void Update_Partita(I_MatchScore* pIScore);
+    LPErrInApp NewPartita(long lPlayerIx);
+    LPErrInApp Update_Partita(I_MatchScore* pIScore);
     void Reset();
     void NextAction();
 

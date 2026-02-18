@@ -216,7 +216,7 @@ void Mano::MatchStart() {
     _p_Table = _p_InvidoCore->GetTable();
 }
 
-void Mano::NewMano(int iPlayerIx) {
+LPErrInApp Mano::NewMano(int iPlayerIx) {
     clearQuestions();
 
     if (_eManoState == MNST_WAIT_NEW_MANO || _eManoState == MNST_MANO_END) {
@@ -241,8 +241,8 @@ void Mano::NewMano(int iPlayerIx) {
         _eManoState = nextTableState();
 
     } else {
-        _p_InvidoCore->RaiseError("Mano state not correct\n");
-        SDL_assert(0);
+         return ERR_UTIL::ErrorCreate("Mano state is not correct %d",
+                                     _eManoState);
     }
 }
 

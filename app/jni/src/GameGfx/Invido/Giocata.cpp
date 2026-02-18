@@ -13,7 +13,7 @@ Giocata::Giocata() {
     m_eGiocataStatus = WAIT_NEW_GIOCATA;
 }
 
-void Giocata::NewGiocata(long lPlayerIx) {
+LPErrInApp Giocata::NewGiocata(long lPlayerIx) {
     ActionItemGio Action;
 
     if (m_eGiocataStatus == WAIT_NEW_GIOCATA) {
@@ -23,9 +23,10 @@ void Giocata::NewGiocata(long lPlayerIx) {
         Action._eNextAction = GIOC_START;
         m_deqNextAction.push_back(Action);
     } else {
-        m_pInvidoCore->RaiseError("Giocata state not right\n");
-        SDL_assert(0);
+        return ERR_UTIL::ErrorCreate("Giocata state is not correct %d",
+                                     m_eGiocataStatus);
     }
+    return NULL;
 }
 
 void Giocata::NextAction() {

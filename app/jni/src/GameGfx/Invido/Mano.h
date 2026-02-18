@@ -77,7 +77,7 @@ class Mano {
     void SetCore(InvidoCore* pVal) { _p_InvidoCore = pVal; }
     void SetGiocata(Giocata* pVal) { _p_Giocata = pVal; }
     void SetScore(MatchPoints* pVal) { _p_Score = pVal; }
-    void NewMano(int iPlayerIx);
+    LPErrInApp NewMano(int iPlayerIx);
     bool Player_Say(int iPlayerIx, eSayPlayer eSay);
     // player play a card
     bool Player_Play(int iPlayerIx, bool vadoDentro);

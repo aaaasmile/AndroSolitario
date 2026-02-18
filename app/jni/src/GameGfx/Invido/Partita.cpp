@@ -12,10 +12,10 @@ Partita::Partita() {
     m_pInvidoCore = NULL;
     m_PartitaState = WAIT_NEW_PARTITA;
     m_lGiocStart = 0;
-    m_eNextAction = NO_ACTION;
+    _eNextAction = NO_ACTION;
 }
 
-void Partita::NewPartita(long lPlayerIx) {
+LPErrInApp Partita::NewPartita(long lPlayerIx) {
     m_lGiocStart = lPlayerIx;
 
     if (m_PartitaState != PARTITA_ONGOING) {
@@ -23,12 +23,13 @@ void Partita::NewPartita(long lPlayerIx) {
 
         m_pGiocata->NewGiocata(m_lGiocStart);
     } else {
-        m_pInvidoCore->RaiseError("Partita state not right\n");
+        return ERR_UTIL::ErrorCreate("Partita state is not correct %d",
+                                     m_PartitaState);
     }
 }
 
 void Partita::NextAction() {
-    switch (m_eNextAction) {
+    switch (_eNextAction) {
         case ACT_PARTITA_END:
             // partita is eneded
             m_pInvidoCore->Partita_End();
@@ -43,16 +44,16 @@ void Partita::NextAction() {
             break;
     }
 
-    m_eNextAction = NO_ACTION;
+    _eNextAction = NO_ACTION;
 }
 
-void Partita::Update_Partita(I_MatchScore* pIScore) {
+LPErrInApp Partita::Update_Partita(I_MatchScore* pIScore) {
     SDL_assert(pIScore);
     SDL_assert(m_PartitaState == PARTITA_ONGOING);
 
     if (pIScore->IsMatchEnd()) {
         // match is ended
-        m_eNextAction = ACT_PARTITA_END;
+        _eNextAction = ACT_PARTITA_END;
         m_PartitaState = PARTITA_END;
     } else {
         // start a new giocata
@@ -64,9 +65,8 @@ void Partita::Update_Partita(I_MatchScore* pIScore) {
                 m_lGiocStart = 0;
                 break;
             default:
-                m_pInvidoCore->RaiseError(
-                    "[Update_Partita] Index out of bound\n");
-                break;
+                return ERR_UTIL::ErrorCreate(
+                    "[Update_Partita] Index out of bound");
         }
         m_pGiocata->NewGiocata(m_lGiocStart);
     }
