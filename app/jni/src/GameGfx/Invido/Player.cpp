@@ -56,24 +56,16 @@ void Player::SetLevel(eGameLevel eNewLevel, I_ALG_Player* I_val) {
 
     switch (eNewLevel) {
         case BEGINNER:
-            SDL_assert(0);
-            break;
-
+        case NIGHTMARE:
         case ADVANCED:
             _p_IAlgorithm = new AlgPlayer();
             _vctAlgToDestroy.push_back(_p_IAlgorithm);
             break;
-
-        case NIGHTMARE:
-            SDL_assert(0);
-            break;
-
         case SERVER_LEVEL:
         case HMI:
             SDL_assert(I_val);
             _p_IAlgorithm = I_val;
             break;
-
         default:
             SDL_assert(0);
     }

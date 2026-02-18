@@ -15,9 +15,8 @@ static _MAP_SAY g_MapSay;
 
 AlgPlayer::AlgPlayer() {
     m_ixCurrMano = 0;
-    m_pCoreGame = 0;
+    m_pCoreGame = NULL;
     m_iOppIndex = NOT_VALID_INDEX;
-    m_itrChan = 3;
     g_MapSay[eSayPlayer::SP_AMONTE] = "A monte";
     g_MapSay[eSayPlayer::SP_INVIDO] = "Invido";
     g_MapSay[eSayPlayer::SP_TRASMAS] = "Tras mas";
@@ -35,6 +34,7 @@ AlgPlayer::AlgPlayer() {
 AlgPlayer::~AlgPlayer() {}
 
 void AlgPlayer::ALG_SetCoreInterface(I_CORE_Game* pCore) {
+    SDL_assert(pCore);
     m_pCoreGame = pCore;
 }
 
@@ -658,7 +658,7 @@ bool AlgPlayer::IsPlayerFirst() {
 // Ritorna: 1,2,3 a seconda della mano
 int AlgPlayer::NumMano() { return m_ixCurrMano + 1; }
 
-void AlgPlayer::ALG_Play() {
+void AlgPlayer::ALG_HaveToPlay() {
     if (IsPlayerFirst()) {
         PlayAsFirst();
     } else {

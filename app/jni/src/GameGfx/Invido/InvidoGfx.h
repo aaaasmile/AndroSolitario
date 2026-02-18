@@ -104,7 +104,6 @@ class InvidoGfx : public I_ALG_Player {
     void handleMouseUpEvent(SDL_Event& event);
     void clickOnPlayerCard(int iIndex);
     void vadoDentro(int cardIx);
-    void renderScreen();
     void drawVadoDentroCard(CardGfx* pCard);
     void showPlayerMarkup(int iPlayerIx);
     void showManoScore(bool bIsPlayed, int iPlayerIx, bool bIsPata,
@@ -120,7 +119,7 @@ class InvidoGfx : public I_ALG_Player {
     void cleanup();
     void animateBeginGiocata();
     void showOkMsgBox(LPCSTR strText);
-    int showYesNoMsgBox(LPCSTR strText);
+    void showYesNoMsgBox(LPCSTR strText);
     void animateManoEnd(int iPlayerIx);
     void showPopUpCallMenu(int iX, int iY, eSayPlayer* peSay);
     void opponentHasPlayedCard(CardSpec& Card, bool vadoDentro);

@@ -22,10 +22,10 @@ class AlgPlayer : public I_ALG_Player {
     virtual void ALG_PlayerHasPlayed(int iPlayerIx, const CardSpec& cardSpec);
     virtual void ALG_PlayerHasVadoDentro(int iPlayerIx);
     virtual void ALG_PlayerHasSaid(int iPlayerIx, eSayPlayer eSay);
-    virtual void ALG_Play();
     virtual void ALG_ManoEnd(I_MatchScore* pScore);
     virtual void ALG_GiocataEnd(I_MatchScore* pScore);
     virtual void ALG_MatchEnd(I_MatchScore* pScore);
+    virtual void ALG_HaveToPlay();
     virtual void ALG_HaveToRespond();
     virtual void ALG_GicataScoreChange(eGiocataScoreState eNewScore);
     virtual void ALG_PlayerSaidWrong(int iPlayerIx);
@@ -63,7 +63,6 @@ class AlgPlayer : public I_ALG_Player {
     int m_iNumManiWon;
     int m_iPlayerOnTurn;
     int m_iNumChiamateInGiocata;
-    int m_itrChan;
     bool m_bIamCalledPoints;
     int m_iCPUCardDentroPos;
     bool m_opponetIsVadoDentro;

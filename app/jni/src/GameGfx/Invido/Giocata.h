@@ -4,6 +4,8 @@
 #include <deque>
 
 #include "InvidoCoreEnv.h"
+#include "ErrorInfo.h"
+
 namespace invido {
     
 class InvidoCore;
