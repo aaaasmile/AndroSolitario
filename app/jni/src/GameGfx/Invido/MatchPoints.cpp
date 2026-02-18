@@ -62,7 +62,7 @@ void MatchPoints::VaDentro(int iPlayerIx){
     cardSpec.SetCardIndex(4); // make sure that the card will always loose
     SDL_assert(_numCardsPlayed < MAX_NUM_PLAYER && _numCardsPlayed >= 0);
     _vctCardPlayed[_numCardsPlayed].playerIx = iPlayerIx;
-    _vctCardPlayed[_numCardsPlayed].cardSpec = cardSpec;
+    _vctCardPlayed[_numCardsPlayed].cardSpec.SetCardIndex(cardSpec.GetCardIndex());
     _numCardsPlayed++;
 }
 

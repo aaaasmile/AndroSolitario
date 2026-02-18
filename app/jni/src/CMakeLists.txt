@@ -33,6 +33,8 @@ set(SOURCES App/MusicManager.cpp
             App/GameHelp.cpp
             CompGfx/LabelLinkGfx.cpp
             CompGfx/ButtonGfx.cpp
+            CompGfx/BalloonGfx.cpp
+            CompGfx/PopUpMenuGfx.cpp
             CompGfx/CheckBoxGfx.cpp
             CompGfx/ComboGfx.cpp
             CompGfx/MesgBoxGfx.cpp

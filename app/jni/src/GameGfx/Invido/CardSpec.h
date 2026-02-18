@@ -16,7 +16,6 @@ class CardSpec {
     int GetCardIndex() const { return _index; }
     eSUIT GetSuit() const { return _eSuit; }
     std::string GetName() const { return _cardName; }
-    void operator=(const CardSpec& r);
     bool operator==(const CardSpec& r) const { return _index == r._index; }
     bool operator!=(const CardSpec& r) const { return _index != r._index; }
     int GetPoints() const;

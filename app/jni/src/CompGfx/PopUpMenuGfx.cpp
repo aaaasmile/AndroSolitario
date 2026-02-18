@@ -39,26 +39,30 @@ void PopUpMenuGfx::Show(SDL_Rect* pRect, SDL_Surface* pScreen,
 }
 
 void PopUpMenuGfx::HandleEvent(SDL_Event* pEvent, const SDL_Point& targetPos) {
-    if (event.type == SDL_KEYDOWN) {
-        if (event.key.keysym.sym == SDLK_RETURN) {
+    if (pEvent->type == SDL_EVENT_KEY_DOWN) {
+        if (pEvent->key.key == SDLK_RETURN) {
             // key on focus
             m_bTerminated = true;
-        } else if (event.key.keysym.sym == SDLK_ESCAPE) {
+        } else if (pEvent->key.key == SDLK_ESCAPE) {
             m_bTerminated = true;
             m_bMenuSelected = false;
         }
     }
-    if (event.type == SDL_MOUSEMOTION) {
+    if (pEvent->type == SDL_EVENT_MOUSE_MOTION) {
         // move the current selection in the menu
-        if (event.motion.x >= m_rctMsgBox.x &&
-            event.motion.x <= m_rctMsgBox.x + m_rctMsgBox.h &&
-            event.motion.y >= m_rctMsgBox.y &&
-            event.motion.y <= m_rctMsgBox.y + m_rctMsgBox.h) {
+        if (pEvent->motion.x >= m_rctMsgBox.x &&
+            pEvent->motion.x <= m_rctMsgBox.x + m_rctMsgBox.h &&
+            pEvent->motion.y >= m_rctMsgBox.y &&
+            pEvent->motion.y <= m_rctMsgBox.y + m_rctMsgBox.h) {
+            int iEmptySpaceOn_Y = 7;
+            int tx, ty;
+            TTF_GetStringSize(m_pFontText, m_vctDataStrings[0].c_str(), 0, &tx,
+                              &ty);
             // mouse inside the menu
             for (Uint32 i = 0; i < m_vctDataStrings.size(); i++) {
-                if (event.motion.y >=
+                if (pEvent->motion.y >=
                         (Sint32)((ty + iEmptySpaceOn_Y) * i + m_rctMsgBox.y) &&
-                    event.motion.y <=
+                    pEvent->motion.y <=
                         (Sint32)(iEmptySpaceOn_Y +
                                  (ty + iEmptySpaceOn_Y) * (i + 1) +
                                  m_rctMsgBox.y)) {
@@ -72,7 +76,7 @@ void PopUpMenuGfx::HandleEvent(SDL_Event* pEvent, const SDL_Point& targetPos) {
             m_bMenuSelected = false;
         }
     }
-    if (event.type == SDL_MOUSEBUTTONDOWN) {
+    if (pEvent->type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
         m_bTerminated = true;
     }
 }
@@ -132,9 +136,10 @@ void PopUpMenuGfx::DrawCtrl(SDL_Surface* pScreen) {
                        iEmptySpaceOn_Y;
         rectHeader.h = ty;
         rectHeader.w = m_rctMsgBox.w - 1;
-        SDL_FillSurfaceRect(pScreen, &rectHeader,
-                        SDL_MapRGB(SDL_GetPixelFormatDetails(pScreen->format),
-                                   NULL, 255, 0, 0));
+        SDL_FillSurfaceRect(
+            pScreen, &rectHeader,
+            SDL_MapRGB(SDL_GetPixelFormatDetails(pScreen->format), NULL, 255, 0,
+                       0));
     }
 
     // draw the text
@@ -144,9 +149,9 @@ void PopUpMenuGfx::DrawCtrl(SDL_Surface* pScreen) {
         int iXOffSet = 5;
         int iYOffset = iEmptySpaceOn_Y + i * (ty + iEmptySpaceOn_Y);
 
-        GFX_UTIL::DrawString(pScreen, strText.c_str(),
-                             m_rctMsgBox.x + iXOffSet, m_rctMsgBox.y + iYOffset,
-                             m_colCurrent, m_pFontText);
+        GFX_UTIL::DrawString(pScreen, strText.c_str(), m_rctMsgBox.x + iXOffSet,
+                             m_rctMsgBox.y + iYOffset, m_colCurrent,
+                             m_pFontText);
     }
 
     // draw border
@@ -160,7 +165,6 @@ void PopUpMenuGfx::DrawCtrl(SDL_Surface* pScreen) {
     GFX_UTIL::DrawRect(pScreen, m_rctMsgBox.x, m_rctMsgBox.y,
                        m_rctMsgBox.x + m_rctMsgBox.w,
                        m_rctMsgBox.y + m_rctMsgBox.h, m_colCurrent);
-
 }
 
 void PopUpMenuGfx::AddLineText(LPCSTR strLine) {
