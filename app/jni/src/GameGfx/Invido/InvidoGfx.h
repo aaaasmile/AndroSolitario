@@ -122,7 +122,7 @@ class InvidoGfx : public I_ALG_Player {
     void showYesNoMsgBox(LPCSTR strText);
     void animateManoEnd(int iPlayerIx);
     void showPopUpCallMenu(int iX, int iY, eSayPlayer* peSay);
-    void opponentHasPlayedCard(CardSpec& Card, bool vadoDentro);
+    void opponentHasPlayedCard(const CardSpec& card, bool vadoDentro);
     ClickCb prepClickCb();
     void updateTextureAsFlipScreen();
     void setDeckType(DeckType& dt) { _deckType.CopyFrom(dt); }

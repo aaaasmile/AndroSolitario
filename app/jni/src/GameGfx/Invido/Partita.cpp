@@ -26,6 +26,7 @@ LPErrInApp Partita::NewPartita(long lPlayerIx) {
         return ERR_UTIL::ErrorCreate("Partita state is not correct %d",
                                      m_PartitaState);
     }
+    return NULL;
 }
 
 void Partita::NextAction() {
@@ -70,6 +71,7 @@ LPErrInApp Partita::Update_Partita(I_MatchScore* pIScore) {
         }
         m_pGiocata->NewGiocata(m_lGiocStart);
     }
+    return NULL;
 }
 
 void Partita::Reset() {

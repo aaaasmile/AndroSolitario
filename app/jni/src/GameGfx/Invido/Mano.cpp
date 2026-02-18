@@ -241,9 +241,10 @@ LPErrInApp Mano::NewMano(int iPlayerIx) {
         _eManoState = nextTableState();
 
     } else {
-         return ERR_UTIL::ErrorCreate("Mano state is not correct %d",
+        return ERR_UTIL::ErrorCreate("Mano state is not correct %d",
                                      _eManoState);
     }
+    return NULL;
 }
 
 bool Mano::Player_Play(int iPlayerIx, bool vadoDentro) {

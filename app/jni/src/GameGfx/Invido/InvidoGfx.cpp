@@ -1414,7 +1414,7 @@ void InvidoGfx::ALG_PlayerHasVadoDentro(int iPlayerIx) {
     }
 }
 
-void InvidoGfx::opponentHasPlayedCard(CardSpec& card, bool vadoDentro) {
+void InvidoGfx::opponentHasPlayedCard(const CardSpec& card, bool vadoDentro) {
     bool bFound = false;
     for (int iIndex = 0; !bFound && iIndex < NUM_CARDS_HAND; iIndex++) {
         if (_aOpponentCards[iIndex].State == CardGfx::CSW_ST_BACK) {

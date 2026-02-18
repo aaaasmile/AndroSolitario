@@ -1,7 +1,9 @@
 #ifndef __CPARTITA_H__
 #define __CPARTITA_H__
 
+#include "ErrorInfo.h"
 #include "InvidoCoreEnv.h"
+
 
 namespace invido {
 
@@ -31,5 +33,5 @@ class Partita {
     eFN_ACTION _eNextAction;
 };
 
-}
+}  // namespace invido
 #endif
