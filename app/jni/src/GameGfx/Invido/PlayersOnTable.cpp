@@ -4,7 +4,7 @@ using namespace invido;
 
 PlayersOnTable::PlayersOnTable() {
     m_lCurrent = 0;
-    m_lNumPlayers = 0;
+    _numPlayers = 0;
     m_lFirstOnTrick = NOT_VALID_INDEX;
     m_lFirstOnGiocata = NOT_VALID_INDEX;
     m_lFirstOnMatch = NOT_VALID_INDEX;
@@ -61,7 +61,7 @@ void PlayersOnTable::Create(Player* pHmiPlayer, int iNumPlayers) {
         }
     }
 
-    m_lNumPlayers = iNumPlayers;
+    _numPlayers = iNumPlayers;
 }
 
 Player* PlayersOnTable::GetPlayerToPlay(eSwitchPLayer eVal) {
@@ -97,17 +97,17 @@ int PlayersOnTable::CalcDistance(int iPlayerRef, int iPlayerTmp) {
     int iTmp = iPlayerRef;
     int iDist = 0;
 
-    SDL_assert(iPlayerTmp >= 0 && iPlayerTmp < m_lNumPlayers);
-    SDL_assert(iPlayerRef >= 0 && iPlayerRef < m_lNumPlayers);
+    SDL_assert(iPlayerTmp >= 0 && iPlayerTmp < _numPlayers);
+    SDL_assert(iPlayerRef >= 0 && iPlayerRef < _numPlayers);
 
     bool bFound = false;
-    while (!bFound && iDist < m_lNumPlayers) {
+    while (!bFound && iDist < _numPlayers) {
         if (aTableIx[iTmp] == iPlayerTmp) {
             bFound = true;
         } else {
             iDist++;
             iTmp++;
-            if (iTmp >= m_lNumPlayers) {
+            if (iTmp >= _numPlayers) {
                 iTmp = 0;
             }
         }
@@ -120,9 +120,9 @@ void PlayersOnTable::CalcCircleIndex(int* paPlayerDeck) {
     SDL_assert(paPlayerDeck);
     paPlayerDeck[0] = m_lCurrent;
     int k = 1;
-    while (k < m_lNumPlayers) {
+    while (k < _numPlayers) {
         paPlayerDeck[k] = paPlayerDeck[k - 1] + 1;
-        if (paPlayerDeck[k] >= m_lNumPlayers) {
+        if (paPlayerDeck[k] >= _numPlayers) {
             paPlayerDeck[k] = 0;
         }
         k++;
@@ -132,7 +132,7 @@ void PlayersOnTable::CalcCircleIndex(int* paPlayerDeck) {
 bool PlayersOnTable::IsLevelPython() {
     bool bRes = false;
 
-    for (int i = 0; i < m_lNumPlayers; i++) {
+    for (int i = 0; i < _numPlayers; i++) {
         eGameLevel eLevel = m_vctPlayers[i].GetLevel();
         if (eLevel == TEST_PYTHON) {
             bRes = true;
@@ -148,9 +148,9 @@ void PlayersOnTable::CalcCircleIndex_Cust(int* paPlayerDeck, int iPlayerIni) {
 
     paPlayerDeck[0] = iPlayerIni;
     int k = 1;
-    while (k < m_lNumPlayers) {
+    while (k < _numPlayers) {
         paPlayerDeck[k] = paPlayerDeck[k - 1] + 1;
-        if (paPlayerDeck[k] >= m_lNumPlayers) {
+        if (paPlayerDeck[k] >= _numPlayers) {
             paPlayerDeck[k] = 0;
         }
         k++;
