@@ -11,6 +11,7 @@ namespace invido {
 class I_CORE_Game {
    public:
     I_CORE_Game() {}
+    virtual ~I_CORE_Game() {}
     virtual bool Say(int iPlayerIx, eSayPlayer eSay) = 0;
     virtual bool PlayCard(int iPlayerIx, const CardSpec& cardSpec) = 0;
     virtual bool VaDentro(int iPlayerIx, const CardSpec& cardSpec) = 0;
@@ -24,6 +25,7 @@ class I_CORE_Game {
 class I_MatchScore {
    public:
     I_MatchScore() {}
+    virtual ~I_MatchScore() {}
     virtual bool IsGiocatEnd() = 0;
     virtual bool IsGiocataMonte() = 0;
     virtual bool IsManoPatada() = 0;
@@ -48,13 +50,16 @@ The player becomes an index on the virtual game table.
 class I_ALG_Player {
    public:
     I_ALG_Player() {}
+    virtual ~I_ALG_Player() {}
     virtual void ALG_SetCoreInterface(I_CORE_Game* pCore) = 0;
     virtual void ALG_SetPlayerIndex(int iIndex) = 0;
     virtual void ALG_SetOpponentIndex(int iIndex, int iOpponentNr) = 0;
     virtual void ALG_SetAssociateIndex(int iIndex) = 0;
     virtual void ALG_NewMatch(int iNumPlayer) = 0;
-    virtual void ALG_NewGiocata(const VCT_CARDSPEC& vctCards, int iPlayerIx) = 0;
-    virtual void ALG_PlayerHasPlayed(int iPlayerIx, const CardSpec& cardSpec) = 0;
+    virtual void ALG_NewGiocata(const VCT_CARDSPEC& vctCards,
+                                int iPlayerIx) = 0;
+    virtual void ALG_PlayerHasPlayed(int iPlayerIx,
+                                     const CardSpec& cardSpec) = 0;
     virtual void ALG_PlayerHasVadoDentro(int iPlayerIx) = 0;
     virtual void ALG_PlayerHasSaid(int iPlayerIx, eSayPlayer eSay) = 0;
     virtual void ALG_ManoEnd(I_MatchScore* pScore) = 0;
@@ -66,5 +71,5 @@ class I_ALG_Player {
     virtual void ALG_PlayerSaidWrong(int iPlayerIx) = 0;
 };
 
-}
+}  // namespace invido
 #endif

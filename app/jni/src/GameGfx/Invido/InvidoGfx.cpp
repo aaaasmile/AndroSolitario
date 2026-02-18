@@ -748,36 +748,36 @@ LPErrInApp InvidoGfx::Show() {
     std::string strTextTmp;
     TRACE_DEBUG("Inizio partita loop \n");
 
-    switch (event.type) {
-        case SDL_EVENT_QUIT:
-            // user want to exit the match
-            // show a messagebox for confirm
-            strTextTmp = _p_LangMgr->GetStringId(Languages::ASK_QUIT);
-            if (showYesNoMsgBox(strTextTmp.c_str()) == MesgBoxGfx::RES_YES) {
-                TRACE_DEBUG("Partita finita per scelta utente\n");
-                return;
-            }
-            break;
+    // switch (event.type) {
+    //     case SDL_EVENT_QUIT:
+    //         // user want to exit the match
+    //         // show a messagebox for confirm
+    //         strTextTmp = _p_LangMgr->GetStringId(Languages::ASK_QUIT);
+    //         if (showYesNoMsgBox(strTextTmp.c_str()) == MesgBoxGfx::RES_YES) {
+    //             TRACE_DEBUG("Partita finita per scelta utente\n");
+    //             return;
+    //         }
+    //         break;
 
-        case SDL_EVENT_KEY_DOWN:
-            if (event.key.key == SDLK_ESCAPE) {
-                done = 1;
-            }
-            handleKeyDownEvent(event);
-            break;
+    //     case SDL_EVENT_KEY_DOWN:
+    //         if (event.key.key == SDLK_ESCAPE) {
+    //             done = 1;
+    //         }
+    //         handleKeyDownEvent(event);
+    //         break;
 
-        case SDL_EVENT_MOUSE_BUTTON_DOWN:
-            handleMouseDownEvent(event);
-            break;
+    //     case SDL_EVENT_MOUSE_BUTTON_DOWN:
+    //         handleMouseDownEvent(event);
+    //         break;
 
-        case SDL_EVENT_MOUSE_MOTION:
-            handleMouseMoveEvent(event);
-            break;
+    //     case SDL_EVENT_MOUSE_MOTION:
+    //         handleMouseMoveEvent(event);
+    //         break;
 
-        case SDL_EVENT_MOUSE_BUTTON_UP:
-            handleMouseUpEvent(event);
-            break;
-    }
+    //     case SDL_EVENT_MOUSE_BUTTON_UP:
+    //         handleMouseUpEvent(event);
+    //         break;
+    // }
     _p_InvidoCore->NextAction();
 }
 
@@ -911,8 +911,9 @@ void InvidoGfx::clickOnPlayerCard(int iIndex) {
     TRACE_DEBUG("card clicked %d\n", iIndex);
     if (_isPlayerCanPlay &&
         (_aPlayerCards[iIndex].State == CardGfx::CSW_ST_VISIBLE)) {
-        _p_InvidoCore->Player_playCard(
-            PLAYER_ME, _aPlayerCards[iIndex].cardSpec.GetCardInfo());
+        CardSpec card;
+        card.SetCardIndex(_aPlayerCards[iIndex].Index());
+        _p_InvidoCore->PlayCard(PLAYER_ME, card);
         _isPlayerCanPlay = false;
     }
 }
@@ -922,15 +923,16 @@ void InvidoGfx::vadoDentro(int cardIx) {
     if (_isPlayerCanPlay &&
         (_aPlayerCards[cardIx].State == CardGfx::CSW_ST_VISIBLE)) {
         _cardVadoDentroIndex = cardIx;
-        _p_InvidoCore->Player_vaDentro(
-            PLAYER_ME, _aPlayerCards[cardIx].cardSpec.GetCardInfo());
+        CardSpec card;
+        card.SetCardIndex(_aPlayerCards[cardIx].Index());
+        _p_InvidoCore->VaDentro(PLAYER_ME, card);
         _isPlayerCanPlay = false;
     }
 }
 
 void InvidoGfx::renderScreen() {
     SDL_UpdateTexture(_p_ScreenTexture, NULL, _p_Screen->pixels,
-                      _p_Screen->pitch);  // sdl 2.0
+                      _p_Screen->pitch);
     SDL_RenderTexture(_p_sdlRenderer, _p_ScreenTexture, NULL, NULL);
     SDL_RenderPresent(_p_sdlRenderer);
 }
@@ -1580,6 +1582,8 @@ void InvidoGfx::ALG_ManoEnd(I_MatchScore* pScore) {
 }
 
 void InvidoGfx::ALG_GiocataEnd(I_MatchScore* pScore) {
+    GameSettings* pGameSettings = GameSettings::GetSettings();
+    Languages* pLang = pGameSettings->GetLanguageMan();
     int iPlayerIx = pScore->GetGiocataWinner();
 
     bool bIsPata = pScore->IsGiocataPatada();
@@ -1587,13 +1591,13 @@ void InvidoGfx::ALG_GiocataEnd(I_MatchScore* pScore) {
     if (bIsPata) {
         // giocata patada
         TRACE_DEBUG("%s %s\n", lpszCST_INFO,
-                    _p_LangMgr->GetStringId(Languages::ID_SCORE).c_str());
-        strMsgFinGiocata = _p_LangMgr->GetStringId(Languages::ID_SCORE);
+                    pLang->GetStringId(Languages::ID_SCORE).c_str());
+        strMsgFinGiocata = pLang->GetStringId(Languages::ID_SCORE);
     } else if (pScore->IsGiocataMonte()) {
         // giocata a monte
         TRACE_DEBUG("%s %s\n", lpszCST_INFO,
-                    _p_LangMgr->GetStringId(Languages::ID_SCORE).c_str());
-        strMsgFinGiocata = _p_LangMgr->GetStringId(Languages::ID_SCORE);
+                    pLang->GetStringId(Languages::ID_SCORE).c_str());
+        strMsgFinGiocata = pLang->GetStringId(Languages::ID_SCORE);
         bIsPata = true;
     } else {
         // giocata with a winner
@@ -1610,21 +1614,21 @@ void InvidoGfx::ALG_GiocataEnd(I_MatchScore* pScore) {
 
         // Giocata vinta da
         TRACE_DEBUG("%s %s %s (%s %d)\n", lpszCST_INFO,
-                    _p_LangMgr->GetStringId(Languages::ID_SCORE).c_str(),
+                    pLang->GetStringId(Languages::ID_SCORE).c_str(),
                     pPlayer->GetName(),
-                    _p_LangMgr->GetStringId(Languages::ID_SCORE).c_str(),
+                    pLang->GetStringId(Languages::ID_SCORE).c_str(),
                     pScore->GetCurrScore());
         sprintf(buffText, "%s \"%s\" (%s %d)",
-                _p_LangMgr->GetStringId(Languages::ID_SCORE).c_str(),
+                pLang->GetStringId(Languages::ID_SCORE).c_str(),
                 pPlayer->GetName(),
-                _p_LangMgr->GetStringId(Languages::ID_SCORE).c_str(),
+                pLang->GetStringId(Languages::ID_SCORE).c_str(),
                 pScore->GetCurrScore());
         // punti
         TRACE_DEBUG("%s %s %s %d, %s %s %d\n", lpszCST_SCORE,
                     pPlayer->GetName(),
-                    _p_LangMgr->GetStringId(Languages::ID_SCORE).c_str(),
+                    pLang->GetStringId(Languages::ID_SCORE).c_str(),
                     pScore->GetPointsPlayer(iPlayerIx), pPlLoser->GetName(),
-                    _p_LangMgr->GetStringId(Languages::ID_SCORE).c_str(),
+                    pLang->GetStringId(Languages::ID_SCORE).c_str(),
                     pScore->GetPointsPlayer(iPlayLoser));
 
         strMsgFinGiocata = buffText;
@@ -1667,18 +1671,23 @@ void InvidoGfx::ALG_MatchEnd(I_MatchScore* pScore) {
 void InvidoGfx::ALG_HaveToPlay() {}
 
 void InvidoGfx::ALG_GicataScoreChange(eGiocataScoreState eNewScore) {
+    GameSettings* pGameSettings = GameSettings::GetSettings();
+    Languages* pLang = pGameSettings->GetLanguageMan();
     STRING lpsNamePoints = _MapPunti[eNewScore];
     // Punteggio della giocata ora è:
     TRACE_DEBUG("%s %s: %s\n", lpszCST_INFO,
-                _p_LangMgr->GetStringId(Languages::ID_SCORE).c_str(),
+                pLang->GetStringId(Languages::ID_SCORE).c_str(),
                 lpsNamePoints.c_str());
 }
 
 void InvidoGfx::ALG_PlayerSaidWrong(int iPlayerIx) {
+    GameSettings* pGameSettings = GameSettings::GetSettings();
+    Languages* pLang = pGameSettings->GetLanguageMan();
+
     if (iPlayerIx == _playerGuiIndex) {
         // Quello che hai chiamato non è corretto
         TRACE_DEBUG("%s, %s\n", lpszCST_SU,
-                    _p_LangMgr->GetStringId(Languages::ID_SCORE).c_str());
+                    pLang->GetStringId(Languages::ID_SCORE).c_str());
     }
 }
 
