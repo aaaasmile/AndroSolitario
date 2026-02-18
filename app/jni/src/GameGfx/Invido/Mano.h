@@ -5,6 +5,7 @@
 #include <map>
 
 #include "Config.h"
+#include "ErrorInfo.h"
 #include "InvidoCoreEnv.h"
 
 namespace invido {
@@ -140,6 +141,6 @@ class Mano {
     MAP_SCORE_SAY _mapScoreSay;
 };
 
-}
+}  // namespace invido
 
 #endif
