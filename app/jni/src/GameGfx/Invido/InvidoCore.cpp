@@ -150,7 +150,6 @@ void InvidoCore::Giocata_Start(long lPlayerIx) {
 
     resetCardInfoPlayers();
     _p_MyMazzo->Shuffle();
-    CardSpec tmpCard;
     _playersOnTable.SetFirstOnGiocata(lPlayerIx);
 
     // 1) first - calculate the table (there is no switch)
@@ -174,15 +173,15 @@ void InvidoCore::Giocata_Start(long lPlayerIx) {
         TRACE_DEBUG("%s => ", pCurrPlayer->GetName());
 
         for (int j = 0; j < NUM_CARDS_HAND; j++) {
-            // distribuite all cards on player
-            _p_MyMazzo->PickNextCard(&tmpCard);
+            bool isValid;
+            CardSpec* pNextCard = _p_MyMazzo->PickNextCard(&isValid);
+            if (pNextCard && isValid) {
+                vctCardArray.push_back(*pNextCard);
+                TRACE_DEBUG("[%s] , ix: %d, pt: %d", pNextCard->GetName(),
+                            pNextCard->GetCardIndex(), pNextCard->GetPoints());
 
-            vctCardArray.push_back(tmpCard);
-            TRACE_DEBUG("[%s] , ix: %d, pt: %d", tmpCard.GetName(),
-                        tmpCard.GetCardIndex(), tmpCard.GetPoints());
-
-            // store card information for controlling
-            _cardInfos.push_back(tmpCard);
+                _cardInfos[iIxCurrPLayer].push_back(*pNextCard);
+            }
         }
         TRACE_DEBUG("\n");
         if (_vctpAlgPlayer[iIxCurrPLayer]) {
@@ -191,9 +190,7 @@ void InvidoCore::Giocata_Start(long lPlayerIx) {
         }
     }
     _matchPoints.GiocataStart();
-    // notify script
     NotifyScript(SCR_NFY_NEWGIOCATA);
-    // notify mano
     _mano.GiocataStart();
 }
 
@@ -308,7 +305,6 @@ void InvidoCore::NtyPlayerSayBuiada(int iPlayerIx) {
         }
     }
 }
-
 
 CardSpec* InvidoCore::checkValidCardPlayed(int iPlayerIx,
                                            const CardSpec& cardSpec) {

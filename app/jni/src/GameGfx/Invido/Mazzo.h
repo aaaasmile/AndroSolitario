@@ -17,16 +17,7 @@ class Mazzo {
     long GetNextCardVal() { return _nextCard; }
     bool Shuffle();
     void Reset() { _nextCard = 0; }
-    long PickNextCard(bool* pbEnd);
-    bool PickNextCard(CardSpec* pRes);
-    long ThrowTableCard();
-    void TraceIt();
-    void Clear() { _vctCards.clear(); }
-    VCT_LONG GetVectorIndexes() { return _vctCards; }
-    size_t Count() { return _vctCards.size(); }
-    long GetIndexRaw(long l) { return _vctCards[l]; }
-    bool IsMoreCards();
-    long GetIndexNextCard(bool* pbEnd);
+    CardSpec* PickNextCard(bool* pIsValid);
     void SetIndexRaw(int iIndex, long lVal);
     void SetRandomSeed(int iVal) {
         _rndSeed = iVal;
@@ -34,8 +25,9 @@ class Mazzo {
     }
 
    private:
-    VCT_LONG _vctCards;
-    long _nextCard;
+    VCT_LONG _vctCardIndex;
+    CardSpec _arrCardSpec[NUM_CARDS];
+    size_t _nextCard;
     InvidoCore* _p_CoreGame;
     int _rndSeed;
 };
