@@ -9,32 +9,23 @@
 #include "AlgPlayerInterface.h"
 #include "CardGfx.h"
 #include "Config.h"
+#include "DeckType.h"
 #include "ErrorInfo.h"
 #include "InvidoCore.h"
 #include "Traits.h"
-#include "DeckType.h"
 
 using namespace traits;
 
-namespace invido {
-
-enum {
-    CRD_MAZZOALTRECARTE = 0,
-    CRD_PLAYER1,
-    CRD_PLAYER2,
-    CRD_TAVOLO_1,
-    CRD_TAVOLO_2,
-    CRD_MAZZO_PLAYER1,
-    CRD_MAZZO_PLAYER2,
-};
-
-class InvidoCore;
 class ButtonGfx;
 class BalloonGfx;
 class Languages;
 class MusicManager;
 class DeckLoader;
 class MesgBoxGfx;
+
+namespace invido {
+
+class InvidoCore;
 
 typedef std::map<eGiocataScoreState, STRING> MAP_SCORE;
 typedef std::map<eSayPlayer, STRING> MAP_SAY;
@@ -131,8 +122,7 @@ class InvidoGfx : public I_ALG_Player {
     void showOkMsgBox(LPCSTR strText);
     int showYesNoMsgBox(LPCSTR strText);
     void animateManoEnd(int iPlayerIx);
-    void showPopUpCallMenu(int iX, int iY,
-                           eSayPlayer* peSay);
+    void showPopUpCallMenu(int iX, int iY, eSayPlayer* peSay);
     void opponentHasPlayedCard(CardSpec& Card, bool vadoDentro);
     ClickCb prepClickCb();
     void updateTextureAsFlipScreen();
@@ -180,5 +170,5 @@ class InvidoGfx : public I_ALG_Player {
     MesgBoxGfx* _p_MsgBox;
 };
 
-}
+}  // namespace invido
 #endif

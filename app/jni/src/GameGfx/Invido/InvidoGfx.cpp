@@ -1467,7 +1467,7 @@ void InvidoGfx::opponentHasPlayedCard(CardSpec& card, bool vadoDentro) {
 
 void InvidoGfx::ALG_PlayerHasPlayed(int iPlayerIx, const CardSpec& cardSpec) {
     // disable ballon
-    _p_balGfx->StartShow("", 0); // TODO use disable method
+    _p_balGfx->StartShow("", 0);  // TODO use disable method
 
     // markup player that have to play
     Player* pPlayer = 0;
@@ -1516,10 +1516,10 @@ void InvidoGfx::ALG_NewGiocata(const VCT_CARDSPEC& vctCards, int iPlayerIx) {
     CardSpec tmpCardSpec;
     for (int i = 0; i < NUM_CARDS_HAND; i++) {
         CardSpec card = vctCards[i];
-        _aPlayerCards[i].SetIndex(card.GetCardIndex()); 
-        _aPlayerCards[i].SetName(card.GetName()); 
-        _aPlayerCards[i].SetSuit(card.GetSuit()); 
-                                                  
+        _aPlayerCards[i].SetIndex(card.GetCardIndex());
+        _aPlayerCards[i].SetName(card.GetName());
+        _aPlayerCards[i].SetSuit(card.GetSuit());
+
         _aPlayerCards[i].State = CardGfx::CSW_ST_VISIBLE;
     }
 
@@ -1664,9 +1664,7 @@ void InvidoGfx::ALG_MatchEnd(I_MatchScore* pScore) {
     _isMatchTerminated = true;
 }
 
-void InvidoGfx::ALG_HaveToPlay(){
-
-}
+void InvidoGfx::ALG_HaveToPlay() {}
 
 void InvidoGfx::ALG_GicataScoreChange(eGiocataScoreState eNewScore) {
     STRING lpsNamePoints = _MapPunti[eNewScore];
@@ -1685,5 +1683,5 @@ void InvidoGfx::ALG_PlayerSaidWrong(int iPlayerIx) {
 }
 
 void InvidoGfx::INP_PlayerSay(eSayPlayer eSay) {
-    _p_InvidoCore->Player_saySomething(_playerGuiIndex, eSay);
+    _p_InvidoCore->Say(_playerGuiIndex, eSay);
 }
