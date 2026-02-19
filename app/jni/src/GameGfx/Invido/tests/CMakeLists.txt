@@ -35,6 +35,7 @@ set(TEST_IMPL_SOURCES
 )
 
 set(TEST_SOURCES
+    main_test.cpp
     test_card.cpp
     test_mazzo.cpp
     test_playersontable.cpp

@@ -2,7 +2,6 @@
 #include <iostream>
 
 #include "../CardSpec.h"
-#include "../Mazzo.h"
 
 void testCardSpec() {
     std::cout << "Running CardSpec tests..." << std::endl;
@@ -26,40 +25,4 @@ void testCardSpec() {
     assert(card.GetSuit() == eSUIT::SPADE);
 
     std::cout << "CardSpec tests PASSED" << std::endl;
-}
-
-void testMazzo() {
-    std::cout << "Running Mazzo tests..." << std::endl;
-
-    invido::Mazzo mazzo;
-    mazzo.Create();
-    mazzo.SetRandomSeed(42);
-    mazzo.Shuffle();
-
-    invido::CardSpec card;
-    bool hasCards = mazzo.PickNextCard(&card);
-    assert(hasCards);
-    assert(card.GetCardIndex() >= 0 && card.GetCardIndex() < 40);
-
-    mazzo.Reset();
-    hasCards = mazzo.PickNextCard(&card);
-    assert(hasCards);
-
-    for (int i = 0; i < 39; i++) {
-        mazzo.PickNextCard(&card);
-    }
-    hasCards = mazzo.PickNextCard(&card);
-    assert(!hasCards);
-
-    std::cout << "Mazzo tests PASSED" << std::endl;
-}
-
-int main() {
-    std::cout << "=== Invido Unit Tests ===" << std::endl;
-
-    testCardSpec();
-    testMazzo();
-
-    std::cout << "=== All tests PASSED ===" << std::endl;
-    return 0;
 }
