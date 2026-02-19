@@ -7,22 +7,38 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-find_package(SDL3 REQUIRED CONFIG PATHS "${CMAKE_SOURCE_DIR}/../../build/SDL" NO_DEFAULT_PATH)
+# SDL finding strategy: 
+# If SDL3 target doesn't exist (standalone build), find it.
+if(NOT TARGET SDL3::SDL3)
+    find_package(SDL3 REQUIRED CONFIG PATHS "${CMAKE_SOURCE_DIR}/../../build/SDL" NO_DEFAULT_PATH)
+endif()
 
-set(TEST_INVIDO_DIR ${CMAKE_SOURCE_DIR}/..)
-set(TEST_APP_DIR ${CMAKE_SOURCE_DIR}/../../../App)
-set(TEST_SDL_DIR ${CMAKE_SOURCE_DIR}/../../../../SDL)
+# Correct paths relative to this CMakeLists.txt
+set(TEST_INVIDO_DIR ${CMAKE_CURRENT_SOURCE_DIR}/..)
+set(TEST_APP_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../../App)
 
+# Include directories for headers
 include_directories(
     ${TEST_INVIDO_DIR}
     ${TEST_APP_DIR}
     ${SDL3_INCLUDE_DIR}
 )
 
+# Implementation files needed for linking
+set(TEST_IMPL_SOURCES
+    ${TEST_INVIDO_DIR}/CardSpec.cpp
+    ${TEST_INVIDO_DIR}/Mazzo.cpp
+    ${TEST_INVIDO_DIR}/PlayersOnTable.cpp
+    ${TEST_INVIDO_DIR}/Player.cpp
+    ${TEST_INVIDO_DIR}/PlayerStatistic.cpp
+    ${TEST_INVIDO_DIR}/AlgPlayer.cpp
+)
+
 set(TEST_SOURCES
     test_card.cpp
     test_mazzo.cpp
     test_playersontable.cpp
+    ${TEST_IMPL_SOURCES}
 )
 
 add_executable(${PROJECT_NAME} ${TEST_SOURCES})
