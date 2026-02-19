@@ -241,4 +241,10 @@ else()
   endif()
 endif()
 
+option(BUILD_INVIDO_TESTS "Build Invido unit tests" OFF)
+
+if(BUILD_INVIDO_TESTS)
+  add_subdirectory(GameGfx/Invido/tests)
+endif()
+
 
