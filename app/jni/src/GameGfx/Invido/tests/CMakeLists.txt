@@ -5,7 +5,13 @@ project(InvidoTests)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+
+# Add debug information and disable optimizations for testing
+if(NOT MSVC)
+    add_compile_options(-g -O0)
+    add_definitions(-D_DEBUG -DTRACEINSERVICE)
+endif()
 
 # SDL finding strategy: 
 # If SDL3 target doesn't exist (standalone build), find it.
@@ -32,6 +38,7 @@ set(TEST_IMPL_SOURCES
     ${TEST_INVIDO_DIR}/Player.cpp
     ${TEST_INVIDO_DIR}/PlayerStatistic.cpp
     ${TEST_INVIDO_DIR}/AlgPlayer.cpp
+    ${TEST_APP_DIR}/../UnixSys/UnixsysTrace.cpp
 )
 
 set(TEST_SOURCES

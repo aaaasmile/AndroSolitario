@@ -9,9 +9,9 @@ void testPlayersOnTableCreation() {
 
     invido::PlayersOnTable players;
 
-    assert(players.GetFirstOnMatch() == invido::NOT_VALID_INDEX);
-    assert(players.GetFirstOnTrick() == invido::NOT_VALID_INDEX);
-    assert(players.GetFirstOnGiocata() == invido::NOT_VALID_INDEX);
+    assert(players.GetFirstOnMatch() == 0);
+    assert(players.GetFirstOnTrick() == 0);
+    assert(players.GetFirstOnGiocata() == 0);
 
     std::cout << "PlayersOnTable creation tests PASSED" << std::endl;
 }
@@ -19,16 +19,19 @@ void testPlayersOnTableCreation() {
 void testPlayersOnTableSetFirst() {
     std::cout << "Running PlayersOnTable set first tests..." << std::endl;
 
-    invido::PlayersOnTable players;
-    players.SetFirstOnMatch(0);
+    invido::PlayersOnTable playersOnTable;
+    invido::Player localPlayer;
+    localPlayer.Create();
+    playersOnTable.Create(&localPlayer, 2);
+    playersOnTable.SetFirstOnMatch(0);
 
-    assert(players.GetFirstOnMatch() == 0);
+    assert(playersOnTable.GetFirstOnMatch() == 0);
 
-    players.SetFirstOnTrick(1);
-    assert(players.GetFirstOnTrick() == 1);
+    playersOnTable.SetFirstOnTrick(0);
+    assert(playersOnTable.GetFirstOnTrick() == 0);
 
-    players.SetFirstOnGiocata(2);
-    assert(players.GetFirstOnGiocata() == 2);
+    playersOnTable.SetFirstOnGiocata(1);
+    assert(playersOnTable.GetFirstOnGiocata() == 1);
 
     std::cout << "PlayersOnTable set first tests PASSED" << std::endl;
 }

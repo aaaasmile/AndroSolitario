@@ -5,9 +5,9 @@ using namespace invido;
 PlayersOnTable::PlayersOnTable() {
     _current = 0;
     _numPlayers = 0;
-    _firstOnTrick = NOT_VALID_INDEX;
-    _firstOnGiocata = NOT_VALID_INDEX;
-    _firstOnMatch = NOT_VALID_INDEX;
+    _firstOnTrick = 0;
+    _firstOnGiocata = 0;
+    _firstOnMatch = 0;
 }
 
 void PlayersOnTable::SetFirstOnTrick(Uint8 index) {
