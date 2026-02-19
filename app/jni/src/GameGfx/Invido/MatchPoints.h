@@ -3,7 +3,7 @@
 
 #include <SDL3/SDL.h>
 
-#include "AlgPlayerInterface.h"
+#include "AlgCoreInterface.h"
 #include "CardSpec.h"
 #include "InvidoCoreEnv.h"
 

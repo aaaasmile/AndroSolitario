@@ -3,7 +3,7 @@
 
 #include <iostream>
 
-#include "AlgPlayerInterface.h"
+#include "AlgCoreInterface.h"
 #include "InvidoCoreEnv.h"
 
 namespace invido {

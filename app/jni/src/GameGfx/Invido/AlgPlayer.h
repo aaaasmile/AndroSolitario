@@ -1,7 +1,7 @@
 #ifndef _ALG_PLAYER_H__
 #define _ALG_PLAYER_H__
 
-#include "AlgPlayerInterface.h"
+#include "AlgCoreInterface.h"
 #include "CardSpec.h"
 #include "InvidoCoreEnv.h"
 

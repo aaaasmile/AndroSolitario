@@ -1,8 +1,6 @@
 #ifndef ___ALGPLAYER_H_
 #define ___ALGPLAYER_H_
 
-// TODO change the name
-
 #include "CardSpec.h"
 #include "InvidoCoreEnv.h"
 

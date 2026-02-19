@@ -6,7 +6,7 @@
 
 #include <map>
 
-#include "AlgPlayerInterface.h"
+#include "AlgCoreInterface.h"
 #include "CardGfx.h"
 #include "Config.h"
 #include "DeckType.h"
