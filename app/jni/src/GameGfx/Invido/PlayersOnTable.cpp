@@ -3,61 +3,61 @@
 using namespace invido;
 
 PlayersOnTable::PlayersOnTable() {
-    m_lCurrent = 0;
+    _current = 0;
     _numPlayers = 0;
-    m_lFirstOnTrick = NOT_VALID_INDEX;
-    m_lFirstOnGiocata = NOT_VALID_INDEX;
-    m_lFirstOnMatch = NOT_VALID_INDEX;
+    _firstOnTrick = NOT_VALID_INDEX;
+    _firstOnGiocata = NOT_VALID_INDEX;
+    _firstOnMatch = NOT_VALID_INDEX;
 }
 
-void PlayersOnTable::SetFirstOnTrick(long lIndex) {
-    if (lIndex < (long)m_vctPlayers.size() && lIndex >= 0) {
-        m_lCurrent = lIndex;
-        m_lFirstOnTrick = lIndex;
+void PlayersOnTable::SetFirstOnTrick(Uint8 index) {
+    if (index < _vctPlayers.size() && index >= 0) {
+        _current = index;
+        _firstOnTrick = index;
     } else {
         SDL_assert(0);
     }
 }
 
-void PlayersOnTable::SetFirstOnGiocata(long lIndex) {
-    if (lIndex < (long)m_vctPlayers.size() && lIndex >= 0) {
-        m_lCurrent = lIndex;
-        m_lFirstOnTrick = lIndex;
-        m_lFirstOnGiocata = lIndex;
+void PlayersOnTable::SetFirstOnGiocata(Uint8 index) {
+    if (index < _vctPlayers.size() && index >= 0) {
+        _current = index;
+        _firstOnTrick = index;
+        _firstOnGiocata = index;
     } else {
         SDL_assert(0);
     }
 }
 
-void PlayersOnTable::SetFirstOnMatch(long lIndex) {
-    if (lIndex < (long)m_vctPlayers.size() && lIndex >= 0) {
-        m_lCurrent = lIndex;
-        m_lFirstOnTrick = lIndex;
-        m_lFirstOnGiocata = lIndex;
-        m_lFirstOnMatch = lIndex;
+void PlayersOnTable::SetFirstOnMatch(Uint8 index) {
+    if (index < _vctPlayers.size() && index >= 0) {
+        _current = index;
+        _firstOnTrick = index;
+        _firstOnGiocata = index;
+        _firstOnMatch = index;
     } else {
         SDL_assert(0);
     }
 }
 
 void PlayersOnTable::Create(Player* pHmiPlayer, int iNumPlayers) {
-    m_vctPlayers.clear();
+    _vctPlayers.clear();
     for (int i = 0; i < iNumPlayers; i++) {
         if (pHmiPlayer && i == 0) {
             pHmiPlayer->SetIndex(0);
-            m_vctPlayers.push_back(*pHmiPlayer);
+            _vctPlayers.push_back(*pHmiPlayer);
         } else {
-            m_vctPlayers.push_back(Player());
-            m_vctPlayers[i].Create();
+            _vctPlayers.push_back(Player());
+            _vctPlayers[i].Create();
             // type is default value. Gfx engine change it.
             if (i == 0) {
                 // the first player is a local
-                m_vctPlayers[i].SetType(PT_LOCAL);
+                _vctPlayers[i].SetType(PT_LOCAL);
             } else {
                 // all others are machine
-                m_vctPlayers[i].SetType(PT_MACHINE);
+                _vctPlayers[i].SetType(PT_MACHINE);
             }
-            m_vctPlayers[i].SetIndex(i);
+            _vctPlayers[i].SetIndex(i);
         }
     }
 
@@ -65,28 +65,28 @@ void PlayersOnTable::Create(Player* pHmiPlayer, int iNumPlayers) {
 }
 
 Player* PlayersOnTable::GetPlayerToPlay(eSwitchPLayer eVal) {
-    size_t lNumPlayers = m_vctPlayers.size();
-    long lTemp = m_lCurrent;
+    size_t numPlayers = _vctPlayers.size();
+    Uint8 playerIx = _current;
 
     if (eVal == SWITCH_TO_NEXT) {
         // current is the next
-        m_lCurrent++;
+        _current++;
 
-        if (m_lCurrent >= lNumPlayers) {
-            m_lCurrent = 0;
+        if (_current >= numPlayers) {
+            _current = 0;
         }
     }
 
-    return &m_vctPlayers[lTemp];
+    return &_vctPlayers[playerIx];
 }
 
-Player* PlayersOnTable::GetPlayerIndex(long lIndex) {
-    if (lIndex < (long)m_vctPlayers.size() && lIndex >= 0) {
+Player* PlayersOnTable::GetPlayerIndex(Uint8 index) {
+    if (index < _vctPlayers.size() && index >= 0) {
     } else {
         SDL_assert(0);
     }
 
-    return &m_vctPlayers[lIndex];
+    return &_vctPlayers[index];
 }
 
 int PlayersOnTable::CalcDistance(int iPlayerRef, int iPlayerTmp) {
@@ -118,7 +118,7 @@ int PlayersOnTable::CalcDistance(int iPlayerRef, int iPlayerTmp) {
 
 void PlayersOnTable::CalcCircleIndex(int* paPlayerDeck) {
     SDL_assert(paPlayerDeck);
-    paPlayerDeck[0] = m_lCurrent;
+    paPlayerDeck[0] = _current;
     int k = 1;
     while (k < _numPlayers) {
         paPlayerDeck[k] = paPlayerDeck[k - 1] + 1;
@@ -133,7 +133,7 @@ bool PlayersOnTable::IsLevelPython() {
     bool bRes = false;
 
     for (int i = 0; i < _numPlayers; i++) {
-        eGameLevel eLevel = m_vctPlayers[i].GetLevel();
+        eGameLevel eLevel = _vctPlayers[i].GetLevel();
         if (eLevel == TEST_PYTHON) {
             bRes = true;
             break;
