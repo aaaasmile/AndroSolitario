@@ -78,6 +78,12 @@ void testPlayersOnTableCalcCircleIndex() {
     playerThree.Init(NULL, invido::PT_MACHINE, "Guido3", 3);
     playerFour.Init(NULL, invido::PT_MACHINE, "Guido4", 4);
 
+    playerOnTable.AddPlayer(playerOne);
+    playerOnTable.AddPlayer(playerTwo);
+    playerOnTable.AddPlayer(playerThree);
+    playerOnTable.AddPlayer(playerFour);
+
+
     playerOnTable.SetCurrentAndFirstOnTrick(0);
 
     int indices[4];
@@ -87,6 +93,13 @@ void testPlayersOnTableCalcCircleIndex() {
     assert(indices[1] == 1);
     assert(indices[2] == 2);
     assert(indices[3] == 3);
+
+    playerOnTable.SetCurrentAndFirstOnTrick(2);
+    playerOnTable.CalcCircleIndex(indices, 4);
+    assert(indices[0] == 2);
+    assert(indices[1] == 3);
+    assert(indices[2] == 0);
+    assert(indices[3] == 1);
 
     std::cout << "PlayersOnTable calc circle index tests PASSED" << std::endl;
 }
