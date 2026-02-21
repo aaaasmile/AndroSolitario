@@ -12,6 +12,7 @@ int main(int argc, char* argv[]) {
         testCardSpec();
         testMazzo();
         testPlayersOnTable();
+        testMatch();
     } catch (const std::exception& e) {
         std::cerr << "Test failed with exception: " << e.what() << std::endl;
         return 1;

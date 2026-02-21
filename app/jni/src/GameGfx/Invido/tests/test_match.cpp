@@ -4,7 +4,9 @@
 #include "../Player.h"
 #include "../PlayersOnTable.h"
 
-void testRandomMatch(){
+void testSimpleMatch() {
+    std::cout << "Running Match tests..." << std::endl;
+
     invido::PlayersOnTable playersOnTable;
     invido::Player player1;
     invido::Player player2;
@@ -13,8 +15,8 @@ void testRandomMatch(){
     player2.Init(NULL, invido::PT_MACHINE, "Rensu", 1);
     playersOnTable.AddPlayer(player1);
     playersOnTable.AddPlayer(player2);
+
+    std::cout << "Match tests PASSED" << std::endl;
 }
 
-void testMatch(){
-    testRandomMatch();
-}
+void testMatch() { testSimpleMatch(); }
