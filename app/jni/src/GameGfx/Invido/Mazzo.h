@@ -2,7 +2,7 @@
 #define __CMAZZO_H
 
 #include "CardSpec.h"
-#include "InvidoCoreEnv.h"
+#include "InvidoCoreDef.h"
 
 namespace invido {
 
@@ -11,7 +11,7 @@ class InvidoCore;
 class Mazzo {
    public:
     Mazzo();
-    void Create();
+    void Init();
     bool Shuffle();
     void Reset() { _nextCard = 0; }
     bool PickNextCard(CardSpec* pNextCard);

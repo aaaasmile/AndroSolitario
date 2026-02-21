@@ -2,28 +2,24 @@
 #define ___ALGPLAYER_H_
 
 #include "CardSpec.h"
-#include "InvidoCoreEnv.h"
+#include "InvidoCoreDef.h"
 
 namespace invido {
 
 class I_CORE_Game {
    public:
-    I_CORE_Game() {}
-    virtual ~I_CORE_Game() {}
-    virtual bool Say(int iPlayerIx, eSayPlayer eSay) = 0;
-    virtual bool PlayCard(int iPlayerIx, const CardSpec& cardSpec) = 0;
-    virtual bool VaDentro(int iPlayerIx, const CardSpec& cardSpec) = 0;
-    virtual void AbandonGame(int iPlayerIx) = 0;
+    virtual bool Say(Uint8 playerIx, eSayPlayer eSay) = 0;
+    virtual bool PlayCard(Uint8 playerIx, const CardSpec& cardSpec) = 0;
+    virtual bool VaDentro(Uint8 playerIx, const CardSpec& cardSpec) = 0;
+    virtual void AbandonGame(Uint8 playerIx) = 0;
     virtual void GetAdmittedCommands(VCT_COMMANDS& vct_Commands,
-                                     int iPlayerIndex) = 0;
+                                     Uint8 playerIx) = 0;
     virtual void GetMoreCommands(VCT_COMMANDS& vct_Commands,
-                                 int iPlayerIndex) = 0;
+                                 Uint8 playerIx) = 0;
 };
 
 class I_MatchScore {
    public:
-    I_MatchScore() {}
-    virtual ~I_MatchScore() {}
     virtual bool IsGiocatEnd() = 0;
     virtual bool IsGiocataMonte() = 0;
     virtual bool IsManoPatada() = 0;
@@ -33,7 +29,7 @@ class I_MatchScore {
     virtual int GetGiocataWinner() = 0;
     virtual int GetMatchWinner() = 0;
     virtual eGiocataScoreState GetCurrScore() = 0;
-    virtual int GetPointsPlayer(int iPlayerIx) = 0;
+    virtual int GetPointsPlayer(Uint8 playerIx) = 0;
     virtual int GetManoNum() = 0;
     virtual bool IsGameAbandoned() = 0;
 };
@@ -47,26 +43,24 @@ The player becomes an index on the virtual game table.
 */
 class I_ALG_Player {
    public:
-    I_ALG_Player() {}
-    virtual ~I_ALG_Player() {}
     virtual void ALG_SetCoreInterface(I_CORE_Game* pCore) = 0;
-    virtual void ALG_SetPlayerIndex(int iIndex) = 0;
-    virtual void ALG_SetOpponentIndex(int iIndex, int iOpponentNr) = 0;
-    virtual void ALG_SetAssociateIndex(int iIndex) = 0;
+    virtual void ALG_SetPlayerIndex(Uint8 playerIx) = 0;
+    virtual void ALG_SetOpponentIndex(Uint8 playerIx) = 0;
+    virtual void ALG_SetAssociateIndex(Uint8 playerIx) = 0;
     virtual void ALG_NewMatch(int iNumPlayer) = 0;
     virtual void ALG_NewGiocata(const VCT_CARDSPEC& vctCards,
-                                int iPlayerIx) = 0;
-    virtual void ALG_PlayerHasPlayed(int iPlayerIx,
+                                Uint8 playerIx) = 0;
+    virtual void ALG_PlayerHasPlayed(Uint8 playerIx,
                                      const CardSpec& cardSpec) = 0;
-    virtual void ALG_PlayerHasVadoDentro(int iPlayerIx) = 0;
-    virtual void ALG_PlayerHasSaid(int iPlayerIx, eSayPlayer eSay) = 0;
+    virtual void ALG_PlayerHasVadoDentro(Uint8 playerIx) = 0;
+    virtual void ALG_PlayerHasSaid(Uint8 playerIx, eSayPlayer eSay) = 0;
     virtual void ALG_ManoEnd(I_MatchScore* pScore) = 0;
     virtual void ALG_GiocataEnd(I_MatchScore* pScore) = 0;
     virtual void ALG_MatchEnd(I_MatchScore* pScore) = 0;
     virtual void ALG_HaveToPlay() = 0;
     virtual void ALG_HaveToRespond() = 0;
     virtual void ALG_GicataScoreChange(eGiocataScoreState eNewScore) = 0;
-    virtual void ALG_PlayerSaidWrong(int iPlayerIx) = 0;
+    virtual void ALG_PlayerSaidWrong(Uint8 playerIx) = 0;
 };
 
 }  // namespace invido

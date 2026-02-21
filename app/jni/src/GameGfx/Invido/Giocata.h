@@ -3,7 +3,7 @@
 
 #include <deque>
 
-#include "InvidoCoreEnv.h"
+#include "InvidoCoreDef.h"
 #include "ErrorInfo.h"
 
 namespace invido {

@@ -9,7 +9,7 @@ Mazzo::Mazzo() {
     _rndSeed = 0;
 }
 
-void Mazzo::Create() {
+void Mazzo::Init() {
     _vctCardIndex.reserve(NUM_CARDS);
     _vctCardIndex.clear();
 

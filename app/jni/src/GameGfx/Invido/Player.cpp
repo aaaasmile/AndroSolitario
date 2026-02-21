@@ -34,39 +34,17 @@ Player& Player::operator=(const Player& a) {
     return *this;
 }
 
-void Player::Create() {
-    _eKind = PT_LOCAL;
-    _playerName = std::string("Remigiu");
-    _index = NOT_VALID_INDEX;
-    _eLevel = DUMMY;
-}
+void Player::Init(I_ALG_Player* I_val, eTypeOfPLayer eVal, LPCSTR lpszName,
+                    Uint8 index) {
+    if (I_val != NULL) {
+        _p_IAlgorithm = I_val;
+    } else {
+        _p_IAlgorithm = new AlgPlayer();
+        _vctAlgToDestroy.push_back(_p_IAlgorithm);
+    }
 
-void Player::SetName(LPCSTR lpszName) {
+    _eKind = eVal;
     _playerName = std::string(lpszName);
-}
-
-void Player::SetType(eTypeOfPLayer eVal) { _eKind = eVal; }
-
-void Player::SetLevel(eGameLevel eNewLevel, I_ALG_Player* I_val) {
-    if (_p_IAlgorithm != 0 && _eLevel != HMI && _eLevel != SERVER_LEVEL) {
-        delete _p_IAlgorithm;
-        _p_IAlgorithm = 0;
-    }
-    _eLevel = eNewLevel;
-
-    switch (eNewLevel) {
-        case BEGINNER:
-        case NIGHTMARE:
-        case ADVANCED:
-            _p_IAlgorithm = new AlgPlayer();
-            _vctAlgToDestroy.push_back(_p_IAlgorithm);
-            break;
-        case SERVER_LEVEL:
-        case HMI:
-            SDL_assert(I_val);
-            _p_IAlgorithm = I_val;
-            break;
-        default:
-            SDL_assert(0);
-    }
+    _index = index;
+    _eLevel = eGameLevel::STANDARD;
 }

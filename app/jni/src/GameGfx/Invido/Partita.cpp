@@ -2,7 +2,7 @@
 
 #include "Giocata.h"
 #include "InvidoCore.h"
-#include "InvidoCoreEnv.h"
+#include "InvidoCoreDef.h"
 #include "MatchPoints.h"
 
 using namespace invido;

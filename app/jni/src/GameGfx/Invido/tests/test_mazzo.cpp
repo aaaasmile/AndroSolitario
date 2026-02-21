@@ -7,7 +7,7 @@ void testMazzoCreation() {
     std::cout << "Running Mazzo creation tests..." << std::endl;
 
     invido::Mazzo mazzo;
-    mazzo.Create();
+    mazzo.Init();
 
     std::cout << "Mazzo creation tests PASSED" << std::endl;
 }
@@ -16,7 +16,7 @@ void testMazzoShuffle() {
     std::cout << "Running Mazzo shuffle tests..." << std::endl;
 
     invido::Mazzo mazzo;
-    mazzo.Create();
+    mazzo.Init();
     mazzo.SetRandomSeed(42);
     bool shuffled = mazzo.Shuffle();
     assert(shuffled);
@@ -28,7 +28,7 @@ void testMazzoPickCard() {
     std::cout << "Running Mazzo pick card tests..." << std::endl;
 
     invido::Mazzo mazzo;
-    mazzo.Create();
+    mazzo.Init();
     mazzo.SetRandomSeed(42);
     mazzo.Shuffle();
 
@@ -44,7 +44,7 @@ void testMazzoReset() {
     std::cout << "Running Mazzo reset tests..." << std::endl;
 
     invido::Mazzo mazzo;
-    mazzo.Create();
+    mazzo.Init();
     mazzo.SetRandomSeed(42);
     mazzo.Shuffle();
 

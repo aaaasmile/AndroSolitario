@@ -6,7 +6,7 @@
 #define _C_INVIDOCORE_H_
 
 #include "Giocata.h"
-#include "InvidoCoreEnv.h"
+#include "InvidoCoreDef.h"
 #include "Mano.h"
 #include "MatchPoints.h"
 #include "Partita.h"
@@ -20,68 +20,66 @@ class Mazzo;
 class InvidoCore : public I_CORE_Game {
    public:
     InvidoCore();
-    ~InvidoCore();
-    void Create(Player* pHmiPlayer, int iNumPlayers);
-    bool WhoWonsTheGame(Player** ppPlayer);
-    bool GetPlayerInPlaying(Player** ppPlayer);
+    virtual ~InvidoCore();
+
+    void Init();
+    void AddPlayer(Player& player);
+    Player* GetPlayerInPlaying() { return _p_PlHaveToPlay; };
     void SetGameType(eGameType eVal) { _eGameType = eVal; }
-    Player* GetPlayer(int iIndex) {
-        return _playersOnTable.GetPlayerIndex(iIndex);
-    }
+    Player* GetPlayer(Uint8 index);
     int GetNumOfPlayers() { return _numPlayers; }
-    MatchPoints* GetMatchPointsObj() { return &_matchPoints; }
-    PlayersOnTable* GetTable() { return &_playersOnTable; }
+    MatchPoints* GetMatchPointsInstance() { return &_matchPoints; }
+    PlayersOnTable* GetTable() { return _p_PlayersOnTable; }
 
     // functions related to the script engine
     void NotifyScript(eScriptNotification eVal);
-    void Script_OverrideDeck(int iPlayer, int iC1, int iC2, int iC3);
-    void Script_Say(int iPlayer, eSayPlayer eSay);
-    void Script_Play(int iPlayer, CardSpec& CardPlayed);
-    void NotifyScriptAlgorithm(int iPlayerIx, eScriptNotification eVal);
+    void Script_OverrideDeck(Uint8 playerIx, int iC1, int iC2, int iC3);
+    void Script_Say(Uint8 playerIx, eSayPlayer eSay);
+    void Script_Play(Uint8 playerIx, CardSpec& CardPlayed);
+    void NotifyScriptAlgorithm(Uint8 playerIx, eScriptNotification eVal);
     void Script_MatchEnd();
-    void Script_SetStartPlayer(int iPlayer);
-    int Script_CheckResult(int iTypeOfItem, int iParam1, int iExpectedVal);
-
+    
     // functions called from Mano
     void Mano_End();
-    void NtyWaitingPlayer_Toplay(int iPlayerIx);
-    void NtyWaitingPlayer_ToResp(int iPlayerIx);
-    void NtyPlayerSayBuiada(int iPlayerIx);
+    void NtyWaitingPlayer_Toplay(Uint8 playerIx);
+    void NtyWaitingPlayer_ToResp(Uint8 playerIx);
+    void NtyPlayerSayBuiada(Uint8 playerIx);
     void ChangeGiocataScore(eGiocataScoreState eNewScore);
-    void Player_VaVia(int iPlayerIx);
+    void Player_VaVia(Uint8 playerIx);
     void Giocata_AMonte();
 
     void Giocata_End();
-    void Giocata_Start(long lPlayerIx);
+    void Giocata_Start(Uint8 playerIx);
 
     void Partita_End();
 
     void NewMatch();
     void NextAction();
     void SetRandomSeed(int iVal);
-
-    bool Say(int iPlayerIx, eSayPlayer eSay);
-    bool PlayCard(int iPlayerIx, const CardSpec& cardSpec);
-    bool VaDentro(int iPlayerIx, const CardSpec& cardSpec);
-    void GetAdmittedCommands(VCT_COMMANDS& vct_Commands, int iPlayerIndex);
-    void GetMoreCommands(VCT_COMMANDS& vct_Commands, int iPlayerIndex);
-    void AbandonGame(int iPlayerIx);
+    // Interface I_CORE_Game
+    bool Say(Uint8 playerIx, eSayPlayer eSay);
+    bool PlayCard(Uint8 playerIx, const CardSpec& cardSpec);
+    bool VaDentro(Uint8 playerIx, const CardSpec& cardSpec);
+    void AbandonGame(Uint8 playerIx);
+    void GetAdmittedCommands(VCT_COMMANDS& vct_Commands, Uint8 playerIxIndex);
+    void GetMoreCommands(VCT_COMMANDS& vct_Commands, Uint8 playerIxIndex);
+    
 
    private:
-    CardSpec* checkValidCardPlayed(int iPlayerIx, const CardSpec& cardSpec);
+    CardSpec* checkValidCardPlayed(Uint8 playerIx, const CardSpec& cardSpec);
     void resetCardInfoPlayers();
-    bool resetCard(int iPlayerIx, const CardSpec& cardSpec);
-    int getNewMatchFirstPlayer();
+    bool resetCard(Uint8 playerIx, const CardSpec& cardSpec);
+    Uint8 getNewMatchFirstPlayer();
 
    private:
-    PlayersOnTable _playersOnTable;
+    PlayersOnTable* _p_PlayersOnTable;
+    Mazzo* _p_MyMazzo;
     eGameType _eGameType;
-    long _numPlayers;
+    size_t _numPlayers;
     Player* _p_PlHaveToPlay;
     Player* _p_StartPlayer;
     eGameLevel _eGameLevel;
     MATCH_STATISTIC _matchStat;
-    Mazzo* _p_MyMazzo;
     Partita _partita;
     Giocata _giocata;
     Mano _mano;
@@ -90,6 +88,6 @@ class InvidoCore : public I_CORE_Game {
     VCT_CARDSPEC _cardInfos[MAX_NUM_PLAYER];
 };
 
-}
+}  // namespace invido
 
 #endif

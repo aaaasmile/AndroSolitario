@@ -6,31 +6,30 @@
 namespace invido {
 class PlayersOnTable {
    public:
-    enum eSwitchPLayer { SWITCH_TO_NEXT, NO_SWITCH };
     PlayersOnTable();
-    void SetFirstOnMatch(Uint8 lIndex);
+    void AddPlayer(Player& player);
+    void SetFirstOnMatch(Uint8 index);
     Uint8 GetFirstOnMatch() { return _firstOnMatch; }
-    void SetFirstOnTrick(Uint8 lIndex);
+    void SetCurrentAndFirstOnTrick(Uint8 index);
     Uint8 GetFirstOnTrick() { return _firstOnTrick; }
-    void SetFirstOnGiocata(Uint8 lIndex);
+    void SetFirstOnGiocata(Uint8 index);
     Uint8 GetFirstOnGiocata() { return _firstOnGiocata; }
-    void Create(Player* pHmiPlayer, int iNumPlayers);
-    Player* GetPlayerToPlay(eSwitchPLayer eVal);
-    Player* GetPlayerIndex(Uint8 lIndex);
+    Player* GetPlayerToPlay();
+    Player* SwitchToNextPlayer();
+    Player* GetPlayerOnIndex(Uint8 index);
+    Player* PeekNextPlayerToIx(Uint8 index);
     int CalcDistance(int iPlayerRef, int PlayerTmp);
-    void CalcCircleIndex(int* paPlayerDeck);
-    void CalcCircleIndex_Cust(int* paPlayerDeck, int iPlayerIni);
-    bool IsLevelPython();
+    void CalcCircleIndex(int* paPlayerDeck, size_t size);
+    size_t GetNumOfPlayers() { return _vctPlayers.size(); }
 
    private:
-    VCT_PLAYERS _vctPlayers;
+    VCT_PLAYER _vctPlayers;
     Uint8 _current;
-    Uint8 _numPlayers;
     Uint8 _firstOnGiocata;
     Uint8 _firstOnTrick;
     Uint8 _firstOnMatch;
 };
 
-}
+}  // namespace invido
 
 #endif

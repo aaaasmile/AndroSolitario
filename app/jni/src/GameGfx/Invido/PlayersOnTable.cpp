@@ -4,19 +4,26 @@ using namespace invido;
 
 PlayersOnTable::PlayersOnTable() {
     _current = 0;
-    _numPlayers = 0;
     _firstOnTrick = 0;
     _firstOnGiocata = 0;
     _firstOnMatch = 0;
 }
 
-void PlayersOnTable::SetFirstOnTrick(Uint8 index) {
+void PlayersOnTable::SetCurrentAndFirstOnTrick(Uint8 index) {
     if (index < _vctPlayers.size() && index >= 0) {
         _current = index;
         _firstOnTrick = index;
     } else {
         SDL_assert(0);
     }
+}
+
+Player* PlayersOnTable::PeekNextPlayerToIx(Uint8 index) {
+    Uint8 next = _current + 1;
+    if (next >= _vctPlayers.size()) {
+        next = 0;
+    }
+    return &_vctPlayers[next];
 }
 
 void PlayersOnTable::SetFirstOnGiocata(Uint8 index) {
@@ -40,75 +47,49 @@ void PlayersOnTable::SetFirstOnMatch(Uint8 index) {
     }
 }
 
-void PlayersOnTable::Create(Player* pHmiPlayer, int iNumPlayers) {
-    _vctPlayers.clear();
-    for (int i = 0; i < iNumPlayers; i++) {
-        if (pHmiPlayer && i == 0) {
-            pHmiPlayer->SetIndex(0);
-            _vctPlayers.push_back(*pHmiPlayer);
-        } else {
-            _vctPlayers.push_back(Player());
-            _vctPlayers[i].Create();
-            // type is default value. Gfx engine change it.
-            if (i == 0) {
-                // the first player is a local
-                _vctPlayers[i].SetType(PT_LOCAL);
-            } else {
-                // all others are machine
-                _vctPlayers[i].SetType(PT_MACHINE);
-            }
-            _vctPlayers[i].SetIndex(i);
-        }
-    }
-
-    _numPlayers = iNumPlayers;
+void PlayersOnTable::AddPlayer(Player& player) {
+    _vctPlayers.push_back(player);
 }
 
-Player* PlayersOnTable::GetPlayerToPlay(eSwitchPLayer eVal) {
+Player* PlayersOnTable::GetPlayerToPlay() {
     size_t numPlayers = _vctPlayers.size();
     Uint8 playerIx = _current;
-
-    if (eVal == SWITCH_TO_NEXT) {
-        // current is the next
-        _current++;
-
-        if (_current >= numPlayers) {
-            _current = 0;
-        }
-    }
-
+    SDL_assert(playerIx < numPlayers && playerIx >= 0);
     return &_vctPlayers[playerIx];
 }
 
-Player* PlayersOnTable::GetPlayerIndex(Uint8 index) {
-    if (index < _vctPlayers.size() && index >= 0) {
-    } else {
-        SDL_assert(0);
+Player* PlayersOnTable::SwitchToNextPlayer() {
+    size_t numPlayers = _vctPlayers.size();
+    Uint8 playerIx = _current;
+    _current++;
+    if (_current >= numPlayers) {
+        _current = 0;
     }
+    SDL_assert(playerIx < _vctPlayers.size() && playerIx >= 0);
+    return &_vctPlayers[playerIx];
+}
 
+Player* PlayersOnTable::GetPlayerOnIndex(Uint8 index) {
+    SDL_assert(index < _vctPlayers.size() && index >= 0);
     return &_vctPlayers[index];
 }
 
-int PlayersOnTable::CalcDistance(int iPlayerRef, int iPlayerTmp) {
-    int aTableIx[MAX_NUM_PLAYER];
-    for (int i = 0; i < MAX_NUM_PLAYER; i++) {
-        aTableIx[i] = i;
-    }
-    int iTmp = iPlayerRef;
+int PlayersOnTable::CalcDistance(int playerIxFrom, int playerIxTo) {
     int iDist = 0;
+    size_t numPlayers = _vctPlayers.size();
 
-    SDL_assert(iPlayerTmp >= 0 && iPlayerTmp < _numPlayers);
-    SDL_assert(iPlayerRef >= 0 && iPlayerRef < _numPlayers);
+    SDL_assert(playerIxTo >= 0 && playerIxTo < numPlayers);
+    SDL_assert(playerIxFrom >= 0 && playerIxFrom < numPlayers);
 
     bool bFound = false;
-    while (!bFound && iDist < _numPlayers) {
-        if (aTableIx[iTmp] == iPlayerTmp) {
+    while (!bFound && iDist < numPlayers) {
+        if (playerIxFrom == playerIxTo) {
             bFound = true;
         } else {
             iDist++;
-            iTmp++;
-            if (iTmp >= _numPlayers) {
-                iTmp = 0;
+            playerIxFrom++;
+            if (playerIxFrom >= numPlayers) {
+                playerIxFrom = 0;
             }
         }
     }
@@ -116,43 +97,19 @@ int PlayersOnTable::CalcDistance(int iPlayerRef, int iPlayerTmp) {
     return iDist;
 }
 
-void PlayersOnTable::CalcCircleIndex(int* paPlayerDeck) {
+void PlayersOnTable::CalcCircleIndex(int* paPlayerDeck, size_t size) {
     SDL_assert(paPlayerDeck);
-    paPlayerDeck[0] = _current;
+    Uint8 iniVal = _current;
+    paPlayerDeck[0] = iniVal;
     int k = 1;
-    while (k < _numPlayers) {
-        paPlayerDeck[k] = paPlayerDeck[k - 1] + 1;
-        if (paPlayerDeck[k] >= _numPlayers) {
-            paPlayerDeck[k] = 0;
+    size_t numPlayers = _vctPlayers.size();
+    SDL_assert(numPlayers <= size);
+    while (k < numPlayers) {
+        iniVal++;
+        if (iniVal >= numPlayers) {
+            iniVal = 0;
         }
-        k++;
-    }
-}
-
-bool PlayersOnTable::IsLevelPython() {
-    bool bRes = false;
-
-    for (int i = 0; i < _numPlayers; i++) {
-        eGameLevel eLevel = _vctPlayers[i].GetLevel();
-        if (eLevel == TEST_PYTHON) {
-            bRes = true;
-            break;
-        }
-    }
-
-    return bRes;
-}
-
-void PlayersOnTable::CalcCircleIndex_Cust(int* paPlayerDeck, int iPlayerIni) {
-    SDL_assert(paPlayerDeck);
-
-    paPlayerDeck[0] = iPlayerIni;
-    int k = 1;
-    while (k < _numPlayers) {
-        paPlayerDeck[k] = paPlayerDeck[k - 1] + 1;
-        if (paPlayerDeck[k] >= _numPlayers) {
-            paPlayerDeck[k] = 0;
-        }
+        paPlayerDeck[k] = iniVal;
         k++;
     }
 }

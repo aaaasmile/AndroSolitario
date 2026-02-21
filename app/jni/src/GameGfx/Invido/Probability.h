@@ -2,7 +2,7 @@
 #define __CPROBABILITY_H____
 
 #include "CardSpec.h"
-#include "InvidoCoreEnv.h"
+#include "InvidoCoreDef.h"
 #include "Mazzo.h"
 
 namespace invido {

@@ -3,7 +3,7 @@
 
 #include "AlgCoreInterface.h"
 #include "CardSpec.h"
-#include "InvidoCoreEnv.h"
+#include "InvidoCoreDef.h"
 
 namespace invido {
 
@@ -12,23 +12,24 @@ class AlgPlayer : public I_ALG_Player {
     AlgPlayer();
     virtual ~AlgPlayer();
 
-    // interface I_ALG_Player
+    // interface I_ALG_Player - start
     virtual void ALG_SetCoreInterface(I_CORE_Game* pCore);
-    virtual void ALG_SetPlayerIndex(int iIndex);
-    virtual void ALG_SetOpponentIndex(int iIndex, int iOpponentNr);
-    virtual void ALG_SetAssociateIndex(int iIndex);
+    virtual void ALG_SetPlayerIndex(Uint8 playerIx);
+    virtual void ALG_SetOpponentIndex(Uint8 playerIx);
+    virtual void ALG_SetAssociateIndex(Uint8 playerIx);
     virtual void ALG_NewMatch(int iNumPlayer);
-    virtual void ALG_NewGiocata(const VCT_CARDSPEC& vctCards, int iPlayerIx);
-    virtual void ALG_PlayerHasPlayed(int iPlayerIx, const CardSpec& cardSpec);
-    virtual void ALG_PlayerHasVadoDentro(int iPlayerIx);
-    virtual void ALG_PlayerHasSaid(int iPlayerIx, eSayPlayer eSay);
+    virtual void ALG_NewGiocata(const VCT_CARDSPEC& vctCards, Uint8 playerIx);
+    virtual void ALG_PlayerHasPlayed(Uint8 playerIx, const CardSpec& cardSpec);
+    virtual void ALG_PlayerHasVadoDentro(Uint8 playerIx);
+    virtual void ALG_PlayerHasSaid(Uint8 playerIx, eSayPlayer eSay);
     virtual void ALG_ManoEnd(I_MatchScore* pScore);
     virtual void ALG_GiocataEnd(I_MatchScore* pScore);
     virtual void ALG_MatchEnd(I_MatchScore* pScore);
     virtual void ALG_HaveToPlay();
     virtual void ALG_HaveToRespond();
     virtual void ALG_GicataScoreChange(eGiocataScoreState eNewScore);
-    virtual void ALG_PlayerSaidWrong(int iPlayerIx);
+    virtual void ALG_PlayerSaidWrong(Uint8 playerIx);
+    // interface I_ALG_Player - end
 
    private:
     void PlayAsFirst();

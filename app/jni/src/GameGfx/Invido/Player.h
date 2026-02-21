@@ -4,7 +4,7 @@
 #include <iostream>
 
 #include "AlgCoreInterface.h"
-#include "InvidoCoreEnv.h"
+#include "InvidoCoreDef.h"
 
 namespace invido {
 
@@ -24,15 +24,17 @@ class Player {
    public:
     Player();
     virtual ~Player();
-    void Create();
-    void SetType(eTypeOfPLayer eVal);
-    void SetLevel(eGameLevel eNewLevel, I_ALG_Player* I_val);
-    eGameLevel GetLevel() { return _eLevel; }
-    eTypeOfPLayer GetType() { return _eKind; }
-    int GetIndex() { return _index; }
-    void SetIndex(int iVal) { _index = iVal; }
+    void Init(I_ALG_Player* I_val, eTypeOfPLayer eVal, LPCSTR lpszName,
+                Uint8 index);
+    void SetName(LPCSTR lpszName) { _playerName = std::string(lpszName); }
     std::string GetName() { return _playerName; }
-    void SetName(LPCSTR lpszName);
+    void SetType(eTypeOfPLayer eVal) { _eKind = eVal; }
+    eTypeOfPLayer GetType() { return _eKind; }
+    void SetLevel(eGameLevel eNewLevel) { _eLevel = eNewLevel; }
+    eGameLevel GetLevel() { return _eLevel; }
+    Uint8 GetIndex() { return _index; }
+    void SetIndex(Uint8 iVal) { _index = iVal; }
+
     I_ALG_Player* GetAlg() { return _p_IAlgorithm; }
 
     friend std::ostream& operator<<(std::ostream& stream, const Player& o);
@@ -42,13 +44,13 @@ class Player {
    private:
     std::string _playerName;
     eTypeOfPLayer _eKind;
-    int _index;
+    Uint8 _index;
     I_ALG_Player* _p_IAlgorithm;
     VCT_PALG _vctAlgToDestroy;
     eGameLevel _eLevel;
 };
 
-typedef std::vector<Player> VCT_PLAYERS;
+typedef std::vector<Player> VCT_PLAYER;
 
 // operators
 inline std::ostream& operator<<(std::ostream& stream, const Player& o) {
@@ -56,6 +58,6 @@ inline std::ostream& operator<<(std::ostream& stream, const Player& o) {
 
     return stream;
 }
-}
+}  // namespace invido
 
 #endif

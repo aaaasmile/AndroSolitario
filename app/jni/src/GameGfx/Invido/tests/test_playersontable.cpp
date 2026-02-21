@@ -7,11 +7,11 @@
 void testPlayersOnTableCreation() {
     std::cout << "Running PlayersOnTable creation tests..." << std::endl;
 
-    invido::PlayersOnTable players;
+    invido::PlayersOnTable playersOnTable;
 
-    assert(players.GetFirstOnMatch() == 0);
-    assert(players.GetFirstOnTrick() == 0);
-    assert(players.GetFirstOnGiocata() == 0);
+    assert(playersOnTable.GetFirstOnMatch() == 0);
+    assert(playersOnTable.GetFirstOnTrick() == 0);
+    assert(playersOnTable.GetFirstOnGiocata() == 0);
 
     std::cout << "PlayersOnTable creation tests PASSED" << std::endl;
 }
@@ -20,14 +20,18 @@ void testPlayersOnTableSetFirst() {
     std::cout << "Running PlayersOnTable set first tests..." << std::endl;
 
     invido::PlayersOnTable playersOnTable;
-    invido::Player localPlayer;
-    localPlayer.Create();
-    playersOnTable.Create(&localPlayer, 2);
+    invido::Player localPlayerOne;
+    invido::Player localPlayerTwo;
+    localPlayerOne.Init(NULL, invido::PT_LOCAL, "Guido", 0);
+    localPlayerTwo.Init(NULL, invido::PT_MACHINE, "Spatasa", 2);
+
+    playersOnTable.AddPlayer(localPlayerOne);
+    playersOnTable.AddPlayer(localPlayerTwo);
     playersOnTable.SetFirstOnMatch(0);
 
     assert(playersOnTable.GetFirstOnMatch() == 0);
 
-    playersOnTable.SetFirstOnTrick(0);
+    playersOnTable.SetCurrentAndFirstOnTrick(0);
     assert(playersOnTable.GetFirstOnTrick() == 0);
 
     playersOnTable.SetFirstOnGiocata(1);
@@ -39,18 +43,21 @@ void testPlayersOnTableSetFirst() {
 void testPlayersOnTableCreatePlayers() {
     std::cout << "Running PlayersOnTable create players tests..." << std::endl;
 
-    invido::PlayersOnTable players;
-    invido::Player localPlayer;
-    localPlayer.Create();
-    localPlayer.SetType(invido::PT_LOCAL);
+    invido::PlayersOnTable playersOnTable;
+    
+    invido::Player localPlayerOne;
+    invido::Player localPlayerTwo;
+    localPlayerOne.Init(NULL, invido::PT_LOCAL, "Guido", 0);
+    localPlayerTwo.Init(NULL, invido::PT_MACHINE, "Spatasa", 2);
+    
+    playersOnTable.AddPlayer(localPlayerOne);
+    playersOnTable.AddPlayer(localPlayerTwo);
 
-    players.Create(&localPlayer, 2);
-
-    invido::Player* player0 = players.GetPlayerIndex(0);
+    invido::Player* player0 = playersOnTable.GetPlayerOnIndex(0);
     assert(player0 != nullptr);
     assert(player0->GetType() == invido::PT_LOCAL);
 
-    invido::Player* player1 = players.GetPlayerIndex(1);
+    invido::Player* player1 = playersOnTable.GetPlayerOnIndex(1);
     assert(player1 != nullptr);
     assert(player1->GetType() == invido::PT_MACHINE);
 
@@ -61,15 +68,20 @@ void testPlayersOnTableCalcCircleIndex() {
     std::cout << "Running PlayersOnTable calc circle index tests..."
               << std::endl;
 
-    invido::PlayersOnTable players;
-    invido::Player localPlayer;
-    localPlayer.Create();
+    invido::PlayersOnTable playerOnTable;
+    invido::Player playerOne;
+    invido::Player playerTwo;
+    invido::Player playerThree;
+    invido::Player playerFour;
+    playerOne.Init(NULL, invido::PT_MACHINE, "Guido", 0);
+    playerTwo.Init(NULL, invido::PT_MACHINE, "Guido2", 1);
+    playerThree.Init(NULL, invido::PT_MACHINE, "Guido3", 3);
+    playerFour.Init(NULL, invido::PT_MACHINE, "Guido4", 4);
 
-    players.Create(&localPlayer, 4);
-    players.SetFirstOnTrick(0);
+    playerOnTable.SetCurrentAndFirstOnTrick(0);
 
     int indices[4];
-    players.CalcCircleIndex(indices);
+    playerOnTable.CalcCircleIndex(indices, 4);
 
     assert(indices[0] == 0);
     assert(indices[1] == 1);

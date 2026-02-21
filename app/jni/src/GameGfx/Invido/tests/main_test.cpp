@@ -3,6 +3,7 @@
 void testCardSpec();
 void testMazzo();
 void testPlayersOnTable();
+void testMatch();
 
 int main(int argc, char* argv[]) {
     std::cout << "=== Invido Unit Tests Runner ===" << std::endl;

@@ -2,7 +2,7 @@
 #define __CPARTITA_H__
 
 #include "ErrorInfo.h"
-#include "InvidoCoreEnv.h"
+#include "InvidoCoreDef.h"
 
 
 namespace invido {

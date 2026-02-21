@@ -6,7 +6,7 @@
 
 #include "Config.h"
 #include "ErrorInfo.h"
-#include "InvidoCoreEnv.h"
+#include "InvidoCoreDef.h"
 
 namespace invido {
 
@@ -39,17 +39,17 @@ class PendQuestion {
     PendQuestion() {
         _isAMonte = false;
         _eScore = SC_CANELA;
-        _playerIx = NOT_VALID_INDEX;
+        _playerIx = 0;
     }
-    PendQuestion(bool bVal, eGiocataScoreState eSc, int iPl) {
+    PendQuestion(bool bVal, eGiocataScoreState eSc, Uint8 plIx) {
         _isAMonte = bVal;
         _eScore = eSc;
-        _playerIx = iPl;
+        _playerIx = plIx;
     }
     void operator=(const PendQuestion& r);
     eGiocataScoreState _eScore;
     bool _isAMonte;
-    int _playerIx;
+    Uint8 _playerIx;
 };
 
 typedef std::deque<PendQuestion> DEQ_PENDQUESTION;
@@ -78,32 +78,33 @@ class Mano {
     void SetCore(InvidoCore* pVal) { _p_InvidoCore = pVal; }
     void SetGiocata(Giocata* pVal) { _p_Giocata = pVal; }
     void SetScore(MatchPoints* pVal) { _p_Score = pVal; }
-    LPErrInApp NewMano(int iPlayerIx);
-    bool Player_Say(int iPlayerIx, eSayPlayer eSay);
+    LPErrInApp NewMano(Uint8 playerIx);
+    bool Player_Say(Uint8 playerIx, eSayPlayer eSay);
     // player play a card
-    bool Player_Play(int iPlayerIx, bool vadoDentro);
+    bool Player_Play(Uint8 playerIx, bool vadoDentro);
     void Reset();
     void NextAction();
     eManoStatus GetState() { return _eManoState; }
     void MatchStart();
-    void GetAdmittedCommands(VCT_COMMANDS& vct_Commands, int iPlayerIndex);
-    void GetMoreCommands(VCT_COMMANDS& vct_Commands, int iPlayerIndex);
+    void GetAdmittedCommands(VCT_COMMANDS& vct_Commands, Uint8 playerIx);
+    void GetMoreCommands(VCT_COMMANDS& vct_Commands, Uint8 playerIx);
     void CommandWithPendingQuestion(PendQuestion& PendQues,
                                     VCT_COMMANDS& vct_Commands,
-                                    int iPlayerIndex);
+                                    Uint8 playerIx);
     void GiocataStart();
 
    private:
+    void calcCircleIndex(int* paPlayerDeck, int size, int iPlayerIni);
     void actionOnQuestion(PendQuestion& PendQues);
-    void handleVadoVia(int iPlayerIx);
-    void handleVaBene(int iPlayerIx);
-    void handle_ScoreCalled(int iPlayerIx, eSayPlayer eSay);
-    void handle_MonteCall(int iPlayerIx, eSayPlayer eSay);
-    void handle_CallMoreOrInvido(int iPlayerIx);
-    void handle_CallNo(int iPlayerIx);
-    void add_Action(int iPlayerIx, eFN_MANOACTION eAct);
+    void handleVadoVia(Uint8 playerIx);
+    void handleVaBene(Uint8 playerIx);
+    void handle_ScoreCalled(Uint8 playerIx, eSayPlayer eSay);
+    void handle_MonteCall(Uint8 playerIx, eSayPlayer eSay);
+    void handle_CallMoreOrInvido(Uint8 playerIx);
+    void handle_CallNo(Uint8 playerIx);
+    void add_Action(int iPar_0, eFN_MANOACTION eAct);
     bool get_LastPendQuest(PendQuestion& PendQues);
-    void add_QuestMonte(int iPlayerIx);
+    void add_QuestMonte(Uint8 playerIx);
     void remove_LastQuestion();
     void restore_StateBeforeQuest();
     void clearQuestions();
@@ -113,7 +114,7 @@ class Mano {
     bool nextAvailSayScore(eSayPlayer* peSayAvail);
     bool isScoreBigClosed(eGiocataScoreState eS1, eGiocataScoreState eS2);
     void actionWithoutQuestion();
-    void giocata_Go_Amonte(int iPlayerIx);
+    void giocata_Go_Amonte(Uint8 playerIx);
     bool isGiocataAMonte();
     bool get_LastPendScoreQuest(PendQuestion& PendQues);
     void removeObsoleteActions();

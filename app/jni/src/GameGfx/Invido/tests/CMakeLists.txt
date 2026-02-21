@@ -46,6 +46,7 @@ set(TEST_SOURCES
     test_card.cpp
     test_mazzo.cpp
     test_playersontable.cpp
+    test_match.cpp
     ${TEST_IMPL_SOURCES}
 )
 

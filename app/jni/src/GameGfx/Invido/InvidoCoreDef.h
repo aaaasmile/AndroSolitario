@@ -1,5 +1,5 @@
-#ifndef _C_COREINVIDOENV_H_
-#define _C_COREINVIDOENV_H_
+#ifndef _C_COREINVIDODEF_H_
+#define _C_COREINVIDODEF_H_
 
 #include <SDL3/SDL.h>
 
@@ -53,13 +53,15 @@ enum eManoStatus {
 enum eGameLevel {
     DUMMY = 0,
     BEGINNER = 1,
-    ADVANCED = 2,
-    NIGHTMARE = 3,
-    HMI = 4,
-    TEST_PYTHON,
-    SERVER_LEVEL
+    STANDARD = 2,
+    ADVANCED = 3,
+    NIGHTMARE = 4,
 };
-enum eTypeOfPLayer { PT_LOCAL, PT_MACHINE, PT_REMOTE, PT_SERVER };
+enum ePlayerType{
+    HMI = 0,
+    SCRIPTED = 1
+};
+enum eTypeOfPLayer { PT_LOCAL, PT_MACHINE, PT_SCRIPT};
 enum eScriptNotification {
     SCR_NFY_SHUFFLEDECK = 0,
     SCR_NFY_HAVETO_SAY = 1,

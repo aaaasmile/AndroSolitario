@@ -69,27 +69,28 @@ class InvidoGfx : public I_ALG_Player {
     void InitInvidoVsCPU();
     void INP_PlayerSay(eSayPlayer eSay);
     void ButCmdClicked(int iButID);
-    Player* GetPlayer(int iIndex) { return _p_InvidoCore->GetPlayer(iIndex); }
-    // I_ALG_Player interface
-    virtual void ALG_SetCoreInterface(I_CORE_Game* pCore) {}
-    virtual void ALG_SetPlayerIndex(int iIndex) { _playerGuiIndex = iIndex; }
-    virtual void ALG_SetOpponentIndex(int iIndex, int iOpponentNr) {
-        _opponentIndex = iIndex;
+    Player* GetPlayer(Uint8 playerIx) { return _p_InvidoCore->GetPlayer(playerIx); }
+    // I_ALG_Player interface - start
+    void ALG_SetCoreInterface(I_CORE_Game* pCore) {}
+    void ALG_SetPlayerIndex(Uint8 playerIx) { _playerGuiIndex = playerIx; }
+    void ALG_SetOpponentIndex(Uint8 playerIx) {
+        _opponentIndex = playerIx;
     }
-    virtual void ALG_SetAssociateIndex(int iIndex) {}
-    virtual void ALG_NewMatch(int iNumPlayer) {}
-    virtual void ALG_NewGiocata(const VCT_CARDSPEC& vctCards, int iPlayerIx);
-    virtual void ALG_PlayerHasPlayed(int iPlayerIx, const CardSpec& cardSpec);
-    virtual void ALG_PlayerHasSaid(int iPlayerIx, eSayPlayer eSay);
-    virtual void ALG_PlayerHasVadoDentro(int iPlayerIx);
-    virtual void ALG_Play();
-    virtual void ALG_ManoEnd(I_MatchScore* pScore);
-    virtual void ALG_GiocataEnd(I_MatchScore* pScore);
-    virtual void ALG_MatchEnd(I_MatchScore* pScore);
-    virtual void ALG_HaveToPlay();
-    virtual void ALG_HaveToRespond();
-    virtual void ALG_GicataScoreChange(eGiocataScoreState eNewScore);
-    virtual void ALG_PlayerSaidWrong(int iPlayerIx);
+    void ALG_SetAssociateIndex(Uint8 playerIx) {}
+    void ALG_NewMatch(int iNumPlayer) {}
+    void ALG_NewGiocata(const VCT_CARDSPEC& vctCards, Uint8 playerIx);
+    void ALG_PlayerHasPlayed(Uint8 playerIx, const CardSpec& cardSpec);
+    void ALG_PlayerHasSaid(Uint8 playerIx, eSayPlayer eSay);
+    void ALG_PlayerHasVadoDentro(Uint8 playerIx);
+    void ALG_Play();
+    void ALG_ManoEnd(I_MatchScore* pScore);
+    void ALG_GiocataEnd(I_MatchScore* pScore);
+    void ALG_MatchEnd(I_MatchScore* pScore);
+    void ALG_HaveToPlay();
+    void ALG_HaveToRespond();
+    void ALG_GicataScoreChange(eGiocataScoreState eNewScore);
+    void ALG_PlayerSaidWrong(Uint8 playerIx);
+    // I_ALG_Player interface - end
 
    private:
     int animateCards();
@@ -105,22 +106,22 @@ class InvidoGfx : public I_ALG_Player {
     void clickOnPlayerCard(int iIndex);
     void vadoDentro(int cardIx);
     void drawVadoDentroCard(CardGfx* pCard);
-    void showPlayerMarkup(int iPlayerIx);
-    void showManoScore(bool bIsPlayed, int iPlayerIx, bool bIsPata,
+    void showPlayerMarkup(Uint8 playerIx);
+    void showManoScore(bool bIsPlayed, Uint8 playerIx, bool bIsPata,
                        int iManoNum);
     void guiPlayerTurn(int iPlayer);
     void showCurrentScore();
-    void showPointsPlayer(int iPlayerIx, VCT_INT& vct_Points);
-    void animGiocataEnd(int iPlayerIx, bool bIsPata);
+    void showPointsPlayer(Uint8 playerIx, VCT_INT& vct_Points);
+    void animGiocataEnd(Uint8 playerIx, bool bIsPata);
     void enableCmds();
     void setCmdButton(size_t iButtonIndex, eSayPlayer eSay, LPCSTR strCaption);
     void enableOnlyCmdButtons(size_t iNumButt);
-    void renderPlayerName(int iPlayerIx);
+    void renderPlayerName(Uint8 playerIx);
     void cleanup();
     void animateBeginGiocata();
     void showOkMsgBox(LPCSTR strText);
     void showYesNoMsgBox(LPCSTR strText);
-    void animateManoEnd(int iPlayerIx);
+    void animateManoEnd(Uint8 playerIx);
     void showPopUpCallMenu(int iX, int iY, eSayPlayer* peSay);
     void opponentHasPlayedCard(const CardSpec& card, bool vadoDentro);
     ClickCb prepClickCb();

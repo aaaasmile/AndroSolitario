@@ -5,7 +5,7 @@
 #include <map>
 
 #include "Config.h"
-#include "InvidoCoreEnv.h"
+#include "InvidoCoreDef.h"
 #include "TraceService.h"
 
 using namespace invido;
@@ -38,16 +38,16 @@ void AlgPlayer::ALG_SetCoreInterface(I_CORE_Game* pCore) {
     m_pCoreGame = pCore;
 }
 
-void AlgPlayer::ALG_SetPlayerIndex(int iIndex) { m_iMyIndex = iIndex; }
+void AlgPlayer::ALG_SetPlayerIndex(Uint8 playerIx) { m_iMyIndex = playerIx; }
 
-void AlgPlayer::ALG_SetOpponentIndex(int iIndex, int iOpponentNr) {
-    m_iOppIndex = iIndex;
+void AlgPlayer::ALG_SetOpponentIndex(Uint8 playerIx) {
+    m_iOppIndex = playerIx;
 }
-void AlgPlayer::ALG_SetAssociateIndex(int iIndex) {}
+void AlgPlayer::ALG_SetAssociateIndex(Uint8 playerIx) {}
 
 void AlgPlayer::ALG_NewMatch(int iNumPlayer) {}
 
-void AlgPlayer::ALG_NewGiocata(const VCT_CARDSPEC& vctCards, int iPlayerIx) {
+void AlgPlayer::ALG_NewGiocata(const VCT_CARDSPEC& vctCards, Uint8 playerIx) {
     SDL_assert(vctCards.size() == NUM_CARDS_HAND);
     int i;
     m_iNumManiWon = 0;
@@ -58,7 +58,7 @@ void AlgPlayer::ALG_NewGiocata(const VCT_CARDSPEC& vctCards, int iPlayerIx) {
     m_WonFirstHand = false;
     m_ixCurrMano = 0;
 
-    m_iPlayerOnTurn = iPlayerIx;
+    m_iPlayerOnTurn = playerIx;
 
     TRACE_DEBUG("[TRALG]Giocata new:");
     for (i = 0; i < NUM_CARDS_HAND; i++) {
@@ -80,21 +80,21 @@ void AlgPlayer::ALG_NewGiocata(const VCT_CARDSPEC& vctCards, int iPlayerIx) {
     m_bLastManoPatada = false;
 }
 
-void AlgPlayer::ALG_PlayerHasVadoDentro(int iPlayerIx) {
-    TRACE_DEBUG("[TRALG]Player %1 va dentro\n", iPlayerIx);
+void AlgPlayer::ALG_PlayerHasVadoDentro(Uint8 playerIx) {
+    TRACE_DEBUG("[TRALG]Player %1 va dentro\n", playerIx);
     CardSpec cardDentro;
-    if (iPlayerIx == m_iMyIndex) {
+    if (playerIx == m_iMyIndex) {
         // l'idea è quella di ritrovare la carta con la quale si è andati dentro
         // e poi di chiamare ALG_PlayerHasPlayed
         SDL_assert(m_iCPUCardDentroPos != eGameConst::NOT_VALID_INDEX);
         cardDentro.SetCardIndex(
             m_vct_Cards_CPU[m_iCPUCardDentroPos].GetCardIndex());
-        ALG_PlayerHasPlayed(iPlayerIx, cardDentro);
+        ALG_PlayerHasPlayed(playerIx, cardDentro);
         m_iCPUCardDentroPos = eGameConst::NOT_VALID_INDEX;
     } else {
         m_opponetIsVadoDentro = true;
         cardDentro.SetCardIndex(3);
-        ALG_PlayerHasPlayed(iPlayerIx, cardDentro);
+        ALG_PlayerHasPlayed(playerIx, cardDentro);
     }
 }
 
@@ -105,12 +105,12 @@ void AlgPlayer::doVadoDentro(int cardPos) {
     m_pCoreGame->VaDentro(m_iMyIndex, m_vct_Cards_CPU[cardPos]);
 }
 
-void AlgPlayer::ALG_PlayerHasPlayed(int iPlayerIx, const CardSpec& cardSpec) {
-    TRACE_DEBUG("[TRALG]Player %d has played [%s]\n", iPlayerIx,
+void AlgPlayer::ALG_PlayerHasPlayed(Uint8 playerIx, const CardSpec& cardSpec) {
+    TRACE_DEBUG("[TRALG]Player %d has played [%s]\n", playerIx,
                 cardSpec.GetName().c_str());
     int i;
     int ix = cardSpec.GetCardIndex();
-    if (iPlayerIx == m_iMyIndex) {
+    if (playerIx == m_iMyIndex) {
         bool bFound = false;
         // card successfully played
         for (i = 0; !bFound && i < eGameConst::NUM_CARDS_HAND; i++) {
@@ -131,15 +131,15 @@ void AlgPlayer::ALG_PlayerHasPlayed(int iPlayerIx, const CardSpec& cardSpec) {
     cardPlayed.SetCardIndex(ix);
     m_vct_Cards_played[m_ixCurrMano].push_back(cardPlayed);
 
-    m_iPlayerOnTurn = iPlayerIx == 0 ? 1 : 0;
+    m_iPlayerOnTurn = playerIx == 0 ? 1 : 0;
     m_iNumChiamateMonte = 0;
     m_sayMyRisp = eSayPlayer::SP_VABENE;
 }
 
-void AlgPlayer::ALG_PlayerHasSaid(int iPlayerIx, eSayPlayer eSay) {
+void AlgPlayer::ALG_PlayerHasSaid(Uint8 playerIx, eSayPlayer eSay) {
     LPCSTR lpsNameSay = g_MapSay[eSay];
-    TRACE_DEBUG("[TRALG]Player %d has said %s\n", iPlayerIx, lpsNameSay);
-    if (iPlayerIx == m_iOppIndex) {
+    TRACE_DEBUG("[TRALG]Player %d has said %s\n", playerIx, lpsNameSay);
+    if (playerIx == m_iOppIndex) {
         // Avversario ha parlato
         if (eSay > eSayPlayer::SP_PARTIDA) {
             m_sayOppRisp = eSay;  // Risposta alla chiamata
@@ -147,7 +147,7 @@ void AlgPlayer::ALG_PlayerHasSaid(int iPlayerIx, eSayPlayer eSay) {
             // avversario ha chiamato dei punti
             m_OpponentSay = eSay;
         }
-    } else if (iPlayerIx == m_iMyIndex) {
+    } else if (playerIx == m_iMyIndex) {
         // Algoritmo ha parlato
         if (eSay > eSayPlayer::SP_PARTIDA) {
             m_sayMyRisp = eSay;  // Risposta alla chiamata
@@ -1036,4 +1036,4 @@ void AlgPlayer::ALG_GicataScoreChange(eGiocataScoreState eNewScore) {
     }
 }
 
-void AlgPlayer::ALG_PlayerSaidWrong(int iPlayerIx) {}
+void AlgPlayer::ALG_PlayerSaidWrong(Uint8 playerIx) {}

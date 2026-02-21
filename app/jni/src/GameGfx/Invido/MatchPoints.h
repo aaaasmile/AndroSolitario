@@ -5,7 +5,7 @@
 
 #include "AlgCoreInterface.h"
 #include "CardSpec.h"
-#include "InvidoCoreEnv.h"
+#include "InvidoCoreDef.h"
 
 namespace invido {
 
@@ -68,26 +68,22 @@ class MatchPoints : public I_MatchScore {
     void GetGiocataInfo(int iNumGiocata, GiocataInfo* pGiocInfo);
     int GetNumGiocateInCurrMatch() { return (int)_vctGiocataInfo.size(); }
     void PlayerVaVia(int iPlayerIx);
-    void SetManoObj(Mano* pVal) { _p_Mano = pVal; }
+    void SetManoInstance(Mano* pVal) { _p_Mano = pVal; }
     void AMonte();
     void SetTheWinner(int iPlayerIx);
     int GetCurrNumCardPlayed() { return _numCardsPlayed; }
 
-    // interface I_MatchScore
-    virtual int GetManoWinner() { return _playerWonsHand; }
-    virtual int GetGiocataWinner() { return _playerGiocataWin; }
-    virtual int GetMatchWinner() { return _playerMatchWin; }
+    // interface I_MatchScore - begin
     virtual bool IsGiocatEnd();
-    virtual eGiocataScoreState GetCurrScore() { return _currentScore; }
-    virtual bool IsManoPatada() { return _isManoPatatda; }
-    virtual bool IsGiocataPatada() {
-        if (_eIsGiocataEnd == GES_PATADA)
+    virtual bool IsGiocataMonte() {
+        if (_eIsGiocataEnd == GES_AMONTE)
             return true;
         else
             return false;
     }
-    virtual bool IsGiocataMonte() {
-        if (_eIsGiocataEnd == GES_AMONTE)
+    virtual bool IsManoPatada() { return _isManoPatatda; }
+    virtual bool IsGiocataPatada() {
+        if (_eIsGiocataEnd == GES_PATADA)
             return true;
         else
             return false;
@@ -98,12 +94,17 @@ class MatchPoints : public I_MatchScore {
         else
             return false;
     }
-    virtual int GetPointsPlayer(int iPlayerIx) {
-        SDL_assert(iPlayerIx >= 0 && iPlayerIx < MAX_NUM_PLAYER);
-        return _vctPlayerPoints[iPlayerIx];
+    virtual int GetManoWinner() { return _playerWonsHand; }
+    virtual int GetGiocataWinner() { return _playerGiocataWin; }
+    virtual int GetMatchWinner() { return _playerMatchWin; }
+    virtual eGiocataScoreState GetCurrScore() { return _currentScore; }
+    virtual int GetPointsPlayer(Uint8 playerIx) {
+        SDL_assert(playerIx >= 0 && playerIx < MAX_NUM_PLAYER);
+        return _vctPlayerPoints[playerIx];
     }
     virtual int GetManoNum() { return _manoRound; }
     virtual bool IsGameAbandoned() { return _isGameAbandoned; }
+    // interface I_MatchScore - end
 
    private:
     void beginSpecialTurn();
@@ -132,6 +133,6 @@ class MatchPoints : public I_MatchScore {
     bool _isGameAbandoned;
 };
 
-}
+}  // namespace invido
 
 #endif

@@ -1,7 +1,7 @@
 #include "CardSpec.h"
 
 #include "CardGfx.h"
-#include "InvidoCoreEnv.h"
+#include "InvidoCoreDef.h"
 using namespace invido;
 
 static const std::string g_CardsNameX[] = {
