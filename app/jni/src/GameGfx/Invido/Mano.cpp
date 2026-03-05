@@ -143,14 +143,14 @@ void Mano::NextAction() {
 
     eGiocataScoreState eScore;
     TRACE_DEBUG("Process action (NextAction): %s\n",
-                stalpzActionName[Action._eNextAction]);
+                stalpzActionName[Action.eNextAction]);
 
-    switch (Action._eNextAction) {
+    switch (Action.eNextAction) {
         case MANO_WAITPL_TOPLAY:
-            SDL_assert(Action._vct_iArg.size() > 0);
+            SDL_assert(Action.vctArg.size() > 0);
             // may be _eNextAction is modified
-            _p_InvidoCore->NtyWaitingPlayer_Toplay(Action._vct_iArg[0]);
-            TRACE_DEBUG("Wait play player: %d\n", Action._vct_iArg[0]);
+            _p_InvidoCore->NtyWaitingPlayer_Toplay(Action.vctArg[0]);
+            TRACE_DEBUG("Wait play player: %d\n", Action.vctArg[0]);
             break;
 
         case MANO_AMONTE:
@@ -164,11 +164,11 @@ void Mano::NextAction() {
             break;
 
         case MANO_VADOVIA:
-            _p_InvidoCore->Player_VaVia(Action._vct_iArg[0]);
+            _p_InvidoCore->Player_VaVia(Action.vctArg[0]);
             break;
 
         case MANO_WAIPL_TORESP:
-            _p_InvidoCore->NtyWaitingPlayer_ToResp(Action._vct_iArg[0]);
+            _p_InvidoCore->NtyWaitingPlayer_ToResp(Action.vctArg[0]);
             break;
 
         case MANO_END:
@@ -176,7 +176,7 @@ void Mano::NextAction() {
             break;
 
         case MANO_CHANGESCORE:
-            eScore = intToEScore(Action._vct_iArg[0]);
+            eScore = intToEScore(Action.vctArg[0]);
             _p_InvidoCore->ChangeGiocataScore(eScore);
             // process the next action without waiting the next trigger
             NextAction();
@@ -189,7 +189,7 @@ void Mano::NextAction() {
             break;
 
         case MANO_SAYBUIDA:
-            _p_InvidoCore->NtyPlayerSayBuiada(Action._vct_iArg[0]);
+            _p_InvidoCore->NtyPlayerSayBuiada(Action.vctArg[0]);
             break;
 
         default:
@@ -591,8 +591,8 @@ void Mano::add_QuestMonte(Uint8 playerIx) {
 void Mano::add_Action(int iPar_0, eFN_MANOACTION eAct) {
     ActionItem Action;
 
-    Action._eNextAction = eAct;
-    Action._vct_iArg.push_back(iPar_0);
+    Action.eNextAction = eAct;
+    Action.vctArg.push_back(iPar_0);
     if (eAct == MANO_WAITPL_TOPLAY || eAct == MANO_WAIPL_TORESP) {
         // remove action scheduled but not yet executed because obsolete
         removeObsoleteActions();
@@ -608,10 +608,10 @@ void Mano::removeObsoleteActions() {
     size_t iNumAct = _deqNextAction.size();
     for (int i = 0; i < iNumAct; i++) {
         ActionItem Action = _deqNextAction[i];
-        if (Action._eNextAction == MANO_WAITPL_TOPLAY ||
-            Action._eNextAction == MANO_WAIPL_TORESP) {
+        if (Action.eNextAction == MANO_WAITPL_TOPLAY ||
+            Action.eNextAction == MANO_WAIPL_TORESP) {
             // this is an obselete action, make it inoffensive
-            _deqNextAction[i]._eNextAction = MANO_NO_ACTION;
+            _deqNextAction[i].eNextAction = MANO_NO_ACTION;
         }
     }
 }

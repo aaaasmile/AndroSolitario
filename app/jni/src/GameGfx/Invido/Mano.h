@@ -59,12 +59,11 @@ typedef std::deque<PendingQuestion> DEQ_PENDQUESTION;
 typedef std::vector<int> VCT_INT;
 #endif
 
-class ActionItem {
-   public:
-    ActionItem() { _eNextAction = MANO_NO_ACTION; }
+struct ActionItem {
+    ActionItem() { eNextAction = MANO_NO_ACTION; }
 
-    eFN_MANOACTION _eNextAction;
-    VCT_INT _vct_iArg;
+    eFN_MANOACTION eNextAction;
+    VCT_INT vctArg;
 };
 
 typedef std::deque<ActionItem> DEQ_ACTIONITEM;
