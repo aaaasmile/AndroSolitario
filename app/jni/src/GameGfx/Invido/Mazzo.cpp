@@ -1,31 +1,22 @@
 #include "Mazzo.h"
 
 #include <algorithm>
+#include <iterator>
 #include <random>
 
 #include "InvidoCore.h"
 
 using namespace invido;
 
-Mazzo::Mazzo() {
-    _nextCard = 0;
-    _rndSeed = 0;
-}
+Mazzo::Mazzo() { _rndSeed = 0; }
 
 void Mazzo::Init() {
-    _vctCardIndex.reserve(NUM_CARDS);
-    _vctCardIndex.clear();
-
     // invido card index
-    int aCardIndex[] = {0,  1,  2,  5,  6,  7,  8,  9,  10, 11, 12,
-                        15, 16, 17, 18, 19, 20, 21, 22, 25, 26, 27,
-                        28, 29, 30, 31, 32, 35, 36, 37, 38, 39};
+    Uint8 aCardIndex[] = {0,  1,  2,  5,  6,  7,  8,  9,  10, 11, 12,
+                          15, 16, 17, 18, 19, 20, 21, 22, 25, 26, 27,
+                          28, 29, 30, 31, 32, 35, 36, 37, 38, 39};
 
-    for (int i = 0; i < NUM_CARDS; i++) {
-        _vctCardIndex.push_back(aCardIndex[i]);
-    }
-
-    _nextCard = 0;
+    _vctCardIndex.assign(std::begin(aCardIndex), std::end(aCardIndex));
 }
 
 void Mazzo::SetIndexRaw(int index, Uint8 val) {
@@ -34,8 +25,8 @@ void Mazzo::SetIndexRaw(int index, Uint8 val) {
     }
 }
 
-void Mazzo::SetRandomSeed(int val) { 
-    _rndSeed = val; 
+void Mazzo::SetRandomSeed(int val) {
+    _rndSeed = val;
     SDL_srand(_rndSeed);
 }
 
@@ -57,10 +48,10 @@ bool Mazzo::Shuffle() {
 bool Mazzo::PickNextCard(CardSpec* pCardPicked) {
     SDL_assert(pCardPicked);
     bool isValid = false;
-    if (_nextCard < _vctCardIndex.size()) {
+    if (!_vctCardIndex.empty()) {
         isValid = true;
-        pCardPicked->SetCardIndex(_vctCardIndex[_nextCard]);
-        _nextCard++;
+        pCardPicked->SetCardIndex(_vctCardIndex.back());
+        _vctCardIndex.pop_back();
     }
     return isValid;
 }
