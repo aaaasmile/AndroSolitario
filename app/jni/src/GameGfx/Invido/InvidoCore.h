@@ -24,7 +24,6 @@ class InvidoCore : public I_CORE_Game {
     virtual ~InvidoCore();
 
     void Init(PlayersOnTable* pPlayersOnTable, Mazzo* pMazzo);
-    void AddPlayer(Player& player);
     Player* GetPlayerInPlaying() { return _p_PlHaveToPlay; };
     void SetGameType(eGameType eVal) { _eGameType = eVal; }
     Player* GetPlayer(Uint8 index);

@@ -723,9 +723,7 @@ void InvidoGfx::InitInvidoVsCPU() {
    
     _p_InvidoCore = new InvidoCore();
     _p_InvidoCore->Init(&playersOnTable, &mazzo);
-    _p_InvidoCore->AddPlayer(player1);
-    _p_InvidoCore->AddPlayer(player2);
-
+   
     _p_MatchPoints = _p_InvidoCore->GetMatchPointsInstance();
 
     TRACE_DEBUG("Partita tra %s e %s", player1.GetName().c_str(),

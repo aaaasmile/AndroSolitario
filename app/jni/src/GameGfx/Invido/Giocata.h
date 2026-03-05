@@ -29,20 +29,20 @@ class Giocata {
     Giocata();
 
    public:
-    void SetCore(InvidoCore* pVal) { m_pInvidoCore = pVal; }
-    void SetPartita(Partita* pVal) { m_pPartita = pVal; }
-    void SetMano(Mano* pVal) { m_pMano = pVal; }
-    LPErrInApp NewGiocata(long lPlayerIx);
-    void Update_Giocata(long lPlayerIx, I_MatchScore* pIScore);
+    void SetCore(InvidoCore* pVal) { _p_InvidoCore = pVal; }
+    void SetPartita(Partita* pVal) { _p_Partita = pVal; }
+    void SetMano(Mano* pVal) { _p_Mano = pVal; }
+    LPErrInApp NewGiocata(Uint8 playerIx);
+    void Update_Giocata(Uint8 playerIx, I_MatchScore* pIScore);
     void Reset();
     void NextAction();
 
    private:
-    InvidoCore* m_pInvidoCore;
-    Partita* m_pPartita;
-    eGiocataStatus m_eGiocataStatus;
-    Mano* m_pMano;
-    DEQ_ACTIT_GIO m_deqNextAction;
+    InvidoCore* _p_InvidoCore;
+    Partita* _p_Partita;
+    eGiocataStatus _eGiocataStatus;
+    Mano* _p_Mano;
+    DEQ_ACTIT_GIO _deqNextAction;
 };
 }
 

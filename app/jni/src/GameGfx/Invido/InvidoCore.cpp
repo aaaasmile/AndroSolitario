@@ -46,12 +46,6 @@ void InvidoCore::Init(PlayersOnTable* pPlayersOnTable, Mazzo* pMazzo) {
     _matchPoints.SetManoInstance(&_mano);
 }
 
-void InvidoCore::AddPlayer(Player& player) {
-    SDL_assert(_p_PlayersOnTable);
-    _p_PlayersOnTable->AddPlayer(player);
-    _numPlayers = _p_PlayersOnTable->GetNumOfPlayers();
-}
-
 Uint8 InvidoCore::getNewMatchFirstPlayer() { return SDL_rand(_numPlayers); }
 
 Player* InvidoCore::GetPlayer(Uint8 iIndex) {
