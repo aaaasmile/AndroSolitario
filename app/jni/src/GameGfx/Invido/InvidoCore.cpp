@@ -10,30 +10,19 @@ InvidoCore::InvidoCore() {
     _p_PlHaveToPlay = NULL;
     _p_StartPlayer = NULL;
     _p_MyMazzo = NULL;
+    _p_PlayersOnTable = NULL;
 }
 
-InvidoCore::~InvidoCore() {
-    if (_p_MyMazzo != NULL) {
-        delete _p_MyMazzo;
-    }
-    if (_p_PlayersOnTable != NULL) {
-        delete _p_PlayersOnTable;
-    }
-}
+InvidoCore::~InvidoCore() {}
 
-void InvidoCore::Init() {
+void InvidoCore::Init(PlayersOnTable* pPlayersOnTable, Mazzo* pMazzo) {
     TRACE_DEBUG("InvidoCore initialize\n");
 
-    if (_p_MyMazzo != NULL) {
-        delete _p_MyMazzo;
-    }
-    if (_p_PlayersOnTable != NULL) {
-        delete _p_PlayersOnTable;
-    }
-    _p_MyMazzo = new Mazzo();
-    _p_MyMazzo->Init();
+    SDL_assert(pPlayersOnTable);
+    SDL_assert(pMazzo);
 
-    _p_PlayersOnTable = new PlayersOnTable();
+    _p_MyMazzo = pMazzo;
+    _p_PlayersOnTable = pPlayersOnTable;
 
     _eGameType = LOCAL_TYPE;
 
@@ -205,7 +194,6 @@ void InvidoCore::Giocata_Start(Uint8 playerIx) {
 
 void InvidoCore::Mano_End() {
     _matchPoints.ManoEnd();
-    
 
     if (_matchPoints.IsManoPatada()) {
         Uint8 playerIx = _p_PlayersOnTable->GetFirstOnTrick();

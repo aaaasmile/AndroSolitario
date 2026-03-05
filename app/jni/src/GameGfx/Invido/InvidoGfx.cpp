@@ -17,6 +17,7 @@
 #include "MusicManager.h"
 #include "PopUpMenuGfx.h"
 #include "InvidoCore.h"
+#include "Mazzo.h"
 
 using namespace invido;
 
@@ -712,12 +713,16 @@ void InvidoGfx::InitInvidoVsCPU() {
     
     Player player1;
     Player player2;
+    PlayersOnTable playersOnTable;
     player1.Init(this, PT_LOCAL, pGameSettings->PlayerName.c_str(), 0);
     player2.Init(NULL, PT_MACHINE, "Re Adlinvidu", 1);
-    
+    playersOnTable.AddPlayer(player1);
+    playersOnTable.AddPlayer(player2);
+    Mazzo mazzo;
+    mazzo.Init();
    
     _p_InvidoCore = new InvidoCore();
-    _p_InvidoCore->Init();
+    _p_InvidoCore->Init(&playersOnTable, &mazzo);
     _p_InvidoCore->AddPlayer(player1);
     _p_InvidoCore->AddPlayer(player2);
 

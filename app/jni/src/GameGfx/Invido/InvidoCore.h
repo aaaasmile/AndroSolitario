@@ -16,13 +16,14 @@
 namespace invido {
 
 class Mazzo;
+class PlayersOnTable;
 
 class InvidoCore : public I_CORE_Game {
    public:
     InvidoCore();
     virtual ~InvidoCore();
 
-    void Init();
+    void Init(PlayersOnTable* pPlayersOnTable, Mazzo* pMazzo);
     void AddPlayer(Player& player);
     Player* GetPlayerInPlaying() { return _p_PlHaveToPlay; };
     void SetGameType(eGameType eVal) { _eGameType = eVal; }

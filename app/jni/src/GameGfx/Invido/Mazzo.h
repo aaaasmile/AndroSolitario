@@ -15,14 +15,11 @@ class Mazzo {
     bool Shuffle();
     void Reset() { _nextCard = 0; }
     bool PickNextCard(CardSpec* pNextCard);
-    void SetIndexRaw(int iIndex, long lVal);
-    void SetRandomSeed(int iVal) {
-        _rndSeed = iVal;
-        SDL_srand(_rndSeed);
-    }
+    void SetIndexRaw(int index, Uint8 val);
+    void SetRandomSeed(int val); 
 
    private:
-    VCT_LONG _vctCardIndex;
+    std::vector<Uint8> _vctCardIndex;
     size_t _nextCard;
     int _rndSeed;
 };

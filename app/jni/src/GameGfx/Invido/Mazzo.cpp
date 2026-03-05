@@ -1,5 +1,8 @@
 #include "Mazzo.h"
 
+#include <algorithm>
+#include <random>
+
 #include "InvidoCore.h"
 
 using namespace invido;
@@ -25,35 +28,38 @@ void Mazzo::Init() {
     _nextCard = 0;
 }
 
-void Mazzo::SetIndexRaw(int iIndex, long lVal) {
-    if (iIndex < (int)_vctCardIndex.size() && iIndex >= 0) {
-        _vctCardIndex[iIndex] = lVal;
+void Mazzo::SetIndexRaw(int index, Uint8 val) {
+    if (index < _vctCardIndex.size() && index >= 0) {
+        _vctCardIndex[index] = val;
     }
+}
+
+void Mazzo::SetRandomSeed(int val) { 
+    _rndSeed = val; 
+    SDL_srand(_rndSeed);
 }
 
 bool Mazzo::Shuffle() {
-    // use SetRandomSeed to have a reproducible sequence
-    IT_VCTLONG it_tmp;
-
-    _nextCard = 0;
-
-    it_tmp = _vctCardIndex.begin();
-    // Leave the deck card to the first position
-
-    // use SDL_rand to shuffle the pool
-    for (size_t i = _vctCardIndex.size() - 1; i > 0; --i) {
-        size_t j = SDL_rand((Uint32)(i + 1));
-        std::swap(_vctCardIndex[i], _vctCardIndex[j]);
+    std::random_device rd;
+    if (_rndSeed == 0) {
+        std::mt19937 g(rd());
+        std::shuffle(_vctCardIndex.begin(), _vctCardIndex.end(), g);
+    } else {
+        TRACE_DEBUG("Shuffle with predef seed %d \n", _rndSeed);
+        std::mt19937 g(_rndSeed);
+        std::shuffle(_vctCardIndex.begin(), _vctCardIndex.end(), g);
+        _rndSeed += 1;
     }
+
     return true;
 }
 
-bool Mazzo::PickNextCard(CardSpec* pNextCard) {
-    SDL_assert(pNextCard);
+bool Mazzo::PickNextCard(CardSpec* pCardPicked) {
+    SDL_assert(pCardPicked);
     bool isValid = false;
     if (_nextCard < _vctCardIndex.size()) {
         isValid = true;
-        pNextCard->SetCardIndex(_vctCardIndex[_nextCard]);
+        pCardPicked->SetCardIndex(_vctCardIndex[_nextCard]);
         _nextCard++;
     }
     return isValid;
