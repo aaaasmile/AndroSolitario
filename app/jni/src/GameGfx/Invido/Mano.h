@@ -34,25 +34,24 @@ typedef std::map<eManoStatus, eFN_MANOACTION> MAP_STATUS_ACTION;
 typedef std::map<eGiocataScoreState, eGiocataScoreState> MAP_SCORE_SCORENEXT;
 typedef std::deque<eManoStatus> DEQ_TABLESTATE;
 
-class PendQuestion {
-   public:
-    PendQuestion() {
+struct PendingQuestion {
+    PendingQuestion() {
         _isAMonte = false;
         _eScore = SC_CANELA;
         _playerIx = 0;
     }
-    PendQuestion(bool bVal, eGiocataScoreState eSc, Uint8 plIx) {
+    PendingQuestion(bool bVal, eGiocataScoreState eSc, Uint8 plIx) {
         _isAMonte = bVal;
         _eScore = eSc;
         _playerIx = plIx;
     }
-    void operator=(const PendQuestion& r);
+    void operator=(const PendingQuestion& r);
     eGiocataScoreState _eScore;
     bool _isAMonte;
     Uint8 _playerIx;
 };
 
-typedef std::deque<PendQuestion> DEQ_PENDQUESTION;
+typedef std::deque<PendingQuestion> DEQ_PENDQUESTION;
 
 //////////////////////////////////////////////////////////////////////
 
@@ -87,13 +86,13 @@ class Mano {
     void MatchStart(int numPlayers);
     void GetAdmittedCommands(VCT_COMMANDS& vct_Commands, Uint8 playerIx);
     void GetMoreCommands(VCT_COMMANDS& vct_Commands, Uint8 playerIx);
-    void CommandWithPendingQuestion(PendQuestion& PendQues,
+    void CommandWithPendingQuestion(PendingQuestion& PendQues,
                                     VCT_COMMANDS& vct_Commands, Uint8 playerIx);
     void GiocataStart();
 
    private:
     void calcCircleIndex(int* paPlayerDeck, int size, int iPlayerIni);
-    void actionOnQuestion(PendQuestion& PendQues);
+    void actionOnQuestion(PendingQuestion& PendQues);
     void handleVadoVia(Uint8 playerIx);
     void handleVaBene(Uint8 playerIx);
     void handle_ScoreCalled(Uint8 playerIx, eSayPlayer eSay);
@@ -101,7 +100,7 @@ class Mano {
     void handle_CallMoreOrInvido(Uint8 playerIx);
     void handle_CallNo(Uint8 playerIx);
     void add_Action(int iPar_0, eFN_MANOACTION eAct);
-    bool get_LastPendQuest(PendQuestion& PendQues);
+    bool get_LastPendQuest(PendingQuestion& PendQues);
     void add_QuestMonte(Uint8 playerIx);
     void remove_LastQuestion();
     void restore_StateBeforeQuest();
@@ -114,7 +113,7 @@ class Mano {
     void actionWithoutQuestion();
     void giocata_Go_Amonte(Uint8 playerIx);
     bool isGiocataAMonte();
-    bool get_LastPendScoreQuest(PendQuestion& PendQues);
+    bool get_LastPendScoreQuest(PendingQuestion& PendQues);
     void removeObsoleteActions();
 
    private:
@@ -124,7 +123,7 @@ class Mano {
     int _numOfPlayers;
     DEQ_ACTIONITEM _deqNextAction;
     MatchPoints* _p_Score;
-    DEQ_PENDQUESTION _deqPendQuestion;
+    DEQ_PENDQUESTION _deqPendingQuestion;
     MAP_ACTION_NAMES _MapActionNames;
     MAP_SAY_SCORE _MapSayScore;
     MAP_PL_STATUS _MapManoStatePl;
