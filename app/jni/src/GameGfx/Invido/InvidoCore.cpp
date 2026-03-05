@@ -34,7 +34,6 @@ void InvidoCore::Init(PlayersOnTable* pPlayersOnTable, Mazzo* pMazzo) {
     _giocata.SetMano(&_mano);
 
     _mano.SetCore(this);
-    _mano.SetGiocata(&_giocata);
     _mano.SetScore(&_matchPoints);
 
     _numPlayers = _p_PlayersOnTable->GetNumOfPlayers();
@@ -101,7 +100,7 @@ void InvidoCore::NewMatch() {
         }
     }
 
-    _mano.MatchStart();
+    _mano.MatchStart(_numPlayers);
     _p_PlayersOnTable->SetFirstOnMatch(firstPlayerIx);
     _p_StartPlayer = _p_PlayersOnTable->GetPlayerOnIndex(firstPlayerIx);
     _partita.NewPartita(firstPlayerIx);
@@ -161,7 +160,7 @@ void InvidoCore::Giocata_Start(Uint8 playerIx) {
 
         VCT_CARDSPEC vctCardArray;
 
-        TRACE_DEBUG("%s => ", pCurrPlayer->GetName());
+        TRACE_DEBUG("%s => ", pCurrPlayer->GetName().c_str());
 
         for (int j = 0; j < NUM_CARDS_HAND; j++) {
             bool isValid;
@@ -170,7 +169,7 @@ void InvidoCore::Giocata_Start(Uint8 playerIx) {
             if (isValid) {
                 vctCardArray.push_back(nextCard);  // CardSpec has no pointers,
                                                    // this is perfectly fine
-                TRACE_DEBUG("[%s] , ix: %d, pt: %d", nextCard.GetName(),
+                TRACE_DEBUG("[%s] , ix: %d, pt: %d", nextCard.GetName().c_str(),
                             nextCard.GetCardIndex(), nextCard.GetPoints());
 
                 _cardInfos[playerIx].push_back(nextCard);

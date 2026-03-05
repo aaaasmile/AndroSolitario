@@ -60,7 +60,6 @@ void PendQuestion::operator=(const PendQuestion& r) {
 
 Mano::Mano() {
     _p_InvidoCore = NULL;
-    _p_Giocata = NULL;
     _eManoState = MNST_WAIT_NEW_MANO;
     _p_Score = NULL;
 
@@ -131,8 +130,6 @@ Mano::Mano() {
         eGiocataScoreState::SC_FUERAJEUQ;
     _mapScoreScNext[eGiocataScoreState::SC_FUERAJEUQ] =
         eGiocataScoreState::SC_PARTIDA;
-
-    _p_Table = NULL;
 }
 
 void Mano::NextAction() {
@@ -206,15 +203,7 @@ void Mano::GiocataStart() {
     _playerChangeScore = NOT_VALID_INDEX;
 }
 
-void Mano::MatchStart() {
-    _numOfPlayers = _p_InvidoCore->GetNumOfPlayers();
-    for (int i = 0; i < _numOfPlayers; i++) {
-        Player* pPlayer = _p_InvidoCore->GetPlayer(i);
-        _eTypePlayer[i] = pPlayer->GetType();
-    }
-
-    _p_Table = _p_InvidoCore->GetTable();
-}
+void Mano::MatchStart(int numPlayers) { _numOfPlayers = numPlayers; }
 
 LPErrInApp Mano::NewMano(Uint8 playerIx) {
     clearQuestions();

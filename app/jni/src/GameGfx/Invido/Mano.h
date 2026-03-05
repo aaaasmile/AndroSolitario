@@ -11,8 +11,8 @@
 namespace invido {
 
 class InvidoCore;
-class Giocata;
 class MatchPoints;
+
 enum eFN_MANOACTION {
     MANO_WAITPL_TOPLAY = 0,
     MANO_WAIPL_TORESP,
@@ -76,7 +76,6 @@ class Mano {
    public:
     Mano();
     void SetCore(InvidoCore* pVal) { _p_InvidoCore = pVal; }
-    void SetGiocata(Giocata* pVal) { _p_Giocata = pVal; }
     void SetScore(MatchPoints* pVal) { _p_Score = pVal; }
     LPErrInApp NewMano(Uint8 playerIx);
     bool Player_Say(Uint8 playerIx, eSayPlayer eSay);
@@ -85,12 +84,11 @@ class Mano {
     void Reset();
     void NextAction();
     eManoStatus GetState() { return _eManoState; }
-    void MatchStart();
+    void MatchStart(int numPlayers);
     void GetAdmittedCommands(VCT_COMMANDS& vct_Commands, Uint8 playerIx);
     void GetMoreCommands(VCT_COMMANDS& vct_Commands, Uint8 playerIx);
     void CommandWithPendingQuestion(PendQuestion& PendQues,
-                                    VCT_COMMANDS& vct_Commands,
-                                    Uint8 playerIx);
+                                    VCT_COMMANDS& vct_Commands, Uint8 playerIx);
     void GiocataStart();
 
    private:
@@ -121,10 +119,8 @@ class Mano {
 
    private:
     InvidoCore* _p_InvidoCore;
-    Giocata* _p_Giocata;
     eManoStatus _eManoState;
     eManoStatus _eOldManoState;
-    eTypeOfPLayer _eTypePlayer[MAX_NUM_PLAYER];
     int _numOfPlayers;
     DEQ_ACTIONITEM _deqNextAction;
     MatchPoints* _p_Score;
@@ -136,7 +132,6 @@ class Mano {
     MAP_STATUS_PL _MapPlayerOnState;
     MAP_STATUS_ACTION _MapActionOnState;
     DEQ_TABLESTATE _deqTableState;
-    PlayersOnTable* _p_Table;
     int _playerChangeScore;
     MAP_SCORE_SCORENEXT _mapScoreScNext;
     MAP_SCORE_SAY _mapScoreSay;
