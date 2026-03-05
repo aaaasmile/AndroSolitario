@@ -36,19 +36,19 @@ typedef std::deque<eManoStatus> DEQ_TABLESTATE;
 
 struct PendingQuestion {
     PendingQuestion() {
-        _isAMonte = false;
-        _eScore = SC_CANELA;
-        _playerIx = 0;
+        isAMonte = false;
+        eScore = SC_CANELA;
+        playerIx = 0;
     }
     PendingQuestion(bool bVal, eGiocataScoreState eSc, Uint8 plIx) {
-        _isAMonte = bVal;
-        _eScore = eSc;
-        _playerIx = plIx;
+        isAMonte = bVal;
+        eScore = eSc;
+        playerIx = plIx;
     }
     void operator=(const PendingQuestion& r);
-    eGiocataScoreState _eScore;
-    bool _isAMonte;
-    Uint8 _playerIx;
+    eGiocataScoreState eScore;
+    bool isAMonte;
+    Uint8 playerIx;
 };
 
 typedef std::deque<PendingQuestion> DEQ_PENDQUESTION;

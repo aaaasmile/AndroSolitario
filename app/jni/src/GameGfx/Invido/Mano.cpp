@@ -53,9 +53,9 @@ static eGiocataScoreState intToEScore(int iVal) {
 }
 
 void PendingQuestion::operator=(const PendingQuestion& r) {
-    _eScore = r._eScore;
-    _isAMonte = r._isAMonte;
-    _playerIx = r._playerIx;
+    eScore = r.eScore;
+    isAMonte = r.isAMonte;
+    playerIx = r.playerIx;
 }
 
 Mano::Mano() {
@@ -252,7 +252,7 @@ bool Mano::Player_Play(Uint8 playerIx, bool vadoDentro) {
 
         PendingQuestion PendQues;
         if (get_LastPendQuest(PendQues)) {
-            if (PendQues._playerIx == playerIx) {
+            if (PendQues.playerIx == playerIx) {
                 // same player has make a question: waiting the responce before
                 // play
                 TRACE_DEBUG("Player %d, question is pending, wait responce\n",
@@ -260,19 +260,19 @@ bool Mano::Player_Play(Uint8 playerIx, bool vadoDentro) {
 
                 return false;
             }
-            if (PendQues._isAMonte) {
+            if (PendQues.isAMonte) {
                 // a monte call is pending: play a card is not admitted
                 TRACE_DEBUG("Player %d, monte call is pending, wait responce\n",
                             playerIx);
                 return false;
             } else {
                 // score question is pending: silent accept the question
-                _p_Score->ChangeCurrentScore(PendQues._eScore,
-                                             PendQues._playerIx);
+                _p_Score->ChangeCurrentScore(PendQues.eScore,
+                                             PendQues.playerIx);
                 // clear question list
                 clearQuestions();
                 // save the player index that make a change
-                _playerChangeScore = PendQues._playerIx;
+                _playerChangeScore = PendQues.playerIx;
             }
         } else {
             TRACE_DEBUG("no question and no player state. Wrong state\n");
@@ -354,16 +354,16 @@ void Mano::handle_ScoreCalled(Uint8 playerIx, eSayPlayer eSay) {
         // score call is admitted only if the pending question  was a small of
         // the call score from opponent How small? only the closest call is
         // admitted (canela->invido->trasmas->noef->foera->partida)
-        if (PendScoreQuesLast._playerIx != playerIx &&
-            isScoreBigClosed(eScore, PendScoreQuesLast._eScore)) {
+        if (PendScoreQuesLast.playerIx != playerIx &&
+            isScoreBigClosed(eScore, PendScoreQuesLast.eScore)) {
             // score call admitted
 
             // implicit change of score to the first call
-            _p_Score->ChangeCurrentScore(PendScoreQuesLast._eScore,
-                                         PendScoreQuesLast._playerIx);
+            _p_Score->ChangeCurrentScore(PendScoreQuesLast.eScore,
+                                         PendScoreQuesLast.playerIx);
             // save the player index that make a change
-            _playerChangeScore = PendScoreQuesLast._playerIx;
-            add_Action(PendScoreQuesLast._eScore, MANO_CHANGESCORE);
+            _playerChangeScore = PendScoreQuesLast.playerIx;
+            add_Action(PendScoreQuesLast.eScore, MANO_CHANGESCORE);
 
             // new question state
             PendingQuestion NewPendQues(false, eScore, playerIx);
@@ -385,7 +385,7 @@ void Mano::handle_ScoreCalled(Uint8 playerIx, eSayPlayer eSay) {
     } else if (get_LastPendQuest(PendQuesMonte)) {
         // if a question is pending, it could be only a monte
         // a monte pending question
-        SDL_assert(PendQuesMonte._isAMonte);
+        SDL_assert(PendQuesMonte.isAMonte);
         if (playerIx == _playerChangeScore) {
             // the same player can't increment the score
             // call not admitted
@@ -416,9 +416,9 @@ void Mano::handle_MonteCall(Uint8 playerIx, eSayPlayer eSay) {
     PendingQuestion PendQuesLast;
 
     if (get_LastPendQuest(PendQuesLast)) {
-        if (PendQuesLast._isAMonte) {
+        if (PendQuesLast.isAMonte) {
             // there is a MONTE pending question
-            if (PendQuesLast._playerIx != playerIx) {
+            if (PendQuesLast.playerIx != playerIx) {
                 // ok this giocata goes a monte
                 giocata_Go_Amonte(playerIx);
             } else {
@@ -452,7 +452,7 @@ void Mano::handle_CallNo(Uint8 playerIx) {
     if (get_LastPendQuest(PendQues)) {
         // there is question pending, the responce is no
         // no is admitted only on "A monte" call
-        if (PendQues._isAMonte) {
+        if (PendQues.isAMonte) {
             // remove the monte question
             remove_LastQuestion();
             if (get_LastPendQuest(PendQues)) {
@@ -479,16 +479,16 @@ void Mano::handleVaBene(Uint8 playerIx) {
     PendingQuestion PendQues;
     if (get_LastPendQuest(PendQues)) {
         // question was pending
-        if (PendQues._isAMonte) {
+        if (PendQues.isAMonte) {
             // question was a monte, accept it
             giocata_Go_Amonte(playerIx);
 
         } else {
             // change score question, set the new score
-            _p_Score->ChangeCurrentScore(PendQues._eScore, PendQues._playerIx);
+            _p_Score->ChangeCurrentScore(PendQues.eScore, PendQues.playerIx);
             // save the player index that make a change
-            _playerChangeScore = PendQues._playerIx;
-            add_Action(PendQues._eScore, MANO_CHANGESCORE);
+            _playerChangeScore = PendQues.playerIx;
+            add_Action(PendQues.eScore, MANO_CHANGESCORE);
             // clear question list
             clearQuestions();
 
@@ -506,7 +506,7 @@ void Mano::handleVaBene(Uint8 playerIx) {
 void Mano::handleVadoVia(Uint8 playerIx) {
     PendingQuestion PendQues;
     if (get_LastPendQuest(PendQues)) {
-        if (PendQues._playerIx != playerIx && !PendQues._isAMonte) {
+        if (PendQues.playerIx != playerIx && !PendQues.isAMonte) {
             // last change score question not accepted
             add_Action(playerIx, MANO_VADOVIA);
             // clear question list
@@ -537,7 +537,7 @@ void Mano::actionOnQuestion(PendingQuestion& PendQues) {
     // prepare state queue on table players
     int aTablePlayer[MAX_NUM_PLAYER];
     // calculate the array of player indexes
-    calcCircleIndex(aTablePlayer, MAX_NUM_PLAYER, PendQues._playerIx);
+    calcCircleIndex(aTablePlayer, MAX_NUM_PLAYER, PendQues.playerIx);
     // use the index of the next player
     int iPlayerNext = aTablePlayer[1];
     add_Action(iPlayerNext, MANO_WAIPL_TORESP);
@@ -634,7 +634,7 @@ bool Mano::get_LastPendScoreQuest(PendingQuestion& PendQues) {
         size_t iIndexLast = iNumEle - iCurr - 1;
         PendQues = _deqPendingQuestion[iIndexLast];
 
-        if (!PendQues._isAMonte) {
+        if (!PendQues.isAMonte) {
             // this is a score question, ok we have it
             bRes = true;
             break;
@@ -691,14 +691,14 @@ eManoStatus Mano::nextTableState() {
 void Mano::CommandWithPendingQuestion(PendingQuestion& PendQues,
                                       VCT_COMMANDS& vct_Commands,
                                       Uint8 playerIx) {
-    if (playerIx == PendQues._playerIx) {
+    if (playerIx == PendQues.playerIx) {
         // if pending question is from the same player,
         // he can say anything
         vct_Commands.clear();
         return;
     }
     // the question is an opponent question
-    if (PendQues._isAMonte) {
+    if (PendQues.isAMonte) {
         // pending question is "a monte"
         vct_Commands.push_back(eSayPlayer::SP_VABENE);
         vct_Commands.push_back(eSayPlayer::SP_NO);
@@ -708,9 +708,9 @@ void Mano::CommandWithPendingQuestion(PendingQuestion& PendQues,
         vct_Commands.push_back(eSayPlayer::SP_AMONTE);
         vct_Commands.push_back(eSayPlayer::SP_GIOCA);
         // get the next score
-        if (PendQues._eScore != eGiocataScoreState::SC_PARTIDA) {
+        if (PendQues.eScore != eGiocataScoreState::SC_PARTIDA) {
             // it is possible to call more score
-            eGiocataScoreState eNextScore = _mapScoreScNext[PendQues._eScore];
+            eGiocataScoreState eNextScore = _mapScoreScNext[PendQues.eScore];
             eSayPlayer eCallMore = _mapScoreSay[eNextScore];
             vct_Commands.push_back(eCallMore);
         }
