@@ -12,6 +12,7 @@
 #include "DeckType.h"
 #include "ErrorInfo.h"
 #include "InvidoCore.h"
+#include "Mazzo.h"
 #include "Traits.h"
 
 using namespace traits;
@@ -69,13 +70,13 @@ class InvidoGfx : public I_ALG_Player {
     void InitInvidoVsCPU();
     void INP_PlayerSay(eSayPlayer eSay);
     void ButCmdClicked(int iButID);
-    Player* GetPlayer(Uint8 playerIx) { return _p_InvidoCore->GetPlayer(playerIx); }
+    Player* GetPlayer(Uint8 playerIx) {
+        return _p_InvidoCore->GetPlayer(playerIx);
+    }
     // I_ALG_Player interface - start
     void ALG_SetCoreInterface(I_CORE_Game* pCore) {}
     void ALG_SetPlayerIndex(Uint8 playerIx) { _playerGuiIndex = playerIx; }
-    void ALG_SetOpponentIndex(Uint8 playerIx) {
-        _opponentIndex = playerIx;
-    }
+    void ALG_SetOpponentIndex(Uint8 playerIx) { _opponentIndex = playerIx; }
     void ALG_SetAssociateIndex(Uint8 playerIx) {}
     void ALG_NewMatch(int iNumPlayer) {}
     void ALG_NewGiocata(const VCT_CARDSPEC& vctCards, Uint8 playerIx);
@@ -142,6 +143,8 @@ class InvidoGfx : public I_ALG_Player {
     TTF_Font* _p_FontText;
     SDL_Surface* _p_Surf_Bar;
     InvidoCore* _p_InvidoCore;
+    PlayersOnTable _playersOnTable;
+    Mazzo _mazzo;
     CardGfx _aPlayerCards[NUM_CARDS_HAND];
     CardGfx _aOpponentCards[NUM_CARDS_HAND];
     CardGfx _CardsTakenPla;

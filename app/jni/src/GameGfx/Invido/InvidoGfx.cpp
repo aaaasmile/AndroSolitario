@@ -11,17 +11,19 @@
 #include "DeckType.h"
 #include "GameSettings.h"
 #include "GfxUtil.h"
+#include "InvidoCore.h"
 #include "InvidoCoreDef.h"
 #include "Languages.h"
+#include "Mazzo.h"
 #include "MesgBoxGfx.h"
 #include "MusicManager.h"
 #include "PopUpMenuGfx.h"
-#include "InvidoCore.h"
-#include "Mazzo.h"
+
 
 using namespace invido;
 
-//static const char* lpszImageBack = "images/invido/im000740.jpg";  // TODO use it
+// static const char* lpszImageBack = "images/invido/im000740.jpg";  // TODO use
+// it
 static const char* lpszaImage_filenames[] = {
     DATA_PREFIX "images/invido/tocca.png",
     DATA_PREFIX "images/invido/LedOff.bmp",
@@ -493,7 +495,7 @@ void InvidoGfx::animateManoEnd(Uint8 playerIx) {
     }
 
     int iIncVel = iPhase2Speed;
-    //bool bEnd = false; // TODO
+    // bool bEnd = false; // TODO
     if (bPhase1_X) {
         // second step, move cards to the trick winner
         if (playerIx == 0) {
@@ -501,14 +503,14 @@ void InvidoGfx::animateManoEnd(Uint8 playerIx) {
             cardTmp[1]._vy += iIncVel;
             if (cardTmp[1]._y >= _p_Screen->h) {
                 // cards outside of the screen
-                //bEnd = true; // TODO
+                // bEnd = true; // TODO
             }
         } else if (playerIx == 1) {
             cardTmp[0]._vy -= iIncVel;
             cardTmp[1]._vy -= iIncVel;
             if (cardTmp[0]._y <= 0) {
                 // cards outside of the screen
-                //bEnd = true; // TODO
+                // bEnd = true; // TODO
             }
         } else {
             // patada
@@ -516,14 +518,14 @@ void InvidoGfx::animateManoEnd(Uint8 playerIx) {
             cardTmp[1]._vx -= iIncVel;
             if (cardTmp[1]._x <= 0) {
                 // cards outside of the screen
-                //bEnd = true; // TODO
+                // bEnd = true; // TODO
             }
         }
     }
 
     loopCount += 1;
     if (loopCount > 1000) {
-        //bEnd = true; // TODO
+        // bEnd = true; // TODO
     }
     SDL_BlitSurface(_p_AlphaDisplay, NULL, _p_Screen, NULL);
     updateTextureAsFlipScreen();
@@ -710,20 +712,20 @@ void InvidoGfx::InitInvidoVsCPU() {
     if (_p_InvidoCore) {
         delete _p_InvidoCore;
     }
-    
+
     Player player1;
     Player player2;
-    PlayersOnTable playersOnTable;
     player1.Init(this, PT_LOCAL, pGameSettings->PlayerName.c_str(), 0);
     player2.Init(NULL, PT_MACHINE, "Re Adlinvidu", 1);
-    playersOnTable.AddPlayer(player1);
-    playersOnTable.AddPlayer(player2);
-    Mazzo mazzo;
-    mazzo.Init();
-   
+    _playersOnTable = PlayersOnTable();
+    _playersOnTable.AddPlayer(player1);
+    _playersOnTable.AddPlayer(player2);
+    _mazzo = Mazzo();
+    _mazzo.Init();
+
     _p_InvidoCore = new InvidoCore();
-    _p_InvidoCore->Init(&playersOnTable, &mazzo);
-   
+    _p_InvidoCore->Init(&_playersOnTable, &_mazzo);
+
     _p_MatchPoints = _p_InvidoCore->GetMatchPointsInstance();
 
     TRACE_DEBUG("Partita tra %s e %s", player1.GetName().c_str(),
