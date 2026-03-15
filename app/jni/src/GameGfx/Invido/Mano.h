@@ -28,8 +28,8 @@ enum eFN_MANOACTION {
 typedef std::map<eSayPlayer, eGiocataScoreState> MAP_SAY_SCORE;
 typedef std::map<eGiocataScoreState, eSayPlayer> MAP_SCORE_SAY;
 typedef std::map<eFN_MANOACTION, STRING> MAP_ACTION_NAMES;
-typedef std::map<int, eManoStatus> MAP_PL_STATUS;
-typedef std::map<eManoStatus, int> MAP_STATUS_PL;
+typedef std::map<Uint8, eManoStatus> MAP_PL_STATUS;
+typedef std::map<eManoStatus, Uint8> MAP_STATUS_PL;
 typedef std::map<eManoStatus, eFN_MANOACTION> MAP_STATUS_ACTION;
 typedef std::map<eGiocataScoreState, eGiocataScoreState> MAP_SCORE_SCORENEXT;
 typedef std::deque<eManoStatus> DEQ_TABLESTATE;
@@ -59,18 +59,18 @@ typedef std::deque<PendingQuestion> DEQ_PENDQUESTION;
 typedef std::vector<int> VCT_INT;
 #endif
 
-struct ActionItem {
-    ActionItem() { eNextAction = MANO_NO_ACTION; }
-
-    eFN_MANOACTION eNextAction;
-    VCT_INT vctArg;
-};
-
-typedef std::deque<ActionItem> DEQ_ACTIONITEM;
-
 class PlayersOnTable;
 class TraceService;
 class Mano {
+    struct ActionItemMano {
+        ActionItemMano() { _eNextAction = MANO_NO_ACTION; }
+
+        eFN_MANOACTION _eNextAction;
+        VCT_INT _vctArg;
+    };
+
+    typedef std::deque<ActionItemMano> DEQ_ACTIONITEM;
+
    public:
     Mano();
     void SetCore(InvidoCore* pVal) { _p_InvidoCore = pVal; }
@@ -90,7 +90,7 @@ class Mano {
     void GiocataStart();
 
    private:
-    void calcCircleIndex(int* paPlayerDeck, int size, int iPlayerIni);
+    Uint8 getNextPlayerIxAfter(Uint8 playerIx);
     void actionOnQuestion(PendingQuestion& PendQues);
     void handleVadoVia(Uint8 playerIx);
     void handleVaBene(Uint8 playerIx);
@@ -119,18 +119,18 @@ class Mano {
     InvidoCore* _p_InvidoCore;
     eManoStatus _eManoState;
     eManoStatus _eOldManoState;
-    int _numOfPlayers;
+    Uint8 _numOfPlayers;
     DEQ_ACTIONITEM _deqNextAction;
     MatchPoints* _p_Score;
     DEQ_PENDQUESTION _deqPendingQuestion;
-    MAP_ACTION_NAMES _MapActionNames;
-    MAP_SAY_SCORE _MapSayScore;
-    MAP_PL_STATUS _MapManoStatePl;
-    MAP_PL_STATUS _MapManoStateResp;
-    MAP_STATUS_PL _MapPlayerOnState;
-    MAP_STATUS_ACTION _MapActionOnState;
+    MAP_ACTION_NAMES _mapActionNames;
+    MAP_SAY_SCORE _mapSayScore;
+    MAP_PL_STATUS _mapManoStatePl;
+    MAP_PL_STATUS _mapManoStateResp;
+    MAP_STATUS_PL _mapPlayerOnState;
+    MAP_STATUS_ACTION _mapActionOnState;
     DEQ_TABLESTATE _deqTableState;
-    int _playerChangeScore;
+    Uint8 _playerChangeScoreIx;
     MAP_SCORE_SCORENEXT _mapScoreScNext;
     MAP_SCORE_SAY _mapScoreSay;
 };

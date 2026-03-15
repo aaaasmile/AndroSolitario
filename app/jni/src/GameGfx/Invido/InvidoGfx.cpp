@@ -1178,7 +1178,7 @@ void InvidoGfx::showCurrentScore() {
     for (int iManoNum = 0; iManoNum < NUM_CARDS_HAND; iManoNum++) {
         bool bIsPata;
         bool bIsPlayed;
-        int playerIx;
+        Uint8 playerIx;
         _p_MatchPoints->GetManoInfo(iManoNum, &playerIx, &bIsPlayed, &bIsPata);
         showManoScore(bIsPlayed, playerIx, bIsPata, iManoNum);
     }
@@ -1259,21 +1259,21 @@ void InvidoGfx::showCurrentScore() {
             GiocataInfo GioInfo;
             _p_MatchPoints->GetGiocataInfo(iNumGio, &GioInfo);
 
-            if (GioInfo.score > 0) {
-                if (GioInfo.playerIndex == j) {
-                    if (GioInfo.score == SC_TRASMAS) {
+            if (GioInfo._score > 0) {
+                if (GioInfo._playerIndex == j) {
+                    if (GioInfo._score == SC_TRASMAS) {
                         vct_Point_pl1.push_back(3);
                         vct_Point_pl1.push_back(3);
-                    } else if (GioInfo.score == SC_TRASMASNOEF) {
-                        vct_Point_pl1.push_back(3);
-                        vct_Point_pl1.push_back(3);
-                        vct_Point_pl1.push_back(3);
-                    } else if (GioInfo.score == SC_FUERAJEUQ) {
+                    } else if (GioInfo._score == SC_TRASMASNOEF) {
                         vct_Point_pl1.push_back(3);
                         vct_Point_pl1.push_back(3);
                         vct_Point_pl1.push_back(3);
+                    } else if (GioInfo._score == SC_FUERAJEUQ) {
                         vct_Point_pl1.push_back(3);
-                    } else if (GioInfo.score == SC_PARTIDA) {
+                        vct_Point_pl1.push_back(3);
+                        vct_Point_pl1.push_back(3);
+                        vct_Point_pl1.push_back(3);
+                    } else if (GioInfo._score == SC_PARTIDA) {
                         vct_Point_pl1.push_back(3);
                         vct_Point_pl1.push_back(3);
                         vct_Point_pl1.push_back(3);
@@ -1283,7 +1283,7 @@ void InvidoGfx::showCurrentScore() {
                         vct_Point_pl1.push_back(3);
                         vct_Point_pl1.push_back(3);
                     } else {
-                        vct_Point_pl1.push_back(GioInfo.score);
+                        vct_Point_pl1.push_back(GioInfo._score);
                     }
                 }
             }

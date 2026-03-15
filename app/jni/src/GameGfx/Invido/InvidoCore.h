@@ -53,8 +53,8 @@ class InvidoCore : public I_CORE_Game {
     void Giocata_Start(Uint8 playerIx);
 
     // Partita callbacks
-    void PartitaEnd();
-    void NewGiocata(Uint8 playerIx);
+    void PartitaEnded();
+    void PartitaStarted(Uint8 playerIx);
 
     void NewMatch();
     void NextAction();
@@ -86,9 +86,9 @@ class InvidoCore : public I_CORE_Game {
     Partita _partita;
     Giocata _giocata;
     Mano _mano;
-    I_ALG_Player* _vctpAlgPlayer[MAX_NUM_PLAYER];
     MatchPoints _matchPoints;
-    VCT_CARDSPEC _cardInfos[MAX_NUM_PLAYER];
+    std::vector<I_ALG_Player*> _vctpAlgPlayer;
+    std::vector<VCT_CARDSPEC> _vctCardInfos;
 };
 
 }  // namespace invido

@@ -20,14 +20,14 @@ class I_CORE_Game {
 
 class I_MatchScore {
    public:
-    virtual bool IsGiocatEnd() = 0;
+    //virtual bool IsGiocatEnd() = 0;
     virtual bool IsGiocataMonte() = 0;
-    virtual bool IsManoPatada() = 0;
     virtual bool IsGiocataPatada() = 0;
+    virtual bool IsManoPatada() = 0;
     virtual bool IsMatchEnd() = 0;
-    virtual int GetManoWinner() = 0;
-    virtual int GetGiocataWinner() = 0;
-    virtual int GetMatchWinner() = 0;
+    virtual Uint8 GetManoWinner() = 0;
+    virtual Uint8 GetGiocataWinner() = 0;
+    virtual Uint8 GetMatchWinner() = 0;
     virtual eGiocataScoreState GetCurrScore() = 0;
     virtual int GetPointsPlayer(Uint8 playerIx) = 0;
     virtual int GetManoNum() = 0;

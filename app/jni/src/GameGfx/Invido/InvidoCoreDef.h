@@ -7,8 +7,6 @@
 
 namespace invido {
 
-typedef std::vector<long> VCT_LONG;
-typedef VCT_LONG::iterator IT_VCTLONG;
 enum eGameConst {
     PLAYER_ME = 0,
     PLAYER_OPPONENT = 1,
@@ -21,14 +19,13 @@ enum eGameConst {
     SPECIAL_SCORE = 23,
     SPECIAL_SCORE_GOAL = 8,
     SCORE_SEVEN = 7,
-    NOT_VALID_INDEX = -1,
+    NOT_VALID_INDEX = 1000,
     NUM_SEEDS = 5,
     BUFF_NAME = 64,
     PLAYER1 = 0,
     PLAYER2 = 1,
     PLAYER3 = 2,
     PLAYER4 = 3,
-    MAX_NUM_PLAYER = 4,
     NUM_PLAY_INVIDO_2 = 2
 };
 enum eGameType { LOCAL_TYPE = 0, NET_CLIENT_TYPE = 1, NET_SERVER_TYPE = 2 };

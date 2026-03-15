@@ -3,47 +3,60 @@
 
 #include <deque>
 
-#include "InvidoCoreDef.h"
 #include "ErrorInfo.h"
+#include "InvidoCoreDef.h"
 
 namespace invido {
-    
+
 class InvidoCore;
 class Partita;
 class Mano;
 class I_MatchScore;
-enum eFN_ACTION_GIO { GIOC_START, GIOC_END, GIOC_NO_ACTION };
-
-class ActionItemGio {
-   public:
-    ActionItemGio() { _eNextAction = GIOC_NO_ACTION; }
-
-    eFN_ACTION_GIO _eNextAction;
-    VCT_LONG m_vct_lArg;
-};
-
-typedef std::deque<ActionItemGio> DEQ_ACTIT_GIO;
 
 class Giocata {
+    enum eGiocataEndState {
+        GES_ON_GOING,
+        GES_HAVE_WINNER,
+        GES_PATADA,
+        GES_AMONTE
+    };
+    enum eFN_ACTION_GIO {
+        GIOC_STARTED,
+        GIOC_WITHWIN_ENDED,
+        GIOC_NOWINNERS_ENDED
+    };
+
+    struct ActionItemGio {
+        eFN_ACTION_GIO _eNextAction;
+        Uint8 _playerIx;
+    };
+    typedef std::deque<ActionItemGio> DEQ_ACTIT_GIO;
+
    public:
     Giocata();
 
    public:
-    void SetCore(InvidoCore* pVal) { _p_InvidoCore = pVal; }
-    void SetPartita(Partita* pVal) { _p_Partita = pVal; }
-    void SetMano(Mano* pVal) { _p_Mano = pVal; }
+    void SetGiocataCB(GiocataCb& giocataCb) { _giocataCb = giocataCb; }
     LPErrInApp NewGiocata(Uint8 playerIx);
-    void Update_Giocata(Uint8 playerIx, I_MatchScore* pIScore);
+
+    // void Update_Giocata();
     void Reset();
     void NextAction();
+    void PlayerGiocataWins(Uint8 playerWinnerIx);
+    void GiocataAMonte();
+    void GiocataPatada();
 
    private:
-    InvidoCore* _p_InvidoCore;
-    Partita* _p_Partita;
+    bool isGiocatEnd();
+    bool isGiocataPatada() { return (_eIsGiocataEnd == GES_PATADA); }
+    bool isGiocataMonte() { return (_eIsGiocataEnd == GES_AMONTE); }
+
+   private:
+    GiocataCb _giocataCb;
     eGiocataStatus _eGiocataStatus;
-    Mano* _p_Mano;
     DEQ_ACTIT_GIO _deqNextAction;
+    eGiocataEndState _eIsGiocataEnd;
 };
-}
+}  // namespace invido
 
 #endif

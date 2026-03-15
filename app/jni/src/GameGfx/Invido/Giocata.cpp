@@ -6,55 +6,29 @@
 
 using namespace invido;
 
-Giocata::Giocata() {
-    _p_InvidoCore = NULL;
-    _p_Partita = NULL;
-    _p_Mano = NULL;
-    _eGiocataStatus = WAIT_NEW_GIOCATA;
-}
-
-LPErrInApp Giocata::NewGiocata(Uint8 playerIx) {
-    ActionItemGio Action;
-
-    if (_eGiocataStatus == WAIT_NEW_GIOCATA) {
-        _eGiocataStatus = GIOCATA_ONGOING;
-        // next action
-        Action.m_vct_lArg.push_back(playerIx);
-        Action._eNextAction = GIOC_START;
-        _deqNextAction.push_back(Action);
-    } else {
-        return ERR_UTIL::ErrorCreate("Giocata state is not correct %d",
-                                     _eGiocataStatus);
-    }
-    return NULL;
-}
+Giocata::Giocata() { _eGiocataStatus = WAIT_NEW_GIOCATA; }
 
 void Giocata::NextAction() {
-    size_t iNumAct = _deqNextAction.size();
-    if (iNumAct == 0) {
+    size_t numAct = _deqNextAction.size();
+    if (numAct == 0) {
         // no action
         return;
     }
-    ActionItemGio Action = _deqNextAction.front();
+    ActionItemGio action = _deqNextAction.front();
     _deqNextAction.pop_front();
 
-    switch (Action._eNextAction) {
-        case GIOC_START:
-            // gioca is started
-            SDL_assert(Action.m_vct_lArg.size() > 0);
-            _p_InvidoCore->Giocata_Start(Action.m_vct_lArg[0]);
-            // mano state
-            _p_Mano->NewMano(Action.m_vct_lArg[0]);
-
+    switch (action._eNextAction) {
+        case GIOC_STARTED:
+            _giocataCb.tc->GiocataStarted(_giocataCb.self, action._playerIx);
             break;
 
-        case GIOC_END:
-            // giocata is eneded
-            _p_InvidoCore->Giocata_End();
+        case GIOC_WITHWIN_ENDED:
+            _giocataCb.tc->GiocataEndedWinner(_giocataCb.self,
+                                              action._playerIx);
             break;
 
-        case GIOC_NO_ACTION:
-            // nothing to do
+        case GIOC_NOWINNERS_ENDED:
+            _giocataCb.tc->GiocataEndDueced(_giocataCb.self);
             break;
 
         default:
@@ -63,23 +37,45 @@ void Giocata::NextAction() {
     }
 }
 
-void Giocata::Update_Giocata(Uint8 playerIx, I_MatchScore* pIScore) {
-    // check mano
-    SDL_assert(_eGiocataStatus == GIOCATA_ONGOING);
-    SDL_assert(pIScore);
-    ActionItemGio Action;
-
-    if (pIScore->IsGiocatEnd()) {
-        // giocata is terminated
-        _eGiocataStatus = WAIT_NEW_GIOCATA;
-        Action._eNextAction = GIOC_END;
-        _deqNextAction.push_back(Action);
-    } else {
-        _p_Mano->NewMano(playerIx);
-    }
-}
-
 void Giocata::Reset() {
     _eGiocataStatus = WAIT_NEW_GIOCATA;
     _deqNextAction.clear();
+}
+
+void Giocata::PlayerGiocataWins(Uint8 playerWinnerIx) {
+    SDL_assert(_eGiocataStatus == GIOCATA_ONGOING);
+
+    _eIsGiocataEnd = GES_HAVE_WINNER;
+    ActionItemGio action = {._eNextAction = GIOC_WITHWIN_ENDED,
+                            ._playerIx = playerWinnerIx};
+    _deqNextAction.push_back(action);
+
+    _eGiocataStatus = WAIT_NEW_GIOCATA;
+}
+
+void Giocata::GiocataAMonte() {
+    _eIsGiocataEnd = GES_AMONTE;
+    ActionItemGio action = {._eNextAction = GIOC_NOWINNERS_ENDED};
+    _deqNextAction.push_back(action);
+    _eGiocataStatus = WAIT_NEW_GIOCATA;
+}
+
+void Giocata::GiocataPatada() {
+    _eIsGiocataEnd = GES_PATADA;
+    ActionItemGio action = {._eNextAction = GIOC_NOWINNERS_ENDED};
+    _deqNextAction.push_back(action);
+    _eGiocataStatus = WAIT_NEW_GIOCATA;
+}
+
+LPErrInApp Giocata::NewGiocata(Uint8 playerIx) {
+    if (_eGiocataStatus == WAIT_NEW_GIOCATA) {
+        _eGiocataStatus = GIOCATA_ONGOING;
+        ActionItemGio action = {._eNextAction = GIOC_STARTED,
+                                ._playerIx = playerIx};
+        _deqNextAction.push_back(action);
+    } else {
+        return ERR_UTIL::ErrorCreate("Giocata state is not correct %d",
+                                     _eGiocataStatus);
+    }
+    return NULL;
 }

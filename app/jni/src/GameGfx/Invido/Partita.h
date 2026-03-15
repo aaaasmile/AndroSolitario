@@ -12,26 +12,29 @@ class Giocata;
 class I_MatchScore;
 
 class Partita {
-    enum eFN_ACTION { ACT_PARTITA_END, NO_ACTION };
+    enum eFN_ACTION_PARTITA { ACT_PARTITA_STARTED, ACT_PARTITA_END };
+
+    struct ActionItemPartita {
+        eFN_ACTION_PARTITA _eNextAction;
+        Uint8 _playerIx;
+    };
+    typedef std::deque<ActionItemPartita> DEQ_ACT_PARTITA;
 
    public:
     Partita();
 
    public:
+   bool IsOngoing() {return _PartitaState == PARTITA_ONGOING;}
     void SetPartitaCB(PartitaCb& partitaCb) { _partitaCb = partitaCb; }
     LPErrInApp NewPartita(Uint8 playerStartIx);
-    LPErrInApp Update_Partita(I_MatchScore* pIScore);
+    void PartitaEnd();
     void Reset();
     void NextAction();
-    bool IsOngoing() {
-        return _PartitaState == ePartitaStatus::PARTITA_ONGOING;
-    }
 
    private:
     ePartitaStatus _PartitaState;
     PartitaCb _partitaCb;
-    Uint8 _playerStartIx;
-    eFN_ACTION _eNextAction;
+    DEQ_ACT_PARTITA _deqNextAction;
 };
 
 }  // namespace invido

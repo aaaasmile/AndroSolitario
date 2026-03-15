@@ -689,17 +689,17 @@ void AlgPlayer::ALG_GiocataEnd(I_MatchScore* pScore) {
         bool bIsPata = pScore->IsGiocataPatada();
         if (bIsPata) {
             // giocata patada
-            TRACE_DEBUG("[TRALG]Giocata patada\n");
+            TRACE_DEBUG("[ALG_GiocataEnd]Giocata patada\n");
         } else if (pScore->IsGiocataMonte()) {
             // giocata a monte
-            TRACE_DEBUG("[TRALG]Giocata a monte\n");
+            TRACE_DEBUG("[ALG_GiocataEnd]Giocata a monte\n");
         } else {
             // winner
             int iPlWinner = pScore->GetGiocataWinner();
 
-            TRACE_DEBUG("[TRALG]Giocata vinta da %d\n", iPlWinner);
+            TRACE_DEBUG("[ALG_GiocataEnd]Giocata vinta da %d\n", iPlWinner);
             TRACE_DEBUG(
-                "[TRALG]Punteggio player 0: %d, punteggio player 1: %d\n",
+                "[ALG_GiocataEnd]Punteggio player 0: %d, punteggio player 1: %d\n",
                 pScore->GetPointsPlayer(m_iMyIndex),
                 pScore->GetPointsPlayer(m_iOppIndex));
         }
@@ -708,20 +708,20 @@ void AlgPlayer::ALG_GiocataEnd(I_MatchScore* pScore) {
 
 void AlgPlayer::ALG_MatchEnd(I_MatchScore* pScore) {
     int iPlWinner = pScore->GetMatchWinner();
-    TRACE_DEBUG("[TRALG]Match vinto da %d\n", iPlWinner);
-    TRACE_DEBUG("[TRALG]Punteggio player 0: %d, punteggio player 1: %d\n",
+    TRACE_DEBUG("[ALG_MatchEnd]Match vinto da %d\n", iPlWinner);
+    TRACE_DEBUG("[ALG_MatchEnd]Punteggio player 0: %d, punteggio player 1: %d\n",
                 pScore->GetPointsPlayer(m_iMyIndex),
                 pScore->GetPointsPlayer(m_iOppIndex));
 }
 
 void AlgPlayer::ALG_HaveToRespond() {
-    TRACE_DEBUG("[TRALG] have to respond");
+    TRACE_DEBUG("[ALG_HaveToRespond] have to respond");
     CardSpec cardUndef;
     int lastNumChiamate = m_iNumChiamateInGiocata;
     if (m_OpponentSay == SP_AMONTE && m_sayMyRisp == eSayPlayer::SP_NO) {
         // a monte was called and it was responded NO, don't change idea
         Chiama(m_sayMyRisp, lastNumChiamate);
-        TRACE_DEBUG("[TRALG] Say R1");
+        TRACE_DEBUG("[ALG_HaveToRespond] Say R1");
         return;
     }
 
@@ -749,7 +749,7 @@ void AlgPlayer::ALG_HaveToRespond() {
         sum_points += points;
     }
     int curr_mano = NumMano();
-    TRACE_DEBUG("[ALG] Say: points first card %d, max points %d \n",
+    TRACE_DEBUG("[ALG_HaveToRespond] Say: points first card %d, max points %d \n",
                 pointsFirstCard, maxpoints);
 
     if (m_OpponentSay >= eSayPlayer::SP_INVIDO &&
@@ -762,7 +762,7 @@ void AlgPlayer::ALG_HaveToRespond() {
     } else {
         iRndIndex = SDL_rand(iNumCmds);
         Chiama(vct_cmd[iRndIndex], lastNumChiamate);
-        TRACE_DEBUG("[TRALG] Say R18");
+        TRACE_DEBUG("[ALG_HaveToRespond] Say R18");
     }
 }
 
@@ -772,30 +772,30 @@ void AlgPlayer::handleSayPopints(int curr_mano, int pointsFirstCard,
     if (maxpoints == 13 && m_bLastManoPatada) {
         if (!ChiamaDiPiu(lastNumChiamate)) {
             Chiama(eSayPlayer::SP_GIOCA, lastNumChiamate);
-            TRACE_DEBUG("[TRALG] Say Pt R000");
+            TRACE_DEBUG("[handleSayPopints] Say Pt R000");
         } else {
-            TRACE_DEBUG("[TRALG] Say Pt R001");
+            TRACE_DEBUG("[handleSayPopints] Say Pt R001");
         }
     } else if ((curr_mano == 1 && sum_points > 22 && maxpoints >= 12) ||
                (maxpoints >= 12 && m_iNumManiWon == 1)) {
         if (SDL_rand(40) > 32) {
             if (!ChiamaDiPiu(lastNumChiamate)) {
                 Chiama(eSayPlayer::SP_GIOCA, lastNumChiamate);
-                TRACE_DEBUG("[TRALG] Say Pt R002");
+                TRACE_DEBUG("[handleSayPopints] Say Pt R002");
             } else {
-                TRACE_DEBUG("[TRALG] Say Pt R003");
+                TRACE_DEBUG("[handleSayPopints] Say Pt R003");
             }
         } else {
             if (!m_bIamCalledPoints && SDL_rand(35) > 28) {
                 if (!ChiamaAMonte(lastNumChiamate)) {
                     Chiama(eSayPlayer::SP_GIOCA, lastNumChiamate);
-                    TRACE_DEBUG("[TRALG] Say Pt R004");
+                    TRACE_DEBUG("[handleSayPopints] Say Pt R004");
                 } else {
-                    TRACE_DEBUG("[TRALG] Say Pt R005");
+                    TRACE_DEBUG("[handleSayPopints] Say Pt R005");
                 }
             } else {
                 Chiama(eSayPlayer::SP_GIOCA, lastNumChiamate);
-                TRACE_DEBUG("[TRALG] Say Pt R006");
+                TRACE_DEBUG("[handleSayPopints] Say Pt R006");
             }
         }
     } else if (m_iPlayerOnTurn != m_iMyIndex && pointsFirstCard < 10 &&
@@ -803,13 +803,13 @@ void AlgPlayer::handleSayPopints(int curr_mano, int pointsFirstCard,
         if (SDL_rand(2) == 1) {
             if (!ChiamaAMonte(lastNumChiamate)) {
                 Chiama(eSayPlayer::SP_VADOVIA, lastNumChiamate);
-                TRACE_DEBUG("[TRALG] Say Pt R007");
+                TRACE_DEBUG("[handleSayPopints] Say Pt R007");
             } else {
-                TRACE_DEBUG("[TRALG] Say Pt R008");
+                TRACE_DEBUG("[handleSayPopints] Say Pt R008");
             }
         } else {
             Chiama(eSayPlayer::SP_VADOVIA, lastNumChiamate);
-            TRACE_DEBUG("[TRALG] Say Pt R009");
+            TRACE_DEBUG("[handleSayPopints] Say Pt R009");
         }
     } else if (curr_mano > 1 && m_iNumManiWon == 0 &&
                m_iPlayerOnTurn == m_iMyIndex && pointsFirstCard > maxpoints) {
@@ -817,89 +817,89 @@ void AlgPlayer::handleSayPopints(int curr_mano, int pointsFirstCard,
         if (SDL_rand(2) == 1) {
             if (!ChiamaAMonte(lastNumChiamate)) {
                 Chiama(eSayPlayer::SP_VADOVIA, lastNumChiamate);
-                TRACE_DEBUG("[TRALG] Say Pt R010");
+                TRACE_DEBUG("[handleSayPopints] Say Pt R010");
             } else {
-                TRACE_DEBUG("[TRALG] Say Pt R011");
+                TRACE_DEBUG("[handleSayPopints] Say Pt R011");
             }
         } else if (SDL_rand(40) > 36) {
             // bluff spudorato
             if (!ChiamaDiPiu(lastNumChiamate)) {
                 Chiama(eSayPlayer::SP_VADOVIA, lastNumChiamate);
-                TRACE_DEBUG("[TRALG] Say Pt R012");
+                TRACE_DEBUG("[handleSayPopints] Say Pt R012");
             } else {
-                TRACE_DEBUG("[TRALG] Say Pt R013");
+                TRACE_DEBUG("[handleSayPopints] Say Pt R013");
             }
         } else {
             Chiama(eSayPlayer::SP_VADOVIA, lastNumChiamate);
-            TRACE_DEBUG("[TRALG] Say Pt R014");
+            TRACE_DEBUG("[handleSayPopints] Say Pt R014");
         }
     } else if (pointsFirstCard < maxpoints && maxpoints >= 12) {
         Chiama(eSayPlayer::SP_GIOCA, lastNumChiamate);
-        TRACE_DEBUG("[TRALG] Say Pt R015");
+        TRACE_DEBUG("[handleSayPopints] Say Pt R015");
     } else if (pointsFirstCard == 11 && curr_mano == 1 &&
                m_iPlayerOnTurn == m_iOppIndex && maxpoints <= 11) {
         if (SDL_rand(10) > 2) {
             if (!ChiamaAMonte(lastNumChiamate)) {
                 Chiama(eSayPlayer::SP_VADOVIA, lastNumChiamate);
-                TRACE_DEBUG("[TRALG] Say Pt R016");
+                TRACE_DEBUG("[handleSayPopints] Say Pt R016");
             } else {
-                TRACE_DEBUG("[TRALG] Say Pt R017");
+                TRACE_DEBUG("[handleSayPopints] Say Pt R017");
             }
         } else {
             Chiama(eSayPlayer::SP_GIOCA, lastNumChiamate);
-            TRACE_DEBUG("[TRALG] Say Pt R018");
+            TRACE_DEBUG("[handleSayPopints] Say Pt R018");
         }
     } else if (curr_mano == 1 && pointsFirstCard >= 12 &&
                m_iOppIndex == m_iPlayerOnTurn) {
         Chiama(eSayPlayer::SP_GIOCA, lastNumChiamate);
-        TRACE_DEBUG("[TRALG] Say Pt R019");
+        TRACE_DEBUG("[handleSayPopints] Say Pt R019");
     } else if (curr_mano == 2 && maxpoints >= 12 && m_iNumManiWon >= 1) {
         Chiama(eSayPlayer::SP_GIOCA, lastNumChiamate);
-        TRACE_DEBUG("[TRALG] Say Pt R020");
+        TRACE_DEBUG("[handleSayPopints] Say Pt R020");
     } else if (m_bLastManoPatada &&
                ((pointsFirstCard < 10 && m_iOppIndex == m_iPlayerOnTurn) ||
                 maxpoints < 10)) {
         if (!ChiamaAMonte(lastNumChiamate)) {
             Chiama(eSayPlayer::SP_VADOVIA, lastNumChiamate);
-            TRACE_DEBUG("[TRALG] Say Pt R021");
+            TRACE_DEBUG("[handleSayPopints] Say Pt R021");
         } else {
-            TRACE_DEBUG("[TRALG] Say Pt R022");
+            TRACE_DEBUG("[handleSayPopints] Say Pt R022");
         }
     } else if (m_iNumManiWon == 1 && pointsFirstCard >= 12 &&
                m_iOppIndex == m_iPlayerOnTurn) {
         Chiama(eSayPlayer::SP_GIOCA, lastNumChiamate);
-        TRACE_DEBUG("[TRALG] Say Pt R023");
+        TRACE_DEBUG("[handleSayPopints] Say Pt R023");
     } else if (m_iNumManiWon == 1 &&
                (pointsFirstCard < maxpoints ||
                 (m_arrIxPlayerWonHand[0] == m_iMyIndex &&
                  pointsFirstCard == maxpoints)) &&
                m_iMyIndex == m_iPlayerOnTurn) {
         Chiama(eSayPlayer::SP_GIOCA, lastNumChiamate);
-        TRACE_DEBUG("[TRALG] Say Pt R024");
+        TRACE_DEBUG("[handleSayPopints] Say Pt R024");
     } else if (m_bLastManoPatada && pointsFirstCard <= maxpoints &&
                m_iMyIndex == m_iPlayerOnTurn) {
         Chiama(eSayPlayer::SP_GIOCA, lastNumChiamate);
-        TRACE_DEBUG("[TRALG] Say Pt R025");
+        TRACE_DEBUG("[handleSayPopints] Say Pt R025");
     } else if (curr_mano == 1 && maxpoints < 11 && pointsFirstCard == -1) {
         if (SDL_rand(10) > 4) {
             if (!ChiamaAMonte(lastNumChiamate)) {
                 Chiama(eSayPlayer::SP_VADOVIA, lastNumChiamate);
-                TRACE_DEBUG("[TRALG] Say Pt R026");
+                TRACE_DEBUG("[handleSayPopints] Say Pt R026");
             }
         } else {
             Chiama(eSayPlayer::SP_VADOVIA, lastNumChiamate);
-            TRACE_DEBUG("[TRALG] Say Pt R027");
+            TRACE_DEBUG("[handleSayPopints] Say Pt R027");
         }
     } else if (curr_mano == 1 && maxpoints <= pointsFirstCard &&
                pointsFirstCard < 11 && m_iPlayerOnTurn == m_iOppIndex) {
         if (SDL_rand(10) > 4) {
             if (!ChiamaAMonte(lastNumChiamate)) {
                 Chiama(eSayPlayer::SP_VADOVIA, lastNumChiamate);
-                TRACE_DEBUG("[TRALG] Say Pt R028");
+                TRACE_DEBUG("[handleSayPopints] Say Pt R028");
             }
         } else {
             Chiama(eSayPlayer::SP_VADOVIA, lastNumChiamate);
-            TRACE_DEBUG("[TRALG] Say Pt R029");
+            TRACE_DEBUG("[handleSayPopints] Say Pt R029");
         }
     } else if (curr_mano == 2 &&
                (maxpoints < pointsFirstCard ||
@@ -908,64 +908,64 @@ void AlgPlayer::handleSayPopints(int curr_mano, int pointsFirstCard,
         if (SDL_rand(10) > 4) {
             if (!ChiamaAMonte(lastNumChiamate)) {
                 Chiama(eSayPlayer::SP_VADOVIA, lastNumChiamate);
-                TRACE_DEBUG("[TRALG] Say Pt R030");
+                TRACE_DEBUG("[handleSayPopints] Say Pt R030");
             }
         } else {
             Chiama(eSayPlayer::SP_VADOVIA, lastNumChiamate);
-            TRACE_DEBUG("[TRALG] Say Pt R031");
+            TRACE_DEBUG("[handleSayPopints] Say Pt R031");
         }
     } else if ((m_iNumManiWon == 1 || m_bLastManoPatada) &&
                m_bIamCalledPoints) {
         Chiama(eSayPlayer::SP_GIOCA, lastNumChiamate);
-        TRACE_DEBUG("[TRALG] Say Pt R032");
+        TRACE_DEBUG("[handleSayPopints] Say Pt R032");
     } else if (curr_mano == 1 && pointsFirstCard == -1 && maxpoints >= 30) {
         Chiama(eSayPlayer::SP_GIOCA, lastNumChiamate);
-        TRACE_DEBUG("[TRALG] Say Pt R033");
+        TRACE_DEBUG("[handleSayPopints] Say Pt R033");
     } else if (curr_mano == 2 && m_iNumManiWon == 0 && maxpoints < 12 &&
                m_iPlayerOnTurn == m_iOppIndex) {
         if (!ChiamaAMonte(lastNumChiamate)) {
-            TRACE_DEBUG("[TRALG] Say Pt R034");
+            TRACE_DEBUG("[handleSayPopints] Say Pt R034");
             Chiama(eSayPlayer::SP_VADOVIA, lastNumChiamate);
         } else {
-            TRACE_DEBUG("[TRALG] Say Pt R035");
+            TRACE_DEBUG("[handleSayPopints] Say Pt R035");
         }
     } else if (curr_mano == 1 && maxpoints < 12 && pointsFirstCard < 12 &&
                m_iPlayerOnTurn == m_iOppIndex) {
         if (!ChiamaAMonte(lastNumChiamate)) {
-            TRACE_DEBUG("[TRALG] Say Pt R036");
+            TRACE_DEBUG("[handleSayPopints] Say Pt R036");
             Chiama(eSayPlayer::SP_VADOVIA, lastNumChiamate);
         } else {
-            TRACE_DEBUG("[TRALG] Say Pt R037");
+            TRACE_DEBUG("[handleSayPopints] Say Pt R037");
         }
     } else if (curr_mano == 3 && m_iPlayerOnTurn == m_iOppIndex &&
                ((pointsFirstCard < 11 && !m_WonFirstHand) ||
                 (pointsFirstCard < 12 && m_WonFirstHand))) {
         if (!ChiamaAMonte(lastNumChiamate)) {
-            TRACE_DEBUG("[TRALG] Say Pt R038");
+            TRACE_DEBUG("[handleSayPopints] Say Pt R038");
             Chiama(eSayPlayer::SP_VADOVIA, lastNumChiamate);
         } else {
-            TRACE_DEBUG("[TRALG] Say Pt R039");
+            TRACE_DEBUG("[handleSayPopints] Say Pt R039");
         }
     } else {
         TRACE_DEBUG(
-            "[TRALG] unhandled response rule: curr_mano %d, maxpoints: %d, "
+            "[handleSayPopints] unhandled response rule: curr_mano %d, maxpoints: %d, "
             "pointsFirstCard %d, m_iPlayerOnTurn %d, prima vinta %d, mani "
             "vinte %d \n",
             curr_mano, maxpoints, pointsFirstCard, m_iPlayerOnTurn,
             m_WonFirstHand, m_iNumManiWon);
         if (SDL_rand(10) > 5) {
             Chiama(eSayPlayer::SP_GIOCA, lastNumChiamate);
-            TRACE_DEBUG("[TRALG] Say Pt R040");
+            TRACE_DEBUG("[handleSayPopints] Say Pt R040");
         } else if (SDL_rand(10) > 4) {
             if (!ChiamaAMonte(lastNumChiamate)) {
                 Chiama(eSayPlayer::SP_GIOCA, lastNumChiamate);
-                TRACE_DEBUG("[TRALG] Say Pt R041");
+                TRACE_DEBUG("[handleSayPopints] Say Pt R041");
             } else {
-                TRACE_DEBUG("[TRALG] Say Pt R042");
+                TRACE_DEBUG("[handleSayPopints] Say Pt R042");
             }
         } else {
             Chiama(eSayPlayer::SP_VADOVIA, lastNumChiamate);
-            TRACE_DEBUG("[TRALG] Say Pt R043");
+            TRACE_DEBUG("[handleSayPopints] Say Pt R043");
         }
     }
 }
@@ -976,63 +976,63 @@ void AlgPlayer::handleSayAmonte(int curr_mano, int pointsFirstCard,
     if (curr_mano == 1 && pointsFirstCard == 13 &&
         m_iPlayerOnTurn != m_iMyIndex) {
         Chiama(eSayPlayer::SP_NO, lastNumChiamate);
-        TRACE_DEBUG("[TRALG] Say MonteRisp R20No");
+        TRACE_DEBUG("[handleSayAmonte] Say MonteRisp R20No");
     } else if (pointsFirstCard > maxpoints && m_iNumManiWon == 0 &&
                m_iPlayerOnTurn == m_iMyIndex) {
         Chiama(eSayPlayer::SP_VABENE, lastNumChiamate);
-        TRACE_DEBUG("[TRALG] Say MonteRisp R13");
+        TRACE_DEBUG("[handleSayAmonte] Say MonteRisp R13");
     } else if (((maxpoints < 10 && m_iNumManiWon == 0) ||
                 (sum_points < 15 && m_iNumManiWon == 0)) &&
                m_iPlayerOnTurn == m_iMyIndex) {
         Chiama(eSayPlayer::SP_VABENE, lastNumChiamate);
-        TRACE_DEBUG("[TRALG] Say MonteRisp R14");
+        TRACE_DEBUG("[handleSayAmonte] Say MonteRisp R14");
     } else if ((m_iPlayerOnTurn != m_iMyIndex) && (curr_mano == 3) &&
                (pointsFirstCard < 10) && (maxpoints == 0)) {
         Chiama(eSayPlayer::SP_VABENE, lastNumChiamate);
-        TRACE_DEBUG("[TRALG] Say Va bene carta bassa giocata terza mano");
+        TRACE_DEBUG("[handleSayAmonte] Say Va bene carta bassa giocata terza mano");
     } else if (curr_mano == 3 && pointsFirstCard == -1 && maxpoints < 9) {
         Chiama(eSayPlayer::SP_VABENE, lastNumChiamate);
-        TRACE_DEBUG("[TRALG] Say MonteRisp R15A");
+        TRACE_DEBUG("[handleSayAmonte] Say MonteRisp R15A");
     } else if (m_iNumManiWon == 1 && m_iPlayerOnTurn == m_iMyIndex &&
                pointsFirstCard != -1 && maxpoints > pointsFirstCard) {
         Chiama(eSayPlayer::SP_NO, lastNumChiamate);
-        TRACE_DEBUG("[TRALG] Say MonteRisp R15D");
+        TRACE_DEBUG("[handleSayAmonte] Say MonteRisp R15D");
     } else if (m_iNumManiWon == 1 && m_iPlayerOnTurn == m_iMyIndex &&
                pointsFirstCard != -1 && maxpoints == pointsFirstCard &&
                m_arrIxPlayerWonHand[0] == m_iMyIndex) {
         Chiama(eSayPlayer::SP_NO, lastNumChiamate);
-        TRACE_DEBUG("[TRALG] Say MonteRispv R15B");
+        TRACE_DEBUG("[handleSayAmonte] Say MonteRispv R15B");
     } else if (m_iNumManiWon == 1 && maxpoints < 10 &&
                m_iPlayerOnTurn == m_iMyIndex) {
         if (SDL_rand(20) > 15) {
             Chiama(eSayPlayer::SP_NO, lastNumChiamate);
-            TRACE_DEBUG("[TRALG] Say MonteRisp R15C");
+            TRACE_DEBUG("[handleSayAmonte] Say MonteRisp R15C");
         } else {
             Chiama(eSayPlayer::SP_VABENE, lastNumChiamate);
-            TRACE_DEBUG("[TRALG] Say MonteRisp R16");
+            TRACE_DEBUG("[handleSayAmonte] Say MonteRisp R16");
         }
     } else if (curr_mano == 1 && sum_points < 23 && pointsFirstCard == -1) {
         Chiama(eSayPlayer::SP_VABENE, lastNumChiamate);
-        TRACE_DEBUG("[TRALG] Say MonteRisp R16B");
+        TRACE_DEBUG("[handleSayAmonte] Say MonteRisp R16B");
     } else if (m_bLastManoPatada &&
                ((pointsFirstCard < 10 && m_iOppIndex == m_iPlayerOnTurn) ||
                 maxpoints < 10)) {
         Chiama(eSayPlayer::SP_VABENE, lastNumChiamate);
-        TRACE_DEBUG("[TRALG] Say MonteRisp R16C");
+        TRACE_DEBUG("[handleSayAmonte] Say MonteRisp R16C");
     } else if (curr_mano > 1 && m_iNumManiWon == 0 && pointsFirstCard == -1 &&
                maxpoints < 12 && m_eScoreCurrent >= SC_INVIDO) {
         Chiama(eSayPlayer::SP_VABENE, lastNumChiamate);
-        TRACE_DEBUG("[TRALG] Say MonteRisp R16D");
+        TRACE_DEBUG("[handleSayAmonte] Say MonteRisp R16D");
     } else {
         Chiama(eSayPlayer::SP_NO, lastNumChiamate);
-        TRACE_DEBUG("[TRALG] Say MonteRisp R17");
+        TRACE_DEBUG("[handleSayAmonte] Say MonteRisp R17");
     }
 }
 
 void AlgPlayer::ALG_GicataScoreChange(eGiocataScoreState eNewScore) {
     m_eScoreCurrent = eNewScore;
     if (m_iMyIndex == 0) {
-        TRACE_DEBUG("[TRALG]Score changed to %d\n", eNewScore);
+        TRACE_DEBUG("[ALG_GicataScoreChange]Score changed to %d\n", eNewScore);
     }
 }
 

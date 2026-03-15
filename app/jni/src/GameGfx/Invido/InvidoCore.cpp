@@ -19,18 +19,19 @@ InvidoCore::~InvidoCore() {}
 
 void fncBind_PartitaEnd(void* self) {
     InvidoCore* pCore = (InvidoCore*)self;
-    return pCore->PartitaEnd();
+    return pCore->PartitaEnded();
 }
-void fncBind_NewGiocata(void* self, Uint8 playerStartIx) {
+void fncBind_PartitaStarted(void* self, Uint8 playerStartIx) {
     InvidoCore* pCore = (InvidoCore*)self;
-    return pCore->NewGiocata(playerStartIx);
+    return pCore->PartitaStarted(playerStartIx);
 }
 
 PartitaCb InvidoCore::prepPartitaDelegator() {
-    // Use only static otherwise you loose it (dangling pointer on stack variable)
-    // it works because InvidoCore is active only on one instance at the same time
-    static VPartitaCb const tc = {.PartitaEnd = (&fncBind_PartitaEnd),
-                                  .NewGiocata = (&fncBind_NewGiocata)};
+    // Use only static otherwise you loose it (dangling pointer on stack
+    // variable) it works because InvidoCore is active only on one instance at
+    // the same time
+    static VPartitaCb const tc = {.PartitaStarted = (&fncBind_PartitaStarted),
+                                  .PartitaEnded = (&fncBind_PartitaEnd)};
 
     return (PartitaCb){.tc = &tc, .self = this};
 }
@@ -61,10 +62,6 @@ void InvidoCore::Init(PlayersOnTable* pPlayersOnTable, Mazzo* pMazzo) {
 
     _numPlayers = _p_PlayersOnTable->GetNumOfPlayers();
 
-    for (int i = 0; i < MAX_NUM_PLAYER; i++) {
-        _vctpAlgPlayer[i] = NULL;
-    }
-
     _matchPoints.SetManoInstance(&_mano);
 }
 
@@ -85,49 +82,49 @@ void InvidoCore::NewMatch() {
     // don't change level during a match
     for (int i = 0; i < _numPlayers; i++) {
         Player* pPlayer = _p_PlayersOnTable->GetPlayerOnIndex(i);
-        _vctpAlgPlayer[i] = pPlayer->GetAlg();
-        if (_vctpAlgPlayer[i]) {
+        I_ALG_Player* pIAlgPlayer = pPlayer->GetAlg();
+        if (pIAlgPlayer) {
             // information before match begin
-            _vctpAlgPlayer[i]->ALG_SetPlayerIndex(pPlayer->GetIndex());
-            _vctpAlgPlayer[i]->ALG_SetCoreInterface(this);
-            _vctpAlgPlayer[i]->ALG_NewMatch(_numPlayers);
+            pIAlgPlayer->ALG_SetPlayerIndex(pPlayer->GetIndex());
+            pIAlgPlayer->ALG_SetCoreInterface(this);
             if (i == 0) {
                 if (_numPlayers == 2) {
                     // invido 2 player
-                    _vctpAlgPlayer[i]->ALG_SetOpponentIndex(1);
+                    pIAlgPlayer->ALG_SetOpponentIndex(1);
                 } else if (_numPlayers == 4) {
                     // invido 4 players
-                    _vctpAlgPlayer[i]->ALG_SetOpponentIndex(1);
-                    _vctpAlgPlayer[i]->ALG_SetOpponentIndex(3);
+                    pIAlgPlayer->ALG_SetOpponentIndex(1);
+                    pIAlgPlayer->ALG_SetOpponentIndex(3);
                 } else {
                     SDL_assert(0);
                 }
             } else if (i == 1) {
                 if (_numPlayers == 2) {
                     // invido 2 player
-                    _vctpAlgPlayer[i]->ALG_SetOpponentIndex(0);
+                    pIAlgPlayer->ALG_SetOpponentIndex(0);
                 } else {
                     // invido 4 players
-                    _vctpAlgPlayer[i]->ALG_SetOpponentIndex(0);
-                    _vctpAlgPlayer[i]->ALG_SetOpponentIndex(2);
+                    pIAlgPlayer->ALG_SetOpponentIndex(0);
+                    pIAlgPlayer->ALG_SetOpponentIndex(2);
                 }
             } else if (i == 2) {
-                _vctpAlgPlayer[i]->ALG_SetOpponentIndex(1);
-                _vctpAlgPlayer[i]->ALG_SetOpponentIndex(3);
+                pIAlgPlayer->ALG_SetOpponentIndex(1);
+                pIAlgPlayer->ALG_SetOpponentIndex(3);
             } else if (i == 3) {
-                _vctpAlgPlayer[i]->ALG_SetOpponentIndex(0);
-                _vctpAlgPlayer[i]->ALG_SetOpponentIndex(2);
+                pIAlgPlayer->ALG_SetOpponentIndex(0);
+                pIAlgPlayer->ALG_SetOpponentIndex(2);
             } else {
                 SDL_assert(0);
             }
+            _vctpAlgPlayer.push_back(pIAlgPlayer);
         }
     }
 
-    _mano.MatchStart(_numPlayers);
+    _mano.MatchStart(_numPlayers); // TODO set Num players, _mano is not for match state
     _p_PlayersOnTable->SetFirstOnMatch(firstPlayerIx);
     _p_StartPlayer = _p_PlayersOnTable->GetPlayerOnIndex(firstPlayerIx);
     _partita.NewPartita(firstPlayerIx);
-    _matchPoints.MatchStart(_numPlayers);
+    _matchPoints.MatchStart(_numPlayers); // TODO set Num players, _matchPoints is not for match state
 }
 
 void InvidoCore::NextAction() {
@@ -137,19 +134,18 @@ void InvidoCore::NextAction() {
 }
 
 void InvidoCore::resetCardInfoPlayers() {
-    for (int i = 0; i < MAX_NUM_PLAYER; i++) {
-        _cardInfos[i].clear();
+    for (VCT_CARDSPEC& cardInfos : _vctCardInfos) {
+        cardInfos.clear();
     }
 }
 
 bool InvidoCore::resetCard(Uint8 playerIx, const CardSpec& cardSpec) {
     bool bRet = false;
-    SDL_assert(playerIx >= 0 && playerIx < MAX_NUM_PLAYER);
 
-    auto it = _cardInfos[playerIx].begin();
-    while (it != _cardInfos[playerIx].end()) {
+    auto it = _vctCardInfos[playerIx].begin();
+    while (it != _vctCardInfos[playerIx].end()) {
         if (it->GetCardIndex() == cardSpec.GetCardIndex()) {
-            it = _cardInfos[playerIx].erase(it);  // Erase and get next
+            it = _vctCardInfos[playerIx].erase(it);  // Erase and get next
         } else {
             ++it;
         }
@@ -195,7 +191,7 @@ void InvidoCore::Giocata_Start(Uint8 playerIx) {
                 TRACE_DEBUG("[%s] , ix: %d, pt: %d", nextCard.GetName().c_str(),
                             nextCard.GetCardIndex(), nextCard.GetPoints());
 
-                _cardInfos[playerIx].push_back(nextCard);
+                _vctCardInfos[playerIx].push_back(nextCard);
             }
         }
         TRACE_DEBUG("\n");
@@ -222,43 +218,43 @@ void InvidoCore::Mano_End() {
     _p_PlHaveToPlay = _p_PlayersOnTable->SwitchToNextPlayer();
     _giocata.Update_Giocata(_p_PlHaveToPlay->GetIndex(), &_matchPoints);
 
-    for (int i = 0; i < _numPlayers; i++) {
-        if (_vctpAlgPlayer[i]) {
-            _vctpAlgPlayer[i]->ALG_ManoEnd(&_matchPoints);
+    for (I_ALG_Player* pIAlgPlayer : _vctpAlgPlayer) {
+        if (pIAlgPlayer) {
+            pIAlgPlayer->ALG_ManoEnd(&_matchPoints);
         }
     }
     NotifyScript(SCR_NFY_ALGMANOEND);
 }
 
 void InvidoCore::Giocata_AMonte() {
-    _matchPoints.AMonte();
-    _giocata.Update_Giocata(NOT_VALID_INDEX, &_matchPoints);
+    _matchPoints.GiocataAMonte();
+    _giocata.GiocataAMonte();
 }
 
 void InvidoCore::Player_VaVia(Uint8 playerIx) {
-    // SDL_assert(0);
-    _matchPoints.PlayerVaVia(playerIx);
-
-    _giocata.Update_Giocata(playerIx, &_matchPoints);
+    Player* pPlayer = _p_PlayersOnTable->PeekNextPlayerToIx(playerIx);
+    Uint8 playerWinnerIx = pPlayer->GetIndex();
+    _matchPoints.GiocataEndWithWinner(playerWinnerIx);
+    _giocata.PlayerGiocataWins(playerWinnerIx);
 }
 
 void InvidoCore::ChangeGiocataScore(eGiocataScoreState eNewScore) {
-    for (int i = 0; i < _numPlayers; i++) {
-        if (_vctpAlgPlayer[i]) {
-            _vctpAlgPlayer[i]->ALG_GicataScoreChange(eNewScore);
+    for (I_ALG_Player* pIAlgPlayer : _vctpAlgPlayer) {
+        if (pIAlgPlayer) {
+            pIAlgPlayer->ALG_GicataScoreChange(eNewScore);
         }
     }
 }
 
 void InvidoCore::Giocata_End() {
     // calculate points
-    _matchPoints.GiocataEnd();
+    //_matchPoints.GiocataEnd();
     // update match state machine
-    _partita.Update_Partita(&_matchPoints);
+    //_partita.Update_Partita(&_matchPoints);
 
-    for (int i = 0; i < _numPlayers; i++) {
-        if (_vctpAlgPlayer[i]) {
-            _vctpAlgPlayer[i]->ALG_GiocataEnd(&_matchPoints);
+    for (I_ALG_Player* pIAlgPlayer : _vctpAlgPlayer) {
+        if (pIAlgPlayer) {
+            pIAlgPlayer->ALG_GiocataEnd(&_matchPoints);
         }
     }
 
@@ -266,31 +262,36 @@ void InvidoCore::Giocata_End() {
 }
 
 // Partita CB - start
-void InvidoCore::PartitaEnd() {
-    for (int i = 0; i < _numPlayers; i++) {
-        if (_vctpAlgPlayer[i]) {
-            _vctpAlgPlayer[i]->ALG_MatchEnd(&_matchPoints);
+void InvidoCore::PartitaEnded() {
+    for (I_ALG_Player* pIAlgPlayer : _vctpAlgPlayer) {
+        if (pIAlgPlayer) {
+            pIAlgPlayer->ALG_MatchEnd(&_matchPoints);
         }
     }
     NotifyScript(SCR_NFY_ALGMATCHEND);
 }
 
-void InvidoCore::NewGiocata(Uint8 playerStartIx) {
+void InvidoCore::PartitaStarted(Uint8 playerStartIx) {
+    for (I_ALG_Player* pIAlgPlayer : _vctpAlgPlayer) {
+        if (pIAlgPlayer) {
+            pIAlgPlayer->ALG_NewMatch(_numPlayers);
+        }
+    }
     _giocata.NewGiocata(playerStartIx);
 }
 // Partita CB  - end
 
 void InvidoCore::AbandonGame(Uint8 playerIx) {
-    Player* pPlayer = _p_PlayersOnTable->PeekNextPlayerToIx(playerIx);
-    SDL_assert(pPlayer);
+    Player* pWinnerPlayer = _p_PlayersOnTable->PeekNextPlayerToIx(playerIx);
+    SDL_assert(pWinnerPlayer);
     // give the victory to the next player
-    Uint8 nextPlayerIx = pPlayer->GetIndex();
+    Uint8 winnerPlayerIx = pWinnerPlayer->GetIndex();
 
-    _matchPoints.SetTheWinner(nextPlayerIx);
+    _matchPoints.SetTheWinnerBecauseAbandon(winnerPlayerIx);
 
-    for (int i = 0; i < _numPlayers; i++) {
-        if (_vctpAlgPlayer[i]) {
-            _vctpAlgPlayer[i]->ALG_MatchEnd(&_matchPoints);
+    for (I_ALG_Player* pIAlgPlayer : _vctpAlgPlayer) {
+        if (pIAlgPlayer) {
+            pIAlgPlayer->ALG_MatchEnd(&_matchPoints);
         }
     }
 }
@@ -313,18 +314,18 @@ void InvidoCore::NtyWaitingPlayer_ToResp(Uint8 playerIx) {
 }
 
 void InvidoCore::NtyPlayerSayBuiada(Uint8 playerIx) {
-    for (int i = 0; i < _numPlayers; i++) {
-        if (_vctpAlgPlayer[i]) {
-            _vctpAlgPlayer[i]->ALG_PlayerSaidWrong(playerIx);
+    for (I_ALG_Player* pIAlgPlayer : _vctpAlgPlayer) {
+        if (pIAlgPlayer) {
+            pIAlgPlayer->ALG_PlayerSaidWrong(playerIx);
         }
     }
 }
 
 CardSpec* InvidoCore::checkValidCardPlayed(Uint8 playerIx,
                                            const CardSpec& cardSpec) {
-    SDL_assert(playerIx >= 0 && playerIx < MAX_NUM_PLAYER);
     CardSpec* pCardplayed = NULL;
-    for (CardSpec& cardInHand : _cardInfos[playerIx]) {
+    VCT_CARDSPEC vctCards = _vctCardInfos[playerIx];
+    for (CardSpec& cardInHand : vctCards) {
         if (cardInHand == cardSpec) {
             pCardplayed = &cardInHand;
         }
@@ -347,10 +348,10 @@ bool InvidoCore::VaDentro(Uint8 playerIx, const CardSpec& cardSpec) {
 
         _matchPoints.VaDentro(playerIx);
 
-        for (int i = 0; i < _numPlayers; i++) {
+        for (I_ALG_Player* pIAlgPlayer : _vctpAlgPlayer) {
             // notify all players that a card was played
-            if (_vctpAlgPlayer[i]) {
-                _vctpAlgPlayer[i]->ALG_PlayerHasVadoDentro(playerIx);
+            if (pIAlgPlayer) {
+                pIAlgPlayer->ALG_PlayerHasVadoDentro(playerIx);
             }
         }
 
@@ -378,10 +379,10 @@ bool InvidoCore::PlayCard(Uint8 playerIx, const CardSpec& cardSpec) {
         // update match points
         _matchPoints.PlayerPlay(playerIx, *pCardplayed);
 
-        for (int i = 0; i < _numPlayers; i++) {
+        for (I_ALG_Player* pIAlgPlayer : _vctpAlgPlayer) {
             // notify all players that a card was played
-            if (_vctpAlgPlayer[i]) {
-                _vctpAlgPlayer[i]->ALG_PlayerHasPlayed(playerIx, *pCardplayed);
+            if (pIAlgPlayer) {
+                pIAlgPlayer->ALG_PlayerHasPlayed(playerIx, *pCardplayed);
             }
         }
 
@@ -396,10 +397,10 @@ bool InvidoCore::Say(Uint8 playerIx, eSayPlayer eSay) {
     bool bRes = false;
     if (_mano.Player_Say(playerIx, eSay)) {
         //  what he said is acceptable on the game
-        for (int i = 0; i < _numPlayers; i++) {
+        for (I_ALG_Player* pIAlgPlayer : _vctpAlgPlayer) {
             // notify all players that a card was played
-            if (_vctpAlgPlayer[i]) {
-                _vctpAlgPlayer[i]->ALG_PlayerHasSaid(playerIx, eSay);
+            if (pIAlgPlayer) {
+                pIAlgPlayer->ALG_PlayerHasSaid(playerIx, eSay);
             }
         }
         bRes = true;

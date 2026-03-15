@@ -9,128 +9,99 @@
 
 namespace invido {
 
-class Mano;
-class ManoInfo {
-   public:
-    ManoInfo() {}
-    void Reset() {
-        isPlayed = false;
-        isPata = false;
-        playerIndex = NOT_VALID_INDEX;
-    }
-    int playerIndex;
-    bool isPlayed;
-    bool isPata;
+struct ManoInfo {
+    Uint8 _playerIndex;
+    bool _isPlayed;
+    bool _isPata;
 };
-class GiocataInfo {
-   public:
-    GiocataInfo() {
-        score = SC_AMONTE;
-        playerIndex = NOT_VALID_INDEX;
-    }
-    GiocataInfo(int iVal, eGiocataScoreState eVal) {
-        score = eVal;
-        playerIndex = iVal;
-    }
-    int playerIndex;
-    eGiocataScoreState score;
-};
+typedef std::vector<ManoInfo> VCT_MANOINFO;
 
+struct GiocataInfo {
+    Uint8 _playerIndex;
+    eGiocataScoreState _score;
+};
 typedef std::vector<GiocataInfo> VCT_GIOCATAINFO;
 
-class CardPlayed {
-   public:
-    CardPlayed() {}
-    CardSpec cardSpec;
-    int playerIx;
+struct CardPlayed {
+    CardSpec _cardSpec;
+    Uint8 _playerIx;
 };
+typedef std::vector<CardPlayed> VCP_CARDPLAYED;
 
 class MatchPoints : public I_MatchScore {
-    enum eGiocataEndState {
-        GES_ON_GOING,
-        GES_HAVE_WINNER,
-        GES_PATADA,
-        GES_AMONTE
-    };
-
    public:
     MatchPoints();
     virtual ~MatchPoints();
     void MatchStart(int iNumPlayer);
+
     void GiocataStart();
-    void GiocataEnd();
-    void PlayerPlay(int iPlayerIx, const CardSpec& cardSpec);
-    void VaDentro(int iPlayerIx);
+    void GiocataEndWithWinner(Uint8 playerWinIx);
+    void GiocataPatada();
+    void GiocataAMonte();
+
+    void PlayerPlay(Uint8 playerIx, const CardSpec& cardSpec);
+    void VaDentro(Uint8 playerIx);
     void ManoEnd();
     void ChangeCurrentScore(eGiocataScoreState eVal, int iPlayer);
-    void GetManoInfo(int iManoNum, int* piPlayerIx, bool* pbIsPlayed,
-                     bool* pbIsPata);
+    void GetManoInfo(int iManoNum, Uint8* pplayerIx, bool* pisPlayed,
+                     bool* pisPata);
     void GetGiocataInfo(int iNumGiocata, GiocataInfo* pGiocInfo);
-    int GetNumGiocateInCurrMatch() { return (int)_vctGiocataInfo.size(); }
-    void PlayerVaVia(int iPlayerIx);
-    void SetManoInstance(Mano* pVal) { _p_Mano = pVal; }
-    void AMonte();
-    void SetTheWinner(int iPlayerIx);
+    size_t GetNumGiocateInCurrMatch() { return _vctGiocataInfo.size(); }
+    // void PlayerGiocataWins(Uint8 playerWinIx);
+    // void SetManoInstance(Mano* pVal) { _p_Mano = pVal; }
+    //void AMonte();
+    void SetTheWinnerBecauseAbandon(Uint8 playerIx);
     int GetCurrNumCardPlayed() { return _numCardsPlayed; }
 
-    // interface I_MatchScore - begin
-    virtual bool IsGiocatEnd();
-    virtual bool IsGiocataMonte() {
-        if (_eIsGiocataEnd == GES_AMONTE)
-            return true;
-        else
-            return false;
-    }
-    virtual bool IsManoPatada() { return _isManoPatatda; }
-    virtual bool IsGiocataPatada() {
-        if (_eIsGiocataEnd == GES_PATADA)
-            return true;
-        else
-            return false;
-    }
-    virtual bool IsMatchEnd() {
-        if (_playerMatchWin != NOT_VALID_INDEX)
-            return true;
-        else
-            return false;
-    }
-    virtual int GetManoWinner() { return _playerWonsHand; }
-    virtual int GetGiocataWinner() { return _playerGiocataWin; }
-    virtual int GetMatchWinner() { return _playerMatchWin; }
-    virtual eGiocataScoreState GetCurrScore() { return _currentScore; }
-    virtual int GetPointsPlayer(Uint8 playerIx) {
-        SDL_assert(playerIx >= 0 && playerIx < MAX_NUM_PLAYER);
+    //  I_MatchScore - begin
+    bool IsGiocataPatada() { return _isGiocataPatada; }
+    bool IsGiocataMonte() { return _isGiocataAMonte; }
+    bool IsManoPatada() { return _isManoPatatda; }
+
+    bool IsMatchEnd() { _isMatchEnd; }
+
+    Uint8 GetManoWinner() { return _playerWonsHand; }
+    Uint8 GetGiocataWinner() { return _playerGiocataWin; }
+    Uint8 GetMatchWinner() { return _playerMatchWin; }
+
+    eGiocataScoreState GetCurrScore() { return _currentScore; }
+    int GetPointsPlayer(Uint8 playerIx) {
+        SDL_assert(playerIx < _vctPlayerPoints.size());
         return _vctPlayerPoints[playerIx];
     }
-    virtual int GetManoNum() { return _manoRound; }
-    virtual bool IsGameAbandoned() { return _isGameAbandoned; }
-    // interface I_MatchScore - end
+    int GetManoNum() { return _manoRound; }
+    bool IsGameAbandoned() { return _isGameAbandoned; }
+    // I_MatchScore - end
 
    private:
     void beginSpecialTurn();
 
    private:
-    int _vctPlayerPoints[MAX_NUM_PLAYER];
-    int _vctHandWons[MAX_NUM_PLAYER];
+    VCT_INT _vctPlayerPoints;
+    VCT_INT _vctHandWons;
+    VCT_MANOINFO _vctManoInfo;
+    VCT_GIOCATAINFO _vctGiocataInfo;
+    VCP_CARDPLAYED _vctCardPlayed;
     eGiocataScoreState _currentScore;
-    int _playerChangeScore;
-    CardPlayed _vctCardPlayed[MAX_NUM_PLAYER];
-    int _numCardsPlayed;
-    int _playerWonsHand;
-    int _numPlayers;
-    bool _isManoPatatda;
-    eGiocataEndState _eIsGiocataEnd;
-    int _playerFirstHand;
+    size_t _numCardsPlayed;
     int _manoRound;
-    int _playerGiocataWin;
-    int _playerMatchWin;
+    int _numPlayers;
     int _scoreGoal;
+
+    Uint8 _playerWonsHand;
+    Uint8 _playerChangeScore;
+    Uint8 _playerFirstHand;
+    Uint8 _playerGiocataWin;
+    Uint8 _playerMatchWin;
+
+    // Mano* _p_Mano;
     bool _isMatchInSpecialScore;
     bool _isOldManoPatada;
-    ManoInfo _ManoDetailInfo[NUM_CARDS_HAND];
-    VCT_GIOCATAINFO _vctGiocataInfo;
-    Mano* _p_Mano;
     bool _isGameAbandoned;
+    bool _isGiocataPatada;
+    bool _isGiocataAMonte;
+    bool _isMatchEnd;
+    bool _isManoPatatda;
 };
 
 }  // namespace invido
