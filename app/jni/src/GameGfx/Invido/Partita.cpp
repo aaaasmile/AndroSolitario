@@ -8,23 +8,23 @@
 using namespace invido;
 
 Partita::Partita() {
-    m_pGiocata = NULL;
-    m_pInvidoCore = NULL;
-    m_PartitaState = WAIT_NEW_PARTITA;
-    m_lGiocStart = 0;
+    _pGiocata = NULL;
+    _pInvidoCore = NULL;
+    _PartitaState = WAIT_NEW_PARTITA;
+    _playerStartIx = 0;
     _eNextAction = NO_ACTION;
 }
 
-LPErrInApp Partita::NewPartita(long lPlayerIx) {
-    m_lGiocStart = lPlayerIx;
+LPErrInApp Partita::NewPartita(Uint8 playerStartIx) {
+    _playerStartIx = playerStartIx;
 
-    if (m_PartitaState != PARTITA_ONGOING) {
-        m_PartitaState = PARTITA_ONGOING;
+    if (_PartitaState != PARTITA_ONGOING) {
+        _PartitaState = PARTITA_ONGOING;
 
-        m_pGiocata->NewGiocata(m_lGiocStart);
+        _pGiocata->NewGiocata(_playerStartIx);
     } else {
         return ERR_UTIL::ErrorCreate("Partita state is not correct %d",
-                                     m_PartitaState);
+                                     _PartitaState);
     }
     return NULL;
 }
@@ -32,8 +32,8 @@ LPErrInApp Partita::NewPartita(long lPlayerIx) {
 void Partita::NextAction() {
     switch (_eNextAction) {
         case ACT_PARTITA_END:
-            // partita is eneded
-            m_pInvidoCore->Partita_End();
+            // partita is ended
+            _pInvidoCore->Partita_End();
             break;
 
         case NO_ACTION:
@@ -50,31 +50,31 @@ void Partita::NextAction() {
 
 LPErrInApp Partita::Update_Partita(I_MatchScore* pIScore) {
     SDL_assert(pIScore);
-    SDL_assert(m_PartitaState == PARTITA_ONGOING);
+    SDL_assert(_PartitaState == PARTITA_ONGOING);
 
     if (pIScore->IsMatchEnd()) {
         // match is ended
         _eNextAction = ACT_PARTITA_END;
-        m_PartitaState = PARTITA_END;
+        _PartitaState = PARTITA_END;
     } else {
         // start a new giocata
-        switch (m_lGiocStart) {
+        switch (_playerStartIx) {
             case 0:
-                m_lGiocStart = 1;
+                _playerStartIx = 1;
                 break;
             case 1:
-                m_lGiocStart = 0;
+                _playerStartIx = 0;
                 break;
             default:
                 return ERR_UTIL::ErrorCreate(
                     "[Update_Partita] Index out of bound");
         }
-        m_pGiocata->NewGiocata(m_lGiocStart);
+        _pGiocata->NewGiocata(_playerStartIx);
     }
     return NULL;
 }
 
 void Partita::Reset() {
-    m_PartitaState = WAIT_NEW_PARTITA;
-    m_lGiocStart = 0;
+    _PartitaState = WAIT_NEW_PARTITA;
+    _playerStartIx = 0;
 }

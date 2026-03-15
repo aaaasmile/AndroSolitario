@@ -30,6 +30,7 @@ class InvidoCore : public I_CORE_Game {
     int GetNumOfPlayers() { return _numPlayers; }
     MatchPoints* GetMatchPointsInstance() { return &_matchPoints; }
     PlayersOnTable* GetTable() { return _p_PlayersOnTable; }
+    bool IsMatchOnGoing() { return _partita.IsOngoing(); }
 
     // functions related to the script engine
     void NotifyScript(eScriptNotification eVal);
@@ -38,7 +39,7 @@ class InvidoCore : public I_CORE_Game {
     void Script_Play(Uint8 playerIx, CardSpec& CardPlayed);
     void NotifyScriptAlgorithm(Uint8 playerIx, eScriptNotification eVal);
     void Script_MatchEnd();
-    
+
     // functions called from Mano
     void Mano_End();
     void NtyWaitingPlayer_Toplay(Uint8 playerIx);
@@ -63,7 +64,6 @@ class InvidoCore : public I_CORE_Game {
     void AbandonGame(Uint8 playerIx);
     void GetAdmittedCommands(VCT_COMMANDS& vct_Commands, Uint8 playerIxIndex);
     void GetMoreCommands(VCT_COMMANDS& vct_Commands, Uint8 playerIxIndex);
-    
 
    private:
     CardSpec* checkValidCardPlayed(Uint8 playerIx, const CardSpec& cardSpec);

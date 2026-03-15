@@ -4,7 +4,6 @@
 #include "ErrorInfo.h"
 #include "InvidoCoreDef.h"
 
-
 namespace invido {
 
 class InvidoCore;
@@ -18,18 +17,21 @@ class Partita {
     Partita();
 
    public:
-    void SetCore(InvidoCore* pVal) { m_pInvidoCore = pVal; }
-    void SetGiocata(Giocata* pVal) { m_pGiocata = pVal; }
-    LPErrInApp NewPartita(long lPlayerIx);
+    void SetCore(InvidoCore* pVal) { _pInvidoCore = pVal; }
+    void SetGiocata(Giocata* pVal) { _pGiocata = pVal; }
+    LPErrInApp NewPartita(Uint8 playerStartIx);
     LPErrInApp Update_Partita(I_MatchScore* pIScore);
     void Reset();
     void NextAction();
+    bool IsOngoing() {
+        return _PartitaState == ePartitaStatus::PARTITA_ONGOING;
+    }
 
    private:
-    ePartitaStatus m_PartitaState;
-    InvidoCore* m_pInvidoCore;
-    Giocata* m_pGiocata;
-    long m_lGiocStart;
+    ePartitaStatus _PartitaState;
+    InvidoCore* _pInvidoCore;
+    Giocata* _pGiocata;
+    Uint8 _playerStartIx;
     eFN_ACTION _eNextAction;
 };
 

@@ -23,6 +23,11 @@ void testSimpleMatch() {
     playersOnTable.AddPlayer(player1);
     playersOnTable.AddPlayer(player2);
     invidoCore.Init(&playersOnTable, &mazzo);
+
+    invidoCore.NewMatch();
+    while(invidoCore.IsMatchOnGoing()){
+        invidoCore.NextAction();
+    }
     
     std::cout << "Match tests PASSED" << std::endl;
 }
