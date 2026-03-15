@@ -15,6 +15,28 @@ InvidoCore::InvidoCore() {
 
 InvidoCore::~InvidoCore() {}
 
+// trait Partita - Start
+
+void fncBind_PartitaEnd(void* self) {
+    InvidoCore* pCore = (InvidoCore*)self;
+    return pCore->PartitaEnd();
+}
+void fncBind_NewGiocata(void* self, Uint8 playerStartIx) {
+    InvidoCore* pCore = (InvidoCore*)self;
+    return pCore->NewGiocata(playerStartIx);
+}
+
+PartitaCb InvidoCore::prepPartitaDelegator() {
+    // Use only static otherwise you loose it (dangling pointer on stack variable)
+    // it works because InvidoCore is active only on one instance at the same time
+    static VPartitaCb const tc = {.PartitaEnd = (&fncBind_PartitaEnd),
+                                  .NewGiocata = (&fncBind_NewGiocata)};
+
+    return (PartitaCb){.tc = &tc, .self = this};
+}
+
+// trait Partita - End
+
 void InvidoCore::Init(PlayersOnTable* pPlayersOnTable, Mazzo* pMazzo) {
     TRACE_DEBUG("InvidoCore initialize\n");
 
@@ -26,8 +48,9 @@ void InvidoCore::Init(PlayersOnTable* pPlayersOnTable, Mazzo* pMazzo) {
 
     _eGameType = LOCAL_TYPE;
 
-    _partita.SetCore(this);
-    _partita.SetGiocata(&_giocata);
+    PartitaCb delCb = prepPartitaDelegator();
+    _partita.SetPartitaCB(delCb);
+    //_partita.SetGiocata(&_giocata);
 
     _giocata.SetCore(this);
     _giocata.SetPartita(&_partita);
@@ -242,7 +265,8 @@ void InvidoCore::Giocata_End() {
     NotifyScript(SCR_NFY_ALGGIOCATAEND);
 }
 
-void InvidoCore::Partita_End() {
+// Partita CB - start
+void InvidoCore::PartitaEnd() {
     for (int i = 0; i < _numPlayers; i++) {
         if (_vctpAlgPlayer[i]) {
             _vctpAlgPlayer[i]->ALG_MatchEnd(&_matchPoints);
@@ -250,6 +274,11 @@ void InvidoCore::Partita_End() {
     }
     NotifyScript(SCR_NFY_ALGMATCHEND);
 }
+
+void InvidoCore::NewGiocata(Uint8 playerStartIx) {
+    _giocata.NewGiocata(playerStartIx);
+}
+// Partita CB  - end
 
 void InvidoCore::AbandonGame(Uint8 playerIx) {
     Player* pPlayer = _p_PlayersOnTable->PeekNextPlayerToIx(playerIx);

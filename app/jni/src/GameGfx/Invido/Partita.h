@@ -3,6 +3,7 @@
 
 #include "ErrorInfo.h"
 #include "InvidoCoreDef.h"
+#include "InvidoTraits.h"
 
 namespace invido {
 
@@ -17,8 +18,7 @@ class Partita {
     Partita();
 
    public:
-    void SetCore(InvidoCore* pVal) { _pInvidoCore = pVal; }
-    void SetGiocata(Giocata* pVal) { _pGiocata = pVal; }
+    void SetPartitaCB(PartitaCb& partitaCb) { _partitaCb = partitaCb; }
     LPErrInApp NewPartita(Uint8 playerStartIx);
     LPErrInApp Update_Partita(I_MatchScore* pIScore);
     void Reset();
@@ -29,8 +29,7 @@ class Partita {
 
    private:
     ePartitaStatus _PartitaState;
-    InvidoCore* _pInvidoCore;
-    Giocata* _pGiocata;
+    PartitaCb _partitaCb;
     Uint8 _playerStartIx;
     eFN_ACTION _eNextAction;
 };

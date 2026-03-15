@@ -8,8 +8,6 @@
 using namespace invido;
 
 Partita::Partita() {
-    _pGiocata = NULL;
-    _pInvidoCore = NULL;
     _PartitaState = WAIT_NEW_PARTITA;
     _playerStartIx = 0;
     _eNextAction = NO_ACTION;
@@ -21,7 +19,7 @@ LPErrInApp Partita::NewPartita(Uint8 playerStartIx) {
     if (_PartitaState != PARTITA_ONGOING) {
         _PartitaState = PARTITA_ONGOING;
 
-        _pGiocata->NewGiocata(_playerStartIx);
+        _partitaCb.tc->NewGiocata(_partitaCb.self, _playerStartIx);
     } else {
         return ERR_UTIL::ErrorCreate("Partita state is not correct %d",
                                      _PartitaState);
@@ -33,7 +31,7 @@ void Partita::NextAction() {
     switch (_eNextAction) {
         case ACT_PARTITA_END:
             // partita is ended
-            _pInvidoCore->Partita_End();
+            _partitaCb.tc->PartitaEnd(_partitaCb.self);
             break;
 
         case NO_ACTION:
@@ -69,7 +67,7 @@ LPErrInApp Partita::Update_Partita(I_MatchScore* pIScore) {
                 return ERR_UTIL::ErrorCreate(
                     "[Update_Partita] Index out of bound");
         }
-        _pGiocata->NewGiocata(_playerStartIx);
+        _partitaCb.tc->NewGiocata(_partitaCb.self, _playerStartIx);
     }
     return NULL;
 }

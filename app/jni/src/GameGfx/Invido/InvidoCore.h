@@ -52,7 +52,9 @@ class InvidoCore : public I_CORE_Game {
     void Giocata_End();
     void Giocata_Start(Uint8 playerIx);
 
-    void Partita_End();
+    // Partita callbacks
+    void PartitaEnd();
+    void NewGiocata(Uint8 playerIx);
 
     void NewMatch();
     void NextAction();
@@ -70,6 +72,7 @@ class InvidoCore : public I_CORE_Game {
     void resetCardInfoPlayers();
     bool resetCard(Uint8 playerIx, const CardSpec& cardSpec);
     Uint8 getNewMatchFirstPlayer();
+    PartitaCb prepPartitaDelegator();
 
    private:
     PlayersOnTable* _p_PlayersOnTable;
