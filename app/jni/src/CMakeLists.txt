@@ -11,7 +11,7 @@ else()
   set(UNIX_SYS OFF)
 endif()
 
-# Solitario program
+# App program
 set(SOURCES App/MusicManager.cpp
             App/AppGfx.cpp
             App/CardGfx.cpp

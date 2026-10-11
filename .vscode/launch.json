@@ -78,7 +78,7 @@
             ]
         },
         {
-            "name": "Windows Debug MySys2",
+            "name": "Windows solitario Debug MySys2",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/solitario.exe",
@@ -138,7 +138,7 @@
             ]
         },
         {
-            "name": "Windows Portrait Debug MySys2",
+            "name": "Windows solitario Portrait Debug MySys2",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/solitario.exe",

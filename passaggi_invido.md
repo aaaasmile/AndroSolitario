@@ -39,6 +39,8 @@ E in buildinvido subdir ci sarà il file InvidoTest.exe.
 Nell'esecuzione di InvidoTest.exe al primo errore o assertion error si pianta. 
 
     .\InvidoTest.exe
+Nota che è possibile eseguire il debug di InvidoTest in Visual Code in windows.
+Basta fare partire il Debugger su "Windows Debug MySys2 - InvidoTESTS".
 
 ## Compilazione con WSL2 target Linux
 Nota che con WSL2 non è possibile usare Copilot in agent mode, solo in chat mode.
@@ -47,3 +49,19 @@ Nota che con WSL2 non è possibile usare Copilot in agent mode, solo in chat mod
     mkdir buildinvido && cd buildinvido
     cmake ../app/jni/  -DSDL_WAYLAND=OFF -DINVIDOPRJ=ON -DBUILD_INVIDO_TESTS=ON
     cmake --build .
+
+## Sorgenti e selezione
+L'idea è quella di avere tutti i files compilati (Solitario e Invido) e poi attraverso
+la classe GameSelector si esegue lo switch del gioco. Lo switch avviene usando 
+GameSettings. 
+Però non mi convince. Se compilo il gioco invido, ho il file invido.exe. Per il solitario
+solitario.exe. Non sono nomi di programmi che vanno bene per entrambi i giochi con
+uno switcher.
+Probabilmente è meglio avere dei singoli giochi anche perché nella distribuzione
+uso i file singoli (web, itch, android). Una collezione di tutti i giochi si portrebbe 
+fare alla fine.
+Il menu HighScore in Invido non ha molto senso. Le opzioni sono diverse, nell'invido
+ci sono delle opzioni in più.
+
+## TODO
+Il testSimpleMatch non funziona (callback in giocata)
