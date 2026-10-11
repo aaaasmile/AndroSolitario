@@ -101,6 +101,8 @@ class Languages {
         ID_S_NO,
         ID_S_GIOCA,
         ID_S_VADODENTRO,
+        WINS,
+        LOSTS,
         TOT_STRINGS
     };
 

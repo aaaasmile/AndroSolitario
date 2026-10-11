@@ -102,6 +102,7 @@ typedef struct {
 // trait for update high score
 typedef struct {
     LPErrInApp (*const SaveScore)(void* self, int64_t score, int numCard);
+    LPErrInApp (*const SaveScoreWinLost)(void* self, uint16_t wins, uint16_t losts);
 } VUpdateHighScoreCb, *LPVUpdateHighScoreCb;
 
 typedef struct {

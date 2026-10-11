@@ -163,6 +163,10 @@ LPErrInApp HighScore::SaveScore(int64_t score, int numCard) {
     return NULL;
 }
 
+LPErrInApp HighScore::SaveScoreWinLost(uint16_t wins, uint16_t losts) {
+    return ERR_UTIL::ErrorCreate("Not supported\n");
+}
+
 LPErrInApp HighScore::Load() {
 #if PLATFORM_EMS
     TRACE_DEBUG("[loadGameHighScore] from the browser storage \n");

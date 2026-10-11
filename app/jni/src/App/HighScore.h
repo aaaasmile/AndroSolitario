@@ -19,6 +19,8 @@ typedef struct {
     std::string Name;
     uint16_t Score;
     uint8_t NumCard;
+    uint16_t Wins;
+    uint16_t Losts;
 } ScoreInfo;
 
 class HighScore {
@@ -39,6 +41,7 @@ class HighScore {
     LPErrInApp Load();
     LPErrInApp Save();
     LPErrInApp SaveScore(int64_t score, int numCard);
+    LPErrInApp SaveScoreWinLost(uint16_t wins, uint16_t losts);
     LPErrInApp Show(SDL_Surface* screen, SDL_Surface* pSurfTitle,
                     UpdateScreenCb& fnUpdateScreen);
     LPErrInApp HandleEvent(SDL_Event* pEvent);

@@ -84,6 +84,8 @@ Languages::Languages() {
     _mtxLangString[LANG_DIAL_BREDA][ON] = "impià";
     _mtxLangString[LANG_DIAL_BREDA][OFF] = "smors";
     _mtxLangString[LANG_DIAL_BREDA][PLEASE_ENTER_NAME] = "Al to nom";
+    _mtxLangString[LANG_DIAL_BREDA][WINS] = "Vinsidi";
+    _mtxLangString[LANG_DIAL_BREDA][LOSTS] = "Persi";
 
     // italiano
     _mtxLangString[LANG_ITA][ID_START] = "Inizia";
@@ -157,6 +159,8 @@ Languages::Languages() {
     _mtxLangString[LANG_ITA][ON] = "ON";
     _mtxLangString[LANG_ITA][OFF] = "OFF";
     _mtxLangString[LANG_ITA][PLEASE_ENTER_NAME] = "Nome del giocatore";
+    _mtxLangString[LANG_ITA][WINS] = "Vinte";
+    _mtxLangString[LANG_ITA][LOSTS] = "Perse";
 
     // English
     _mtxLangString[LANG_ENG][ID_START] = "Start";
@@ -231,6 +235,8 @@ Languages::Languages() {
     _mtxLangString[LANG_ENG][ON] = "ON";
     _mtxLangString[LANG_ENG][OFF] = "OFF";
     _mtxLangString[LANG_ENG][PLEASE_ENTER_NAME] = "Please enter the name";
+    _mtxLangString[LANG_ENG][WINS] = "Wins";
+    _mtxLangString[LANG_ENG][LOSTS] = "Losts";
 }
 
 std::string Languages::GetStringId(eStringID eId) {

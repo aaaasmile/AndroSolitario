@@ -32,16 +32,30 @@ HighScore::HighScore() {
     _lastUpTimestamp = 0;
     _state = HighScore::READY_TO_START;
 
-    for (int k = 0; k < 10; k++) {
-        _scoreInfo[k].Score = 5940 - (k * 250);
+    for (uint16_t k = 0; k < 10; k++) {
+        _scoreInfo[k].Wins = 16 - k;
+        _scoreInfo[k].Losts = 0;
+        if (k > 0) {
+            _scoreInfo[k].Wins = 14 - k;
+            _scoreInfo[k].Losts = 1;
+        }
         if (k > 1) {
-            _scoreInfo[k].Score = _scoreInfo[k].Score - (k - 1) * 50;
+            _scoreInfo[k].Wins = 12 - k;
+            _scoreInfo[k].Losts = k + 2;
         }
         if (k > 2) {
-            _scoreInfo[k].Score = _scoreInfo[k].Score - (k - 2) * 20;
+            _scoreInfo[k].Wins -= 1;
+            _scoreInfo[k].Losts = k + 1;
         }
-        _scoreInfo[k].Name = "Re dal sulitari";
-        _scoreInfo[k].NumCard = 40;
+        if (k > 5) {
+            _scoreInfo[k].Wins -= 1;
+            _scoreInfo[k].Losts = k + 2;
+        }
+        if (k > 8) {
+            _scoreInfo[k].Wins = 0;
+            _scoreInfo[k].Losts = k + 5;
+        }
+        _scoreInfo[k].Name = "Re Invido";
     }
 }
 
@@ -86,8 +100,8 @@ LPErrInApp HighScore::Save() {
     for (int k = 0; k < NUMOFSCORE; k++) {
         std::string kstr = std::to_string(k);
         std::string val = _scoreInfo[k].Name + ":" +
-                          std::to_string(_scoreInfo[k].Score) + ":" +
-                          std::to_string(_scoreInfo[k].NumCard);
+                          std::to_string(_scoreInfo[k].Wins) + ":" +
+                          std::to_string(_scoreInfo[k].Losts);
         saveGameHighScore(kstr.c_str(), val.c_str());
     }
 #else
@@ -116,13 +130,12 @@ LPErrInApp HighScore::Save() {
             return ERR_UTIL::ErrorCreate("SDL_RWwrite name highscore %s\n",
                                          SDL_GetError());
         }
-        if (SDL_WriteU16LE(dst, _scoreInfo[k].Score) == 0) {
-            return ERR_UTIL::ErrorCreate("SDL_RWwrite score highscore %s\n",
+        if (SDL_WriteU16LE(dst, _scoreInfo[k].Wins) == 0) {
+            return ERR_UTIL::ErrorCreate("SDL_RWwrite wins highscore %s\n",
                                          SDL_GetError());
         }
-        numWritten = SDL_WriteIO(dst, &_scoreInfo[k].NumCard, 1);
-        if (numWritten < 1) {
-            return ERR_UTIL::ErrorCreate("SDL_RWwrite numCard highscore %s\n",
+        if (SDL_WriteU16LE(dst, _scoreInfo[k].Losts) == 0) {
+            return ERR_UTIL::ErrorCreate("SDL_RWwrite losts highscore %s\n",
                                          SDL_GetError());
         }
     }
@@ -132,12 +145,16 @@ LPErrInApp HighScore::Save() {
 }
 
 LPErrInApp HighScore::SaveScore(int64_t score, int numCard) {
-    if (score < 0 || score > 1000000) {
+    return ERR_UTIL::ErrorCreate("Not supported\n");
+}
+
+LPErrInApp HighScore::SaveScoreWinLost(uint16_t wins, uint16_t losts) {
+    if (wins < 0 || losts < 0) {
         return NULL;
     }
     int j = -1;
     for (int i = 0; i < NUMOFSCORE; i++) {
-        if (score > _scoreInfo[i].Score) {
+        if (wins > _scoreInfo[i].Wins) {
             j = i;
             break;
         }
@@ -150,8 +167,8 @@ LPErrInApp HighScore::SaveScore(int64_t score, int numCard) {
             if (i == j) {
                 prev = _scoreInfo[i];
                 _scoreInfo[i].Name = pGameSettings->PlayerName;
-                _scoreInfo[i].Score = score;
-                _scoreInfo[i].NumCard = numCard;
+                _scoreInfo[i].Wins = wins;
+                _scoreInfo[i].Losts = losts;
             } else {
                 ScoreInfo temp = _scoreInfo[i];
                 _scoreInfo[i] = prev;
@@ -173,20 +190,20 @@ LPErrInApp HighScore::Load() {
             TRACE_DEBUG("No high score in storage found, use defaults \n");
             return NULL;
         }
-        int numCard = 40;
         std::string name = "";
-        int score = 0;
+        int wins = 0;
+        int losts = 0;
         std::vector<std::string> parts = splitString(result, ':');
         if (parts.size() >= 2) {
             name = parts[0];
-            score = std::stoi(parts[1]);
+            wins = std::stoi(parts[1]);
             if (parts.size() >= 3) {
-                numCard = std::stoi(parts[2]);
+                losts = std::stoi(parts[2]);
             }
         }
         _scoreInfo[k].Name = name;
-        _scoreInfo[k].Score = score;
-        _scoreInfo[k].NumCard = numCard;
+        _scoreInfo[k].Wins = wins;
+        _scoreInfo[k].Losts = losts;
     }
 #else
     LPGameSettings pGameSettings = GameSettings::GetSettings();
@@ -203,23 +220,27 @@ LPErrInApp HighScore::Load() {
 
     for (int k = 0; k < 10; k++) {
         char name[16];
-        uint16_t score = 0;
-        uint8_t numCard;
+        uint16_t wins = 0;
+        uint16_t losts;
         if (SDL_ReadIO(src, &name, 16) == 0) {
             return ERR_UTIL::ErrorCreate(
                 "SDL_RWread on highscore file error (file %s): %s\n",
                 g_filepath, SDL_GetError());
         }
-        SDL_ReadU16LE(src, &score);
-        if (SDL_ReadIO(src, &numCard, 1) == 0) {
+        if (!SDL_ReadU16LE(src, &wins)){
+            return ERR_UTIL::ErrorCreate(
+                "SDL_RWread on highscore file error (file %s): %s\n",
+                g_filepath, SDL_GetError());
+        }
+        if (!SDL_ReadU16LE(src, &losts)){
             return ERR_UTIL::ErrorCreate(
                 "SDL_RWread on highscore file error (file %s): %s\n",
                 g_filepath, SDL_GetError());
         }
 
         _scoreInfo[k].Name = name;
-        _scoreInfo[k].Score = score;
-        _scoreInfo[k].NumCard = numCard;
+        _scoreInfo[k].Wins = wins;
+        _scoreInfo[k].Losts = losts;
     }
     SDL_CloseIO(src);
 #endif
@@ -336,11 +357,11 @@ LPErrInApp HighScore::HandleIterate(bool& done) {
                              xIni + xOff, yIni + yOff, txtColor, pFont2);
         xOff += bx;
         GFX_UTIL::DrawString(_p_surfScreen,
-                             pLanguages->GetCStringId(Languages::POINTS),
+                             pLanguages->GetCStringId(Languages::WINS),
                              xIni + xOff, yIni + yOff, txtColor, pFont2);
         xOff += cx;
         GFX_UTIL::DrawString(_p_surfScreen,
-                             pLanguages->GetCStringId(Languages::CARDDECK),
+                             pLanguages->GetCStringId(Languages::LOSTS),
                              xIni + xOff, yIni + yOff, txtColor, pFont2);
         yOff += dx;
         xOff = 0;
@@ -362,11 +383,11 @@ LPErrInApp HighScore::HandleIterate(bool& done) {
             GFX_UTIL::DrawString(_p_surfScreen, _scoreInfo[i].Name.c_str(),
                                  xIni + xOff, yIni + yOff, txtColor, pFont);
             xOff += bx;
-            snprintf(buff, sizeof(buff), "%d", _scoreInfo[i].Score);
+            snprintf(buff, sizeof(buff), "%d", _scoreInfo[i].Wins);
             GFX_UTIL::DrawString(_p_surfScreen, buff, xIni + xOff, yIni + yOff,
                                  txtColor, pFont);
             xOff += cx;
-            snprintf(buff, sizeof(buff), "%d", _scoreInfo[i].NumCard);
+            snprintf(buff, sizeof(buff), "%d", _scoreInfo[i].Losts);
             GFX_UTIL::DrawString(_p_surfScreen, buff, xIni + xOff, yIni + yOff,
                                  txtColor, pFont);
             yOff += ex;

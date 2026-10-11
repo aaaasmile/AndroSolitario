@@ -556,6 +556,11 @@ LPErrInApp fncBind_SaveScore(void* self, int64_t score, int numCard) {
     return pHighScore->SaveScore(score, numCard);
 }
 
+LPErrInApp fncBind_SaveScoreWinLost(void* self, uint16_t wins, uint16_t losts) {
+    HighScore* pHighScore = (HighScore*)self;
+    return pHighScore->SaveScoreWinLost(wins, losts);
+}
+
 MenuDelegator AppGfx::prepMenuDelegator() {
     // Use only static otherwise you loose it
     static VMenuDelegator const tc = {.LeaveMenu = (&fncBind_LeaveMenu),
@@ -576,7 +581,10 @@ UpdateHighScoreCb AppGfx::prepHighScoreCb() {
         _p_HighScore = new HighScore();
         _p_HighScore->Load();
     }
-    static VUpdateHighScoreCb const tc = {.SaveScore = (&fncBind_SaveScore)};
+    static VUpdateHighScoreCb const tc = {
+        .SaveScore = (&fncBind_SaveScore),
+        .SaveScoreWinLost = (&fncBind_SaveScoreWinLost),
+    };
     return (UpdateHighScoreCb){.tc = &tc, .self = _p_HighScore};
 }
 
