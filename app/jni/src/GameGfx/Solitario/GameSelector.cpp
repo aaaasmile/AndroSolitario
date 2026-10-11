@@ -454,3 +454,8 @@ GameHelpPagesCb GameSelector::PrepareGameHelpPages() {
         return (GameHelpPagesCb){.tc = &tc, .self = this};
     }
 }
+
+enum Languages::eStringID GameSelector::GetGameTitle(){
+    return Languages::ID_SOLITARIO;
+}
+ 

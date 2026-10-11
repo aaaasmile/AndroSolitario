@@ -201,7 +201,8 @@ LPErrInApp AppGfx::Init() {
 
     TRACE_DEBUG("Font initialized OK\n");
 
-    const char* title = pLanguages->GetCStringId(Languages::ID_SOLITARIO);
+    enum Languages::eStringID eTitle = _p_GameSelector->GetGameTitle();
+    const char* title = pLanguages->GetCStringId(eTitle);
     SDL_SetWindowTitle(_p_Window, title);
 
     SDL_Surface* psIcon = SDL_LoadBMP(g_lpszIconProgFile);

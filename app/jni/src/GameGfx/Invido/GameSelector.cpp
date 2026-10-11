@@ -1,14 +1,14 @@
 #include "GameSelector.h"
 
 #include "Config.h"
-#include "GameGfx/Solitario/SolitarioGfx.h"
 #include "GameSettings.h"
+#include "InvidoGfx.h"
 
-GameSelector::GameSelector() { _p_InvidoGfx = NULL; }
+GameSelector::GameSelector() { _p_Gfx = NULL; }
 
 GameSelector::~GameSelector() {
-    if (_p_InvidoGfx != NULL) {
-        delete _p_InvidoGfx;
+    if (_p_Gfx != NULL) {
+        delete (invido::InvidoGfx*)_p_Gfx;
     }
     GameSettings* pGameSettings = GameSettings::GetSettings();
     pGameSettings->SetGameTypeGfx(GameTypeEnum::Invido);
@@ -426,16 +426,16 @@ LPErrInApp fncBind_OnResize(void* self, SDL_Surface* pScreen) {
 }
 
 GameGfxCb GameSelector::PrepGameGfx() {
-    if (_p_InvidoGfx != NULL) {
-        delete _p_InvidoGfx;
+    if (_p_Gfx != NULL) {
+        delete (invido::InvidoGfx*)_p_Gfx;
     }
-    _p_InvidoGfx = new invido::InvidoGfx();
+    _p_Gfx = new invido::InvidoGfx();
     static VGameGfxCb const tc = {.HandleEvent = (&fncBind_HandleEvent),
                                   .HandleIterate = (&fncBind_HandleIterate),
                                   .Initialize = (&fncBind_Initialize),
                                   .Show = (&fncBind_Show),
                                   .OnResize = (&fncBind_OnResize)};
-    return (GameGfxCb){.tc = &tc, .self = _p_InvidoGfx};
+    return (GameGfxCb){.tc = &tc, .self = _p_Gfx};
 }
 
 GameHelpPagesCb GameSelector::PrepareGameHelpPages() {
@@ -449,5 +449,8 @@ GameHelpPagesCb GameSelector::PrepareGameHelpPages() {
             .GetHelpPages = (&fncBind_GetHelpPagesInvidoITA)};
         return (GameHelpPagesCb){.tc = &tc, .self = this};
     }
-    return (GameHelpPagesCb){.tc = NULL, .self = NULL};
+}
+
+enum Languages::eStringID GameSelector::GetGameTitle() {
+    return Languages::ID_INVIDO;
 }

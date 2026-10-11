@@ -1,12 +1,10 @@
 #ifndef __GAMESELECTOR__H_
 #define __GAMESELECTOR__H_
 
+#include "Languages.h"
 #include "Traits.h"
-#include "GameGfx/Invido/InvidoGfx.h"
 
 using namespace traits;
-
-class SolitarioGfx;
 
 class GameSelector {
    public:
@@ -14,10 +12,10 @@ class GameSelector {
     ~GameSelector();
     GameGfxCb PrepGameGfx();
     GameHelpPagesCb PrepareGameHelpPages();
+    enum Languages::eStringID GetGameTitle();
 
    private:
-    SolitarioGfx* _p_SolitarioGfx;
-    invido::InvidoGfx* _p_InvidoGfx;
+    void* _p_Gfx;
 };
 
 #endif
