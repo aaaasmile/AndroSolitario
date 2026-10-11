@@ -22,13 +22,26 @@ Con il progetto solitario compilo anche i sorgenti del solitario.
 Nota che i comandi vanno messi nel terminal di Visual Code previo il settings del path dove si trova cmake (vedi start_code.ps1)
 
     rm -r buildinvido
-    cmake -S app/jni/ -B buildinvido  -DSDL_WAYLAND=OFF
+    cmake -S app/jni/ -B buildinvido  -DSDL_WAYLAND=OFF -DINVIDOPRJ=ON -DBUILD_INVIDO_TESTS=ON
     cmake --build buildinvido
     cd buildinvido 
     .\invido.exe
+    .\InvidoTest.exe
+Quando poi cambi un sorgente usa:
 
+    .\ninja
+
+## Unit test
+Le unit test si trovano nella sottodirectory tests. Esse vengono compilati con
+
+    -DBUILD_INVIDO_TESTS=ON
+E in buildinvido subdir ci sarà il file InvidoTest.exe.
+Nell'esecuzione di InvidoTest.exe al primo errore o assertion error si pianta. 
+
+    .\InvidoTest.exe
 
 ## Compilazione con WSL2 target Linux
+Nota che con WSL2 non è possibile usare Copilot in agent mode, solo in chat mode.
 
     rm -r -R buildinvido
     mkdir buildinvido && cd buildinvido
