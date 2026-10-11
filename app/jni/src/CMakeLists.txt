@@ -4,6 +4,10 @@ if(INVIDOPRJ)
   add_compile_definitions(INVIDOPRJ)
 endif()
 
+if(SOLITARIOPRJ)
+  add_compile_definitions(SOLITARIOPRJ)
+endif()
+
 # Don't mistake osx for unix
 if(UNIX AND NOT ANDROID AND NOT APPLE AND NOT RISCOS)
   set(UNIX_SYS ON)
@@ -29,7 +33,6 @@ set(SOURCES App/MusicManager.cpp
             App/TraceService.cpp
             App/HighScore.cpp
             App/CurrentTime.cpp
-            App/GameSelector.cpp
             App/GameHelp.cpp
             CompGfx/LabelLinkGfx.cpp
             CompGfx/ButtonGfx.cpp
@@ -41,8 +44,11 @@ set(SOURCES App/MusicManager.cpp
             CompGfx/LabelGfx.cpp
             CompGfx/TextInputGfx.cpp
             CompGfx/KeyboardGfx.cpp)
+
+if(INVIDOPRJ)
 # Invido Sources
 list(APPEND SOURCES
+        GameGfx/Invido/GameSelector.cpp
         GameGfx/Invido/AlgPlayer.cpp
         GameGfx/Invido/CardSpec.cpp
         GameGfx/Invido/Giocata.cpp
@@ -56,11 +62,16 @@ list(APPEND SOURCES
         GameGfx/Invido/PlayersOnTable.cpp
         GameGfx/Invido/PlayerStatistic.cpp
         GameGfx/Invido/Probability.cpp)
+endif()
+
+if(SOLITARIOPRJ)
 # Solitario Sources
 list(APPEND SOURCES
+        GameGfx/Solitario/GameSelector.cpp
         GameGfx/Solitario/CardRegionGfx.cpp
         GameGfx/Solitario/CardStackGfx.cpp
         GameGfx/Solitario/SolitarioGfx.cpp)
+endif()
 
 if (${UNIX_SYS})
     set(SOURCES2 UnixSys/UnixsysTrace.cpp)

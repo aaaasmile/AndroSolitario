@@ -12,7 +12,7 @@
 
 enum BackgroundTypeEnum { Commessaggio = 0, Mantova = 1, Black = 2 };
 enum InputTypeEnum { Mouse = 0, TouchWithoutMouse = 1 };
-enum GameTypeEnum { Solitario, Invido };
+enum GameTypeEnum { Undef, Solitario, Invido };
 
 class MusicManager;
 
@@ -86,6 +86,7 @@ class GameSettings {
     bool IsDEVPortrait() { return _portraitDevMode; }
 
     GameTypeEnum GetGameTypeGfx() { return _gameType; };
+    void SetGameTypeGfx(enum GameTypeEnum gmType) { _gameType = gmType; }
 
    private:
     GameSettings();
@@ -111,7 +112,7 @@ class GameSettings {
     bool _portraitNarrowMode = false;
     bool _portraitWideMode = false;
     bool _portraitDevMode = false;
-    GameTypeEnum _gameType = GameTypeEnum::Solitario;
+    GameTypeEnum _gameType = GameTypeEnum::Undef;
 };
 
 typedef GameSettings* LPGameSettings;
