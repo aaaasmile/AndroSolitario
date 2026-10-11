@@ -45,5 +45,5 @@ Nota che con WSL2 non è possibile usare Copilot in agent mode, solo in chat mod
 
     rm -r -R buildinvido
     mkdir buildinvido && cd buildinvido
-    cmake ../app/jni/  -DSDL_WAYLAND=OFF -DINVIDOPRJ=ON
+    cmake ../app/jni/  -DSDL_WAYLAND=OFF -DINVIDOPRJ=ON -DBUILD_INVIDO_TESTS=ON
     cmake --build .
