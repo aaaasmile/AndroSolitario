@@ -76,7 +76,7 @@ Nella finestra WSL UbuntuMinitoro vado nella directory ~/projects/AndroSolitario
     
     code .
 
-## Compilazione con target WSL2
+## Compilazione con target WSL2 (Linux)
 Voglio compilare i sorgenti di AndroSolitario3 anche su WSL, questo per vedere se l'app funziona
 prima di tutto su questo target.
 Uso CMake per compilare il target su WSL, mentre ndk con gradle (Android.mk) per quanto
