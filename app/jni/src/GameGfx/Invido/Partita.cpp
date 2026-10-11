@@ -32,8 +32,8 @@ void Partita::NextAction() {
     }
 }
 
-void Partita::Reset() { 
-    _PartitaState = ePartitaStatus::WAIT_NEW_PARTITA; 
+void Partita::Reset() {
+    _PartitaState = ePartitaStatus::WAIT_NEW_PARTITA;
     _deqNextAction.clear();
 }
 

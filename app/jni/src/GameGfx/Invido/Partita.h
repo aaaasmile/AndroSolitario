@@ -5,6 +5,8 @@
 #include "InvidoCoreDef.h"
 #include "InvidoTraits.h"
 
+#include <deque>
+
 namespace invido {
 
 class InvidoCore;

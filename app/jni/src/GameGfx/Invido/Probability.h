@@ -25,7 +25,7 @@ class Probability {
 
    private:
     bool _indexNotInit;
-    VCT_LONG _vctCounter;
+    VCT_INT _vctCounter;
     int _cardOnHand;
 };
 

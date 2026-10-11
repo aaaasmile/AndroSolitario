@@ -6,20 +6,19 @@ using namespace invido;
 
 MatchPoints::MatchPoints() {
     _numPlayers = NUM_PLAY_INVIDO_2;
-    _p_Mano = 0;
+    //_p_Mano = 0;
     _isGameAbandoned = false;
-    for (int iManoNum = 0; iManoNum < NUM_CARDS_HAND; iManoNum++) {
-        _vctManoInfo[iManoNum].Reset();
-    }
+    // for (int iManoNum = 0; iManoNum < NUM_CARDS_HAND; iManoNum++) {
+    //     _vctManoInfo[iManoNum].Reset();
+    // }
     _currentScore = SC_CANELA;
 }
 
 MatchPoints::~MatchPoints() {}
 
 void MatchPoints::MatchStart(int iNumPlayer) {
-    for (int i = 0; i < MAX_NUM_PLAYER; i++) {
-        _vctPlayerPoints[i] = 0;
-    }
+    _vctPlayerPoints.assign(iNumPlayer, 0);
+
     _numPlayers = iNumPlayer;
     _playerMatchWin = NOT_VALID_INDEX;
     _scoreGoal = SCORE_GOAL;
@@ -91,7 +90,7 @@ void MatchPoints::ManoEnd() {
             if (_playerFirstHand != NOT_VALID_INDEX) {
                 // the first player who take the mano is the giocata winner
                 _playerGiocataWin = _playerFirstHand;
-                _eIsGiocataEnd = GES_HAVE_WINNER;
+                //_eIsGiocataEnd = GES_HAVE_WINNER;
             }
             _playerWonsHand = NOT_VALID_INDEX;
             _vctManoInfo[iManoTerminatedIndex]._isPata = true;
@@ -109,7 +108,7 @@ void MatchPoints::ManoEnd() {
                 // giocata is terminated, giocata winner is the first player in
                 // this hand
                 _playerGiocataWin = iPlayer_1;
-                _eIsGiocataEnd = GES_HAVE_WINNER;
+                //_eIsGiocataEnd = GES_HAVE_WINNER;
             }
             _playerWonsHand = iPlayer_1;
             _vctManoInfo[iManoTerminatedIndex]._playerIndex = iPlayer_1;
@@ -124,7 +123,7 @@ void MatchPoints::ManoEnd() {
                 // giocata is terminated, giocata winner is the second player in
                 // this hand
                 _playerGiocataWin = iPlayer_2;
-                _eIsGiocataEnd = GES_HAVE_WINNER;
+                //_eIsGiocataEnd = GES_HAVE_WINNER;
             }
             _playerWonsHand = iPlayer_2;
             _vctManoInfo[iManoTerminatedIndex]._playerIndex = iPlayer_2;
@@ -133,7 +132,7 @@ void MatchPoints::ManoEnd() {
             // giocata is terminated
             if (_isManoPatatda && (_playerFirstHand == NOT_VALID_INDEX)) {
                 // strange case all hands was patada. Giocata is also patada.
-                _eIsGiocataEnd = GES_PATADA;
+                //_eIsGiocataEnd = GES_PATADA;
                 _playerGiocataWin = iPlayer_1;
             } else {
                 // giocata winner must be already defined

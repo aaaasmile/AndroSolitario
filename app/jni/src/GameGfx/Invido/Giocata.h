@@ -5,6 +5,7 @@
 
 #include "ErrorInfo.h"
 #include "InvidoCoreDef.h"
+#include "InvidoTraits.h"
 
 namespace invido {
 

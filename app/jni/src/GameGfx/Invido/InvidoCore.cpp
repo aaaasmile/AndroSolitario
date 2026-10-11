@@ -53,16 +53,16 @@ void InvidoCore::Init(PlayersOnTable* pPlayersOnTable, Mazzo* pMazzo) {
     _partita.SetPartitaCB(delCb);
     //_partita.SetGiocata(&_giocata);
 
-    _giocata.SetCore(this);
-    _giocata.SetPartita(&_partita);
-    _giocata.SetMano(&_mano);
+    //_giocata.SetCore(this);
+    //_giocata.SetPartita(&_partita);
+    //_giocata.SetMano(&_mano);
 
     _mano.SetCore(this);
     _mano.SetScore(&_matchPoints);
 
     _numPlayers = _p_PlayersOnTable->GetNumOfPlayers();
 
-    _matchPoints.SetManoInstance(&_mano);
+    //_matchPoints.SetManoInstance(&_mano);
 }
 
 Uint8 InvidoCore::getNewMatchFirstPlayer() { return SDL_rand(_numPlayers); }
@@ -216,7 +216,7 @@ void InvidoCore::Mano_End() {
         _p_PlayersOnTable->SetCurrentAndFirstOnTrick(winnerPlayerIx);
     }
     _p_PlHaveToPlay = _p_PlayersOnTable->SwitchToNextPlayer();
-    _giocata.Update_Giocata(_p_PlHaveToPlay->GetIndex(), &_matchPoints);
+    //_giocata.Update_Giocata(_p_PlHaveToPlay->GetIndex(), &_matchPoints);
 
     for (I_ALG_Player* pIAlgPlayer : _vctpAlgPlayer) {
         if (pIAlgPlayer) {

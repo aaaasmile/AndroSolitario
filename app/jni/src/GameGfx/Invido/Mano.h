@@ -55,10 +55,6 @@ typedef std::deque<PendingQuestion> DEQ_PENDQUESTION;
 
 //////////////////////////////////////////////////////////////////////
 
-#ifndef VCT_INT
-typedef std::vector<int> VCT_INT;
-#endif
-
 class PlayersOnTable;
 class TraceService;
 class Mano {

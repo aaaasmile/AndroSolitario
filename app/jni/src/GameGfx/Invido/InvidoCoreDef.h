@@ -19,7 +19,7 @@ enum eGameConst {
     SPECIAL_SCORE = 23,
     SPECIAL_SCORE_GOAL = 8,
     SCORE_SEVEN = 7,
-    NOT_VALID_INDEX = 1000,
+    NOT_VALID_INDEX = 255,
     NUM_SEEDS = 5,
     BUFF_NAME = 64,
     PLAYER1 = 0,
@@ -100,6 +100,10 @@ enum eGiocataScoreState {
 
 typedef std::vector<eSayPlayer> VCT_COMMANDS;
 
-}
+#ifndef VCT_INT
+typedef std::vector<int> VCT_INT;
+#endif
 
+
+}
 #endif

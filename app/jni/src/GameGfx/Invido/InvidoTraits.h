@@ -3,11 +3,12 @@
 
 #include <SDL3/SDL.h>
 
+namespace invido {
 // trait Partita
 
 typedef struct {
     void (*const PartitaStarted)(void* self, Uint8 playerIx);
-    void (*const PartitaEnded)(void* self); 
+    void (*const PartitaEnded)(void* self);
 } VPartitaCb, *LPVPartitaCb;
 
 typedef struct {
@@ -27,5 +28,6 @@ typedef struct {
     void* self;
 } GiocataCb, *LPGiocataCb;
 
+}  // namespace invido
 
 #endif

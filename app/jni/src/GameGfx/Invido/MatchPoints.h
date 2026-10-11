@@ -58,7 +58,7 @@ class MatchPoints : public I_MatchScore {
     bool IsGiocataMonte() { return _isGiocataAMonte; }
     bool IsManoPatada() { return _isManoPatatda; }
 
-    bool IsMatchEnd() { _isMatchEnd; }
+    bool IsMatchEnd() { return _isMatchEnd; }
 
     Uint8 GetManoWinner() { return _playerWonsHand; }
     Uint8 GetGiocataWinner() { return _playerGiocataWin; }
