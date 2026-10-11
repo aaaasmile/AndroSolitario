@@ -86,7 +86,7 @@ class GameSettings {
     bool IsDEVPortrait() { return _portraitDevMode; }
 
     GameTypeEnum GetGameTypeGfx() { return _gameType; };
-    void SetGameTypeGfx(enum GameTypeEnum gmType) { _gameType = gmType; }
+    void SetGameTypeGfx(enum GameTypeEnum gmType);
 
    private:
     GameSettings();

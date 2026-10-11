@@ -67,7 +67,7 @@ GameSettings::GameSettings() {
     _p_Languages = NULL;
     _p_MusicManager = NULL;
     _p_fontDejUnderscoreSmall = NULL;
-    GameName = "Solitario";
+    GameName = "";
 }
 
 GameSettings::~GameSettings() {
@@ -282,6 +282,21 @@ LPErrInApp GameSettings::SaveSettings() {
     SDL_CloseIO(dst);
 #endif
     return NULL;
+}
+
+void GameSettings::SetGameTypeGfx(enum GameTypeEnum gmType) {
+    _gameType = gmType;
+    switch (gmType) {
+        case GameTypeEnum::Invido:
+            GameName = "Invido";
+            break;
+        case GameTypeEnum::Solitario:
+            GameName = "Solitario";
+            break;
+
+        default:
+            break;
+    }
 }
 
 LPErrInApp GameSettings::LoadFonts() {

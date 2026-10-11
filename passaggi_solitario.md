@@ -84,13 +84,13 @@ riguarda il target Android.
 
     rm -r -R build
     mkdir build && cd build
-    cmake ../app/jni/ -DSDL_WAYLAND=OFF
+    cmake ../app/jni/ -DSDL_WAYLAND=OFF -DSOLITARIOPRJ=ON
     cmake --build .
 o alternativo, senza cambiare la directory (-S è la source dir, -B è la build dir)
 anche se dopo devo entrare nella dir quando cambio il codice:
 
     rm -r -R build
-    cmake -S app/jni/ -B build  -DSDL_WAYLAND=OFF
+    cmake -S app/jni/ -B build  -DSDL_WAYLAND=OFF -DSOLITARIOPRJ=ON
     cmake --build build
 Una volta compilato:
 
@@ -100,7 +100,7 @@ Una volta compilato:
 
 Problemi con la funzione random di std. Se uso
 
-    cmake ../app/jni/ -DSDL_WAYLAND=OFF -DCMAKE_CXX_COMPILER=/usr/bin/g++
+    cmake ../app/jni/ -DSDL_WAYLAND=OFF -DSOLITARIOPRJ=ON -DCMAKE_CXX_COMPILER=/usr/bin/g++
     
 per avere g++ in modo esplicito non risolve il problema, quindi è meglio lasciarlo fuori
 ed usare lo standard c++.
@@ -128,9 +128,9 @@ Gli asset li ho copiati con un post build command.
 
 ## Compilazione con target Windows (MySys2) con Visual Studio Code (C/C++ extension)
 
-    rm -r build
-    cmake -S app/jni/ -B build  -DSDL_WAYLAND=OFF
-    cmake --build build
+    rm -r buildsolitario
+    cmake -S app/jni/ -B buildsolitario  -DSDL_WAYLAND=OFF -DSOLITARIOPRJ=ON
+    cmake --build buildsolitario
     cd build 
     .\solitario.exe
     ninja
@@ -154,7 +154,7 @@ Il software usa l'extension clangd che è molto diversa da quella di Visual Stud
 I comandi da usare sono:
 
     rm -r build
-    cmake -S app/jni/ -B build  -DSDL_WAYLAND=OFF -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+    cmake -S app/jni/ -B build  -DSDL_WAYLAND=OFF -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DSOLITARIOPRJ=ON
     cmake --build build
     cd build 
     .\solitario.exe
@@ -167,7 +167,7 @@ usa configurazioni come quelle descritte in c_cpp_properties.json, ma deve esser
 Per la versione release, bisogna prima creare il target release:
 
     rm -r buildrelease
-    cmake -S app/jni/ -B buildrelease  -DSDL_WAYLAND=OFF -DCMAKE_BUILD_TYPE=Release
+    cmake -S app/jni/ -B buildrelease  -DSDL_WAYLAND=OFF -DCMAKE_BUILD_TYPE=Release -DSOLITARIOPRJ=ON
     cmake --build buildrelease --config Release
 
 Per creare il setup basta adattare il file mysys/installer_solitario.iss (cambiare la versione) e con il programma 
@@ -202,7 +202,7 @@ Ora nella root di questo progetto:
     rm -r -R build-web
     mkdir build-web && cd build-web
 
-    emcmake cmake ../app/jni/ -DSDL_WAYLAND=OFF -DSDLTTF_VENDORED=ON
+    emcmake cmake ../app/jni/ -DSDL_WAYLAND=OFF -DSDLTTF_VENDORED=ON -DSOLITARIOPRJ=ON
     emmake make -j$(nproc)
 Per vedere la app nel browser, bisogna far partire il web server:
 
@@ -230,7 +230,7 @@ Nella bash (nota MyRelease, con Release non riesco a vedere emoj UTF-8 fonts, pe
     rm -r -R build-webrel
     mkdir build-webrel && cd build-webrel
 
-    emcmake cmake ../app/jni/ -DSDL_WAYLAND=OFF -DSDLTTF_VENDORED=ON -DCMAKE_BUILD_TYPE=MyRelease
+    emcmake cmake ../app/jni/ -DSDL_WAYLAND=OFF -DSDLTTF_VENDORED=ON -DCMAKE_BUILD_TYPE=MyRelease -DSOLITARIOPRJ=ON
     emmake make -j$(nproc)
 
 ### Emscripten Nuova versione
@@ -331,7 +331,7 @@ Per esempio cd scratch/test_font vorrei compilare il programma hello.c.
 A questo scopo ho creato un nuovo file CMakeList.txt che mi compila sdl e il file.
 
     rm -r -R build
-    cmake -S . -B build -DSDL_WAYLAND=OFF
+    cmake -S . -B build -DSDL_WAYLAND=OFF -DSOLITARIOPRJ=ON
     cmake --build build
     cd build
     ./hello
