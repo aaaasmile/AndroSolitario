@@ -29,7 +29,10 @@
             ],
             "compilerPath": "/usr/bin/gcc",
             "cppStandard": "gnu++17",
-            "intelliSenseMode": "linux-gcc-x64"
+            "intelliSenseMode": "linux-gcc-x64",
+            "compileCommands": [
+                "${workspaceFolder}/buildinvido/compile_commands.json"
+            ]
         },
         {
             "name": "Emscripten",
