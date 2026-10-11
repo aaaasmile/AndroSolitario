@@ -7,12 +7,12 @@
 GameSelector::GameSelector() {
     GameSettings* pGameSettings = GameSettings::GetSettings();
     pGameSettings->SetGameTypeGfx(GameTypeEnum::Solitario);
-    _p_SolitarioGfx = NULL;
+    _p_Gfx = NULL;
 }
 
 GameSelector::~GameSelector() {
-    if (_p_SolitarioGfx != NULL) {
-        delete _p_SolitarioGfx;
+    if (_p_Gfx != NULL) {
+        delete (SolitarioGfx*)_p_Gfx;
     }
 }
 
@@ -430,16 +430,16 @@ LPErrInApp fncBind_OnResize(void* self, SDL_Surface* pScreen) {
 }
 
 GameGfxCb GameSelector::PrepGameGfx() {
-    if (_p_SolitarioGfx != NULL) {
-        delete _p_SolitarioGfx;
+    if (_p_Gfx != NULL) {
+        delete (SolitarioGfx*)_p_Gfx;
     }
-    _p_SolitarioGfx = new SolitarioGfx();
+    _p_Gfx = new SolitarioGfx();
     static VGameGfxCb const tc = {.HandleEvent = (&fncBind_HandleEvent),
                                   .HandleIterate = (&fncBind_HandleIterate),
                                   .Initialize = (&fncBind_Initialize),
                                   .Show = (&fncBind_Show),
                                   .OnResize = (&fncBind_OnResize)};
-    return (GameGfxCb){.tc = &tc, .self = _p_SolitarioGfx};
+    return (GameGfxCb){.tc = &tc, .self = _p_Gfx};
 }
 
 GameHelpPagesCb GameSelector::PrepareGameHelpPages() {
