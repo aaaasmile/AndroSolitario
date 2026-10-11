@@ -26,12 +26,9 @@ set(SOURCES App/MusicManager.cpp
             App/Languages.cpp
             App/Main.cpp
             App/Fading.cpp
-            App/Credits.cpp
             App/ErrorInfo.cpp
             App/MenuMgr.cpp
-            App/OptionsGfx.cpp
             App/TraceService.cpp
-            App/HighScore.cpp
             App/CurrentTime.cpp
             App/GameHelp.cpp
             CompGfx/LabelLinkGfx.cpp
@@ -48,6 +45,9 @@ set(SOURCES App/MusicManager.cpp
 if(INVIDOPRJ)
 # Invido Sources
 list(APPEND SOURCES
+        GameGfx/Invido/Credits.cpp
+        GameGfx/Invido/OptionsGfx.cpp
+        GameGfx/Invido/HighScore.cpp
         GameGfx/Invido/GameSelector.cpp
         GameGfx/Invido/AlgPlayer.cpp
         GameGfx/Invido/CardSpec.cpp
@@ -67,6 +67,9 @@ endif()
 if(SOLITARIOPRJ)
 # Solitario Sources
 list(APPEND SOURCES
+        GameGfx/Solitario/Credits.cpp
+        GameGfx/Solitario/OptionsGfx.cpp
+        GameGfx/Solitario/HighScore.cpp
         GameGfx/Solitario/GameSelector.cpp
         GameGfx/Solitario/CardRegionGfx.cpp
         GameGfx/Solitario/CardStackGfx.cpp

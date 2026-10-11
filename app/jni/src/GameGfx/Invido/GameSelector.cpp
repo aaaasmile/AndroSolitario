@@ -10,6 +10,8 @@ GameSelector::~GameSelector() {
     if (_p_InvidoGfx != NULL) {
         delete _p_InvidoGfx;
     }
+    GameSettings* pGameSettings = GameSettings::GetSettings();
+    pGameSettings->SetGameTypeGfx(GameTypeEnum::Invido);
 }
 
 LPErrInApp fncBind_HandleEvent(void* self, SDL_Event* pEvent,
@@ -28,8 +30,6 @@ LPErrInApp fncBind_Initialize(void* self, SDL_Surface* pScreen,
                               SDL_Window* pWindow,
                               SDL_Surface* pSceneBackground,
                               UpdateHighScoreCb& fnHighScore) {
-    GameSettings* pGameSettings = GameSettings::GetSettings();
-    pGameSettings->SetGameTypeGfx(GameTypeEnum::Invido);
     invido::InvidoGfx* pInvidoGfx = (invido::InvidoGfx*)self;
     return pInvidoGfx->Initialize(pScreen, fnUpdateScreen, pWindow,
                                   pSceneBackground, fnHighScore);
