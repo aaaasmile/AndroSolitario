@@ -316,7 +316,7 @@ Non riesco a capire perché sul mio Nothing Phone ricevo sempre:
 In questo modo non riesco a vedere la console del browser.
 
 ### Emscripten Touch e mouse
-Il zarget wasm funziona nel browser e quidi gira su device che hanno il touch, il mouse oppure entrambi.
+Il target wasm funziona nel browser e quidi gira su devices che hanno il touch, il mouse oppure entrambi.
 Se abilito mouse e touch ho gli stessi eventi ripetuti e questo l'app non li supporta (pensa al toggle della musica). 
 Quindi il target Emscripten viene compilato solo con il mouse che funziona decentementre anche su Android.
 
@@ -329,9 +329,10 @@ In javascript chiamo la funzione con: Module.setLanguage(this.dataset.lang);
 Voglio creare dei piccoli progetti per testare delle funzionalità singole.
 Per esempio cd scratch/test_font vorrei compilare il programma hello.c.
 A questo scopo ho creato un nuovo file CMakeList.txt che mi compila sdl e il file.
-
+	
+	cd scratch/test_font
     rm -r -R build
-    cmake -S . -B build -DSDL_WAYLAND=OFF -DSOLITARIOPRJ=ON
+    cmake -S . -B build -DSDL_WAYLAND=OFF
     cmake --build build
     cd build
     ./hello
@@ -343,7 +344,7 @@ viene creato il solitario. Per questo task uso un custom command in POST_BUILD d
 file CMakeList.
 
 ## Debugger WSL
-In Visual Code seezionare "Debug WSL", settare un break point e far partire il debugger
+In Visual Code selezionare "Debug WSL", settare un break point e far partire il debugger
 di Visual Code. Funziona immediatamente senza problemi.
 
 
@@ -637,7 +638,7 @@ Questi sono i todo della conversione in Android.
 - Il font della message box è troppo piccolo [DONE]
 
 ## Manca in Windows
-- Deploy per con l'installer
+- Deploy per con l'installer [DONE]
 
 ## Mouse e Touch
 Una discussione interessante sull'argomento si trova su 

@@ -57,11 +57,17 @@ GameSettings.
 Però non mi convince. Se compilo il gioco invido, ho il file invido.exe. Per il solitario
 solitario.exe. Non sono nomi di programmi che vanno bene per entrambi i giochi con
 uno switcher.
-Probabilmente è meglio avere dei singoli giochi anche perché nella distribuzione
-uso i file singoli (web, itch, android). Una collezione di tutti i giochi si portrebbe 
-fare alla fine.
-Il menu HighScore in Invido non ha molto senso. Le opzioni sono diverse, nell'invido
-ci sono delle opzioni in più.
+Quindi genero singoli giochi che hanno delle parti esclusive e in una sola istanza. Questo per facilitare la distribuzione
+dei file singoli (web, itch, android). Una collezione di tutti i giochi si portrebbe 
+fare alla fine cambiando però la struttura.
+Per esempio il menu HighScore in Invido è molto diverso da quello del solitario. 
+Le opzioni sono diverse, nell'invido ci sono delle opzioni in più. 
+Allora ho messo nella main App solo gli header
+con le implementazioni cpp per i vari giochi nelle varie sottodirectory 
+(attenzione che non è più possibile avere invido e solitario nello stesso exe).
+
 
 ## TODO
-Il testSimpleMatch non funziona (callback in giocata)
+Il testSimpleMatch non funziona. Sto aggiustando le varie callbacks a InvidoCore
+da parte delle varie classi come Mano e Giocata. Su windows usa Visual Code
+e il debug di InvidoTests

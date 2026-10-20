@@ -25,6 +25,18 @@ void fncBind_PartitaStarted(void* self, Uint8 playerStartIx) {
     InvidoCore* pCore = (InvidoCore*)self;
     return pCore->PartitaStarted(playerStartIx);
 }
+void fncBind_GiocataStarted(void* self, Uint8 playerStartIx) {
+    InvidoCore* pCore = (InvidoCore*)self;
+    return pCore->Giocata_Start(playerStartIx);
+}
+void fncBind_GiocataEndedWinner(void* self, Uint8) {
+    InvidoCore* pCore = (InvidoCore*)self;
+    return pCore->Giocata_End();
+}
+void fncBind_GiocataEndDueced(void* self) {
+    InvidoCore* pCore = (InvidoCore*)self;
+    return pCore->Giocata_End();
+}
 
 PartitaCb InvidoCore::prepPartitaDelegator() {
     // Use only static otherwise you loose it (dangling pointer on stack
@@ -34,6 +46,15 @@ PartitaCb InvidoCore::prepPartitaDelegator() {
                                   .PartitaEnded = (&fncBind_PartitaEnd)};
 
     return (PartitaCb){.tc = &tc, .self = this};
+}
+
+GiocataCb InvidoCore::prepGiocataDelegator() {
+    // The callback table must outlive this function because Giocata stores it.
+    static VGiocataCb const tc = {.GiocataStarted = (&fncBind_GiocataStarted),
+                                  .GiocataEndedWinner = (&fncBind_GiocataEndedWinner),
+                                  .GiocataEndDueced = (&fncBind_GiocataEndDueced)};
+
+    return (GiocataCb){.tc = &tc, .self = this};
 }
 
 // trait Partita - End
@@ -49,11 +70,13 @@ void InvidoCore::Init(PlayersOnTable* pPlayersOnTable, Mazzo* pMazzo) {
 
     _eGameType = LOCAL_TYPE;
 
-    PartitaCb delCb = prepPartitaDelegator();
-    _partita.SetPartitaCB(delCb);
+    PartitaCb delegatorCb = prepPartitaDelegator();
+    _partita.SetPartitaCB(delegatorCb);
     //_partita.SetGiocata(&_giocata);
 
-    //_giocata.SetCore(this);
+    GiocataCb giocataCb = prepGiocataDelegator();
+    _giocata.SetGiocataCB(giocataCb);
+
     //_giocata.SetPartita(&_partita);
     //_giocata.SetMano(&_mano);
 
@@ -117,10 +140,11 @@ void InvidoCore::NewMatch() {
                 SDL_assert(0);
             }
             _vctpAlgPlayer.push_back(pIAlgPlayer);
+            _vctCardInfos.push_back(VCT_CARDSPEC{});
         }
     }
 
-    _mano.MatchStart(_numPlayers); // TODO set Num players, _mano is not for match state
+    _mano.Init(_numPlayers); // TODO set Num players, _mano is not for match state
     _p_PlayersOnTable->SetFirstOnMatch(firstPlayerIx);
     _p_StartPlayer = _p_PlayersOnTable->GetPlayerOnIndex(firstPlayerIx);
     _partita.NewPartita(firstPlayerIx);
@@ -342,7 +366,7 @@ bool InvidoCore::VaDentro(Uint8 playerIx, const CardSpec& cardSpec) {
 
     bool bRes = false;
     // change mano state
-    if (_mano.Player_Play(playerIx, true)) {
+    if (_mano.Player_PlayACard(playerIx, true)) {
         // next player is on game
         _p_PlHaveToPlay = _p_PlayersOnTable->SwitchToNextPlayer();
 
@@ -372,7 +396,7 @@ bool InvidoCore::PlayCard(Uint8 playerIx, const CardSpec& cardSpec) {
 
     bool bRes = false;
     // change mano state
-    if (_mano.Player_Play(playerIx, false)) {
+    if (_mano.Player_PlayACard(playerIx, false)) {
         // next player is on game
         _p_PlHaveToPlay = _p_PlayersOnTable->SwitchToNextPlayer();
 

@@ -21,7 +21,7 @@ class PlayersOnTable;
 class InvidoCore : public I_CORE_Game {
    public:
     InvidoCore();
-    virtual ~InvidoCore();
+    ~InvidoCore();
 
     void Init(PlayersOnTable* pPlayersOnTable, Mazzo* pMazzo);
     Player* GetPlayerInPlaying() { return _p_PlHaveToPlay; };
@@ -73,6 +73,7 @@ class InvidoCore : public I_CORE_Game {
     bool resetCard(Uint8 playerIx, const CardSpec& cardSpec);
     Uint8 getNewMatchFirstPlayer();
     PartitaCb prepPartitaDelegator();
+    GiocataCb prepGiocataDelegator();
 
    private:
     PlayersOnTable* _p_PlayersOnTable;

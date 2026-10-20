@@ -211,7 +211,7 @@ void Mano::GiocataStart() {
     _playerChangeScoreIx = NOT_VALID_INDEX;
 }
 
-void Mano::MatchStart(int numPlayers) { _numOfPlayers = numPlayers; }
+void Mano::Init(int numPlayers) { _numOfPlayers = numPlayers; }
 
 LPErrInApp Mano::NewMano(Uint8 playerIx) {
     clearQuestions();
@@ -244,7 +244,7 @@ LPErrInApp Mano::NewMano(Uint8 playerIx) {
     return NULL;
 }
 
-bool Mano::Player_Play(Uint8 playerIx, bool vadoDentro) {
+bool Mano::Player_PlayACard(Uint8 playerIx, bool vadoDentro) {
     TRACE_DEBUG("Player%d play state %s\n", playerIx,
                 stalpzManoState[_eManoState]);
 

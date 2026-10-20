@@ -4,14 +4,16 @@
 #include "GameSettings.h"
 #include "InvidoGfx.h"
 
-GameSelector::GameSelector() { _p_Gfx = NULL; }
+GameSelector::GameSelector() {
+    _p_Gfx = NULL;
+    GameSettings* pGameSettings = GameSettings::GetSettings();
+    pGameSettings->SetGameTypeGfx(GameTypeEnum::Invido);
+}
 
 GameSelector::~GameSelector() {
     if (_p_Gfx != NULL) {
         delete (invido::InvidoGfx*)_p_Gfx;
     }
-    GameSettings* pGameSettings = GameSettings::GetSettings();
-    pGameSettings->SetGameTypeGfx(GameTypeEnum::Invido);
 }
 
 LPErrInApp fncBind_HandleEvent(void* self, SDL_Event* pEvent,

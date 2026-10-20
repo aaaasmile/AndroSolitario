@@ -53,7 +53,6 @@ struct PendingQuestion {
 
 typedef std::deque<PendingQuestion> DEQ_PENDQUESTION;
 
-//////////////////////////////////////////////////////////////////////
 
 class PlayersOnTable;
 class TraceService;
@@ -73,12 +72,11 @@ class Mano {
     void SetScore(MatchPoints* pVal) { _p_Score = pVal; }
     LPErrInApp NewMano(Uint8 playerIx);
     bool Player_Say(Uint8 playerIx, eSayPlayer eSay);
-    // player play a card
-    bool Player_Play(Uint8 playerIx, bool vadoDentro);
+    bool Player_PlayACard(Uint8 playerIx, bool vadoDentro);
     void Reset();
     void NextAction();
     eManoStatus GetState() { return _eManoState; }
-    void MatchStart(int numPlayers);
+    void Init(int numPlayers);
     void GetAdmittedCommands(VCT_COMMANDS& vct_Commands, Uint8 playerIx);
     void GetMoreCommands(VCT_COMMANDS& vct_Commands, Uint8 playerIx);
     void CommandWithPendingQuestion(PendingQuestion& PendQues,
