@@ -37,6 +37,47 @@ void fncBind_GiocataEndDueced(void* self) {
     InvidoCore* pCore = (InvidoCore*)self;
     return pCore->Giocata_End();
 }
+void fncBind_ManoEnd(void* self) {
+    InvidoCore* pCore = (InvidoCore*)self;
+    return pCore->Mano_End();
+}
+void fncBind_NtyWaitingPlayer_Toplay(void* self, Uint8 playerIx) {
+    InvidoCore* pCore = (InvidoCore*)self;
+    return pCore->NtyWaitingPlayer_Toplay(playerIx);
+}
+void fncBind_NtyWaitingPlayer_ToResp(void* self, Uint8 playerIx) {
+    InvidoCore* pCore = (InvidoCore*)self;
+    return pCore->NtyWaitingPlayer_ToResp(playerIx);
+}
+void fncBind_NtyPlayerSayBuiada(void* self, Uint8 playerIx) {
+    InvidoCore* pCore = (InvidoCore*)self;
+    return pCore->NtyPlayerSayBuiada(playerIx);
+}
+void fncBind_ChangeGiocataScore(void* self, eGiocataScoreState eNewScore) {
+    InvidoCore* pCore = (InvidoCore*)self;
+    return pCore->ChangeGiocataScore(eNewScore);
+}
+void fncBind_Player_VaVia(void* self, Uint8 playerIx) {
+    InvidoCore* pCore = (InvidoCore*)self;
+    return pCore->Player_VaVia(playerIx);
+}
+void fncBind_Giocata_AMonte(void* self) {
+    InvidoCore* pCore = (InvidoCore*)self;
+    return pCore->Giocata_AMonte();
+}
+
+ManoCb InvidoCore::prepManoDelegator() {
+    static VManoCb const tc = {
+        .Mano_End = (&fncBind_ManoEnd),
+        .NtyWaitingPlayer_Toplay = (&fncBind_NtyWaitingPlayer_Toplay),
+        .NtyWaitingPlayer_ToResp = (&fncBind_NtyWaitingPlayer_ToResp),
+        .NtyPlayerSayBuiada = (&fncBind_NtyPlayerSayBuiada),
+        .ChangeGiocataScore = (&fncBind_ChangeGiocataScore),
+        .Player_VaVia = (&fncBind_Player_VaVia),
+        .Giocata_AMonte = (&fncBind_Giocata_AMonte)};
+
+    return (ManoCb){.tc = &tc, .self = this};
+}
 
 PartitaCb InvidoCore::prepPartitaDelegator() {
     // Use only static otherwise you loose it (dangling pointer on stack
@@ -80,7 +121,8 @@ void InvidoCore::Init(PlayersOnTable* pPlayersOnTable, Mazzo* pMazzo) {
     //_giocata.SetPartita(&_partita);
     //_giocata.SetMano(&_mano);
 
-    _mano.SetCore(this);
+    ManoCb manoCb = prepManoDelegator();
+    _mano.SetManoCB(manoCb);
     _mano.SetScore(&_matchPoints);
 
     _numPlayers = _p_PlayersOnTable->GetNumOfPlayers();

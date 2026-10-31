@@ -1,9 +1,10 @@
 #ifndef INVIDO_TRAITS___H_
 #define INVIDO_TRAITS___H_
 
-#include <SDL3/SDL.h>
+#include "InvidoCoreDef.h"
 
 namespace invido {
+
 // trait Partita
 
 typedef struct {
@@ -27,6 +28,22 @@ typedef struct {
     VGiocataCb const* tc;
     void* self;
 } GiocataCb, *LPGiocataCb;
+
+// trait Mano
+typedef struct {
+    void (*const Mano_End)(void* self);
+    void (*const NtyWaitingPlayer_Toplay)(void* self, Uint8 playerIx);
+    void (*const NtyWaitingPlayer_ToResp)(void* self, Uint8 playerIx);
+    void (*const NtyPlayerSayBuiada)(void* self, Uint8 playerIx);
+    void (*const ChangeGiocataScore)(void* self, eGiocataScoreState eNewScore);
+    void (*const Player_VaVia)(void* self, Uint8 playerIx);
+    void (*const Giocata_AMonte)(void* self);
+} VManoCb, *LPVManoCb;
+
+typedef struct {
+    VManoCb const* tc;
+    void* self;
+} ManoCb, *LPManoCb;
 
 }  // namespace invido
 

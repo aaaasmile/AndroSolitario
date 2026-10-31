@@ -18,7 +18,8 @@ The wiring and call flow is:
 1. `InvidoCore::prepGiocataDelegator()` creates a `static const VGiocataCb` table whose functions forward to `InvidoCore` methods. The table must outlive the function because `Giocata` stores its pointer.
 2. `InvidoCore::Init()` passes the resulting `GiocataCb` to `_giocata.SetGiocataCB(...)`, connecting the `Giocata` member to the `InvidoCore` callbacks via the context pointer.
 3. When `Giocata` processes queued actions, it calls the matching function through `_giocataCb.tc`, passing `_giocataCb.self` as the first argument. For example, a start action calls `GiocataStarted(self, playerIx)`.
-4. Follow both the table definition and each binding function when changing a callback. Keep signatures in sync, preserve the static table's lifetime, and ensure the context points to a live owner. Apply the same tracing approach to the `Partita` callback table.
+4. The same pattern is used by `Mano`: `VManoCb` declares callbacks for ending a hand, notifying players, changing the trick score, handling `A Monte`, and other game events. `InvidoCore::prepManoDelegator()` creates the callback table, and `InvidoCore::Init()` connects it with `_mano.SetManoCB(...)`. `Mano` calls the functions through `_manoCb.tc`, passing `_manoCb.self`; it no longer depends directly on `InvidoCore`. Its `MatchPoints` dependency remains separately injected with `SetScore()`.
+5. Follow the table definition and each binding function when changing a callback. Keep signatures in sync, preserve the static table's lifetime, and ensure the context points to a live owner. Apply the same tracing approach to the `Partita` callback table.
 
 ## Game-State Coordination
 

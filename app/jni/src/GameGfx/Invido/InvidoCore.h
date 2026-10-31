@@ -74,6 +74,7 @@ class InvidoCore : public I_CORE_Game {
     Uint8 getNewMatchFirstPlayer();
     PartitaCb prepPartitaDelegator();
     GiocataCb prepGiocataDelegator();
+    ManoCb prepManoDelegator();
 
    private:
     PlayersOnTable* _p_PlayersOnTable;

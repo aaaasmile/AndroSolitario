@@ -3,7 +3,6 @@
 #include <cstddef>
 
 #include "Config.h"
-#include "InvidoCore.h"
 #include "InvidoCoreDef.h"
 #include "MatchPoints.h"
 #include "TraceService.h"
@@ -59,7 +58,6 @@ void PendingQuestion::operator=(const PendingQuestion& r) {
 }
 
 Mano::Mano() {
-    _p_InvidoCore = NULL;
     _eManoState = MNST_WAIT_NEW_MANO;
     _p_Score = NULL;
 
@@ -157,35 +155,35 @@ void Mano::NextAction() {
         case MANO_WAITPL_TOPLAY:
             SDL_assert(Action._vctArg.size() > 0);
             // may be _eNextAction is modified
-            _p_InvidoCore->NtyWaitingPlayer_Toplay(Action._vctArg[0]);
+            _manoCb.tc->NtyWaitingPlayer_Toplay(_manoCb.self,
+                                                Action._vctArg[0]);
             TRACE_DEBUG("Wait play player: %d\n", Action._vctArg[0]);
             break;
 
         case MANO_AMONTE:
-            _p_InvidoCore->Giocata_AMonte();
+            _manoCb.tc->Giocata_AMonte(_manoCb.self);
             break;
 
         case MANO_VADODENTRO:
-            // _p_InvidoCore->;
-            //  TO DO
+            // TO DO
             SDL_assert(0);
             break;
 
         case MANO_VADOVIA:
-            _p_InvidoCore->Player_VaVia(Action._vctArg[0]);
+            _manoCb.tc->Player_VaVia(_manoCb.self, Action._vctArg[0]);
             break;
 
         case MANO_WAIPL_TORESP:
-            _p_InvidoCore->NtyWaitingPlayer_ToResp(Action._vctArg[0]);
+            _manoCb.tc->NtyWaitingPlayer_ToResp(_manoCb.self, Action._vctArg[0]);
             break;
 
         case MANO_END:
-            _p_InvidoCore->Mano_End();
+            _manoCb.tc->Mano_End(_manoCb.self);
             break;
 
         case MANO_CHANGESCORE:
             eScore = intToEScore(Action._vctArg[0]);
-            _p_InvidoCore->ChangeGiocataScore(eScore);
+            _manoCb.tc->ChangeGiocataScore(_manoCb.self, eScore);
             // process the next action without waiting the next trigger
             NextAction();
             break;
@@ -197,7 +195,7 @@ void Mano::NextAction() {
             break;
 
         case MANO_SAYBUIDA:
-            _p_InvidoCore->NtyPlayerSayBuiada(Action._vctArg[0]);
+            _manoCb.tc->NtyPlayerSayBuiada(_manoCb.self, Action._vctArg[0]);
             break;
 
         default:
@@ -779,9 +777,8 @@ bool Mano::nextAvailSayScore(eSayPlayer* peSayAvail) {
     eSayPlayer eTmp = eSayPlayer::SP_AMONTE;
 
     // retrive current score
-    MatchPoints* pMatchPoints = _p_InvidoCore->GetMatchPointsInstance();
-    SDL_assert(pMatchPoints);
-    eGiocataScoreState eCurrScore = pMatchPoints->GetCurrScore();
+    SDL_assert(_p_Score);
+    eGiocataScoreState eCurrScore = _p_Score->GetCurrScore();
 
     if (eCurrScore == SC_PARTIDA) {
         // there is no points bigger as "partida"
@@ -818,9 +815,8 @@ bool Mano::nextAvailSayScore(eSayPlayer* peSayAvail) {
 
 bool Mano::isGiocataAMonte() {
     bool bRet = false;
-    MatchPoints* pMatchPoints = _p_InvidoCore->GetMatchPointsInstance();
-    SDL_assert(pMatchPoints);
-    eGiocataScoreState eCurrScore = pMatchPoints->GetCurrScore();
+    SDL_assert(_p_Score);
+    eGiocataScoreState eCurrScore = _p_Score->GetCurrScore();
     if (eCurrScore == eGiocataScoreState::SC_AMONTE ||
         eCurrScore == eGiocataScoreState::SC_PATTA) {
         bRet = true;

@@ -7,10 +7,10 @@
 #include "Config.h"
 #include "ErrorInfo.h"
 #include "InvidoCoreDef.h"
+#include "InvidoTraits.h"
 
 namespace invido {
 
-class InvidoCore;
 class MatchPoints;
 
 enum eFN_MANOACTION {
@@ -68,7 +68,7 @@ class Mano {
 
    public:
     Mano();
-    void SetCore(InvidoCore* pVal) { _p_InvidoCore = pVal; }
+    void SetManoCB(ManoCb& manoCb) { _manoCb = manoCb; }
     void SetScore(MatchPoints* pVal) { _p_Score = pVal; }
     LPErrInApp NewMano(Uint8 playerIx);
     bool Player_Say(Uint8 playerIx, eSayPlayer eSay);
@@ -110,7 +110,7 @@ class Mano {
     void removeObsoleteActions();
 
    private:
-    InvidoCore* _p_InvidoCore;
+    ManoCb _manoCb;
     eManoStatus _eManoState;
     eManoStatus _eOldManoState;
     Uint8 _numOfPlayers;
