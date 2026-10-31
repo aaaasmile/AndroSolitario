@@ -211,34 +211,49 @@ void Mano::GiocataStart() {
 
 void Mano::Init(int numPlayers) { _numOfPlayers = numPlayers; }
 
+static void calcCircleIndex(std::vector<size_t>& paPlayerDeck, int iPlayerIni) {
+    SDL_assert(paPlayerDeck.size() > 0);
+    size_t size = paPlayerDeck.size();
+
+    paPlayerDeck[0] = iPlayerIni;
+    int k = 1;
+    while (k < size) {
+        paPlayerDeck[k] = paPlayerDeck[k - 1] + 1;
+        if (paPlayerDeck[k] >= size) {
+            paPlayerDeck[k] = 0;
+        }
+        k++;
+    }
+}
+
 LPErrInApp Mano::NewMano(Uint8 playerIx) {
     clearQuestions();
-    // TODO make only one the next state
-    // if (_eManoState == MNST_WAIT_NEW_MANO || _eManoState == MNST_MANO_END) {
-    //     SDL_assert(playerIx >= 0 && playerIx < _numOfPlayers);
-    //     // set action
-    //     add_Action(playerIx, MANO_WAITPL_TOPLAY);
+    if (_eManoState == MNST_WAIT_NEW_MANO || _eManoState == MNST_MANO_END) {
+        SDL_assert(playerIx >= 0 && playerIx < _numOfPlayers);
+        // set action
+        add_Action(playerIx, MANO_WAITPL_TOPLAY);
 
-    //     // prepare state queue on table players
-    //     std::vector<> aTablePlayer[MAX_NUM_PLAYER];
+        // prepare state queue on table players
+        std::vector<size_t> aTablePlayer;
+        aTablePlayer.assign(_numOfPlayers, 0);
 
-    //     // calculate the array of player indexes
-    //     calcCircleIndex(aTablePlayer, MAX_NUM_PLAYER, playerIx);
-    //     _deqTableState.clear();
-    //     for (int i = 0; i < _numOfPlayers; i++) {
-    //         int iTmpPlayer = aTablePlayer[i];
-    //         eManoStatus eVal = _MapManoStatePl[iTmpPlayer];
-    //         _deqTableState.push_back(eVal);
-    //     }
-    //     _deqTableState.push_back(MNST_MANO_END);
+        // calculate the array of player indexes
+        calcCircleIndex(aTablePlayer, playerIx);
+        _deqTableState.clear();
+        for (size_t i = 0; i < _numOfPlayers; i++) {
+            size_t tmpPlayer = aTablePlayer[i];
+            eManoStatus eVal = _mapManoStatePl[tmpPlayer];
+            _deqTableState.push_back(eVal);
+        }
+        _deqTableState.push_back(MNST_MANO_END);
 
-    //     // next state
-    //     _eManoState = nextTableState();
+        // next state
+        _eManoState = nextTableState();
 
-    // } else {
-    //     return ERR_UTIL::ErrorCreate("Mano state is not correct %d",
-    //                                  _eManoState);
-    // }
+    } else {
+        return ERR_UTIL::ErrorCreate("Mano state is not correct %d",
+                                     _eManoState);
+    }
     return NULL;
 }
 
@@ -552,20 +567,6 @@ Uint8 Mano::getNextPlayerIxAfter(Uint8 playerIx){
     }
     return nextIx;
 }
-// void Mano::calcCircleIndex(int* paPlayerDeck, int size, int iPlayerIni) {
-//     SDL_assert(paPlayerDeck);
-//     SDL_assert(size > 0);
-
-//     paPlayerDeck[0] = iPlayerIni;
-//     int k = 1;
-//     while (k < _numOfPlayers && k < size) {
-//         paPlayerDeck[k] = paPlayerDeck[k - 1] + 1;
-//         if (paPlayerDeck[k] >= _numOfPlayers) {
-//             paPlayerDeck[k] = 0;
-//         }
-//         k++;
-//     }
-// }
 
 void Mano::actionWithoutQuestion() {
     SDL_assert(_deqPendingQuestion.size() == 0);
