@@ -1,6 +1,6 @@
 ---
 name: invido-cpp-sdl3
-description: 'Use when implementing, debugging, or testing the Invido game in this C++/SDL3 workspace, especially its Rust-like trait pattern, callback delegation, game flow, CMake builds, and unit tests.'
+description: 'Use when implementing, debugging, or testing the Invido game in this C++/SDL3 workspace, especially its Rust-like trait pattern, callback delegation, game-state progression and action queues, CMake builds, and unit tests.'
 ---
 
 # Invido C++/SDL3 Development
@@ -29,6 +29,14 @@ The wiring and call flow is:
 - **`Mano`** tracks the play and score-call (`chiamata`) state within a trick, including player turns, responses to calls, and score changes. A score raise requires the other player to respond: they may accept, raise to a higher score, or call `A Monte`, which invalidates the current `Giocata` and leads to another trick.
 
 The default game has two players. Do not assume other player counts unless the relevant configuration or task explicitly enables them. When modifying transitions, verify how `Mano` notifies `InvidoCore`, how `InvidoCore` starts/ends `Giocata`, and how a trick outcome affects `Partita` and match scoring; avoid duplicating state in multiple classes.
+
+## Match Progression and Action Queues
+
+Match progression is advanced by repeated calls to `InvidoCore::NextAction()`, driven by the game loop in `InvidoGfx`. Each of the three state-machine classes—`Mano`, `Giocata`, and `Partita`—has its own `std::deque` of pending actions. State-changing methods enqueue actions; each `NextAction()` processes queued work and may call back into `InvidoCore`, which can enqueue work in another state machine.
+
+`InvidoCore::NextAction()` services the queues in this order: `Mano`, then `Giocata`, then `Partita`. This ordering allows an action processed by an earlier queue to schedule an action for a later queue during the same call (for example, a `Mano` action may request `Giocata_AMonte()`, enqueueing a `Giocata` action that can then be handled). An action enqueued for a queue that has already been serviced waits until a later `InvidoCore::NextAction()` call. `Giocata` and `Partita` each dequeue at most one action per call. `Mano` also dequeues one action normally, but its `MANO_CHANGESCORE` and `MANO_NO_ACTION` branches recursively call `NextAction()`, so one call can process additional queued actions.
+
+When changing progression logic, preserve queue ownership and ordering, check which callbacks enqueue downstream actions, and consider whether an action runs during the current tick or the next. Avoid assuming that a single `InvidoCore::NextAction()` drains every queue completely.
 
 ## Workflow
 
