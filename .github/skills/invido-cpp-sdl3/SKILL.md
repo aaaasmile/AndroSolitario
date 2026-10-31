@@ -1,16 +1,29 @@
 ---
 name: invido-cpp-sdl3
-description: 'Use when implementing, debugging, or testing the Invido game in this C++/SDL3 workspace, especially game flow, callbacks, CMake builds, and Invido unit tests.'
+description: 'Use when implementing, debugging, or testing the Invido game in this C++/SDL3 workspace, especially its Rust-like trait pattern, callback delegation, game flow, CMake builds, and unit tests.'
 ---
 
 # Invido C++/SDL3 Development
 
 Use this workflow for Invido-specific implementation and debugging. For general workspace guidance, follow [the project instructions](../../copilot-instructions.md). Consult [`passaggi_invido.md`](../../../passaggi_invido.md) for the maintainer's detailed build and architecture notes.
 
+## Invido Traits and Callbacks
+
+Invido uses a C-style callback-table pattern called “traits,” inspired by Rust traits but implemented with function pointers and a context pointer (not Rust interfaces or C++ inheritance). Read [`InvidoTraits.h`](../../../app/jni/src/GameGfx/Invido/InvidoTraits.h) for the callback-table definitions.
+
+For the `Giocata` trait, `VGiocataCb` declares `GiocataStarted`, `GiocataEndedWinner`, and `GiocataEndDueced`. `GiocataCb` pairs a pointer to that function table (`tc`) with a `self` context pointer. This lets `Giocata` invoke callbacks on its owner without depending directly on its implementation.
+
+The wiring and call flow is:
+
+1. `InvidoCore::prepGiocataDelegator()` creates a `static const VGiocataCb` table whose functions forward to `InvidoCore` methods. The table must outlive the function because `Giocata` stores its pointer.
+2. `InvidoCore::Init()` passes the resulting `GiocataCb` to `_giocata.SetGiocataCB(...)`, connecting the `Giocata` member to the `InvidoCore` callbacks via the context pointer.
+3. When `Giocata` processes queued actions, it calls the matching function through `_giocataCb.tc`, passing `_giocataCb.self` as the first argument. For example, a start action calls `GiocataStarted(self, playerIx)`.
+4. Follow both the table definition and each binding function when changing a callback. Keep signatures in sync, preserve the static table's lifetime, and ensure the context points to a live owner. Apply the same tracing approach to the `Partita` callback table.
+
 ## Workflow
 
 1. Identify whether the change belongs to shared app code or `app/jni/src/GameGfx/Invido`; keep game-specific behavior in the Invido sources.
-2. Before changing a game-flow method, callback, or interface, follow its callers and related state transitions across `InvidoCore`, `Mano`, `Giocata`, and `Partita`. Preserve callback lifetimes and existing contracts.
+2. Before changing a game-flow method, callback, trait table, or interface, trace the full connection from callback definition through delegator setup and `Set...CB` wiring to the invocation site. Also follow related state transitions across `InvidoCore`, `Mano`, `Giocata`, and `Partita`.
 3. Make a small, focused change. Follow `.clang-format`, nearby conventions, and existing CMake target selection. Avoid unrelated changes to Solitario or vendored SDL code.
 4. Configure and build from the repository root for Windows/MySys2:
    ```powershell
