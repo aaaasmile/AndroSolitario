@@ -20,6 +20,16 @@ The wiring and call flow is:
 3. When `Giocata` processes queued actions, it calls the matching function through `_giocataCb.tc`, passing `_giocataCb.self` as the first argument. For example, a start action calls `GiocataStarted(self, playerIx)`.
 4. Follow both the table definition and each binding function when changing a callback. Keep signatures in sync, preserve the static table's lifetime, and ensure the context points to a live owner. Apply the same tracing approach to the `Partita` callback table.
 
+## Game-State Coordination
+
+`InvidoCore` is the coordinator of the game state. It owns the `Partita`, `Giocata`, and `Mano` state-machine objects as members and coordinates their transitions through callbacks and actions. Keep their responsibilities distinct when changing game logic:
+
+- **`Partita`** tracks whether the overall game is ongoing or has ended. It is the lifetime/state boundary for the match-level game.
+- **`Giocata`** represents a card-distribution trick: a new trick begins with cards dealt to the players (three cards each in the standard two-player game), and the trick eventually ends with a winner or without one. `A Monte` invalidates the current trick, so play can continue with another distribution/trick.
+- **`Mano`** tracks the play and score-call (`chiamata`) state within a trick, including player turns, responses to calls, and score changes. A score raise requires the other player to respond: they may accept, raise to a higher score, or call `A Monte`, which invalidates the current `Giocata` and leads to another trick.
+
+The default game has two players. Do not assume other player counts unless the relevant configuration or task explicitly enables them. When modifying transitions, verify how `Mano` notifies `InvidoCore`, how `InvidoCore` starts/ends `Giocata`, and how a trick outcome affects `Partita` and match scoring; avoid duplicating state in multiple classes.
+
 ## Workflow
 
 1. Identify whether the change belongs to shared app code or `app/jni/src/GameGfx/Invido`; keep game-specific behavior in the Invido sources.
