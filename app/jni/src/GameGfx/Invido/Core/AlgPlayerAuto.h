@@ -32,7 +32,7 @@ class AlgPlayerAuto : public I_ALG_Player {
     const std::string& GetLastError() const;
 
    private:
-    void PlayNextRecordedAction();
+    void PlayNextRecordedAction(GameActionReplayer::PlayerAction::Type expectedType);
     void StoreError(LPErrInApp error);
 
     GameActionReplayer& _replayer;

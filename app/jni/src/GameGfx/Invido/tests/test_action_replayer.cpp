@@ -102,8 +102,8 @@ invjson::Value MakeRecording() {
     actions.PushBack(MakeAction("Engine", "Deal", -1, NULL, 0));
     actions.PushBack(MakeAction("Player", "Say", 1, "Say",
                                 invido::SP_VABENE));
-    actions.PushBack(MakeAction("Player", "PlayCard", 0, "Card", 5));
     actions.PushBack(MakeAction("Engine", "ShuffledDeck", -1, NULL, 0));
+    actions.PushBack(MakeAction("Player", "PlayCard", 0, "Card", 5));
     actions.PushBack(MakeAction("Player", "PlayCard", 1, "Card", 12));
     recording["Actions"] = actions;
     return recording;
@@ -157,10 +157,47 @@ void testGameActionReplayer() {
     assert(dynamic_cast<invido::AlgPlayerAuto*>(player0.GetAlg()) != NULL);
     assert(dynamic_cast<invido::AlgPlayerAuto*>(player1.GetAlg()) != NULL);
 
+    invido::GameActionReplayer mismatchReplayer;
+    error = mismatchReplayer.LoadFile(path);
+    assert(error == NULL);
+    invido::GameActionReplayer::PlayerAction firstAction;
+    bool firstActionAvailable = false;
+    error = mismatchReplayer.PeekNextPlayerAction(0, firstAction,
+                                                  firstActionAvailable);
+    assert(error == NULL && firstActionAvailable);
+    assert(firstAction.type ==
+           invido::GameActionReplayer::PlayerAction::Type::Say);
+    invido::AlgPlayerAuto wrongTypePlayer(mismatchReplayer, 0);
+    FakeCore wrongTypeCore;
+    wrongTypePlayer.ALG_SetCoreInterface(&wrongTypeCore);
+    wrongTypePlayer.ALG_HaveToPlay();
+    assert(wrongTypePlayer.HasError());
+    assert(wrongTypeCore.Commands().empty());
+    assert(!mismatchReplayer.IsComplete());
+
+    invjson::Value responseMismatchRecording = MakeRecording();
+    invjson::Value responseMismatchActions = invjson::Value::MakeArray();
+    responseMismatchActions.PushBack(
+        MakeAction("Player", "PlayCard", 0, "Card", 5));
+    responseMismatchRecording["Actions"] = responseMismatchActions;
+    const std::string responseMismatchPath =
+        "GameActionReplayerResponseMismatchTest.json";
+    assert(WriteJsonFile(responseMismatchPath, responseMismatchRecording));
+    invido::GameActionReplayer responseMismatchReplayer;
+    error = responseMismatchReplayer.LoadFile(responseMismatchPath);
+    assert(error == NULL);
+    invido::AlgPlayerAuto wrongResponsePlayer(responseMismatchReplayer, 0);
+    FakeCore wrongResponseCore;
+    wrongResponsePlayer.ALG_SetCoreInterface(&wrongResponseCore);
+    wrongResponsePlayer.ALG_HaveToRespond();
+    assert(wrongResponsePlayer.HasError());
+    assert(wrongResponseCore.Commands().empty());
+    assert(!responseMismatchReplayer.IsComplete());
+
     FakeCore core;
     player0.GetAlg()->ALG_SetCoreInterface(&core);
     player1.GetAlg()->ALG_SetCoreInterface(&core);
-    player0.GetAlg()->ALG_HaveToPlay();
+    player0.GetAlg()->ALG_HaveToRespond();
     player1.GetAlg()->ALG_HaveToRespond();
     player0.GetAlg()->ALG_HaveToPlay();
     player1.GetAlg()->ALG_HaveToPlay();
@@ -213,8 +250,28 @@ void testGameActionReplayer() {
     assert(error != NULL);
     assert(unsupportedReplayer.GetPlayerCount() == 0);
 
+    const std::string truncatedPath = "GameActionReplayerTruncatedTest.json";
+    invjson::Value truncatedRecording = MakeRecording();
+    invjson::Value truncatedActions = invjson::Value::MakeArray();
+    truncatedActions.PushBack(
+        MakeAction("Player", "Say", 0, "Say", invido::SP_INVIDO));
+    truncatedRecording["Actions"] = truncatedActions;
+    assert(WriteJsonFile(truncatedPath, truncatedRecording));
+    invido::GameActionReplayer truncatedReplayer;
+    error = truncatedReplayer.LoadFile(truncatedPath);
+    assert(error == NULL);
+    invido::AlgPlayerAuto playerWaitingForCard(truncatedReplayer, 0);
+    FakeCore cardCore;
+    playerWaitingForCard.ALG_SetCoreInterface(&cardCore);
+    playerWaitingForCard.ALG_HaveToPlay();
+    assert(playerWaitingForCard.HasError());
+    assert(cardCore.Commands().empty());
+
     assert(SDL_RemovePath(path.c_str()));
+    assert(SDL_RemovePath(responseMismatchPath.c_str()));
     assert(SDL_RemovePath(rejectedPath.c_str()));
     assert(SDL_RemovePath(unsupportedPath.c_str()));
+    assert(SDL_RemovePath(truncatedPath.c_str()));
+    assert(SDL_RemovePath(truncatedPath.c_str()));
     std::cout << "GameActionReplayer tests PASSED" << std::endl;
 }

@@ -34,11 +34,16 @@ void AlgPlayerAuto::ALG_MatchEnd(I_MatchScore* score) {}
 void AlgPlayerAuto::ALG_GicataScoreChange(eGiocataScoreState newScore) {}
 void AlgPlayerAuto::ALG_PlayerSaidWrong(Uint8 playerIndex) {}
 
-void AlgPlayerAuto::ALG_HaveToPlay() { PlayNextRecordedAction(); }
+void AlgPlayerAuto::ALG_HaveToPlay() {
+    PlayNextRecordedAction(GameActionReplayer::PlayerAction::Type::PlayCard);
+}
 
-void AlgPlayerAuto::ALG_HaveToRespond() { PlayNextRecordedAction(); }
+void AlgPlayerAuto::ALG_HaveToRespond() {
+    PlayNextRecordedAction(GameActionReplayer::PlayerAction::Type::Say);
+}
 
-void AlgPlayerAuto::PlayNextRecordedAction() {
+void AlgPlayerAuto::PlayNextRecordedAction(
+    GameActionReplayer::PlayerAction::Type expectedType) {
     if (!_lastError.empty() || _p_CoreGame == NULL) {
         return;
     }
@@ -59,9 +64,18 @@ void AlgPlayerAuto::PlayNextRecordedAction() {
         StoreError(ERR_UTIL::ErrorCreate(errorMessage));
         return;
     }
+    if (action.type != expectedType) {
+        char errorMessage[128];
+        SDL_snprintf(errorMessage, sizeof(errorMessage),
+                     "Replay action %d has the wrong type for player %d",
+                     static_cast<int>(action.sequence),
+                     static_cast<int>(_playerIndex));
+        StoreError(ERR_UTIL::ErrorCreate(errorMessage));
+        return;
+    }
 
     bool accepted = false;
-    switch (action.type) {
+    switch (expectedType) {
         case GameActionReplayer::PlayerAction::Type::Say:
             accepted = _p_CoreGame->Say(
                 _playerIndex, static_cast<eSayPlayer>(action.value));
@@ -76,7 +90,7 @@ void AlgPlayerAuto::PlayNextRecordedAction() {
 
     if (!accepted) {
         const char* actionName =
-            action.type == GameActionReplayer::PlayerAction::Type::Say
+            expectedType == GameActionReplayer::PlayerAction::Type::Say
                 ? "Say"
                 : "PlayCard";
         char errorMessage[128];
