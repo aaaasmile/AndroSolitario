@@ -57,7 +57,7 @@ class InvidoCore : public I_CORE_Game {
     void PartitaStarted(Uint8 playerIx);
 
     void NewMatch();
-    void NextAction();
+    bool NextAction();
     void SetRandomSeed(int iVal);
     // Interface I_CORE_Game
     bool Say(Uint8 playerIx, eSayPlayer eSay);

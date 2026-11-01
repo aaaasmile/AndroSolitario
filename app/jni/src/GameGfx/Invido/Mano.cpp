@@ -138,11 +138,9 @@ Mano::Mano() {
         eGiocataScoreState::SC_PARTIDA;
 }
 
-void Mano::NextAction() {
-    size_t iNumAct = _deqNextAction.size();
-    if (iNumAct == 0) {
-        // no action
-        return;
+bool Mano::NextAction() {
+    if (_deqNextAction.empty()) {
+        return false;
     }
     ActionItemMano Action = _deqNextAction.front();
     _deqNextAction.pop_front();
@@ -167,7 +165,7 @@ void Mano::NextAction() {
         case MANO_VADODENTRO:
             // TO DO
             SDL_assert(0);
-            break;
+            return false;
 
         case MANO_VADOVIA:
             _manoCb.tc->Player_VaVia(_manoCb.self, Action._vctArg[0]);
@@ -186,13 +184,11 @@ void Mano::NextAction() {
             _manoCb.tc->ChangeGiocataScore(_manoCb.self, eScore);
             // process the next action without waiting the next trigger
             NextAction();
-            break;
+            return true;
 
         case MANO_NO_ACTION:
-            // nothing to do
-            // process the next action without waiting the next trigger
-            NextAction();
-            break;
+            // This sentinel is consumed without executing an action.
+            return NextAction();
 
         case MANO_SAYBUIDA:
             _manoCb.tc->NtyPlayerSayBuiada(_manoCb.self, Action._vctArg[0]);
@@ -202,6 +198,7 @@ void Mano::NextAction() {
             SDL_assert(0);
             break;
     }
+    return true;
 }
 
 void Mano::GiocataStart() {

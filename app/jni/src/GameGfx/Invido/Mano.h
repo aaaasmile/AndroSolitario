@@ -74,7 +74,7 @@ class Mano {
     bool Player_Say(Uint8 playerIx, eSayPlayer eSay);
     bool Player_PlayACard(Uint8 playerIx, bool vadoDentro);
     void Reset();
-    void NextAction();
+    bool NextAction();
     eManoStatus GetState() { return _eManoState; }
     void Init(int numPlayers);
     void GetAdmittedCommands(VCT_COMMANDS& vct_Commands, Uint8 playerIx);

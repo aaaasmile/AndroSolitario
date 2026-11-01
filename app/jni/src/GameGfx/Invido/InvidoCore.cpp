@@ -201,10 +201,12 @@ void InvidoCore::NewMatch() {
     _matchPoints.MatchStart(_numPlayers); // TODO set Num players, _matchPoints is not for match state
 }
 
-void InvidoCore::NextAction() {
-    _mano.NextAction();
-    _giocata.NextAction();
-    _partita.NextAction();
+bool InvidoCore::NextAction() {
+    const bool manoActionTaken = _mano.NextAction();
+    const bool giocataActionTaken = _giocata.NextAction();
+    const bool partitaActionTaken = _partita.NextAction();
+
+    return manoActionTaken || giocataActionTaken || partitaActionTaken;
 }
 
 void InvidoCore::resetCardInfoPlayers() {

@@ -1,5 +1,6 @@
 #include <cassert>
 #include <iostream>
+#include <stdexcept>
 
 #include "../Player.h"
 #include "../PlayersOnTable.h"
@@ -25,8 +26,10 @@ void testSimpleMatch() {
     invidoCore.Init(&playersOnTable, &mazzo);
 
     invidoCore.NewMatch();
-    while(invidoCore.IsMatchOnGoing()){
-        invidoCore.NextAction();
+    while (invidoCore.IsMatchOnGoing()) {
+        if (!invidoCore.NextAction()) {
+            throw std::runtime_error("Match stalled: no game action was taken");
+        }
     }
     
     std::cout << "Match tests PASSED" << std::endl;

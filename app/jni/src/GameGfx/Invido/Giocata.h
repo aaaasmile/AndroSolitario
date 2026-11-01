@@ -42,7 +42,7 @@ class Giocata {
 
     // void Update_Giocata();
     void Reset();
-    void NextAction();
+    bool NextAction();
     void PlayerGiocataWins(Uint8 playerWinnerIx);
     void GiocataAMonte();
     void GiocataPatada();

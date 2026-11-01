@@ -31,7 +31,7 @@ class Partita {
     LPErrInApp NewPartita(Uint8 playerStartIx);
     void PartitaEnd();
     void Reset();
-    void NextAction();
+    bool NextAction();
 
    private:
     ePartitaStatus _PartitaState;
