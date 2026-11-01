@@ -48,27 +48,27 @@ class AlgPlayer : public I_ALG_Player {
                           int lastNumChiamate, int maxpoints, int sum_points);
 
    private:
-    std::vector<CardSpec> m_vct_Cards_CPU;
-    std::vector<CardSpec> m_vct_Cards_played[NUM_HANDS];
-    eGiocataScoreState m_eScoreCurrent;
-    I_CORE_Game* m_pCoreGame;
-    int m_iMyIndex;
-    int m_iOppIndex;
-    eSayPlayer m_OpponentSay;
-    eSayPlayer m_sayOppRisp;
-    eSayPlayer m_MyLastSay;
-    eSayPlayer m_sayMyRisp;
-    int m_arrIxPlayerWonHand[NUM_CARDS_HAND];
-    bool m_bLastManoPatada;
-    int m_iNumChiamateMonte;
-    int m_iNumManiWon;
-    int m_iPlayerOnTurn;
-    int m_iNumChiamateInGiocata;
-    bool m_bIamCalledPoints;
-    int m_iCPUCardDentroPos;
-    bool m_opponetIsVadoDentro;
-    bool m_WonFirstHand;
-    int m_ixCurrMano;
+    std::vector<CardSpec> _vctCpuCards;
+    std::vector<CardSpec> _vctPlayedCards[NUM_HANDS];
+    eGiocataScoreState _currentScore;
+    I_CORE_Game* _p_CoreGame;
+    int _myIndex;
+    int _opponentIndex;
+    eSayPlayer _opponentSay;
+    eSayPlayer _opponentResponseSay;
+    eSayPlayer _myLastSay;
+    eSayPlayer _myResponseSay;
+    int _playerWonHandIndices[NUM_CARDS_HAND];
+    bool _lastManoPatada;
+    int _numAmonteCalls;
+    int _numManiWon;
+    int _playerOnTurn;
+    int _numCallsInGiocata;
+    bool _hasCalledPoints;
+    int _cpuCardDentroPosition;
+    bool _opponentWentDentro;
+    bool _wonFirstHand;
+    int _currentManoIndex;
 };
 
 }  // namespace invido

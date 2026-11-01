@@ -9,7 +9,7 @@ Use this workflow for Invido-specific implementation and debugging. For general 
 
 ## Member Naming
 
-For Invido class members, use a leading underscore and omit type affixes such as `m_i` or `m_b`. Non-pointer member names start with a lowercase letter after the underscore and use camel case; for example, `m_iNumManiWon` becomes `_numManiWon`. For pointer members, use the `_p_` prefix followed by the member name; for example, `m_pCoreGame` becomes `_p_CoreGame`.
+For Invido class members, use a leading underscore and omit legacy type affixes such as `m_i` or `m_b`. Non-pointer, non-vector member names start with a lowercase letter after the underscore and use camel case; for example, `m_iNumManiWon` becomes `_numManiWon`. Pointer members use the `_p_` prefix followed by the member name; for example, `m_pCoreGame` becomes `_p_CoreGame`. For `std::vector` members, use `_vct` followed by an upper-case name; for example, `std::vector<CardSpec> _cpuCards` becomes `std::vector<CardSpec> _vctCpuCards`.
 
 ## Invido Traits and Callbacks
 
