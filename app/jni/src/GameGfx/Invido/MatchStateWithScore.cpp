@@ -1,23 +1,20 @@
-#include "MatchPoints.h"
+#include "MatchStateWithScore.h"
 
 #include "Mano.h"
 
 using namespace invido;
 
-MatchPoints::MatchPoints() {
+MatchStateWithScore::MatchStateWithScore() {
     _numPlayers = NUM_PLAY_INVIDO_2;
     _playerChangeScore = NOT_VALID_INDEX;
     _isGameAbandoned = false;
     _isMatchEnd = false;
-    // for (int iManoNum = 0; iManoNum < NUM_CARDS_HAND; iManoNum++) {
-    //     _vctManoInfo[iManoNum].Reset();
-    // }
-    _currentScore = SC_CANELA;
+   _currentScore = SC_CANELA;
 }
 
-MatchPoints::~MatchPoints() {}
+MatchStateWithScore::~MatchStateWithScore() {}
 
-void MatchPoints::MatchStart(int iNumPlayer) {
+void MatchStateWithScore::MatchStart(int iNumPlayer) {
     _vctPlayerPoints.assign(iNumPlayer, 0);
 
     _numPlayers = iNumPlayer;
@@ -29,7 +26,7 @@ void MatchPoints::MatchStart(int iNumPlayer) {
     _vctGiocataInfo.clear();
 }
 
-void MatchPoints::GiocataStart() {
+void MatchStateWithScore::GiocataStart() {
     _vctHandWons.assign(_numPlayers, 0);
     _vctCardPlayed.assign(_numPlayers, CardPlayed{});
     _vctManoInfo.assign(NUM_CARDS_HAND,
@@ -51,14 +48,14 @@ void MatchPoints::GiocataStart() {
     _isManoPatatda = false;
 }
 
-void MatchPoints::PlayerPlay(Uint8 playerIx, const CardSpec& cardSpec) {
+void MatchStateWithScore::PlayerPlay(Uint8 playerIx, const CardSpec& cardSpec) {
     SDL_assert(_numCardsPlayed < _vctCardPlayed.size());
     _vctCardPlayed[_numCardsPlayed]._playerIx = playerIx;
     _vctCardPlayed[_numCardsPlayed]._cardSpec = cardSpec;
     _numCardsPlayed++;
 }
 
-void MatchPoints::VaDentro(Uint8 playerIx) {
+void MatchStateWithScore::VaDentro(Uint8 playerIx) {
     CardSpec cardSpec;
     cardSpec.SetCardIndex(4);  // make sure that the card will always loose
     SDL_assert(_numCardsPlayed < _vctCardPlayed.size());
@@ -69,7 +66,7 @@ void MatchPoints::VaDentro(Uint8 playerIx) {
     _numCardsPlayed++;
 }
 
-void MatchPoints::ManoEnd() {
+void MatchStateWithScore::ManoEnd() {
     SDL_assert(_numCardsPlayed == _numPlayers);
     int manoTerminatedIndex = _manoRound;
     SDL_assert(manoTerminatedIndex >= 0 &&
@@ -149,21 +146,21 @@ void MatchPoints::ManoEnd() {
     _numCardsPlayed = 0;
 }
 
-void MatchPoints::GiocataPatada() {
+void MatchStateWithScore::GiocataPatada() {
     GiocataInfo gi = {._score = SC_PATTA};
     _vctGiocataInfo.push_back(gi);
     _vctManoInfo.clear();
     _isGiocataPatada = true;
 }
 
-void MatchPoints::GiocataAMonte() {
+void MatchStateWithScore::GiocataAMonte() {
     GiocataInfo gi = {._score = SC_AMONTE};
     _vctGiocataInfo.push_back(gi);
     _vctManoInfo.clear();
     _isGiocataAMonte = true;
 }
 
-void MatchPoints::GiocataEndWithWinner(Uint8 playerWinIx) {
+void MatchStateWithScore::GiocataEndWithWinner(Uint8 playerWinIx) {
     SDL_assert(_eIsGiocataEnd == GES_HAVE_WINNER);
     SDL_assert(playerWinIx < _vctPlayerPoints.size());
     _playerGiocataWin = playerWinIx;
@@ -189,14 +186,14 @@ void MatchPoints::GiocataEndWithWinner(Uint8 playerWinIx) {
     _vctManoInfo.clear();
 }
 
-void MatchPoints::beginSpecialTurn() {
+void MatchStateWithScore::beginSpecialTurn() {
     _scoreGoal = SPECIAL_SCORE_GOAL;
     _vctPlayerPoints[PLAYER1] = 0;
     _vctPlayerPoints[PLAYER2] = 0;
     _isMatchInSpecialScore = true;
 }
 
-void MatchPoints::GetManoInfo(int manoNum, Uint8* pplayerIx, bool* pisPlayed,
+void MatchStateWithScore::GetManoInfo(int manoNum, Uint8* pplayerIx, bool* pisPlayed,
                               bool* pisPata) {
     SDL_assert(pisPata);
     SDL_assert(pisPlayed);
@@ -211,14 +208,14 @@ void MatchPoints::GetManoInfo(int manoNum, Uint8* pplayerIx, bool* pisPlayed,
     }
 }
 
-void MatchPoints::GetGiocataInfo(int iNumGiocata, GiocataInfo* pGiocInfo) {
+void MatchStateWithScore::GetGiocataInfo(int iNumGiocata, GiocataInfo* pGiocInfo) {
     SDL_assert(pGiocInfo);
     if (iNumGiocata >= 0 && iNumGiocata < (int)_vctGiocataInfo.size()) {
         *pGiocInfo = _vctGiocataInfo[iNumGiocata];
     }
 }
 
-void MatchPoints::ChangeCurrentScore(eGiocataScoreState eVal, int iPlayer) {
+void MatchStateWithScore::ChangeCurrentScore(eGiocataScoreState eVal, int iPlayer) {
     if (eVal > 0) {
         SDL_assert(iPlayer != _playerChangeScore);
     }
@@ -226,7 +223,7 @@ void MatchPoints::ChangeCurrentScore(eGiocataScoreState eVal, int iPlayer) {
     _playerChangeScore = iPlayer;
 }
 
-void MatchPoints::SetTheWinnerBecauseAbandon(Uint8 playerIx) {
+void MatchStateWithScore::SetTheWinnerBecauseAbandon(Uint8 playerIx) {
     _playerMatchWin = playerIx;
     _isGameAbandoned = true;
     _isMatchEnd = true;

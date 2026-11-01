@@ -1,5 +1,5 @@
-#ifndef __MATCHPOINTS_H
-#define __MATCHPOINTS_H
+#ifndef __MATCHSTATEWITHSCORE_H
+#define __MATCHSTATEWITHSCORE_H
 
 #include <SDL3/SDL.h>
 
@@ -28,7 +28,7 @@ struct CardPlayed {
 };
 typedef std::vector<CardPlayed> VCP_CARDPLAYED;
 
-class MatchPoints : public I_MatchScore {
+class MatchStateWithScore : public I_MatchScore {
     enum eGiocataEndState {
         GES_ON_GOING,
         GES_HAVE_WINNER,
@@ -37,8 +37,8 @@ class MatchPoints : public I_MatchScore {
     };
 
    public:
-    MatchPoints();
-    virtual ~MatchPoints();
+    MatchStateWithScore();
+    virtual ~MatchStateWithScore();
     void MatchStart(int iNumPlayer);
 
     void GiocataStart();

@@ -4,7 +4,7 @@
 
 #include "Config.h"
 #include "InvidoCoreDef.h"
-#include "MatchPoints.h"
+#include "MatchStateWithScore.h"
 #include "TraceService.h"
 
 using namespace invido;

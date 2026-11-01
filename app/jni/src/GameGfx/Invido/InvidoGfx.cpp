@@ -64,7 +64,7 @@ InvidoGfx::InvidoGfx() {
     for (int i = 0; i < InvidoGfx::NUM_ANIMAGES; i++) {
         _p_AnImages[i] = NULL;
     }
-    _p_MatchPoints = NULL;
+    _p_MatchStateWithScore = NULL;
     _p_InvidoCore = NULL;
     _isPlayerCanPlay = false;
     _playerThatHaveMarkup = 0;
@@ -726,7 +726,7 @@ void InvidoGfx::InitInvidoVsCPU() {
     _p_InvidoCore = new InvidoCore();
     _p_InvidoCore->Init(&_playersOnTable, &_mazzo);
 
-    _p_MatchPoints = _p_InvidoCore->GetMatchPointsInstance();
+    _p_MatchStateWithScore = _p_InvidoCore->GetMatchStateWithScoreInstance();
 
     TRACE_DEBUG("Partita tra %s e %s", player1.GetName().c_str(),
                 player2.GetName().c_str());
@@ -1153,7 +1153,7 @@ void InvidoGfx::showManoScore(bool bIsPlayed, Uint8 playerIx, bool bIsPata,
 }
 
 void InvidoGfx::guiPlayerTurn(int iPlayer) {
-    SDL_assert(_p_MatchPoints);
+    SDL_assert(_p_MatchStateWithScore);
     _isPlayerCanPlay = true;
 
     _playerThatHaveMarkup = iPlayer;
@@ -1179,7 +1179,7 @@ void InvidoGfx::showCurrentScore() {
         bool bIsPata;
         bool bIsPlayed;
         Uint8 playerIx;
-        _p_MatchPoints->GetManoInfo(iManoNum, &playerIx, &bIsPlayed, &bIsPata);
+        _p_MatchStateWithScore->GetManoInfo(iManoNum, &playerIx, &bIsPlayed, &bIsPata);
         showManoScore(bIsPlayed, playerIx, bIsPata, iManoNum);
     }
 
@@ -1234,9 +1234,9 @@ void InvidoGfx::showCurrentScore() {
                          _p_FontText);
 
     // current giocata score
-    eGiocataScoreState eCurrScore = _p_MatchPoints->GetCurrScore();
+    eGiocataScoreState eCurrScore = _p_MatchStateWithScore->GetCurrScore();
     STRING lpsNamePoints = _MapPunti[eCurrScore];
-    if (_p_MatchPoints->IsGiocataMonte()) {
+    if (_p_MatchStateWithScore->IsGiocataMonte()) {
         lpsNamePoints = pLangMgr->GetStringId(Languages::ID_S_AMONTE).c_str();
     }
     char buffTmp[256];
@@ -1251,13 +1251,13 @@ void InvidoGfx::showCurrentScore() {
                          GFX_UTIL_COLOR::White, _p_FontText);
 
     // player score
-    int iNumGiocate = _p_MatchPoints->GetNumGiocateInCurrMatch();
+    int iNumGiocate = _p_MatchStateWithScore->GetNumGiocateInCurrMatch();
     VCT_INT vct_Point_pl1;
     for (int j = 0; j < NUM_PLAY_INVIDO_2; j++) {
         vct_Point_pl1.clear();
         for (int iNumGio = 0; iNumGio < iNumGiocate; iNumGio++) {
             GiocataInfo GioInfo;
-            _p_MatchPoints->GetGiocataInfo(iNumGio, &GioInfo);
+            _p_MatchStateWithScore->GetGiocataInfo(iNumGio, &GioInfo);
 
             if (GioInfo._score > 0) {
                 if (GioInfo._playerIndex == j) {
@@ -1438,7 +1438,7 @@ void InvidoGfx::opponentHasPlayedCard(const CardSpec& card, bool vadoDentro) {
     Player* pPlayer = _p_InvidoCore->GetPlayer(_opponentIndex);
     TRACE_DEBUG("%s %s has played %s\n", lpszCST_INFO,
                 pPlayer->GetName().c_str(), card.GetName().c_str());
-    int iNumCardPlayed = _p_MatchPoints->GetCurrNumCardPlayed();
+    int iNumCardPlayed = _p_MatchStateWithScore->GetCurrNumCardPlayed();
     if (iNumCardPlayed == 1) {
         // first card played from opponent, don't need a delay
         //_DelayAction.CheckPoint(50, DelayNextAction::NOCHANGE);

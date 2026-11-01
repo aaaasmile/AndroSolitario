@@ -42,7 +42,7 @@ set(TEST_IMPL_SOURCES
     ${TEST_INVIDO_DIR}/Giocata.cpp
     ${TEST_INVIDO_DIR}/Mano.cpp
     ${TEST_INVIDO_DIR}/Partita.cpp
-    ${TEST_INVIDO_DIR}/MatchPoints.cpp
+    ${TEST_INVIDO_DIR}/MatchStateWithScore.cpp
     ${TEST_APP_DIR}/ErrorInfo.cpp
     ${TEST_APP_DIR}/../UnixSys/UnixsysTrace.cpp
 )

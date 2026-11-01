@@ -2,7 +2,7 @@
 
 #include "InvidoCore.h"
 #include "Mano.h"
-#include "MatchPoints.h"
+#include "MatchStateWithScore.h"
 
 using namespace invido;
 

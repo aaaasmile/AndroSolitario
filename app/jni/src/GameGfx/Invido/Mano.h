@@ -11,7 +11,7 @@
 
 namespace invido {
 
-class MatchPoints;
+class MatchStateWithScore;
 
 enum eFN_MANOACTION {
     MANO_WAITPL_TOPLAY = 0,
@@ -69,7 +69,7 @@ class Mano {
    public:
     Mano();
     void SetManoCB(ManoCb& manoCb) { _manoCb = manoCb; }
-    void SetScore(MatchPoints* pVal) { _p_Score = pVal; }
+    void SetScore(MatchStateWithScore* pVal) { _p_Score = pVal; }
     LPErrInApp NewMano(Uint8 playerIx);
     bool Player_Say(Uint8 playerIx, eSayPlayer eSay);
     bool Player_PlayACard(Uint8 playerIx, bool vadoDentro);
@@ -115,7 +115,7 @@ class Mano {
     eManoStatus _eOldManoState;
     Uint8 _numOfPlayers;
     DEQ_ACTIONITEM _deqNextAction;
-    MatchPoints* _p_Score;
+    MatchStateWithScore* _p_Score;
     DEQ_PENDQUESTION _deqPendingQuestion;
     MAP_ACTION_NAMES _mapActionNames;
     MAP_SAY_SCORE _mapSayScore;

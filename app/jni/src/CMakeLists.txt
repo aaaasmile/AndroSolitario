@@ -55,7 +55,7 @@ list(APPEND SOURCES
         GameGfx/Invido/InvidoCore.cpp
         GameGfx/Invido/InvidoGfx.cpp
         GameGfx/Invido/Mano.cpp
-        GameGfx/Invido/MatchPoints.cpp
+        GameGfx/Invido/MatchStateWithScore.cpp
         GameGfx/Invido/Partita.cpp
         GameGfx/Invido/Mazzo.cpp
         GameGfx/Invido/Player.cpp

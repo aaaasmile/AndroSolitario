@@ -159,7 +159,7 @@ class InvidoGfx : public I_ALG_Player {
     MAP_SAY _Map_fb_Say;
     MAP_INTID _Map_id_EchoSay;
     MAP_INTID _Map_idSynth_Say;
-    MatchPoints* _p_MatchPoints;
+    MatchStateWithScore* _p_MatchStateWithScore;
     bool _isPlayerCanPlay;
     int _playerThatHaveMarkup;
     ButtonGfx* _p_btArrayCmd[NUMOFBUTTON];

@@ -8,7 +8,7 @@
 #include "Giocata.h"
 #include "InvidoCoreDef.h"
 #include "Mano.h"
-#include "MatchPoints.h"
+#include "MatchStateWithScore.h"
 #include "Partita.h"
 #include "PlayerStatistic.h"
 #include "PlayersOnTable.h"
@@ -28,7 +28,7 @@ class InvidoCore : public I_CORE_Game {
     void SetGameType(eGameType eVal) { _eGameType = eVal; }
     Player* GetPlayer(Uint8 index);
     int GetNumOfPlayers() { return _numPlayers; }
-    MatchPoints* GetMatchPointsInstance() { return &_matchPoints; }
+    MatchStateWithScore* GetMatchStateWithScoreInstance() { return &_matchStateWithScore; }
     PlayersOnTable* GetTable() { return _p_PlayersOnTable; }
     bool IsMatchOnGoing() { return _partita.IsOngoing(); }
 
@@ -88,7 +88,7 @@ class InvidoCore : public I_CORE_Game {
     Partita _partita;
     Giocata _giocata;
     Mano _mano;
-    MatchPoints _matchPoints;
+    MatchStateWithScore _matchStateWithScore;
     std::vector<I_ALG_Player*> _vctpAlgPlayer;
     std::vector<VCT_CARDSPEC> _vctCardInfos;
 };

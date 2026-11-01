@@ -129,11 +129,11 @@ void InvidoCore::Init(PlayersOnTable* pPlayersOnTable, Mazzo* pMazzo) {
 
     ManoCb manoCb = prepManoDelegator();
     _mano.SetManoCB(manoCb);
-    _mano.SetScore(&_matchPoints);
+    _mano.SetScore(&_matchStateWithScore);
 
     _numPlayers = _p_PlayersOnTable->GetNumOfPlayers();
 
-    //_matchPoints.SetManoInstance(&_mano);
+    //_matchStateWithScore.SetManoInstance(&_mano);
 }
 
 Uint8 InvidoCore::getNewMatchFirstPlayer() { return SDL_rand(_numPlayers); }
@@ -200,7 +200,7 @@ void InvidoCore::NewMatch() {
     _p_PlayersOnTable->SetFirstOnMatch(firstPlayerIx);
     _p_StartPlayer = _p_PlayersOnTable->GetPlayerOnIndex(firstPlayerIx);
     _partita.NewPartita(firstPlayerIx);
-    _matchPoints.MatchStart(_numPlayers);  // TODO set Num players, _matchPoints
+    _matchStateWithScore.MatchStart(_numPlayers);  // TODO set Num players, _matchStateWithScore
                                            // is not for match state
 }
 
@@ -281,7 +281,7 @@ void InvidoCore::Giocata_Start(Uint8 playerIx) {
             _vctpAlgPlayer[playerIx]->ALG_NewGiocata(vctCardArray, playerIx);
         }
     }
-    _matchPoints.GiocataStart();
+    _matchStateWithScore.GiocataStart();
     NotifyScript(SCR_NFY_NEWGIOCATA);
     _mano.GiocataStart();
     LPErrInApp manoError = _mano.NewMano(firstPlayerIx);
@@ -289,30 +289,30 @@ void InvidoCore::Giocata_Start(Uint8 playerIx) {
 }
 
 void InvidoCore::Mano_End() {
-    _matchPoints.ManoEnd();
+    _matchStateWithScore.ManoEnd();
 
     for (I_ALG_Player* pIAlgPlayer : _vctpAlgPlayer) {
         if (pIAlgPlayer) {
-            pIAlgPlayer->ALG_ManoEnd(&_matchPoints);
+            pIAlgPlayer->ALG_ManoEnd(&_matchStateWithScore);
         }
     }
 
-    const bool giocataEnded = _matchPoints.IsGiocataEnd();
+    const bool giocataEnded = _matchStateWithScore.IsGiocataEnd();
     if (giocataEnded) {
-        if (_matchPoints.IsGiocataPatada()) {
+        if (_matchStateWithScore.IsGiocataPatada()) {
             _giocata.GiocataPatada();
-        } else if (_matchPoints.IsGiocataMonte()) {
+        } else if (_matchStateWithScore.IsGiocataMonte()) {
             _giocata.GiocataAMonte();
         } else {
-            Uint8 giocataWinnerIx = _matchPoints.GetGiocataWinner();
+            Uint8 giocataWinnerIx = _matchStateWithScore.GetGiocataWinner();
             _giocata.PlayerGiocataWins(giocataWinnerIx);
         }
     } else {
-        if (_matchPoints.IsManoPatada()) {
+        if (_matchStateWithScore.IsManoPatada()) {
             Uint8 playerIx = _p_PlayersOnTable->GetFirstOnTrick();
             _p_PlayersOnTable->SetCurrentAndFirstOnTrick(playerIx);
         } else {
-            Uint8 winnerPlayerIx = _matchPoints.GetManoWinner();
+            Uint8 winnerPlayerIx = _matchStateWithScore.GetManoWinner();
             _p_PlayersOnTable->SetCurrentAndFirstOnTrick(winnerPlayerIx);
         }
         _p_PlHaveToPlay = _p_PlayersOnTable->GetPlayerToPlay();
@@ -323,14 +323,14 @@ void InvidoCore::Mano_End() {
 }
 
 void InvidoCore::Giocata_AMonte() {
-    _matchPoints.GiocataAMonte();
+    _matchStateWithScore.GiocataAMonte();
     _giocata.GiocataAMonte();
 }
 
 void InvidoCore::Player_VaVia(Uint8 playerIx) {
     Player* pPlayer = _p_PlayersOnTable->PeekNextPlayerToIx(playerIx);
     Uint8 playerWinnerIx = pPlayer->GetIndex();
-    _matchPoints.GiocataEndWithWinner(playerWinnerIx);
+    _matchStateWithScore.GiocataEndWithWinner(playerWinnerIx);
     _giocata.PlayerGiocataWins(playerWinnerIx);
 }
 
@@ -345,19 +345,19 @@ void InvidoCore::ChangeGiocataScore(eGiocataScoreState eNewScore) {
 void InvidoCore::Giocata_End() {
     for (I_ALG_Player* pIAlgPlayer : _vctpAlgPlayer) {
         if (pIAlgPlayer) {
-            pIAlgPlayer->ALG_GiocataEnd(&_matchPoints);
+            pIAlgPlayer->ALG_GiocataEnd(&_matchStateWithScore);
         }
     }
 
     NotifyScript(SCR_NFY_ALGGIOCATAEND);
     _mano.Reset();
 
-    if (_matchPoints.IsMatchEnd()) {
+    if (_matchStateWithScore.IsMatchEnd()) {
         _partita.PartitaEnd();
         return;
     }
 
-    Uint8 nextStartPlayerIx = _matchPoints.GetGiocataWinner();
+    Uint8 nextStartPlayerIx = _matchStateWithScore.GetGiocataWinner();
     if (nextStartPlayerIx == NOT_VALID_INDEX) {
         nextStartPlayerIx = _p_PlayersOnTable->GetPlayerToPlay()->GetIndex();
     }
@@ -369,7 +369,7 @@ void InvidoCore::Giocata_End() {
 void InvidoCore::PartitaEnded() {
     for (I_ALG_Player* pIAlgPlayer : _vctpAlgPlayer) {
         if (pIAlgPlayer) {
-            pIAlgPlayer->ALG_MatchEnd(&_matchPoints);
+            pIAlgPlayer->ALG_MatchEnd(&_matchStateWithScore);
         }
     }
     NotifyScript(SCR_NFY_ALGMATCHEND);
@@ -391,11 +391,11 @@ void InvidoCore::AbandonGame(Uint8 playerIx) {
     // give the victory to the next player
     Uint8 winnerPlayerIx = pWinnerPlayer->GetIndex();
 
-    _matchPoints.SetTheWinnerBecauseAbandon(winnerPlayerIx);
+    _matchStateWithScore.SetTheWinnerBecauseAbandon(winnerPlayerIx);
 
     for (I_ALG_Player* pIAlgPlayer : _vctpAlgPlayer) {
         if (pIAlgPlayer) {
-            pIAlgPlayer->ALG_MatchEnd(&_matchPoints);
+            pIAlgPlayer->ALG_MatchEnd(&_matchStateWithScore);
         }
     }
 }
@@ -452,7 +452,7 @@ bool InvidoCore::VaDentro(Uint8 playerIx, const CardSpec& cardSpec) {
         // next player is on game
         _p_PlHaveToPlay = _p_PlayersOnTable->SwitchToNextPlayer();
 
-        _matchPoints.VaDentro(playerIx);
+        _matchStateWithScore.VaDentro(playerIx);
 
         for (I_ALG_Player* pIAlgPlayer : _vctpAlgPlayer) {
             // notify all players that a card was played
@@ -484,7 +484,7 @@ bool InvidoCore::PlayCard(Uint8 playerIx, const CardSpec& cardSpec) {
         _p_PlHaveToPlay = _p_PlayersOnTable->SwitchToNextPlayer();
 
         // update match points
-        _matchPoints.PlayerPlay(playerIx, *pCardplayed);
+        _matchStateWithScore.PlayerPlay(playerIx, *pCardplayed);
 
         for (I_ALG_Player* pIAlgPlayer : _vctpAlgPlayer) {
             // notify all players that a card was played
