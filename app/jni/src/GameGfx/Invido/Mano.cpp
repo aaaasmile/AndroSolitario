@@ -153,9 +153,9 @@ bool Mano::NextAction() {
         case MANO_WAITPL_TOPLAY:
             SDL_assert(Action._vctArg.size() > 0);
             // may be _eNextAction is modified
+            TRACE_DEBUG("[Mano] Wait play player: %d\n", Action._vctArg[0]);
             _manoCb.tc->NtyWaitingPlayer_Toplay(_manoCb.self,
                                                 Action._vctArg[0]);
-            TRACE_DEBUG("Wait play player: %d\n", Action._vctArg[0]);
             break;
 
         case MANO_AMONTE:
@@ -163,16 +163,15 @@ bool Mano::NextAction() {
             break;
 
         case MANO_VADODENTRO:
-            // TO DO
-            SDL_assert(0);
-            return false;
+            break;
 
         case MANO_VADOVIA:
             _manoCb.tc->Player_VaVia(_manoCb.self, Action._vctArg[0]);
             break;
 
         case MANO_WAIPL_TORESP:
-            _manoCb.tc->NtyWaitingPlayer_ToResp(_manoCb.self, Action._vctArg[0]);
+            _manoCb.tc->NtyWaitingPlayer_ToResp(_manoCb.self,
+                                                Action._vctArg[0]);
             break;
 
         case MANO_END:
@@ -558,9 +557,9 @@ void Mano::actionOnQuestion(PendingQuestion& PendQues) {
     _eManoState = _mapManoStateResp[playerIxNext];
 }
 
-Uint8 Mano::getNextPlayerIxAfter(Uint8 playerIx){
+Uint8 Mano::getNextPlayerIxAfter(Uint8 playerIx) {
     Uint8 nextIx = playerIx + 1;
-    if (nextIx >= _numOfPlayers){
+    if (nextIx >= _numOfPlayers) {
         return 0;
     }
     return nextIx;
