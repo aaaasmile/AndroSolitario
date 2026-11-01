@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "../../../Lib/Json/Json.h"
+#include "ErrorInfo.h"
 #include "InvidoCoreDef.h"
 
 namespace invido {
@@ -15,24 +16,24 @@ class GameActionRecorder {
    public:
     GameActionRecorder();
 
-    bool Initialize(const std::vector<Uint8>& cardIndices,
-                    PlayersOnTable& playersOnTable,
-                    const std::string& settingsDirectory,
-                    const std::string& gameName, std::string& errorMessage);
-    bool InitializeAtPath(const std::vector<Uint8>& cardIndices,
+    LPErrInApp Initialize(const std::vector<Uint8>& cardIndices,
                           PlayersOnTable& playersOnTable,
-                          const std::string& filePath,
-                          std::string& errorMessage);
+                          const std::string& settingsDirectory,
+                          const std::string& gameName);
+    LPErrInApp InitializeAtPath(const std::vector<Uint8>& cardIndices,
+                                PlayersOnTable& playersOnTable,
+                                const std::string& filePath);
     void RecordAction(const std::string& source, const std::string& action,
                       const invjson::Value::Object& details =
                           invjson::Value::Object());
-    bool Finalize(const std::string& outcome, std::string& errorMessage);
+    LPErrInApp Finalize(const std::string& outcome);
+    bool IsInitialized() const;
     const std::string& GetFilePath() const;
     const std::vector<invjson::Value>& GetActions() const;
     void RecordGiocataDeck(const std::vector<Uint8>& cardIndices);
 
    private:
-    bool WriteDocument(std::string& errorMessage);
+    LPErrInApp WriteDocument();
 
     invjson::Value _document;
     std::vector<invjson::Value> _vctActions;

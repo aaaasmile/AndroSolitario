@@ -150,13 +150,13 @@ void InvidoCore::Init(PlayersOnTable* pPlayersOnTable, Mazzo* pMazzo) {
     _numPlayers = _p_PlayersOnTable->GetNumOfPlayers();
 
     if (!_recordingDirectory.empty() && !_gameName.empty()) {
-        std::string recorderError;
-        if (!_gameActionRecorder.Initialize(_p_MyMazzo->GetCardIndexOrder(),
-                                            *_p_PlayersOnTable,
-                                            _recordingDirectory, _gameName,
-                                            recorderError)) {
+        LPErrInApp recorderError = _gameActionRecorder.Initialize(
+            _p_MyMazzo->GetCardIndexOrder(), *_p_PlayersOnTable,
+            _recordingDirectory, _gameName);
+        if (recorderError != NULL) {
             TRACE("[Core-Init] Unable to initialize Invido action recording: %s\n",
-                  recorderError.c_str());
+                  recorderError->ErrorText.c_str());
+            delete recorderError;
         }
     } else {
         TRACE("[Core-Init] Invido action recording location is not configured\n");
@@ -434,10 +434,11 @@ void InvidoCore::Giocata_End() {
 
 // Partita CB - start
 void InvidoCore::PartitaEnded() {
-    std::string recorderError;
-    if (!_gameActionRecorder.Finalize("Completed", recorderError)) {
+    LPErrInApp recorderError = _gameActionRecorder.Finalize("Completed");
+    if (recorderError != NULL) {
         TRACE("Unable to finalize Invido action recording: %s\n",
-              recorderError.c_str());
+              recorderError->ErrorText.c_str());
+        delete recorderError;
     }
 
     for (I_ALG_Player* pIAlgPlayer : _vctpAlgPlayer) {
@@ -474,10 +475,11 @@ void InvidoCore::AbandonGame(Uint8 playerIx) {
     actionDetails["Player"] = invjson::Value(static_cast<int>(playerIx));
     actionDetails["Winner"] = invjson::Value(static_cast<int>(winnerPlayerIx));
     _gameActionRecorder.RecordAction("Player", "Abandon", actionDetails);
-    std::string recorderError;
-    if (!_gameActionRecorder.Finalize("Abandoned", recorderError)) {
+    LPErrInApp recorderError = _gameActionRecorder.Finalize("Abandoned");
+    if (recorderError != NULL) {
         TRACE("Unable to finalize Invido action recording: %s\n",
-              recorderError.c_str());
+              recorderError->ErrorText.c_str());
+        delete recorderError;
     }
 
     for (I_ALG_Player* pIAlgPlayer : _vctpAlgPlayer) {

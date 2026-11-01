@@ -18,18 +18,17 @@ void AddObjectField(invjson::Value& object, const std::string& name,
 GameActionRecorder::GameActionRecorder()
     : _isInitialized(false), _isFinalized(false) {}
 
-bool GameActionRecorder::Initialize(
+LPErrInApp GameActionRecorder::Initialize(
     const std::vector<Uint8>& cardIndices, PlayersOnTable& playersOnTable,
-    const std::string& settingsDirectory, const std::string& gameName,
-    std::string& errorMessage) {
+    const std::string& settingsDirectory, const std::string& gameName) {
     if (settingsDirectory.empty() || gameName.empty()) {
-        errorMessage = "Recording directory or game name is not defined";
-        return false;
+        return ERR_UTIL::ErrorCreate(
+            "Recording directory or game name is not defined");
     }
     if (!SDL_CreateDirectory(settingsDirectory.c_str())) {
-        errorMessage = "Unable to create recording directory '" +
-                       settingsDirectory + "': " + SDL_GetError();
-        return false;
+        return ERR_UTIL::ErrorCreate(
+            "Unable to create recording directory '%s': %s",
+            settingsDirectory.c_str(), SDL_GetError());
     }
 
     char timestamp[32];
@@ -38,8 +37,7 @@ bool GameActionRecorder::Initialize(
                      static_cast<unsigned long long>(SDL_GetTicksNS()));
     if (timestampLength < 0 ||
         timestampLength >= static_cast<int>(sizeof(timestamp))) {
-        errorMessage = "Could not create a recording filename";
-        return false;
+        return ERR_UTIL::ErrorCreate("Could not create a recording filename");
     }
 
     const std::string baseFileName =
@@ -49,16 +47,14 @@ bool GameActionRecorder::Initialize(
         _filePath = baseFileName + "-" +
                     std::to_string(SDL_GetPerformanceCounter()) + ".json";
     }
-    return InitializeAtPath(cardIndices, playersOnTable, _filePath,
-                            errorMessage);
+    return InitializeAtPath(cardIndices, playersOnTable, _filePath);
 }
 
-bool GameActionRecorder::InitializeAtPath(
+LPErrInApp GameActionRecorder::InitializeAtPath(
     const std::vector<Uint8>& cardIndices, PlayersOnTable& playersOnTable,
-    const std::string& filePath, std::string& errorMessage) {
+    const std::string& filePath) {
     if (filePath.empty()) {
-        errorMessage = "Recording path is not defined";
-        return false;
+        return ERR_UTIL::ErrorCreate("Recording path is not defined");
     }
     _filePath = filePath;
     _vctActions.clear();
@@ -88,11 +84,12 @@ bool GameActionRecorder::InitializeAtPath(
     _isInitialized = true;
     _isFinalized = false;
 
-    if (!WriteDocument(errorMessage)) {
+    LPErrInApp error = WriteDocument();
+    if (error != NULL) {
         _isInitialized = false;
-        return false;
+        return error;
     }
-    return true;
+    return NULL;
 }
 
 void GameActionRecorder::RecordAction(
@@ -113,14 +110,12 @@ void GameActionRecorder::RecordAction(
     _vctActions.push_back(entry);
 }
 
-bool GameActionRecorder::Finalize(const std::string& outcome,
-                                  std::string& errorMessage) {
+LPErrInApp GameActionRecorder::Finalize(const std::string& outcome) {
     if (!_isInitialized) {
-        errorMessage = "Recorder was not initialized";
-        return false;
+        return ERR_UTIL::ErrorCreate("Recorder was not initialized");
     }
     if (_isFinalized) {
-        return true;
+        return NULL;
     }
 
     _document["Actions"] = invjson::Value::MakeArray();
@@ -128,39 +123,40 @@ bool GameActionRecorder::Finalize(const std::string& outcome,
         _document["Actions"].PushBack(_vctActions[i]);
     }
     _document["Outcome"] = invjson::Value(outcome);
-    if (!WriteDocument(errorMessage)) {
-        return false;
+    LPErrInApp error = WriteDocument();
+    if (error != NULL) {
+        return error;
     }
     _isFinalized = true;
-    return true;
+    return NULL;
 }
 
-bool GameActionRecorder::WriteDocument(std::string& errorMessage) {
+bool GameActionRecorder::IsInitialized() const { return _isInitialized; }
+
+LPErrInApp GameActionRecorder::WriteDocument() {
     if (!_isInitialized || _filePath.empty()) {
-        errorMessage = "Recorder has no output file";
-        return false;
+        return ERR_UTIL::ErrorCreate("Recorder has no output file");
     }
 
     const std::string json = invjson::Stringify(_document);
     SDL_IOStream* output = SDL_IOFromFile(_filePath.c_str(), "wb");
     if (output == NULL) {
-        errorMessage = SDL_GetError();
-        return false;
+        return ERR_UTIL::ErrorCreate("Unable to open recorder file %s",
+                                     SDL_GetError());
     }
 
     const size_t bytesWritten = SDL_WriteIO(output, json.data(), json.size());
-    const bool writeSucceeded = bytesWritten == json.size();
-    const std::string writeError = writeSucceeded ? "" : SDL_GetError();
-    const bool closeSucceeded = SDL_CloseIO(output);
-    if (!writeSucceeded) {
-        errorMessage = writeError;
-        return false;
+    if (bytesWritten != json.size()) {
+        const std::string writeError = SDL_GetError();
+        SDL_CloseIO(output);
+        return ERR_UTIL::ErrorCreate("Unable to write recorder JSON: %s",
+                                     writeError.c_str());
     }
-    if (!closeSucceeded) {
-        errorMessage = SDL_GetError();
-        return false;
+    if (!SDL_CloseIO(output)) {
+        return ERR_UTIL::ErrorCreate("Unable to close recorder file: %s",
+                                     SDL_GetError());
     }
-    return true;
+    return NULL;
 }
 
 const std::string& GameActionRecorder::GetFilePath() const {

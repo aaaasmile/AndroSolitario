@@ -20,7 +20,7 @@ Add a `GameActionRecorder` that observes an Invido match, stores executed action
 - Use the JSON implementation to create and serialize the match document.
 - Construct a unique recording filename using `GameSettings::GetSettings()->SettingsDir` and `GameName`, following the platform-aware file-location pattern in `HighScore::Save`.
 - Use SDL IO functions such as `SDL_IOFromFile`, `SDL_WriteIO`, and `SDL_CloseIO` for file access.
-- Keep `InvidoCore::Init`'s existing signature; report file/open/write errors through the project's existing error/reporting conventions without changing the public API.
+- Recorder operations return `LPErrInApp`: return `NULL` on success and use `ERR_UTIL::ErrorCreate(...)` for failures. `InvidoCore` logs any recorder error and does not propagate it outside.
 
 ## Initial match snapshot
 

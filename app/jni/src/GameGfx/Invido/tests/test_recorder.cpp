@@ -26,10 +26,9 @@ void testGameActionRecorder() {
     cardIndices.push_back(2);
     cardIndices.push_back(39);
     const std::string path = "GameActionRecorderTest.json";
-    std::string error;
-    const bool initialized =
-        recorder.InitializeAtPath(cardIndices, players, path, error);
-    assert(initialized);
+    LPErrInApp error = recorder.InitializeAtPath(cardIndices, players, path);
+    assert(error == NULL);
+    delete error;
 
     SDL_IOStream* input = SDL_IOFromFile(path.c_str(), "rb");
     assert(input != NULL);
@@ -55,8 +54,10 @@ void testGameActionRecorder() {
     recorder.RecordAction("Player", "PlayCard", actionDetails);
     assert(recorder.GetActions().size() == 1);
 
-    assert(recorder.Finalize("Completed", error));
-    assert(recorder.Finalize("Completed", error));
+    error = recorder.Finalize("Completed");
+    assert(error == NULL);
+    error = recorder.Finalize("Completed");
+    assert(error == NULL);
     input = SDL_IOFromFile(path.c_str(), "rb");
     assert(input != NULL);
     const Sint64 finalSize = SDL_GetIOSize(input);
