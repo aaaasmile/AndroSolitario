@@ -479,6 +479,7 @@ void AlgPlayer::GiocaACaso() {
 }
 
 void AlgPlayer::PlayAsSecond() {
+    SDL_assert(m_vct_Cards_CPU.size() > 0);
     CardSpec result;
     bool hasCardResult = true;
     SDL_assert(m_vct_Cards_played[m_ixCurrMano].size() == 1);

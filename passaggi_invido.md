@@ -70,4 +70,6 @@ con le implementazioni cpp per i vari giochi nelle varie sottodirectory
 ## TODO
 Il testSimpleMatch non funziona. Sto aggiustando le varie callbacks a InvidoCore
 da parte delle varie classi come Mano e Giocata. Su windows usa Visual Code
-e il debug di InvidoTests
+e il debug di InvidoTests.
+- In AlgPLayer m_vct_Cards_CPU va a zero size. I nomi delle variabili locali in AlgPLayer
+non vanno bene.
