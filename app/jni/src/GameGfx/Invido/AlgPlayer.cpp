@@ -60,13 +60,13 @@ void AlgPlayer::ALG_NewGiocata(const VCT_CARDSPEC& vctCards, Uint8 playerIx) {
 
     _playerOnTurn = playerIx;
     _cpuCardDentroPosition = NOT_VALID_INDEX;
-    _vctCpuCards.resize(NUM_CARDS_HAND);
+    _vctMyCards.resize(NUM_CARDS_HAND);
 
     TRACE_DEBUG("[TRALG]Giocata new:");
     for (i = 0; i < NUM_CARDS_HAND; i++) {
         CardSpec card = vctCards[i];
         int ix = card.GetCardIndex();
-        _vctCpuCards[i].SetCardIndex(ix);
+        _vctMyCards[i].SetCardIndex(ix);
         _playerWonHandIndices[i] = -1;
         TRACE_DEBUG("%d , carta: %s ", i, card.GetName().c_str());
     }
@@ -90,7 +90,7 @@ void AlgPlayer::ALG_PlayerHasVadoDentro(Uint8 playerIx) {
         // e poi di chiamare ALG_PlayerHasPlayed
         SDL_assert(_cpuCardDentroPosition != eGameConst::NOT_VALID_INDEX);
         cardDentro.SetCardIndex(
-            _vctCpuCards[_cpuCardDentroPosition].GetCardIndex());
+            _vctMyCards[_cpuCardDentroPosition].GetCardIndex());
         ALG_PlayerHasPlayed(playerIx, cardDentro);
         _cpuCardDentroPosition = eGameConst::NOT_VALID_INDEX;
     } else {
@@ -103,8 +103,8 @@ void AlgPlayer::ALG_PlayerHasVadoDentro(Uint8 playerIx) {
 void AlgPlayer::doVadoDentro(int cardPos) {
     CardSpec cardUndef;
     _cpuCardDentroPosition = cardPos;
-    SDL_assert(_vctCpuCards[cardPos] != cardUndef);
-    _p_CoreGame->VaDentro(_myIndex, _vctCpuCards[cardPos]);
+    SDL_assert(_vctMyCards[cardPos] != cardUndef);
+    _p_CoreGame->VaDentro(_myIndex, _vctMyCards[cardPos]);
 }
 
 void AlgPlayer::ALG_PlayerHasPlayed(Uint8 playerIx, const CardSpec& cardSpec) {
@@ -113,10 +113,10 @@ void AlgPlayer::ALG_PlayerHasPlayed(Uint8 playerIx, const CardSpec& cardSpec) {
     int ix = cardSpec.GetCardIndex();
     if (playerIx == _myIndex) {
         bool bFound = false;
-        for (auto cardIt = _vctCpuCards.begin();
-             cardIt != _vctCpuCards.end(); ++cardIt) {
+        for (auto cardIt = _vctMyCards.begin();
+             cardIt != _vctMyCards.end(); ++cardIt) {
             if (ix == cardIt->GetCardIndex()) {
-                _vctCpuCards.erase(cardIt);
+                _vctMyCards.erase(cardIt);
                 bFound = true;
                 break;
             }
@@ -124,8 +124,8 @@ void AlgPlayer::ALG_PlayerHasPlayed(Uint8 playerIx, const CardSpec& cardSpec) {
         SDL_assert(bFound);
     } else {
         // Opponent card was played; advance to the next CPU hand position.
-        if (!_vctCpuCards.empty()) {
-            _vctCpuCards.erase(_vctCpuCards.begin());
+        if (!_vctMyCards.empty()) {
+            _vctMyCards.erase(_vctMyCards.begin());
         }
         _opponentSay = eSayPlayer::SP_VABENE;
     }
@@ -226,7 +226,7 @@ void AlgPlayer::PlayAsFirst() {
     int i = 0, maxpoints = 0, max_pos = 0, sum_points = 0, min_pos = 0;
     int min_points = 20;
     int med_points = 0, med_pos = 0;
-    for (const CardSpec& card : _vctCpuCards) {
+    for (const CardSpec& card : _vctMyCards) {
         int points = card.GetPoints();
         if (points > maxpoints) {
             med_points = maxpoints;
@@ -252,10 +252,10 @@ void AlgPlayer::PlayAsFirst() {
         min_pos, min_points, med_pos, med_points, max_pos, maxpoints);
 
     if (curr_mano == 2 && _numManiWon == 1) {
-        result = _vctCpuCards[min_pos];
+        result = _vctMyCards[min_pos];
         TRACE_DEBUG("Candidate from min position\n");
     } else {
-        result = _vctCpuCards[max_pos];
+        result = _vctMyCards[max_pos];
     }
     TRACE_DEBUG("[TRALG]candidate play PLF_pos: %s\n",
                 result.GetName().c_str());
@@ -293,7 +293,7 @@ void AlgPlayer::PlayAsFirst() {
             }
         }
         if (hasCardResult) {
-            result = _vctCpuCards[min_pos];
+            result = _vctMyCards[min_pos];
             TRACE_DEBUG("[TRALG]PLF_cand_min_pos: %s\n",
                         result.GetName().c_str());
         }
@@ -305,11 +305,11 @@ void AlgPlayer::PlayAsFirst() {
         }
     } else if (curr_mano == 1 && maxpoints >= 12 && med_points < 10 &&
                med_points > 0) {
-        result = _vctCpuCards[med_pos];
+        result = _vctMyCards[med_pos];
         TRACE_DEBUG("[TRALG]PLF_cand_med_pos: %s\n", result.GetName().c_str());
     } else if (curr_mano == 1 && maxpoints >= 11 && med_points < 10) {
         if (SDL_rand(10) > 5) {
-            result = _vctCpuCards[med_pos];
+            result = _vctMyCards[med_pos];
             TRACE_DEBUG("[TRALG]PLF_cand_med_pos Brnd: %s\n",
                         result.GetName().c_str());
         }
@@ -472,14 +472,14 @@ void AlgPlayer::PlayAsFirst() {
 }
 
 void AlgPlayer::GiocaACaso() {
-    SDL_assert(_vctCpuCards.size() > 0);
-    int iCartaPos = SDL_rand(_vctCpuCards.size());
+    SDL_assert(_vctMyCards.size() > 0);
+    int iCartaPos = SDL_rand(_vctMyCards.size());
     SDL_assert(_p_CoreGame);
-    _p_CoreGame->PlayCard(_myIndex, _vctCpuCards[iCartaPos]);
+    _p_CoreGame->PlayCard(_myIndex, _vctMyCards[iCartaPos]);
 }
 
 void AlgPlayer::PlayAsSecond() {
-    SDL_assert(_vctCpuCards.size() > 0);
+    SDL_assert(_vctMyCards.size() > 0);
     CardSpec result;
     bool hasCardResult = true;
     SDL_assert(_vctPlayedCards[_currentManoIndex].size() == 1);
@@ -492,7 +492,7 @@ void AlgPlayer::PlayAsSecond() {
     int i = 0, maxpoints = 0, max_pos = 0, min_pos = 0;
     int min_points = 20, same_points_pos = -1, first_take_pos = -1,
         first_take_points = 20;
-    for (const CardSpec& card : _vctCpuCards) {
+    for (const CardSpec& card : _vctMyCards) {
         int points = card.GetPoints();
         if (points > maxpoints) {
             maxpoints = points;
@@ -519,22 +519,22 @@ void AlgPlayer::PlayAsSecond() {
     if (_opponentWentDentro) {
         // Avversario è  andato dentro, quindi si gioca la carta più bassa che
         // si vince la mano
-        result = _vctCpuCards[min_pos];
+        result = _vctMyCards[min_pos];
         TRACE_DEBUG("[TRALG]PL2nd_min_vadodentro: %s\n",
                     result.GetName().c_str());
     } else if (first_take_pos != -1) {
         // si prende
-        result = _vctCpuCards[first_take_pos];
+        result = _vctMyCards[first_take_pos];
         TRACE_DEBUG("[TRALG]PL2nd_cand_first_take_pos: %s\n",
                     result.GetName().c_str());
     } else if (same_points_pos != -1) {
         // poi se patta
-        result = _vctCpuCards[same_points_pos];
+        result = _vctMyCards[same_points_pos];
         TRACE_DEBUG("[TRALG]PL2nd_cand_same_pos: %s\n",
                     result.GetName().c_str());
     } else {
         // perdo, quindi gioca la carta pi bassa
-        result = _vctCpuCards[min_pos];
+        result = _vctMyCards[min_pos];
         TRACE_DEBUG("[TRALG]PL2nd_cand_min_pos: %s\n",
                     result.GetName().c_str());
     }
@@ -613,7 +613,7 @@ void AlgPlayer::PlayAsSecond() {
             hasCardResult = false;
         }
     } else if (same_points_pos != -1 && maxpoints >= 12) {
-        result = _vctCpuCards[same_points_pos];
+        result = _vctMyCards[same_points_pos];
         TRACE_DEBUG("[TRALG]PL2nd_cand_same_points_pos: %s\n",
                     result.GetName().c_str());
         if (SDL_rand(20) > 5) {
@@ -742,7 +742,7 @@ void AlgPlayer::ALG_HaveToRespond() {
     size_t iNumCmds = vct_cmd.size();
     int maxpoints = 0, sum_points = 0;
     int min_points = 20;
-    for (const CardSpec& card : _vctCpuCards) {
+    for (const CardSpec& card : _vctMyCards) {
         int points = card.GetPoints();
         if (points > maxpoints) {
             maxpoints = points;

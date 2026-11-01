@@ -48,7 +48,7 @@ class AlgPlayer : public I_ALG_Player {
                           int lastNumChiamate, int maxpoints, int sum_points);
 
    private:
-    std::vector<CardSpec> _vctCpuCards;
+    std::vector<CardSpec> _vctMyCards;
     std::vector<CardSpec> _vctPlayedCards[NUM_HANDS];
     eGiocataScoreState _currentScore;
     I_CORE_Game* _p_CoreGame;
