@@ -13,7 +13,7 @@ For Invido class members, use a leading underscore and omit legacy type affixes 
 
 ## Error Handling
 
-Use `LPErrInApp` for error-returning Invido APIs: return `NULL` on success and create errors with `ERR_UTIL::ErrorCreate(...)` on failure. Callers should check the returned pointer, report its `ErrorText` as appropriate, then delete the allocated error. Do not substitute a boolean return plus an output error string.
+Use `LPErrInApp` for error-returning Invido APIs: return `NULL` on success and create errors with `ERR_UTIL::ErrorCreate(...)` on failure. `ErrorCreate` returns a pointer to one of ten rotating static error slots; callers must not delete it, and should copy its `ErrorText` before more than ten subsequent `ErrorCreate` calls. Do not substitute a boolean return plus an output error string.
 
 ## Invido Traits and Callbacks
 

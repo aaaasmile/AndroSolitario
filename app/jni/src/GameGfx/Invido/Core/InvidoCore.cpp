@@ -156,7 +156,6 @@ void InvidoCore::Init(PlayersOnTable* pPlayersOnTable, Mazzo* pMazzo) {
         if (recorderError != NULL) {
             TRACE("[Core-Init] Unable to initialize Invido action recording: %s\n",
                   recorderError->ErrorText.c_str());
-            delete recorderError;
         }
     } else {
         TRACE("[Core-Init] Invido action recording location is not configured\n");
@@ -438,7 +437,6 @@ void InvidoCore::PartitaEnded() {
     if (recorderError != NULL) {
         TRACE("Unable to finalize Invido action recording: %s\n",
               recorderError->ErrorText.c_str());
-        delete recorderError;
     }
 
     for (I_ALG_Player* pIAlgPlayer : _vctpAlgPlayer) {
@@ -479,7 +477,6 @@ void InvidoCore::AbandonGame(Uint8 playerIx) {
     if (recorderError != NULL) {
         TRACE("Unable to finalize Invido action recording: %s\n",
               recorderError->ErrorText.c_str());
-        delete recorderError;
     }
 
     for (I_ALG_Player* pIAlgPlayer : _vctpAlgPlayer) {

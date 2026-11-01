@@ -6,11 +6,13 @@ void testPlayersOnTable();
 void testMatch();
 void testJson();
 void testGameActionRecorder();
+void testErrorInfo();
 
 int main(int argc, char* argv[]) {
     std::cout << "=== Invido Unit Tests Runner ===" << std::endl;
 
     try {
+        testErrorInfo();
         testJson();
         testGameActionRecorder();
         testCardSpec();

@@ -28,7 +28,6 @@ void testGameActionRecorder() {
     const std::string path = "GameActionRecorderTest.json";
     LPErrInApp error = recorder.InitializeAtPath(cardIndices, players, path);
     assert(error == NULL);
-    delete error;
 
     SDL_IOStream* input = SDL_IOFromFile(path.c_str(), "rb");
     assert(input != NULL);

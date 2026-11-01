@@ -52,6 +52,7 @@ set(TEST_IMPL_SOURCES
 
 set(TEST_SOURCES
     main_test.cpp
+    test_error_info.cpp
     test_json.cpp
     test_recorder.cpp
     test_card.cpp
