@@ -4,11 +4,15 @@ void testCardSpec();
 void testMazzo();
 void testPlayersOnTable();
 void testMatch();
+void testJson();
+void testGameActionRecorder();
 
 int main(int argc, char* argv[]) {
     std::cout << "=== Invido Unit Tests Runner ===" << std::endl;
 
     try {
+        testJson();
+        testGameActionRecorder();
         testCardSpec();
         testMazzo();
         testPlayersOnTable();

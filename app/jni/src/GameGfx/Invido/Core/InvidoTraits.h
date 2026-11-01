@@ -10,6 +10,8 @@ namespace invido {
 typedef struct {
     void (*const PartitaStarted)(void* self, Uint8 playerIx);
     void (*const PartitaEnded)(void* self);
+    void (*const ActionExecuted)(void* self, const char* actionName,
+                                 int playerIx);
 } VPartitaCb, *LPVPartitaCb;
 
 typedef struct {
@@ -22,6 +24,8 @@ typedef struct {
     void (*const GiocataStarted)(void* self, Uint8 playerStartIx);
     void (*const GiocataEndedWinner)(void* self, Uint8 playerWinIx);
     void (*const GiocataEndDueced)(void* self);
+    void (*const ActionExecuted)(void* self, const char* actionName,
+                                 int playerIx);
 } VGiocataCb, *LPVGiocataCb;
 
 typedef struct {
@@ -38,6 +42,8 @@ typedef struct {
     void (*const ChangeGiocataScore)(void* self, eGiocataScoreState eNewScore);
     void (*const Player_VaVia)(void* self, Uint8 playerIx);
     void (*const Giocata_AMonte)(void* self);
+    void (*const ActionExecuted)(void* self, const char* actionName,
+                                 int parameter);
 } VManoCb, *LPVManoCb;
 
 typedef struct {

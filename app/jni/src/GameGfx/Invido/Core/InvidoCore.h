@@ -5,6 +5,7 @@
 #ifndef _C_INVIDOCORE_H_
 #define _C_INVIDOCORE_H_
 
+#include "GameActionRecorder.h"
 #include "Giocata.h"
 #include "InvidoCoreDef.h"
 #include "Mano.h"
@@ -48,6 +49,9 @@ class InvidoCore : public I_CORE_Game {
     void ChangeGiocataScore(eGiocataScoreState eNewScore);
     void Player_VaVia(Uint8 playerIx);
     void Giocata_AMonte();
+    void RecordEngineAction(const char* actionName, int parameter);
+    void RecordGiocataAction(const char* actionName, int playerIx);
+    void RecordPartitaAction(const char* actionName, int playerIx);
 
     void Giocata_End();
     void Giocata_Start(Uint8 playerIx);
@@ -59,6 +63,8 @@ class InvidoCore : public I_CORE_Game {
     void NewMatch();
     bool NextAction();
     void SetRandomSeed(int iVal);
+    void SetRecordingLocation(const std::string& directory,
+                              const std::string& gameName);
     // Interface I_CORE_Game
     bool Say(Uint8 playerIx, eSayPlayer eSay);
     bool PlayCard(Uint8 playerIx, const CardSpec& cardSpec);
@@ -89,6 +95,9 @@ class InvidoCore : public I_CORE_Game {
     Giocata _giocata;
     Mano _mano;
     MatchStateWithScore _matchStateWithScore;
+    GameActionRecorder _gameActionRecorder;
+    std::string _recordingDirectory;
+    std::string _gameName;
     std::vector<I_ALG_Player*> _vctpAlgPlayer;
     std::vector<VCT_CARDSPEC> _vctCardInfos;
 };

@@ -51,6 +51,8 @@ list(APPEND SOURCES
         GameGfx/Invido/Gfx/GameSelector.cpp
         GameGfx/Invido/Core/AlgPlayer.cpp
         GameGfx/Invido/Core/CardSpec.cpp
+        GameGfx/Invido/Core/GameActionRecorder.cpp
+        Lib/Json/Json.cpp
         GameGfx/Invido/Core/Giocata.cpp
         GameGfx/Invido/Core/InvidoCore.cpp
         GameGfx/Invido/Gfx/InvidoGfx.cpp

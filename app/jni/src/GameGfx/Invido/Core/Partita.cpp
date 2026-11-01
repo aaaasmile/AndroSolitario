@@ -16,6 +16,23 @@ bool Partita::NextAction() {
     ActionItemPartita action = _deqNextAction.front();
     _deqNextAction.pop_front();
 
+    const char* actionName = "Unknown";
+    switch (action._eNextAction) {
+        case ACT_PARTITA_STARTED:
+            actionName = "Started";
+            break;
+        case ACT_PARTITA_END:
+            actionName = "Ended";
+            break;
+        default:
+            SDL_assert(0);
+            break;
+    }
+    const int playerIndex = action._eNextAction == ACT_PARTITA_STARTED
+                                ? action._playerIx
+                                : NOT_VALID_INDEX;
+    _partitaCb.tc->ActionExecuted(_partitaCb.self, actionName, playerIndex);
+
     switch (action._eNextAction) {
         case ACT_PARTITA_STARTED:
             _partitaCb.tc->PartitaStarted(_partitaCb.self, action._playerIx);

@@ -15,6 +15,24 @@ bool Giocata::NextAction() {
     ActionItemGio action = _deqNextAction.front();
     _deqNextAction.pop_front();
 
+    const char* actionName = "Unknown";
+    switch (action._eNextAction) {
+        case GIOC_STARTED:
+            actionName = "Started";
+            break;
+        case GIOC_WITHWIN_ENDED:
+            actionName = "EndedWithWinner";
+            break;
+        case GIOC_NOWINNERS_ENDED:
+            actionName = "EndedWithoutWinner";
+            break;
+        default:
+            SDL_assert(0);
+            break;
+    }
+    _giocataCb.tc->ActionExecuted(_giocataCb.self, actionName,
+                                  action._playerIx);
+
     switch (action._eNextAction) {
         case GIOC_STARTED:
             _giocataCb.tc->GiocataStarted(_giocataCb.self, action._playerIx);

@@ -71,7 +71,8 @@ class Mano {
     void SetManoCB(ManoCb& manoCb) { _manoCb = manoCb; }
     void SetScore(MatchStateWithScore* pVal) { _p_Score = pVal; }
     LPErrInApp NewMano(Uint8 playerIx);
-    bool Player_Say(Uint8 playerIx, eSayPlayer eSay);
+    bool Player_Say(Uint8 playerIx, eSayPlayer eSay,
+                    bool* accepted = NULL);
     bool Player_PlayACard(Uint8 playerIx, bool vadoDentro);
     void Reset();
     bool NextAction();

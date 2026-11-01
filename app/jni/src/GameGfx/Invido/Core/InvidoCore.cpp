@@ -26,6 +26,11 @@ void fncBind_PartitaStarted(void* self, Uint8 playerStartIx) {
     InvidoCore* pCore = (InvidoCore*)self;
     return pCore->PartitaStarted(playerStartIx);
 }
+void fncBind_PartitaActionExecuted(void* self, const char* actionName,
+                                   int playerIx) {
+    InvidoCore* pCore = (InvidoCore*)self;
+    return pCore->RecordPartitaAction(actionName, playerIx);
+}
 void fncBind_GiocataStarted(void* self, Uint8 playerStartIx) {
     InvidoCore* pCore = (InvidoCore*)self;
     return pCore->Giocata_Start(playerStartIx);
@@ -37,6 +42,11 @@ void fncBind_GiocataEndedWinner(void* self, Uint8) {
 void fncBind_GiocataEndDueced(void* self) {
     InvidoCore* pCore = (InvidoCore*)self;
     return pCore->Giocata_End();
+}
+void fncBind_GiocataActionExecuted(void* self, const char* actionName,
+                                   int playerIx) {
+    InvidoCore* pCore = (InvidoCore*)self;
+    return pCore->RecordGiocataAction(actionName, playerIx);
 }
 void fncBind_ManoEnd(void* self) {
     InvidoCore* pCore = (InvidoCore*)self;
@@ -66,6 +76,11 @@ void fncBind_Giocata_AMonte(void* self) {
     InvidoCore* pCore = (InvidoCore*)self;
     return pCore->Giocata_AMonte();
 }
+void fncBind_ManoActionExecuted(void* self, const char* actionName,
+                               int parameter) {
+    InvidoCore* pCore = (InvidoCore*)self;
+    return pCore->RecordEngineAction(actionName, parameter);
+}
 
 ManoCb InvidoCore::prepManoDelegator() {
     static VManoCb const tc = {
@@ -75,7 +90,8 @@ ManoCb InvidoCore::prepManoDelegator() {
         .NtyPlayerSayBuiada = (&fncBind_NtyPlayerSayBuiada),
         .ChangeGiocataScore = (&fncBind_ChangeGiocataScore),
         .Player_VaVia = (&fncBind_Player_VaVia),
-        .Giocata_AMonte = (&fncBind_Giocata_AMonte)};
+        .Giocata_AMonte = (&fncBind_Giocata_AMonte),
+        .ActionExecuted = (&fncBind_ManoActionExecuted)};
 
     return (ManoCb){.tc = &tc, .self = this};
 }
@@ -84,8 +100,10 @@ PartitaCb InvidoCore::prepPartitaDelegator() {
     // Use only static otherwise you loose it (dangling pointer on stack
     // variable) it works because InvidoCore is active only on one instance at
     // the same time
-    static VPartitaCb const tc = {.PartitaStarted = (&fncBind_PartitaStarted),
-                                  .PartitaEnded = (&fncBind_PartitaEnd)};
+    static VPartitaCb const tc = {
+        .PartitaStarted = (&fncBind_PartitaStarted),
+        .PartitaEnded = (&fncBind_PartitaEnd),
+        .ActionExecuted = (&fncBind_PartitaActionExecuted)};
 
     return (PartitaCb){.tc = &tc, .self = this};
 }
@@ -95,7 +113,8 @@ GiocataCb InvidoCore::prepGiocataDelegator() {
     static VGiocataCb const tc = {
         .GiocataStarted = (&fncBind_GiocataStarted),
         .GiocataEndedWinner = (&fncBind_GiocataEndedWinner),
-        .GiocataEndDueced = (&fncBind_GiocataEndDueced)};
+        .GiocataEndDueced = (&fncBind_GiocataEndDueced),
+        .ActionExecuted = (&fncBind_GiocataActionExecuted)};
 
     return (GiocataCb){.tc = &tc, .self = this};
 }
@@ -134,7 +153,50 @@ void InvidoCore::Init(PlayersOnTable* pPlayersOnTable, Mazzo* pMazzo) {
 
     _numPlayers = _p_PlayersOnTable->GetNumOfPlayers();
 
+    if (!_recordingDirectory.empty() && !_gameName.empty()) {
+        std::string recorderError;
+        if (!_gameActionRecorder.Initialize(_p_MyMazzo->GetCardIndexOrder(),
+                                            *_p_PlayersOnTable,
+                                            _recordingDirectory, _gameName,
+                                            recorderError)) {
+            TRACE("Unable to initialize Invido action recording: %s\n",
+                  recorderError.c_str());
+        }
+    } else {
+        TRACE("Invido action recording location is not configured\n");
+    }
+
     //_matchStateWithScore.SetManoInstance(&_mano);
+}
+
+void InvidoCore::SetRecordingLocation(const std::string& directory,
+                                      const std::string& gameName) {
+    _recordingDirectory = directory;
+    _gameName = gameName;
+}
+
+void InvidoCore::RecordEngineAction(const char* actionName, int parameter) {
+    invjson::Value::Object details;
+    if (parameter != NOT_VALID_INDEX) {
+        details["Parameter"] = invjson::Value(parameter);
+    }
+    _gameActionRecorder.RecordAction("Engine", actionName, details);
+}
+
+void InvidoCore::RecordGiocataAction(const char* actionName, int playerIx) {
+    invjson::Value::Object details;
+    if (playerIx != NOT_VALID_INDEX) {
+        details["Player"] = invjson::Value(playerIx);
+    }
+    _gameActionRecorder.RecordAction("Giocata", actionName, details);
+}
+
+void InvidoCore::RecordPartitaAction(const char* actionName, int playerIx) {
+    invjson::Value::Object details;
+    if (playerIx != NOT_VALID_INDEX) {
+        details["Player"] = invjson::Value(playerIx);
+    }
+    _gameActionRecorder.RecordAction("Partita", actionName, details);
 }
 
 Uint8 InvidoCore::getNewMatchFirstPlayer() { return SDL_rand(_numPlayers); }
@@ -248,6 +310,7 @@ void InvidoCore::Giocata_Start(Uint8 playerIx) {
 
     _p_MyMazzo->Reset();
     _p_MyMazzo->Shuffle();
+    _gameActionRecorder.RecordGiocataDeck(_p_MyMazzo->GetCardIndexOrder());
     NotifyScript(SCR_NFY_SHUFFLEDECK);
     _p_PlayersOnTable->SetFirstOnGiocata(playerIx);
 
@@ -278,6 +341,16 @@ void InvidoCore::Giocata_Start(Uint8 playerIx) {
             }
         }
         TRACE_DEBUG("\n");
+        invjson::Value::Object dealDetails;
+        dealDetails["Player"] = invjson::Value(static_cast<int>(playerIx));
+        invjson::Value dealtCardIndices = invjson::Value::MakeArray();
+        for (size_t cardIndex = 0; cardIndex < vctCardArray.size(); ++cardIndex) {
+            dealtCardIndices.PushBack(invjson::Value(
+                vctCardArray[cardIndex].GetCardIndex()));
+        }
+        dealDetails["Cards"] = dealtCardIndices;
+        _gameActionRecorder.RecordAction("Engine", "Deal", dealDetails);
+
         if (_vctpAlgPlayer[playerIx]) {
             _vctpAlgPlayer[playerIx]->ALG_NewGiocata(vctCardArray, playerIx);
         }
@@ -367,6 +440,12 @@ void InvidoCore::Giocata_End() {
 
 // Partita CB - start
 void InvidoCore::PartitaEnded() {
+    std::string recorderError;
+    if (!_gameActionRecorder.Finalize("Completed", recorderError)) {
+        TRACE("Unable to finalize Invido action recording: %s\n",
+              recorderError.c_str());
+    }
+
     for (I_ALG_Player* pIAlgPlayer : _vctpAlgPlayer) {
         if (pIAlgPlayer) {
             pIAlgPlayer->ALG_MatchEnd(&_matchStateWithScore);
@@ -376,6 +455,10 @@ void InvidoCore::PartitaEnded() {
 }
 
 void InvidoCore::PartitaStarted(Uint8 playerStartIx) {
+    invjson::Value::Object actionDetails;
+    actionDetails["Player"] = invjson::Value(static_cast<int>(playerStartIx));
+    _gameActionRecorder.RecordAction("Engine", "MatchStarted", actionDetails);
+
     for (I_ALG_Player* pIAlgPlayer : _vctpAlgPlayer) {
         if (pIAlgPlayer) {
             pIAlgPlayer->ALG_NewMatch(_numPlayers);
@@ -392,6 +475,16 @@ void InvidoCore::AbandonGame(Uint8 playerIx) {
     Uint8 winnerPlayerIx = pWinnerPlayer->GetIndex();
 
     _matchStateWithScore.SetTheWinnerBecauseAbandon(winnerPlayerIx);
+
+    invjson::Value::Object actionDetails;
+    actionDetails["Player"] = invjson::Value(static_cast<int>(playerIx));
+    actionDetails["Winner"] = invjson::Value(static_cast<int>(winnerPlayerIx));
+    _gameActionRecorder.RecordAction("Player", "Abandon", actionDetails);
+    std::string recorderError;
+    if (!_gameActionRecorder.Finalize("Abandoned", recorderError)) {
+        TRACE("Unable to finalize Invido action recording: %s\n",
+              recorderError.c_str());
+    }
 
     for (I_ALG_Player* pIAlgPlayer : _vctpAlgPlayer) {
         if (pIAlgPlayer) {
@@ -454,6 +547,11 @@ bool InvidoCore::VaDentro(Uint8 playerIx, const CardSpec& cardSpec) {
 
         _matchStateWithScore.VaDentro(playerIx);
 
+        invjson::Value::Object actionDetails;
+        actionDetails["Player"] = invjson::Value(static_cast<int>(playerIx));
+        actionDetails["Card"] = invjson::Value(pCardplayed->GetCardIndex());
+        _gameActionRecorder.RecordAction("Player", "VaDentro", actionDetails);
+
         for (I_ALG_Player* pIAlgPlayer : _vctpAlgPlayer) {
             // notify all players that a card was played
             if (pIAlgPlayer) {
@@ -486,6 +584,11 @@ bool InvidoCore::PlayCard(Uint8 playerIx, const CardSpec& cardSpec) {
         // update match points
         _matchStateWithScore.PlayerPlay(playerIx, *pCardplayed);
 
+        invjson::Value::Object actionDetails;
+        actionDetails["Player"] = invjson::Value(static_cast<int>(playerIx));
+        actionDetails["Card"] = invjson::Value(pCardplayed->GetCardIndex());
+        _gameActionRecorder.RecordAction("Player", "PlayCard", actionDetails);
+
         for (I_ALG_Player* pIAlgPlayer : _vctpAlgPlayer) {
             // notify all players that a card was played
             if (pIAlgPlayer) {
@@ -502,8 +605,16 @@ bool InvidoCore::PlayCard(Uint8 playerIx, const CardSpec& cardSpec) {
 
 bool InvidoCore::Say(Uint8 playerIx, eSayPlayer eSay) {
     bool bRes = false;
-    if (_mano.Player_Say(playerIx, eSay)) {
-        //  what he said is acceptable on the game
+    bool sayAccepted = false;
+    if (_mano.Player_Say(playerIx, eSay, &sayAccepted)) {
+        if (sayAccepted) {
+            invjson::Value::Object actionDetails;
+            actionDetails["Player"] = invjson::Value(static_cast<int>(playerIx));
+            actionDetails["Say"] = invjson::Value(static_cast<int>(eSay));
+            _gameActionRecorder.RecordAction("Player", "Say", actionDetails);
+        }
+
+        // Preserve the existing wrong-say notification behavior.
         for (I_ALG_Player* pIAlgPlayer : _vctpAlgPlayer) {
             // notify all players that a card was played
             if (pIAlgPlayer) {

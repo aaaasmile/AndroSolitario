@@ -32,6 +32,8 @@ include_directories(
 
 # Implementation files needed for linking
 set(TEST_IMPL_SOURCES
+    ${TEST_INVIDO_DIR}/Core/GameActionRecorder.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../../Lib/Json/Json.cpp
     ${TEST_INVIDO_DIR}/Core/CardSpec.cpp
     ${TEST_INVIDO_DIR}/Core/Mazzo.cpp
     ${TEST_INVIDO_DIR}/Core/PlayersOnTable.cpp
@@ -49,6 +51,8 @@ set(TEST_IMPL_SOURCES
 
 set(TEST_SOURCES
     main_test.cpp
+    test_json.cpp
+    test_recorder.cpp
     test_card.cpp
     test_mazzo.cpp
     test_playersontable.cpp

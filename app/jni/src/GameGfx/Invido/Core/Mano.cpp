@@ -1,5 +1,6 @@
 #include "Mano.h"
 
+#include <algorithm>
 #include <cstddef>
 
 #include "Config.h"
@@ -144,6 +145,14 @@ bool Mano::NextAction() {
     }
     ActionItemMano Action = _deqNextAction.front();
     _deqNextAction.pop_front();
+
+    const int actionParameter = Action._vctArg.empty()
+                                    ? NOT_VALID_INDEX
+                                    : Action._vctArg.front();
+    const char* actionName = stalpzActionName[Action._eNextAction];
+    if (Action._eNextAction != MANO_NO_ACTION) {
+        _manoCb.tc->ActionExecuted(_manoCb.self, actionName, actionParameter);
+    }
 
     eGiocataScoreState eScore;
     TRACE_DEBUG("[Mano] Process action (NextAction): %s\n",
@@ -317,12 +326,16 @@ bool Mano::Player_PlayACard(Uint8 playerIx, bool vadoDentro) {
     return true;
 }
 
-bool Mano::Player_Say(Uint8 playerIx, eSayPlayer eSay) {
+bool Mano::Player_Say(Uint8 playerIx, eSayPlayer eSay, bool* accepted) {
+    if (accepted != NULL) {
+        *accepted = false;
+    }
     if (_eManoState == MNST_WAIT_NEW_MANO || _eManoState == MNST_MANO_END) {
         // don't accept calls if the mano is not initialized
         return false;
     }
 
+    const DEQ_ACTIONITEM queuedActionsBeforeSay = _deqNextAction;
     bool bRes = true;
 
     if (eSay == eSayPlayer::SP_INVIDO || eSay == eSayPlayer::SP_TRASMAS ||
@@ -345,6 +358,25 @@ bool Mano::Player_Say(Uint8 playerIx, eSayPlayer eSay) {
         SDL_assert(0);
     }
 
+    const bool rejectedActionScheduled = std::any_of(
+        _deqNextAction.begin(), _deqNextAction.end(),
+        [&queuedActionsBeforeSay](const ActionItemMano& queuedAction) {
+            if (queuedAction._eNextAction != MANO_SAYBUIDA) {
+                return false;
+            }
+            return std::find_if(
+                       queuedActionsBeforeSay.begin(),
+                       queuedActionsBeforeSay.end(),
+                       [&queuedAction](const ActionItemMano& previousAction) {
+                           return previousAction._eNextAction ==
+                                      queuedAction._eNextAction &&
+                                  previousAction._vctArg ==
+                                      queuedAction._vctArg;
+                       }) == queuedActionsBeforeSay.end();
+        });
+    if (accepted != NULL) {
+        *accepted = !rejectedActionScheduled;
+    }
     return bRes;
 }
 

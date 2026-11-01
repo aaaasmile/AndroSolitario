@@ -724,6 +724,8 @@ void InvidoGfx::InitInvidoVsCPU() {
     _mazzo.Init();
 
     _p_InvidoCore = new InvidoCore();
+    _p_InvidoCore->SetRecordingLocation(pGameSettings->SettingsDir,
+                                        pGameSettings->GameName);
     _p_InvidoCore->Init(&_playersOnTable, &_mazzo);
 
     _p_MatchStateWithScore = _p_InvidoCore->GetMatchStateWithScoreInstance();

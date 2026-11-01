@@ -15,6 +15,9 @@ class Mazzo {
     bool Shuffle();
     void Reset() { Init(); }
     bool PickNextCard(CardSpec* pNextCard);
+    const std::vector<Uint8>& GetCardIndexOrder() const {
+        return _vctCardIndex;
+    }
     void SetIndexRaw(int index, Uint8 val);
     void SetRandomSeed(int val);
 
