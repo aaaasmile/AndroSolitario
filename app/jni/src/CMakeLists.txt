@@ -49,19 +49,19 @@ list(APPEND SOURCES
         GameGfx/Invido/OptionsGfx.cpp
         GameGfx/Invido/HighScore.cpp
         GameGfx/Invido/GameSelector.cpp
-        GameGfx/Invido/AlgPlayer.cpp
-        GameGfx/Invido/CardSpec.cpp
+        GameGfx/Invido/Core/AlgPlayer.cpp
+        GameGfx/Invido/Core/CardSpec.cpp
         GameGfx/Invido/Core/Giocata.cpp
         GameGfx/Invido/Core/InvidoCore.cpp
         GameGfx/Invido/InvidoGfx.cpp
         GameGfx/Invido/Core/Mano.cpp
         GameGfx/Invido/Core/MatchStateWithScore.cpp
         GameGfx/Invido/Core/Partita.cpp
-        GameGfx/Invido/Mazzo.cpp
-        GameGfx/Invido/Player.cpp
-        GameGfx/Invido/PlayersOnTable.cpp
-        GameGfx/Invido/PlayerStatistic.cpp
-        GameGfx/Invido/Probability.cpp)
+        GameGfx/Invido/Core/Mazzo.cpp
+        GameGfx/Invido/Core/Player.cpp
+        GameGfx/Invido/Core/PlayersOnTable.cpp
+        GameGfx/Invido/Core/PlayerStatistic.cpp
+        GameGfx/Invido/Core/Probability.cpp)
 endif()
 
 if(SOLITARIOPRJ)

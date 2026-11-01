@@ -1,8 +1,8 @@
 #include <cassert>
 #include <iostream>
 
-#include "../Player.h"
-#include "../PlayersOnTable.h"
+#include "../Core/Player.h"
+#include "../Core/PlayersOnTable.h"
 
 void testPlayersOnTableCreation() {
     std::cout << "Running PlayersOnTable creation tests..." << std::endl;

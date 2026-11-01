@@ -2,7 +2,7 @@
 
 #include "Giocata.h"
 #include "InvidoCore.h"
-#include "../InvidoCoreDef.h"
+#include "InvidoCoreDef.h"
 #include "MatchStateWithScore.h"
 
 using namespace invido;

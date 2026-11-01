@@ -4,7 +4,7 @@
 #include <iterator>
 #include <random>
 
-#include "Core/InvidoCore.h"
+#include "InvidoCore.h"
 
 using namespace invido;
 

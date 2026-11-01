@@ -3,9 +3,9 @@
 
 #include <SDL3/SDL.h>
 
-#include "../AlgCoreInterface.h"
-#include "../CardSpec.h"
-#include "../InvidoCoreDef.h"
+#include "AlgCoreInterface.h"
+#include "CardSpec.h"
+#include "InvidoCoreDef.h"
 
 namespace invido {
 

@@ -3,7 +3,7 @@
 #include <cstddef>
 
 #include "Config.h"
-#include "../InvidoCoreDef.h"
+#include "InvidoCoreDef.h"
 #include "MatchStateWithScore.h"
 #include "TraceService.h"
 

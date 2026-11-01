@@ -1,7 +1,7 @@
 #include <cassert>
 #include <iostream>
 
-#include "../CardSpec.h"
+#include "../Core/CardSpec.h"
 
 void testCardSpec() {
     std::cout << "Running CardSpec tests..." << std::endl;

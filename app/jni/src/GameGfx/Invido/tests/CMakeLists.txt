@@ -32,12 +32,12 @@ include_directories(
 
 # Implementation files needed for linking
 set(TEST_IMPL_SOURCES
-    ${TEST_INVIDO_DIR}/CardSpec.cpp
-    ${TEST_INVIDO_DIR}/Mazzo.cpp
-    ${TEST_INVIDO_DIR}/PlayersOnTable.cpp
-    ${TEST_INVIDO_DIR}/Player.cpp
-    ${TEST_INVIDO_DIR}/PlayerStatistic.cpp
-    ${TEST_INVIDO_DIR}/AlgPlayer.cpp
+    ${TEST_INVIDO_DIR}/Core/CardSpec.cpp
+    ${TEST_INVIDO_DIR}/Core/Mazzo.cpp
+    ${TEST_INVIDO_DIR}/Core/PlayersOnTable.cpp
+    ${TEST_INVIDO_DIR}/Core/Player.cpp
+    ${TEST_INVIDO_DIR}/Core/PlayerStatistic.cpp
+    ${TEST_INVIDO_DIR}/Core/AlgPlayer.cpp
     ${TEST_INVIDO_DIR}/Core/InvidoCore.cpp
     ${TEST_INVIDO_DIR}/Core/Giocata.cpp
     ${TEST_INVIDO_DIR}/Core/Mano.cpp

@@ -1,7 +1,7 @@
 #include <cassert>
 #include <iostream>
 
-#include "../Mazzo.h"
+#include "../Core/Mazzo.h"
 
 void testMazzoCreation() {
     std::cout << "Running Mazzo creation tests..." << std::endl;

@@ -2,10 +2,10 @@
 #include <iostream>
 #include <stdexcept>
 
-#include "../Player.h"
-#include "../PlayersOnTable.h"
+#include "../Core/Player.h"
+#include "../Core/PlayersOnTable.h"
 #include "../Core/InvidoCore.h"
-#include "../Mazzo.h"
+#include "../Core/Mazzo.h"
 
 void testSimpleMatch() {
     std::cout << "Running Match tests..." << std::endl;
