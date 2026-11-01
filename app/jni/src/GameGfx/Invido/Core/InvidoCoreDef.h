@@ -58,7 +58,7 @@ enum ePlayerType{
     HMI = 0,
     SCRIPTED = 1
 };
-enum eTypeOfPLayer { PT_LOCAL, PT_MACHINE, PT_SCRIPT};
+enum eTypeOfPLayer { PT_LOCAL, PT_MACHINE, PT_SCRIPT, PT_AUTO};
 enum eScriptNotification {
     SCR_NFY_SHUFFLEDECK = 0,
     SCR_NFY_HAVETO_SAY = 1,

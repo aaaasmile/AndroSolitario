@@ -56,7 +56,7 @@ LPErrInApp Player::InitFromActionPlayer(GameActionReplayer& actionReplayer,
         new AlgPlayerAuto(actionReplayer, playerIx));
     _p_IAlgorithm = algorithm.get();
     _vctAlgToDestroy.push_back(algorithm);
-    _eKind = PT_MACHINE;
+    _eKind = PT_AUTO;
     _playerName = playerInfo.name;
     _index = playerIx;
     _eLevel = eGameLevel::STANDARD;
