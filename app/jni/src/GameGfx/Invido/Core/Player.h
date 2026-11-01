@@ -24,6 +24,7 @@ class Player {
    public:
     Player();
     virtual ~Player();
+    void CleanUp();
     void Init(I_ALG_Player* I_val, eTypeOfPLayer eVal, LPCSTR lpszName,
                 Uint8 index);
     void SetName(LPCSTR lpszName) { _playerName = std::string(lpszName); }

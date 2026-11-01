@@ -10,10 +10,13 @@ Player::Player() {
     _eLevel = DUMMY;
 }
 
-Player::~Player() {
+Player::~Player() { CleanUp(); }
+
+void Player::CleanUp() {
     for (size_t i = 0; i < _vctAlgToDestroy.size(); i++) {
         delete _vctAlgToDestroy[i];
     }
+    _vctAlgToDestroy.clear();
 }
 
 Player::Player(const Player& a) {

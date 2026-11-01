@@ -5,20 +5,19 @@
 #include <stdio.h>
 #include <time.h>
 
+#include "../Core/InvidoCore.h"
+#include "../Core/InvidoCoreDef.h"
+#include "../Core/Mazzo.h"
 #include "BalloonGfx.h"
 #include "ButtonGfx.h"
 #include "DeckLoader.h"
 #include "DeckType.h"
 #include "GameSettings.h"
 #include "GfxUtil.h"
-#include "../Core/InvidoCore.h"
-#include "../Core/InvidoCoreDef.h"
 #include "Languages.h"
-#include "../Core/Mazzo.h"
 #include "MesgBoxGfx.h"
 #include "MusicManager.h"
 #include "PopUpMenuGfx.h"
-
 
 using namespace invido;
 
@@ -296,6 +295,10 @@ void InvidoGfx::cleanup() {
             SDL_DestroySurface(_p_AnImages[i]);
             _p_AnImages[i] = NULL;
         }
+    }
+    if (_p_InvidoCore) {
+        delete _p_InvidoCore;
+        _p_InvidoCore = NULL;
     }
 }
 
@@ -709,9 +712,7 @@ void InvidoGfx::showYesNoMsgBox(LPCSTR strText) {
 
 void InvidoGfx::InitInvidoVsCPU() {
     GameSettings* pGameSettings = GameSettings::GetSettings();
-    if (_p_InvidoCore) {
-        delete _p_InvidoCore;
-    }
+    
 
     Player player1;
     Player player2;
@@ -723,6 +724,9 @@ void InvidoGfx::InitInvidoVsCPU() {
     _mazzo = Mazzo();
     _mazzo.Init();
 
+    if (_p_InvidoCore) {
+        delete _p_InvidoCore;
+    }
     _p_InvidoCore = new InvidoCore();
     _p_InvidoCore->SetRecordingLocation(pGameSettings->SettingsDir,
                                         pGameSettings->GameName);
@@ -1181,7 +1185,8 @@ void InvidoGfx::showCurrentScore() {
         bool bIsPata;
         bool bIsPlayed;
         Uint8 playerIx;
-        _p_MatchStateWithScore->GetManoInfo(iManoNum, &playerIx, &bIsPlayed, &bIsPata);
+        _p_MatchStateWithScore->GetManoInfo(iManoNum, &playerIx, &bIsPlayed,
+                                            &bIsPata);
         showManoScore(bIsPlayed, playerIx, bIsPata, iManoNum);
     }
 
