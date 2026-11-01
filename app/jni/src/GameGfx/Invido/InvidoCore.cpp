@@ -106,6 +106,11 @@ void InvidoCore::Init(PlayersOnTable* pPlayersOnTable, Mazzo* pMazzo) {
     SDL_assert(pPlayersOnTable);
     SDL_assert(pMazzo);
 
+    _vctpAlgPlayer.clear();
+    _vctCardInfos.clear();
+    _p_PlHaveToPlay = NULL;
+    _p_StartPlayer = NULL;
+
     _p_MyMazzo = pMazzo;
     _p_PlayersOnTable = pPlayersOnTable;
 
@@ -143,7 +148,11 @@ void InvidoCore::NewMatch() {
     // extract the first player
     Uint8 firstPlayerIx = getNewMatchFirstPlayer();
 
-    // save players alg in a table
+    // Keep algorithm and hand vectors aligned with player indices.
+    _vctpAlgPlayer.clear();
+    _vctpAlgPlayer.reserve(_numPlayers);
+    _vctCardInfos.assign(_numPlayers, VCT_CARDSPEC{});
+
     // don't change level during a match
     for (int i = 0; i < _numPlayers; i++) {
         Player* pPlayer = _p_PlayersOnTable->GetPlayerOnIndex(i);
@@ -182,7 +191,6 @@ void InvidoCore::NewMatch() {
                 SDL_assert(0);
             }
             _vctpAlgPlayer.push_back(pIAlgPlayer);
-            _vctCardInfos.push_back(VCT_CARDSPEC{});
         }
     }
 
@@ -206,18 +214,22 @@ void InvidoCore::resetCardInfoPlayers() {
 }
 
 bool InvidoCore::resetCard(Uint8 playerIx, const CardSpec& cardSpec) {
-    bool bRet = false;
+    SDL_assert(playerIx < _vctCardInfos.size());
+    if (playerIx >= _vctCardInfos.size()) {
+        return false;
+    }
 
-    auto it = _vctCardInfos[playerIx].begin();
-    while (it != _vctCardInfos[playerIx].end()) {
-        if (it->GetCardIndex() == cardSpec.GetCardIndex()) {
-            it = _vctCardInfos[playerIx].erase(it);  // Erase and get next
-        } else {
-            ++it;
+    const int cardIndex = cardSpec.GetCardIndex();
+    auto& playerCards = _vctCardInfos[playerIx];
+    for (auto cardIt = playerCards.begin(); cardIt != playerCards.end();
+         ++cardIt) {
+        if (cardIt->GetCardIndex() == cardIndex) {
+            playerCards.erase(cardIt);
+            return true;
         }
     }
 
-    return bRet;
+    return false;
 }
 
 void InvidoCore::Giocata_Start(Uint8 playerIx) {
@@ -228,20 +240,19 @@ void InvidoCore::Giocata_Start(Uint8 playerIx) {
     // player that have to play first, is the first that get the cards after
     // shuffle
 
+    _p_MyMazzo->Reset();
     _p_MyMazzo->Shuffle();
     NotifyScript(SCR_NFY_SHUFFLEDECK);
     _p_PlayersOnTable->SetFirstOnGiocata(playerIx);
 
     // 2) second - retreive the player that have to play and switch the table
     _p_PlHaveToPlay = _p_PlayersOnTable->SwitchToNextPlayer();
-    Player* pCurrPlayer = _p_PlHaveToPlay;
-    Uint8 currPlayerIx = pCurrPlayer->GetIndex();
-    // 3) distribuite cards
-    for (int i = 0; i < _numPlayers; i++) {
-        if (i > 0) {
-            pCurrPlayer = _p_PlayersOnTable->PeekNextPlayerToIx(currPlayerIx);
-            currPlayerIx = pCurrPlayer->GetIndex();
-        }
+    // 3) distribute cards starting from the player who will play first.
+    const Uint8 firstPlayerIx = _p_PlHaveToPlay->GetIndex();
+    for (size_t playerOffset = 0; playerOffset < _numPlayers; ++playerOffset) {
+        const Uint8 playerIx =
+            static_cast<Uint8>((firstPlayerIx + playerOffset) % _numPlayers);
+        Player* pCurrPlayer = _p_PlayersOnTable->GetPlayerOnIndex(playerIx);
 
         VCT_CARDSPEC vctCardArray;
 
@@ -268,21 +279,24 @@ void InvidoCore::Giocata_Start(Uint8 playerIx) {
     _matchPoints.GiocataStart();
     NotifyScript(SCR_NFY_NEWGIOCATA);
     _mano.GiocataStart();
+    LPErrInApp manoError = _mano.NewMano(firstPlayerIx);
+    SDL_assert(manoError == NULL);
 }
 
 void InvidoCore::Mano_End() {
     _matchPoints.ManoEnd();
 
+    const bool manoEnded = _matchPoints.GetManoNum() >= NUM_CARDS_HAND;
     if (_matchPoints.IsManoPatada()) {
         Uint8 playerIx = _p_PlayersOnTable->GetFirstOnTrick();
         _p_PlayersOnTable->SetCurrentAndFirstOnTrick(playerIx);
-
     } else {
         Uint8 winnerPlayerIx = _matchPoints.GetManoWinner();
         _p_PlayersOnTable->SetCurrentAndFirstOnTrick(winnerPlayerIx);
     }
-    _p_PlHaveToPlay = _p_PlayersOnTable->SwitchToNextPlayer();
-    //_giocata.Update_Giocata(_p_PlHaveToPlay->GetIndex(), &_matchPoints);
+    if (!manoEnded) {
+        _p_PlHaveToPlay = _p_PlayersOnTable->SwitchToNextPlayer();
+    }
 
     for (I_ALG_Player* pIAlgPlayer : _vctpAlgPlayer) {
         if (pIAlgPlayer) {
@@ -290,6 +304,19 @@ void InvidoCore::Mano_End() {
         }
     }
     NotifyScript(SCR_NFY_ALGMANOEND);
+
+    if (manoEnded) {
+        return;
+    }
+
+    Uint8 giocataWinnerIx = _matchPoints.GetGiocataWinner();
+    if (giocataWinnerIx != NOT_VALID_INDEX) {
+        _matchPoints.GiocataEndWithWinner(giocataWinnerIx);
+        _giocata.PlayerGiocataWins(giocataWinnerIx);
+    } else if (_matchPoints.GetManoNum() < NUM_CARDS_HAND) {
+        LPErrInApp manoError = _mano.NewMano(_p_PlHaveToPlay->GetIndex());
+        SDL_assert(manoError == NULL);
+    }
 }
 
 void InvidoCore::Giocata_AMonte() {
@@ -313,11 +340,6 @@ void InvidoCore::ChangeGiocataScore(eGiocataScoreState eNewScore) {
 }
 
 void InvidoCore::Giocata_End() {
-    // calculate points
-    //_matchPoints.GiocataEnd();
-    // update match state machine
-    //_partita.Update_Partita(&_matchPoints);
-
     for (I_ALG_Player* pIAlgPlayer : _vctpAlgPlayer) {
         if (pIAlgPlayer) {
             pIAlgPlayer->ALG_GiocataEnd(&_matchPoints);
@@ -325,6 +347,19 @@ void InvidoCore::Giocata_End() {
     }
 
     NotifyScript(SCR_NFY_ALGGIOCATAEND);
+    _mano.Reset();
+
+    if (_matchPoints.IsMatchEnd()) {
+        _partita.PartitaEnd();
+        return;
+    }
+
+    Uint8 nextStartPlayerIx = _matchPoints.GetGiocataWinner();
+    if (nextStartPlayerIx == NOT_VALID_INDEX) {
+        nextStartPlayerIx = _p_PlayersOnTable->GetPlayerToPlay()->GetIndex();
+    }
+    LPErrInApp giocataError = _giocata.NewGiocata(nextStartPlayerIx);
+    SDL_assert(giocataError == NULL);
 }
 
 // Partita CB - start
@@ -389,15 +424,17 @@ void InvidoCore::NtyPlayerSayBuiada(Uint8 playerIx) {
 
 CardSpec* InvidoCore::checkValidCardPlayed(Uint8 playerIx,
                                            const CardSpec& cardSpec) {
-    CardSpec* pCardplayed = NULL;
-    VCT_CARDSPEC vctCards = _vctCardInfos[playerIx];
-    for (CardSpec& cardInHand : vctCards) {
+    if (playerIx >= _vctCardInfos.size()) {
+        return NULL;
+    }
+
+    for (CardSpec& cardInHand : _vctCardInfos[playerIx]) {
         if (cardInHand == cardSpec) {
-            pCardplayed = &cardInHand;
+            return &cardInHand;
         }
     }
 
-    return pCardplayed;
+    return NULL;
 }
 
 bool InvidoCore::VaDentro(Uint8 playerIx, const CardSpec& cardSpec) {
@@ -432,6 +469,7 @@ void InvidoCore::SetRandomSeed(int iVal) { _p_MyMazzo->SetRandomSeed(iVal); }
 
 bool InvidoCore::PlayCard(Uint8 playerIx, const CardSpec& cardSpec) {
     CardSpec* pCardplayed = checkValidCardPlayed(playerIx, cardSpec);
+    SDL_assert(pCardplayed);
     if (pCardplayed == NULL) {
         return false;
     }

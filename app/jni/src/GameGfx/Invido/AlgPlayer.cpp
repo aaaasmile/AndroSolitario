@@ -59,6 +59,8 @@ void AlgPlayer::ALG_NewGiocata(const VCT_CARDSPEC& vctCards, Uint8 playerIx) {
     m_ixCurrMano = 0;
 
     m_iPlayerOnTurn = playerIx;
+    m_iCPUCardDentroPos = NOT_VALID_INDEX;
+    m_vct_Cards_CPU.resize(NUM_CARDS_HAND);
 
     TRACE_DEBUG("[TRALG]Giocata new:");
     for (i = 0; i < NUM_CARDS_HAND; i++) {
@@ -108,22 +110,23 @@ void AlgPlayer::doVadoDentro(int cardPos) {
 void AlgPlayer::ALG_PlayerHasPlayed(Uint8 playerIx, const CardSpec& cardSpec) {
     TRACE_DEBUG("[TRALG]Player %d has played [%s]\n", playerIx,
                 cardSpec.GetName().c_str());
-    int i;
     int ix = cardSpec.GetCardIndex();
     if (playerIx == m_iMyIndex) {
         bool bFound = false;
-        // card successfully played
-        for (i = 0; !bFound && i < eGameConst::NUM_CARDS_HAND; i++) {
-            if (ix == m_vct_Cards_CPU[i].GetCardIndex()) {
-                // card found
-                // m_vct_Cards_CPU[i] = CardUndef;
-                // TODO remove card
+        for (auto cardIt = m_vct_Cards_CPU.begin();
+             cardIt != m_vct_Cards_CPU.end(); ++cardIt) {
+            if (ix == cardIt->GetCardIndex()) {
+                m_vct_Cards_CPU.erase(cardIt);
                 bFound = true;
+                break;
             }
         }
         SDL_assert(bFound);
     } else {
-        // oponent play
+        // Opponent card was played; advance to the next CPU hand position.
+        if (!m_vct_Cards_CPU.empty()) {
+            m_vct_Cards_CPU.erase(m_vct_Cards_CPU.begin());
+        }
         m_OpponentSay = eSayPlayer::SP_VABENE;
     }
 

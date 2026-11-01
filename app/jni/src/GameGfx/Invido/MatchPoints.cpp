@@ -6,8 +6,9 @@ using namespace invido;
 
 MatchPoints::MatchPoints() {
     _numPlayers = NUM_PLAY_INVIDO_2;
-    //_p_Mano = 0;
+    _playerChangeScore = NOT_VALID_INDEX;
     _isGameAbandoned = false;
+    _isMatchEnd = false;
     // for (int iManoNum = 0; iManoNum < NUM_CARDS_HAND; iManoNum++) {
     //     _vctManoInfo[iManoNum].Reset();
     // }
@@ -23,24 +24,27 @@ void MatchPoints::MatchStart(int iNumPlayer) {
     _playerMatchWin = NOT_VALID_INDEX;
     _scoreGoal = SCORE_GOAL;
     _isMatchInSpecialScore = false;
+    _isGameAbandoned = false;
+    _isMatchEnd = false;
     _vctGiocataInfo.clear();
 }
 
 void MatchPoints::GiocataStart() {
-    _vctHandWons.clear();
-    _vctCardPlayed.clear();
-    for (int i = 0; i < _numPlayers; i++) {
-        _vctHandWons.push_back(0);
-    }
+    _vctHandWons.assign(_numPlayers, 0);
+    _vctCardPlayed.assign(_numPlayers, CardPlayed{});
+    _vctManoInfo.assign(NUM_CARDS_HAND,
+                        ManoInfo{NOT_VALID_INDEX, false, false});
+    _isMatchEnd = false;
+    _isMatchEnd = false;
     _numCardsPlayed = 0;
     _manoRound = 0;
     _currentScore = SC_CANELA;
     _playerWonsHand = NOT_VALID_INDEX;
     _playerFirstHand = NOT_VALID_INDEX;
     _playerGiocataWin = NOT_VALID_INDEX;
+    _playerChangeScore = NOT_VALID_INDEX;
 
     
-    _vctManoInfo.clear();
     _isGameAbandoned = false;
     _isGiocataAMonte = false;
     _isGiocataPatada = false;
@@ -172,6 +176,7 @@ void MatchPoints::GiocataEndWithWinner(Uint8 playerWinIx) {
     if (_vctPlayerPoints[_playerGiocataWin] >= _scoreGoal) {
         // match is terminated
         _playerMatchWin = _playerGiocataWin;
+        _isMatchEnd = true;
     } else if (_vctPlayerPoints[PLAYER1] == SPECIAL_SCORE &&
                _vctPlayerPoints[PLAYER2] == SPECIAL_SCORE) {
         // special condition both player are on 23 to 23 or after 7 to 7....
@@ -231,4 +236,5 @@ void MatchPoints::ChangeCurrentScore(eGiocataScoreState eVal, int iPlayer) {
 void MatchPoints::SetTheWinnerBecauseAbandon(Uint8 playerIx) {
     _playerMatchWin = playerIx;
     _isGameAbandoned = true;
+    _isMatchEnd = true;
 }

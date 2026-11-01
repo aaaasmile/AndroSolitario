@@ -18,7 +18,7 @@
   .\buildinvido\InvidoTests.exe
   ```
 - The Invido test target is controlled by `BUILD_INVIDO_TESTS`; the CMake target is `InvidoTests` (`InvidoTests.exe` on Windows). Run the focused tests after game-core changes, then build the Invido app when practical.
-- For a test failure, report the exact command and relevant output. Do not claim tests passed unless they were run.
+- If a test run hangs, crashes, or otherwise fails, make at most two attempts to diagnose or rerun it. After two unsuccessful attempts, stop the test loop and report the exact command, relevant output, and unresolved failure; do not keep retrying or claim tests passed.
 
 ## Agent Workflow
 - Inspect the relevant code and project notes before editing; make the smallest complete change that solves the task.

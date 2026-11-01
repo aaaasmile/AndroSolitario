@@ -148,7 +148,7 @@ void Mano::NextAction() {
     _deqNextAction.pop_front();
 
     eGiocataScoreState eScore;
-    TRACE_DEBUG("Process action (NextAction): %s\n",
+    TRACE_DEBUG("[Mano] Process action (NextAction): %s\n",
                 stalpzActionName[Action._eNextAction]);
 
     switch (Action._eNextAction) {
@@ -249,6 +249,7 @@ LPErrInApp Mano::NewMano(Uint8 playerIx) {
 
         // next state
         _eManoState = nextTableState();
+        _eOldManoState = MNST_WAIT_NEW_MANO;
 
     } else {
         return ERR_UTIL::ErrorCreate("Mano state is not correct %d",
