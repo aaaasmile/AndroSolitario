@@ -6,13 +6,13 @@
 
 #include <map>
 
-#include "Core/AlgCoreInterface.h"
+#include "../Core/AlgCoreInterface.h"
 #include "CardGfx.h"
 #include "Config.h"
 #include "DeckType.h"
 #include "ErrorInfo.h"
-#include "Core/InvidoCore.h"
-#include "Core/Mazzo.h"
+#include "../Core/InvidoCore.h"
+#include "../Core/Mazzo.h"
 #include "Traits.h"
 
 using namespace traits;

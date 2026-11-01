@@ -45,15 +45,15 @@ set(SOURCES App/MusicManager.cpp
 if(INVIDOPRJ)
 # Invido Sources
 list(APPEND SOURCES
-        GameGfx/Invido/Credits.cpp
-        GameGfx/Invido/OptionsGfx.cpp
-        GameGfx/Invido/HighScore.cpp
-        GameGfx/Invido/GameSelector.cpp
+        GameGfx/Invido/Gfx/Credits.cpp
+        GameGfx/Invido/Gfx/OptionsGfx.cpp
+        GameGfx/Invido/Gfx/HighScore.cpp
+        GameGfx/Invido/Gfx/GameSelector.cpp
         GameGfx/Invido/Core/AlgPlayer.cpp
         GameGfx/Invido/Core/CardSpec.cpp
         GameGfx/Invido/Core/Giocata.cpp
         GameGfx/Invido/Core/InvidoCore.cpp
-        GameGfx/Invido/InvidoGfx.cpp
+        GameGfx/Invido/Gfx/InvidoGfx.cpp
         GameGfx/Invido/Core/Mano.cpp
         GameGfx/Invido/Core/MatchStateWithScore.cpp
         GameGfx/Invido/Core/Partita.cpp
