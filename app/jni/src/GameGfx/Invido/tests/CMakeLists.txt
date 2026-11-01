@@ -22,6 +22,7 @@ endif()
 # Correct paths relative to this CMakeLists.txt
 set(TEST_INVIDO_DIR ${CMAKE_CURRENT_SOURCE_DIR}/..)
 set(TEST_APP_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../../App)
+set(TEST_APP_LIB ${CMAKE_CURRENT_SOURCE_DIR}/../../../Lib)
 
 # Include directories for headers
 include_directories(
@@ -33,7 +34,7 @@ include_directories(
 # Implementation files needed for linking
 set(TEST_IMPL_SOURCES
     ${TEST_INVIDO_DIR}/Core/GameActionRecorder.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../../Lib/Json/Json.cpp
+    ${TEST_APP_LIB}/Json/Json.cpp
     ${TEST_INVIDO_DIR}/Core/CardSpec.cpp
     ${TEST_INVIDO_DIR}/Core/Mazzo.cpp
     ${TEST_INVIDO_DIR}/Core/PlayersOnTable.cpp
