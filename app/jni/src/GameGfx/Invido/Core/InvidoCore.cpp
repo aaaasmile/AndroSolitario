@@ -292,12 +292,6 @@ void InvidoCore::Giocata_Start(Uint8 playerIx) {
 void InvidoCore::Mano_End() {
     _matchStateWithScore.ManoEnd();
 
-    for (I_ALG_Player* pIAlgPlayer : _vctpAlgPlayer) {
-        if (pIAlgPlayer) {
-            pIAlgPlayer->ALG_ManoEnd(&_matchStateWithScore);
-        }
-    }
-
     const bool giocataEnded = _matchStateWithScore.IsGiocataEnd();
     if (giocataEnded) {
         if (_matchStateWithScore.IsGiocataPatada()) {
@@ -316,9 +310,14 @@ void InvidoCore::Mano_End() {
             Uint8 winnerPlayerIx = _matchStateWithScore.GetManoWinner();
             _p_PlayersOnTable->SetCurrentAndFirstOnTrick(winnerPlayerIx);
         }
-        _p_PlHaveToPlay = _p_PlayersOnTable->GetPlayerToPlay();
+        _p_PlHaveToPlay = _p_PlayersOnTable->SwitchToNextPlayer();
         LPErrInApp manoError = _mano.NewMano(_p_PlHaveToPlay->GetIndex());
         SDL_assert(manoError == NULL);
+    }
+    for (I_ALG_Player* pIAlgPlayer : _vctpAlgPlayer) {
+        if (pIAlgPlayer) {
+            pIAlgPlayer->ALG_ManoEnd(&_matchStateWithScore);
+        }
     }
     NotifyScript(SCR_NFY_ALGMANOEND);
 }
