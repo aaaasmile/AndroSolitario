@@ -21,12 +21,8 @@ void testGameActionRecorder() {
     players.AddPlayer(player1);
 
     invido::GameActionRecorder recorder;
-    std::vector<Uint8> cardIndices;
-    cardIndices.push_back(0);
-    cardIndices.push_back(2);
-    cardIndices.push_back(39);
     const std::string path = "GameActionRecorderTest.json";
-    LPErrInApp error = recorder.InitializeAtPath(cardIndices, players, path);
+    LPErrInApp error = recorder.InitializeAtPath(players, path);
     assert(error == NULL);
 
     SDL_IOStream* input = SDL_IOFromFile(path.c_str(), "rb");
@@ -39,7 +35,7 @@ void testGameActionRecorder() {
     assert(SDL_CloseIO(input));
     const invjson::ParseResult initialDocument = invjson::Parse(initialJson);
     assert(initialDocument.success);
-    assert(initialDocument.value.Find("Mazzo")->AsArray().size() == 3);
+    assert(initialDocument.value.Find("Mazzo") == NULL);
     assert(initialDocument.value.Find("Players")->AsArray().size() == 2);
     assert(initialDocument.value.Find("Actions")->AsArray().empty());
     assert(initialDocument.value.Find("Players")

@@ -16,12 +16,10 @@ class GameActionRecorder {
    public:
     GameActionRecorder();
 
-    LPErrInApp Initialize(const std::vector<Uint8>& cardIndices,
-                          PlayersOnTable& playersOnTable,
+    LPErrInApp Initialize(PlayersOnTable& playersOnTable,
                           const std::string& settingsDirectory,
                           const std::string& gameName);
-    LPErrInApp InitializeAtPath(const std::vector<Uint8>& cardIndices,
-                                PlayersOnTable& playersOnTable,
+    LPErrInApp InitializeAtPath(PlayersOnTable& playersOnTable,
                                 const std::string& filePath);
     void RecordAction(const std::string& source, const std::string& action,
                       const invjson::Value::Object& details =

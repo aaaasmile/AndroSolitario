@@ -151,8 +151,7 @@ void InvidoCore::Init(PlayersOnTable* pPlayersOnTable, Mazzo* pMazzo) {
 
     if (!_recordingDirectory.empty() && !_gameName.empty()) {
         LPErrInApp recorderError = _gameActionRecorder.Initialize(
-            _p_MyMazzo->GetCardIndexOrder(), *_p_PlayersOnTable,
-            _recordingDirectory, _gameName);
+            *_p_PlayersOnTable, _recordingDirectory, _gameName);
         if (recorderError != NULL) {
             TRACE("[Core-Init] Unable to initialize Invido action recording: %s\n",
                   recorderError->ErrorText.c_str());

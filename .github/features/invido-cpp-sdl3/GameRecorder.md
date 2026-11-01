@@ -26,9 +26,10 @@ Add a `GameActionRecorder` that observes an Invido match, stores executed action
 
 At the end of `InvidoCore::Init`, initialize the recorder with:
 
-- `Mazzo`: the initial deck as a JSON array of card indexes, captured before any shuffle or deal. Add a read-only snapshot accessor to `Mazzo` if necessary.
 - `Players`: an array of player objects containing each player's name and index, obtained through `PlayersOnTable` and `Player`.
 - `Actions`: an initially empty array.
+
+Do not pass or serialize the initial `Mazzo` card-index list during recorder initialization. The shuffled deck and actual deals are recorded as actions when each `Giocata` starts.
 
 Use valid JSON keys and syntax (for example, `"Ix"` as a quoted key, with no trailing commas). Ensure player names are escaped by the JSON writer.
 

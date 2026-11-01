@@ -19,8 +19,8 @@ GameActionRecorder::GameActionRecorder()
     : _isInitialized(false), _isFinalized(false) {}
 
 LPErrInApp GameActionRecorder::Initialize(
-    const std::vector<Uint8>& cardIndices, PlayersOnTable& playersOnTable,
-    const std::string& settingsDirectory, const std::string& gameName) {
+    PlayersOnTable& playersOnTable, const std::string& settingsDirectory,
+    const std::string& gameName) {
     if (settingsDirectory.empty() || gameName.empty()) {
         return ERR_UTIL::ErrorCreate(
             "Recording directory or game name is not defined");
@@ -47,12 +47,11 @@ LPErrInApp GameActionRecorder::Initialize(
         _filePath = baseFileName + "-" +
                     std::to_string(SDL_GetPerformanceCounter()) + ".json";
     }
-    return InitializeAtPath(cardIndices, playersOnTable, _filePath);
+    return InitializeAtPath(playersOnTable, _filePath);
 }
 
 LPErrInApp GameActionRecorder::InitializeAtPath(
-    const std::vector<Uint8>& cardIndices, PlayersOnTable& playersOnTable,
-    const std::string& filePath) {
+    PlayersOnTable& playersOnTable, const std::string& filePath) {
     if (filePath.empty()) {
         return ERR_UTIL::ErrorCreate("Recording path is not defined");
     }
@@ -62,12 +61,6 @@ LPErrInApp GameActionRecorder::InitializeAtPath(
     _isFinalized = false;
     _document = invjson::Value::MakeObject();
     _document["FormatVersion"] = invjson::Value(1);
-
-    invjson::Value deck = invjson::Value::MakeArray();
-    for (size_t i = 0; i < cardIndices.size(); ++i) {
-        deck.PushBack(invjson::Value(static_cast<int>(cardIndices[i])));
-    }
-    _document["Mazzo"] = deck;
 
     invjson::Value players = invjson::Value::MakeArray();
     const size_t playerCount = playersOnTable.GetNumOfPlayers();
