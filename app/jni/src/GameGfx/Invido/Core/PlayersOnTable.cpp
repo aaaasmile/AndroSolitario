@@ -51,6 +51,12 @@ void PlayersOnTable::AddPlayer(Player& player) {
     _vctPlayers.push_back(player);
 }
 
+void PlayersOnTable::CleanUp() {
+    for (Player& player : _vctPlayers) {
+        player.CleanUp();
+    }
+}
+
 Player* PlayersOnTable::GetPlayerToPlay() {
     size_t numPlayers = _vctPlayers.size();
     Uint8 playerIx = _current;

@@ -8,6 +8,7 @@ class PlayersOnTable {
    public:
     PlayersOnTable();
     void AddPlayer(Player& player);
+    void CleanUp();
     void SetFirstOnMatch(Uint8 index);
     Uint8 GetFirstOnMatch() { return _firstOnMatch; }
     void SetCurrentAndFirstOnTrick(Uint8 index);

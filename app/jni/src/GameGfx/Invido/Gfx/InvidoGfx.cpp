@@ -718,6 +718,7 @@ void InvidoGfx::InitInvidoVsCPU() {
     Player player2;
     player1.Init(this, PT_LOCAL, pGameSettings->PlayerName.c_str(), 0);
     player2.Init(NULL, PT_MACHINE, "Re Adlinvidu", 1);
+    _playersOnTable.CleanUp();
     _playersOnTable = PlayersOnTable();
     _playersOnTable.AddPlayer(player1);
     _playersOnTable.AddPlayer(player2);
