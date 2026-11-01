@@ -6,12 +6,12 @@
 #define _C_INVIDOCORE_H_
 
 #include "Giocata.h"
-#include "InvidoCoreDef.h"
+#include "../InvidoCoreDef.h"
 #include "Mano.h"
 #include "MatchStateWithScore.h"
 #include "Partita.h"
-#include "PlayerStatistic.h"
-#include "PlayersOnTable.h"
+#include "../PlayerStatistic.h"
+#include "../PlayersOnTable.h"
 
 namespace invido {
 

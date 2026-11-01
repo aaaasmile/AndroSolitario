@@ -38,11 +38,11 @@ set(TEST_IMPL_SOURCES
     ${TEST_INVIDO_DIR}/Player.cpp
     ${TEST_INVIDO_DIR}/PlayerStatistic.cpp
     ${TEST_INVIDO_DIR}/AlgPlayer.cpp
-    ${TEST_INVIDO_DIR}/InvidoCore.cpp
-    ${TEST_INVIDO_DIR}/Giocata.cpp
-    ${TEST_INVIDO_DIR}/Mano.cpp
-    ${TEST_INVIDO_DIR}/Partita.cpp
-    ${TEST_INVIDO_DIR}/MatchStateWithScore.cpp
+    ${TEST_INVIDO_DIR}/Core/InvidoCore.cpp
+    ${TEST_INVIDO_DIR}/Core/Giocata.cpp
+    ${TEST_INVIDO_DIR}/Core/Mano.cpp
+    ${TEST_INVIDO_DIR}/Core/Partita.cpp
+    ${TEST_INVIDO_DIR}/Core/MatchStateWithScore.cpp
     ${TEST_APP_DIR}/ErrorInfo.cpp
     ${TEST_APP_DIR}/../UnixSys/UnixsysTrace.cpp
 )

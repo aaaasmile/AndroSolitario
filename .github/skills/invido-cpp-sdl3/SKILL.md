@@ -45,7 +45,7 @@ When changing progression logic, preserve queue ownership and ordering, check wh
 
 ## Workflow
 
-1. Identify whether the change belongs to shared app code or `app/jni/src/GameGfx/Invido`; keep game-specific behavior in the Invido sources.
+1. Identify whether the change belongs to shared app code or `app/jni/src/GameGfx/Invido`; keep game-specific behavior in the Invido sources. Core state-machine files (`Giocata`, `Partita`, `Mano`, `InvidoCore`, and `MatchStateWithScore`) live in `app/jni/src/GameGfx/Invido/Core`.
 2. Before changing a game-flow method, callback, trait table, or interface, trace the full connection from callback definition through delegator setup and `Set...CB` wiring to the invocation site. Also follow related state transitions across `InvidoCore`, `Mano`, `Giocata`, and `Partita`.
 3. Make a small, focused change. Follow `.clang-format`, nearby conventions, and existing CMake target selection. Avoid unrelated changes to Solitario or vendored SDL code.
 4. Configure and build from the repository root for Windows/MySys2:

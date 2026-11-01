@@ -1,6 +1,7 @@
 #include "InvidoCore.h"
 
-#include "Mazzo.h"
+#include "../Mazzo.h"
+#include "../Player.h"
 #include "TraceService.h"
 
 using namespace invido;

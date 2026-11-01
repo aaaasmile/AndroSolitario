@@ -51,12 +51,12 @@ list(APPEND SOURCES
         GameGfx/Invido/GameSelector.cpp
         GameGfx/Invido/AlgPlayer.cpp
         GameGfx/Invido/CardSpec.cpp
-        GameGfx/Invido/Giocata.cpp
-        GameGfx/Invido/InvidoCore.cpp
+        GameGfx/Invido/Core/Giocata.cpp
+        GameGfx/Invido/Core/InvidoCore.cpp
         GameGfx/Invido/InvidoGfx.cpp
-        GameGfx/Invido/Mano.cpp
-        GameGfx/Invido/MatchStateWithScore.cpp
-        GameGfx/Invido/Partita.cpp
+        GameGfx/Invido/Core/Mano.cpp
+        GameGfx/Invido/Core/MatchStateWithScore.cpp
+        GameGfx/Invido/Core/Partita.cpp
         GameGfx/Invido/Mazzo.cpp
         GameGfx/Invido/Player.cpp
         GameGfx/Invido/PlayersOnTable.cpp

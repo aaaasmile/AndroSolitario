@@ -2,8 +2,8 @@
 #define __CPARTITA_H__
 
 #include "ErrorInfo.h"
-#include "InvidoCoreDef.h"
-#include "InvidoTraits.h"
+#include "../InvidoCoreDef.h"
+#include "../InvidoTraits.h"
 
 #include <deque>
 

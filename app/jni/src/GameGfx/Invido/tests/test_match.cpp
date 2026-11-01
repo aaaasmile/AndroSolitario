@@ -4,7 +4,7 @@
 
 #include "../Player.h"
 #include "../PlayersOnTable.h"
-#include "../InvidoCore.h"
+#include "../Core/InvidoCore.h"
 #include "../Mazzo.h"
 
 void testSimpleMatch() {

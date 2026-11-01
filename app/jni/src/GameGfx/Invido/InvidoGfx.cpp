@@ -11,7 +11,7 @@
 #include "DeckType.h"
 #include "GameSettings.h"
 #include "GfxUtil.h"
-#include "InvidoCore.h"
+#include "Core/InvidoCore.h"
 #include "InvidoCoreDef.h"
 #include "Languages.h"
 #include "Mazzo.h"

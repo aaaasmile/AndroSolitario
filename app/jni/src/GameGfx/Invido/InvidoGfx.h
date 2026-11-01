@@ -11,7 +11,7 @@
 #include "Config.h"
 #include "DeckType.h"
 #include "ErrorInfo.h"
-#include "InvidoCore.h"
+#include "Core/InvidoCore.h"
 #include "Mazzo.h"
 #include "Traits.h"
 
