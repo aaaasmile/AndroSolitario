@@ -13,14 +13,14 @@ void AddObjectField(invjson::Value& object, const std::string& name,
     object[name] = value;
 }
 
-}  // namespace
+}  // namespace private
 
 GameActionRecorder::GameActionRecorder()
     : _isInitialized(false), _isFinalized(false) {}
 
-LPErrInApp GameActionRecorder::Initialize(
-    PlayersOnTable& playersOnTable, const std::string& settingsDirectory,
-    const std::string& gameName) {
+LPErrInApp GameActionRecorder::Initialize(PlayersOnTable& playersOnTable,
+                                          const std::string& settingsDirectory,
+                                          const std::string& gameName) {
     if (settingsDirectory.empty() || gameName.empty()) {
         return ERR_UTIL::ErrorCreate(
             "Recording directory or game name is not defined");
@@ -50,8 +50,8 @@ LPErrInApp GameActionRecorder::Initialize(
     return InitializeAtPath(playersOnTable, _filePath);
 }
 
-LPErrInApp GameActionRecorder::InitializeAtPath(
-    PlayersOnTable& playersOnTable, const std::string& filePath) {
+LPErrInApp GameActionRecorder::InitializeAtPath(PlayersOnTable& playersOnTable,
+                                                const std::string& filePath) {
     if (filePath.empty()) {
         return ERR_UTIL::ErrorCreate("Recording path is not defined");
     }
@@ -65,8 +65,7 @@ LPErrInApp GameActionRecorder::InitializeAtPath(
     invjson::Value players = invjson::Value::MakeArray();
     const size_t playerCount = playersOnTable.GetNumOfPlayers();
     for (size_t i = 0; i < playerCount; ++i) {
-        Player* player = playersOnTable.GetPlayerOnIndex(
-            static_cast<Uint8>(i));
+        Player* player = playersOnTable.GetPlayerOnIndex(static_cast<Uint8>(i));
         invjson::Value playerData = invjson::Value::MakeObject();
         playerData["Name"] = invjson::Value(player->GetName());
         playerData["Ix"] = invjson::Value(static_cast<int>(player->GetIndex()));
@@ -85,9 +84,9 @@ LPErrInApp GameActionRecorder::InitializeAtPath(
     return NULL;
 }
 
-void GameActionRecorder::RecordAction(
-    const std::string& source, const std::string& action,
-    const invjson::Value::Object& details) {
+void GameActionRecorder::RecordAction(const std::string& source,
+                                      const std::string& action,
+                                      const invjson::Value::Object& details) {
     if (!_isInitialized || _isFinalized) {
         return;
     }
@@ -156,9 +155,7 @@ LPErrInApp GameActionRecorder::WriteDocument() {
     return NULL;
 }
 
-const std::string& GameActionRecorder::GetFilePath() const {
-    return _filePath;
-}
+const std::string& GameActionRecorder::GetFilePath() const { return _filePath; }
 
 const std::vector<invjson::Value>& GameActionRecorder::GetActions() const {
     return _vctActions;
