@@ -24,11 +24,12 @@ class GameActionRecorder {
     void RecordAction(const std::string& source, const std::string& action,
                       const invjson::Value::Object& details =
                           invjson::Value::Object());
+    LPErrInApp FlashActions();
     LPErrInApp Finalize(const std::string& outcome);
     bool IsInitialized() const;
     const std::string& GetFilePath() const;
     const std::vector<invjson::Value>& GetActions() const;
-    void RecordGiocataDeck(const std::vector<Uint8>& cardIndices);
+    LPErrInApp RecordGiocataDeck(const std::vector<Uint8>& cardIndices);
 
    private:
     LPErrInApp WriteDocument();

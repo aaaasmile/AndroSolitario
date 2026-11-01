@@ -77,7 +77,7 @@ LPErrInApp GameActionRecorder::InitializeAtPath(
     _isInitialized = true;
     _isFinalized = false;
 
-    LPErrInApp error = WriteDocument();
+    LPErrInApp error = FlashActions();
     if (error != NULL) {
         _isInitialized = false;
         return error;
@@ -100,7 +100,15 @@ void GameActionRecorder::RecordAction(
          it != details.end(); ++it) {
         AddObjectField(entry, it->first, it->second);
     }
+    _document["Actions"].PushBack(entry);
     _vctActions.push_back(entry);
+}
+
+LPErrInApp GameActionRecorder::FlashActions() {
+    if (!_isInitialized) {
+        return ERR_UTIL::ErrorCreate("Recorder was not initialized");
+    }
+    return WriteDocument();
 }
 
 LPErrInApp GameActionRecorder::Finalize(const std::string& outcome) {
@@ -111,12 +119,8 @@ LPErrInApp GameActionRecorder::Finalize(const std::string& outcome) {
         return NULL;
     }
 
-    _document["Actions"] = invjson::Value::MakeArray();
-    for (size_t i = 0; i < _vctActions.size(); ++i) {
-        _document["Actions"].PushBack(_vctActions[i]);
-    }
     _document["Outcome"] = invjson::Value(outcome);
-    LPErrInApp error = WriteDocument();
+    LPErrInApp error = FlashActions();
     if (error != NULL) {
         return error;
     }
@@ -160,7 +164,7 @@ const std::vector<invjson::Value>& GameActionRecorder::GetActions() const {
     return _vctActions;
 }
 
-void GameActionRecorder::RecordGiocataDeck(
+LPErrInApp GameActionRecorder::RecordGiocataDeck(
     const std::vector<Uint8>& cardIndices) {
     invjson::Value::Object details;
     invjson::Value deck = invjson::Value::MakeArray();
@@ -169,6 +173,10 @@ void GameActionRecorder::RecordGiocataDeck(
     }
     details["Mazzo"] = deck;
     RecordAction("Engine", "ShuffledDeck", details);
+    if (!_isInitialized || _isFinalized) {
+        return NULL;
+    }
+    return FlashActions();
 }
 
 }  // namespace invido

@@ -49,6 +49,13 @@ void testGameActionRecorder() {
     recorder.RecordAction("Player", "PlayCard", actionDetails);
     assert(recorder.GetActions().size() == 1);
 
+    std::vector<Uint8> shuffledDeck;
+    shuffledDeck.push_back(2);
+    shuffledDeck.push_back(5);
+    error = recorder.RecordGiocataDeck(shuffledDeck);
+    assert(error == NULL);
+    assert(recorder.GetActions().size() == 2);
+
     error = recorder.Finalize("Completed");
     assert(error == NULL);
     error = recorder.Finalize("Completed");
@@ -63,7 +70,10 @@ void testGameActionRecorder() {
     assert(SDL_CloseIO(input));
     const invjson::ParseResult finalDocument = invjson::Parse(finalJson);
     assert(finalDocument.success);
-    assert(finalDocument.value.Find("Actions")->AsArray().size() == 1);
+    const invjson::Value::Array& recordedActions =
+        finalDocument.value.Find("Actions")->AsArray();
+    assert(recordedActions.size() == 2);
+    assert(recordedActions[1].Find("Action")->AsString() == "ShuffledDeck");
     assert(finalDocument.value.Find("Outcome")->AsString() == "Completed");
 
     assert(SDL_RemovePath(path.c_str()));

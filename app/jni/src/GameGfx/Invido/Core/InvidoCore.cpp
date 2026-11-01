@@ -302,7 +302,12 @@ void InvidoCore::Giocata_Start(Uint8 playerIx) {
 
     _p_MyMazzo->Reset();
     _p_MyMazzo->Shuffle();
-    _gameActionRecorder.RecordGiocataDeck(_p_MyMazzo->GetCardIndexOrder());
+    LPErrInApp recorderError =
+        _gameActionRecorder.RecordGiocataDeck(_p_MyMazzo->GetCardIndexOrder());
+    if (recorderError != NULL) {
+        TRACE("Unable to flash Invido action recording: %s\n",
+              recorderError->ErrorText.c_str());
+    }
     NotifyScript(SCR_NFY_SHUFFLEDECK);
     _p_PlayersOnTable->SetFirstOnGiocata(playerIx);
 
