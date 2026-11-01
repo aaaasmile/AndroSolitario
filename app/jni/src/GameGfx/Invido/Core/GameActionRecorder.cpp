@@ -26,6 +26,11 @@ bool GameActionRecorder::Initialize(
         errorMessage = "Recording directory or game name is not defined";
         return false;
     }
+    if (!SDL_CreateDirectory(settingsDirectory.c_str())) {
+        errorMessage = "Unable to create recording directory '" +
+                       settingsDirectory + "': " + SDL_GetError();
+        return false;
+    }
 
     char timestamp[32];
     const int timestampLength =

@@ -122,7 +122,7 @@ GiocataCb InvidoCore::prepGiocataDelegator() {
 // trait Partita - End
 
 void InvidoCore::Init(PlayersOnTable* pPlayersOnTable, Mazzo* pMazzo) {
-    TRACE_DEBUG("InvidoCore initialize\n");
+    TRACE_DEBUG("[Core-Init] InvidoCore initialize\n");
 
     SDL_assert(pPlayersOnTable);
     SDL_assert(pMazzo);
@@ -139,13 +139,9 @@ void InvidoCore::Init(PlayersOnTable* pPlayersOnTable, Mazzo* pMazzo) {
 
     PartitaCb delegatorCb = prepPartitaDelegator();
     _partita.SetPartitaCB(delegatorCb);
-    //_partita.SetGiocata(&_giocata);
 
     GiocataCb giocataCb = prepGiocataDelegator();
     _giocata.SetGiocataCB(giocataCb);
-
-    //_giocata.SetPartita(&_partita);
-    //_giocata.SetMano(&_mano);
 
     ManoCb manoCb = prepManoDelegator();
     _mano.SetManoCB(manoCb);
@@ -159,14 +155,12 @@ void InvidoCore::Init(PlayersOnTable* pPlayersOnTable, Mazzo* pMazzo) {
                                             *_p_PlayersOnTable,
                                             _recordingDirectory, _gameName,
                                             recorderError)) {
-            TRACE("Unable to initialize Invido action recording: %s\n",
+            TRACE("[Core-Init] Unable to initialize Invido action recording: %s\n",
                   recorderError.c_str());
         }
     } else {
-        TRACE("Invido action recording location is not configured\n");
+        TRACE("[Core-Init] Invido action recording location is not configured\n");
     }
-
-    //_matchStateWithScore.SetManoInstance(&_mano);
 }
 
 void InvidoCore::SetRecordingLocation(const std::string& directory,
