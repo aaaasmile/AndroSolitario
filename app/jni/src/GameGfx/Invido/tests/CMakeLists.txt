@@ -34,6 +34,8 @@ include_directories(
 # Implementation files needed for linking
 set(TEST_IMPL_SOURCES
     ${TEST_INVIDO_DIR}/Core/GameActionRecorder.cpp
+    ${TEST_INVIDO_DIR}/Core/GameActionReplayer.cpp
+    ${TEST_INVIDO_DIR}/Core/AlgPlayerAuto.cpp
     ${TEST_APP_LIB}/Json/Json.cpp
     ${TEST_INVIDO_DIR}/Core/CardSpec.cpp
     ${TEST_INVIDO_DIR}/Core/Mazzo.cpp
@@ -55,6 +57,7 @@ set(TEST_SOURCES
     test_error_info.cpp
     test_json.cpp
     test_recorder.cpp
+    test_action_replayer.cpp
     test_card.cpp
     test_mazzo.cpp
     test_playersontable.cpp

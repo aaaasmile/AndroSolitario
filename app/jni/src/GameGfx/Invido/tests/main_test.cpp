@@ -6,6 +6,7 @@ void testPlayersOnTable();
 void testMatch();
 void testJson();
 void testGameActionRecorder();
+void testGameActionReplayer();
 void testErrorInfo();
 
 int main(int argc, char* argv[]) {
@@ -15,6 +16,7 @@ int main(int argc, char* argv[]) {
         testErrorInfo();
         testJson();
         testGameActionRecorder();
+        testGameActionReplayer();
         testCardSpec();
         testMazzo();
         testPlayersOnTable();

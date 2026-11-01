@@ -2,8 +2,10 @@
 #define __CPLAYER_H__
 
 #include <iostream>
+#include <memory>
 
 #include "AlgCoreInterface.h"
+#include "ErrorInfo.h"
 #include "InvidoCoreDef.h"
 
 namespace invido {
@@ -18,15 +20,19 @@ inline eCARDINDEX& operator++(eCARDINDEX& eF, int) {
     return eF = (eF >= CIX_2) ? CIX_0 : eCARDINDEX(eF + 1);
 }
 
+class GameActionReplayer;
+
 class Player {
-    typedef std::vector<I_ALG_Player*> VCT_PALG;
+    typedef std::vector<std::shared_ptr<I_ALG_Player>> VCT_PALG;
 
    public:
     Player();
     virtual ~Player();
     void CleanUp();
     void Init(I_ALG_Player* I_val, eTypeOfPLayer eVal, LPCSTR lpszName,
-                Uint8 index);
+              Uint8 index);
+    LPErrInApp InitFromActionPlayer(GameActionReplayer& actionReplayer,
+                                    Uint8 playerIx);
     void SetName(LPCSTR lpszName) { _playerName = std::string(lpszName); }
     std::string GetName() { return _playerName; }
     void SetType(eTypeOfPLayer eVal) { _eKind = eVal; }
