@@ -48,15 +48,9 @@ class Giocata {
     void GiocataPatada();
 
    private:
-    bool isGiocatEnd();
-    bool isGiocataPatada() { return (_eIsGiocataEnd == GES_PATADA); }
-    bool isGiocataMonte() { return (_eIsGiocataEnd == GES_AMONTE); }
-
-   private:
     GiocataCb _giocataCb;
     eGiocataStatus _eGiocataStatus;
     DEQ_ACTIT_GIO _deqNextAction;
-    eGiocataEndState _eIsGiocataEnd;
 };
 }  // namespace invido
 

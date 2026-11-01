@@ -20,7 +20,7 @@ class I_CORE_Game {
 
 class I_MatchScore {
    public:
-    //virtual bool IsGiocatEnd() = 0;
+    virtual bool IsGiocataEnd() = 0;
     virtual bool IsGiocataMonte() = 0;
     virtual bool IsGiocataPatada() = 0;
     virtual bool IsManoPatada() = 0;
@@ -30,7 +30,7 @@ class I_MatchScore {
     virtual Uint8 GetMatchWinner() = 0;
     virtual eGiocataScoreState GetCurrScore() = 0;
     virtual int GetPointsPlayer(Uint8 playerIx) = 0;
-    virtual int GetManoNum() = 0;
+    virtual int GetManoRound() = 0;
     virtual bool IsGameAbandoned() = 0;
 };
 /** Inteface to be implemented from player algorithm. Functions are called by

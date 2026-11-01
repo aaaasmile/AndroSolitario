@@ -691,7 +691,7 @@ void AlgPlayer::ALG_ManoEnd(I_MatchScore* pScore) {
     _currentManoIndex++;
 
     _lastManoPatada = pScore->IsManoPatada();
-    int index = pScore->GetManoNum() - 1;
+    int index = pScore->GetManoRound() - 1;
     SDL_assert(index >= 0 && index < NUM_CARDS_HAND);
     _playerWonHandIndices[index] =
         _lastManoPatada ? -2 : pScore->GetManoWinner();

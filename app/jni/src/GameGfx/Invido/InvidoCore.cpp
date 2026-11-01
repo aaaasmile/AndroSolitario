@@ -91,9 +91,10 @@ PartitaCb InvidoCore::prepPartitaDelegator() {
 
 GiocataCb InvidoCore::prepGiocataDelegator() {
     // The callback table must outlive this function because Giocata stores it.
-    static VGiocataCb const tc = {.GiocataStarted = (&fncBind_GiocataStarted),
-                                  .GiocataEndedWinner = (&fncBind_GiocataEndedWinner),
-                                  .GiocataEndDueced = (&fncBind_GiocataEndDueced)};
+    static VGiocataCb const tc = {
+        .GiocataStarted = (&fncBind_GiocataStarted),
+        .GiocataEndedWinner = (&fncBind_GiocataEndedWinner),
+        .GiocataEndDueced = (&fncBind_GiocataEndDueced)};
 
     return (GiocataCb){.tc = &tc, .self = this};
 }
@@ -194,11 +195,13 @@ void InvidoCore::NewMatch() {
         }
     }
 
-    _mano.Init(_numPlayers); // TODO set Num players, _mano is not for match state
+    _mano.Init(
+        _numPlayers);  // TODO set Num players, _mano is not for match state
     _p_PlayersOnTable->SetFirstOnMatch(firstPlayerIx);
     _p_StartPlayer = _p_PlayersOnTable->GetPlayerOnIndex(firstPlayerIx);
     _partita.NewPartita(firstPlayerIx);
-    _matchPoints.MatchStart(_numPlayers); // TODO set Num players, _matchPoints is not for match state
+    _matchPoints.MatchStart(_numPlayers);  // TODO set Num players, _matchPoints
+                                           // is not for match state
 }
 
 bool InvidoCore::NextAction() {
@@ -288,37 +291,35 @@ void InvidoCore::Giocata_Start(Uint8 playerIx) {
 void InvidoCore::Mano_End() {
     _matchPoints.ManoEnd();
 
-    const bool manoEnded = _matchPoints.GetManoNum() >= NUM_CARDS_HAND;
-    if (_matchPoints.IsManoPatada()) {
-        Uint8 playerIx = _p_PlayersOnTable->GetFirstOnTrick();
-        _p_PlayersOnTable->SetCurrentAndFirstOnTrick(playerIx);
-    } else {
-        Uint8 winnerPlayerIx = _matchPoints.GetManoWinner();
-        _p_PlayersOnTable->SetCurrentAndFirstOnTrick(winnerPlayerIx);
-    }
-    if (!manoEnded) {
-        _p_PlHaveToPlay = _p_PlayersOnTable->SwitchToNextPlayer();
-    }
-
     for (I_ALG_Player* pIAlgPlayer : _vctpAlgPlayer) {
         if (pIAlgPlayer) {
             pIAlgPlayer->ALG_ManoEnd(&_matchPoints);
         }
     }
-    NotifyScript(SCR_NFY_ALGMANOEND);
 
-    if (manoEnded) {
-        return;
-    }
-
-    Uint8 giocataWinnerIx = _matchPoints.GetGiocataWinner();
-    if (giocataWinnerIx != NOT_VALID_INDEX) {
-        _matchPoints.GiocataEndWithWinner(giocataWinnerIx);
-        _giocata.PlayerGiocataWins(giocataWinnerIx);
-    } else if (_matchPoints.GetManoNum() < NUM_CARDS_HAND) {
+    const bool giocataEnded = _matchPoints.IsGiocataEnd();
+    if (giocataEnded) {
+        if (_matchPoints.IsGiocataPatada()) {
+            _giocata.GiocataPatada();
+        } else if (_matchPoints.IsGiocataMonte()) {
+            _giocata.GiocataAMonte();
+        } else {
+            Uint8 giocataWinnerIx = _matchPoints.GetGiocataWinner();
+            _giocata.PlayerGiocataWins(giocataWinnerIx);
+        }
+    } else {
+        if (_matchPoints.IsManoPatada()) {
+            Uint8 playerIx = _p_PlayersOnTable->GetFirstOnTrick();
+            _p_PlayersOnTable->SetCurrentAndFirstOnTrick(playerIx);
+        } else {
+            Uint8 winnerPlayerIx = _matchPoints.GetManoWinner();
+            _p_PlayersOnTable->SetCurrentAndFirstOnTrick(winnerPlayerIx);
+        }
+        _p_PlHaveToPlay = _p_PlayersOnTable->GetPlayerToPlay();
         LPErrInApp manoError = _mano.NewMano(_p_PlHaveToPlay->GetIndex());
         SDL_assert(manoError == NULL);
     }
+    NotifyScript(SCR_NFY_ALGMANOEND);
 }
 
 void InvidoCore::Giocata_AMonte() {
@@ -525,12 +526,12 @@ void InvidoCore::GetMoreCommands(VCT_COMMANDS& vct_Commands, Uint8 playerIx) {
 }
 
 void InvidoCore::NotifyScript(eScriptNotification eVal) {
-    //TRACE_DEBUG("Event %d\n", eVal);
+    // TRACE_DEBUG("Event %d\n", eVal);
 }
 
 void InvidoCore::NotifyScriptAlgorithm(Uint8 playerIx,
                                        eScriptNotification eVal) {
-    //TRACE_DEBUG("Algorithm %d, %d\n", playerIx, eVal);
+    // TRACE_DEBUG("Algorithm %d, %d\n", playerIx, eVal);
 }
 
 ////////////////////////////////////////// functions called by Script

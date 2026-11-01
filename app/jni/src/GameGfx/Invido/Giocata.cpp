@@ -44,7 +44,6 @@ void Giocata::Reset() {
 void Giocata::PlayerGiocataWins(Uint8 playerWinnerIx) {
     SDL_assert(_eGiocataStatus == GIOCATA_ONGOING);
 
-    _eIsGiocataEnd = GES_HAVE_WINNER;
     ActionItemGio action = {._eNextAction = GIOC_WITHWIN_ENDED,
                             ._playerIx = playerWinnerIx};
     _deqNextAction.push_back(action);
@@ -53,14 +52,12 @@ void Giocata::PlayerGiocataWins(Uint8 playerWinnerIx) {
 }
 
 void Giocata::GiocataAMonte() {
-    _eIsGiocataEnd = GES_AMONTE;
     ActionItemGio action = {._eNextAction = GIOC_NOWINNERS_ENDED};
     _deqNextAction.push_back(action);
     _eGiocataStatus = WAIT_NEW_GIOCATA;
 }
 
 void Giocata::GiocataPatada() {
-    _eIsGiocataEnd = GES_PATADA;
     ActionItemGio action = {._eNextAction = GIOC_NOWINNERS_ENDED};
     _deqNextAction.push_back(action);
     _eGiocataStatus = WAIT_NEW_GIOCATA;

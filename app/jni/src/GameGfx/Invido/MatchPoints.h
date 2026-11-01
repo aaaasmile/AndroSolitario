@@ -29,6 +29,13 @@ struct CardPlayed {
 typedef std::vector<CardPlayed> VCP_CARDPLAYED;
 
 class MatchPoints : public I_MatchScore {
+    enum eGiocataEndState {
+        GES_ON_GOING,
+        GES_HAVE_WINNER,
+        GES_PATADA,
+        GES_AMONTE
+    };
+
    public:
     MatchPoints();
     virtual ~MatchPoints();
@@ -47,15 +54,17 @@ class MatchPoints : public I_MatchScore {
                      bool* pisPata);
     void GetGiocataInfo(int iNumGiocata, GiocataInfo* pGiocInfo);
     size_t GetNumGiocateInCurrMatch() { return _vctGiocataInfo.size(); }
-    // void PlayerGiocataWins(Uint8 playerWinIx);
-    // void SetManoInstance(Mano* pVal) { _p_Mano = pVal; }
-    //void AMonte();
     void SetTheWinnerBecauseAbandon(Uint8 playerIx);
     int GetCurrNumCardPlayed() { return _numCardsPlayed; }
 
     //  I_MatchScore - begin
-    bool IsGiocataPatada() { return _isGiocataPatada; }
-    bool IsGiocataMonte() { return _isGiocataAMonte; }
+    bool IsGiocataEnd() {
+        return (_eIsGiocataEnd == GES_PATADA || _eIsGiocataEnd == GES_AMONTE ||
+                _eIsGiocataEnd == GES_HAVE_WINNER);
+    }
+    bool IsGiocataPatada() { return (_eIsGiocataEnd == GES_PATADA); }
+    bool IsGiocataMonte() { return (_eIsGiocataEnd == GES_AMONTE); }
+
     bool IsManoPatada() { return _isManoPatatda; }
 
     bool IsMatchEnd() { return _isMatchEnd; }
@@ -69,7 +78,7 @@ class MatchPoints : public I_MatchScore {
         SDL_assert(playerIx < _vctPlayerPoints.size());
         return _vctPlayerPoints[playerIx];
     }
-    int GetManoNum() { return _manoRound; }
+    int GetManoRound() { return _manoRound; }
     bool IsGameAbandoned() { return _isGameAbandoned; }
     // I_MatchScore - end
 
@@ -83,6 +92,8 @@ class MatchPoints : public I_MatchScore {
     VCT_GIOCATAINFO _vctGiocataInfo;
     VCP_CARDPLAYED _vctCardPlayed;
     eGiocataScoreState _currentScore;
+    eGiocataEndState _eIsGiocataEnd;
+
     size_t _numCardsPlayed;
     int _manoRound;
     int _numPlayers;
@@ -94,7 +105,6 @@ class MatchPoints : public I_MatchScore {
     Uint8 _playerGiocataWin;
     Uint8 _playerMatchWin;
 
-    // Mano* _p_Mano;
     bool _isMatchInSpecialScore;
     bool _isOldManoPatada;
     bool _isGameAbandoned;
