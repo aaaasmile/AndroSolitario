@@ -7,6 +7,10 @@ description: 'Use when implementing, debugging, or testing the Invido game in th
 
 Use this workflow for Invido-specific implementation and debugging. For general workspace guidance, follow [the project instructions](../../copilot-instructions.md). Consult [`passaggi_invido.md`](../../../passaggi_invido.md) for the maintainer's detailed build and architecture notes.
 
+## Member Naming
+
+For Invido class members, use a leading underscore and omit type affixes such as `m_i` or `m_b`. Non-pointer member names start with a lowercase letter after the underscore and use camel case; for example, `m_iNumManiWon` becomes `_numManiWon`. For pointer members, use the `_p_` prefix followed by the member name; for example, `m_pCoreGame` becomes `_p_CoreGame`.
+
 ## Invido Traits and Callbacks
 
 Invido uses a C-style callback-table pattern called “traits,” inspired by Rust traits but implemented with function pointers and a context pointer (not Rust interfaces or C++ inheritance). Read [`InvidoTraits.h`](../../../app/jni/src/GameGfx/Invido/InvidoTraits.h) for the callback-table definitions.
