@@ -525,12 +525,12 @@ void InvidoCore::GetMoreCommands(VCT_COMMANDS& vct_Commands, Uint8 playerIx) {
 }
 
 void InvidoCore::NotifyScript(eScriptNotification eVal) {
-    TRACE_DEBUG("Event %d\n", eVal);
+    //TRACE_DEBUG("Event %d\n", eVal);
 }
 
 void InvidoCore::NotifyScriptAlgorithm(Uint8 playerIx,
                                        eScriptNotification eVal) {
-    TRACE_DEBUG("Algorithm %d, %d\n", playerIx, eVal);
+    //TRACE_DEBUG("Algorithm %d, %d\n", playerIx, eVal);
 }
 
 ////////////////////////////////////////// functions called by Script
