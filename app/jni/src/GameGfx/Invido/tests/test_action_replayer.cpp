@@ -208,7 +208,7 @@ void testGameActionReplayer() {
     FakeCore wrongResponseCore;
     wrongResponsePlayer.ALG_SetCoreInterface(&wrongResponseCore);
     error = wrongResponsePlayer.ALG_HaveToRespond();
-    assert(error == NULL);
+    assert(error != NULL);
     assert(wrongResponseCore.Commands().empty());
     assert(!responseMismatchReplayer.IsComplete());
 
@@ -254,7 +254,7 @@ void testGameActionReplayer() {
     FakeCore rejectingCore(false);
     rejectingPlayer.ALG_SetCoreInterface(&rejectingCore);
     error = rejectingPlayer.ALG_HaveToPlay();
-    assert(error == NULL);
+    assert(error != NULL);
     assert(!rejectedReplayer.IsComplete());
 
     invjson::Value unsupportedRecording = MakeRecording();
