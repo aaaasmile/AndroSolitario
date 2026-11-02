@@ -325,7 +325,7 @@ bool InvidoCore::resetCard(Uint8 playerIx, const CardSpec& cardSpec) {
 }
 
 void InvidoCore::Giocata_Start(Uint8 playerIx) {
-    TRACE_DEBUG("Giocata_Start\n");
+    TRACE_DEBUG("[InvidoCore] Giocata_Start, player : %d\n", playerIx);
 
     resetCardInfoPlayers();
     // 1) first - calculate the table (there is no switch)
@@ -339,18 +339,18 @@ void InvidoCore::Giocata_Start(Uint8 playerIx) {
             _p_GameActionReplayer->GetNextGiocataData(giocataData);
         if (replayError == NULL && giocataData.firstPlayerIndex != playerIx) {
             char errorMessage[128];
-            SDL_snprintf(
-                errorMessage, sizeof(errorMessage),
-                "Replay trick starts with player %d, expected player %d",
-                static_cast<int>(giocataData.firstPlayerIndex),
-                static_cast<int>(playerIx));
+            SDL_snprintf(errorMessage, sizeof(errorMessage),
+                         "[InvidoCore] Replay trick starts with player %d, "
+                         "expected player %d",
+                         static_cast<int>(giocataData.firstPlayerIndex),
+                         static_cast<int>(playerIx));
             replayError = ERR_UTIL::ErrorCreate(errorMessage);
         }
         if (replayError == NULL) {
             replayError = _p_MyMazzo->SetCardIndexOrder(giocataData.deckOrder);
         }
         if (replayError != NULL) {
-            TRACE("Unable to prepare replay deck: %s\n",
+            TRACE("[InvidoCore] Unable to prepare replay deck: %s\n",
                   replayError->ErrorText.c_str());
             return;
         }
@@ -359,7 +359,7 @@ void InvidoCore::Giocata_Start(Uint8 playerIx) {
         LPErrInApp recorderError = _gameActionRecorder.RecordGiocataDeck(
             _p_MyMazzo->GetCardIndexOrder());
         if (recorderError != NULL) {
-            TRACE("Unable to flash Invido action recording: %s\n",
+            TRACE("[InvidoCore] Unable to flash Invido action recording: %s\n",
                   recorderError->ErrorText.c_str());
         }
     }
@@ -377,7 +377,8 @@ void InvidoCore::Giocata_Start(Uint8 playerIx) {
 
         VCT_CARDSPEC vctCardArray;
 
-        TRACE_DEBUG("%s => ", pCurrPlayer->GetName().c_str());
+        TRACE_DEBUG("[InvidoCore] %s - Ix: %d => ",
+                    pCurrPlayer->GetName().c_str(), pCurrPlayer->GetIndex());
 
         for (int j = 0; j < NUM_CARDS_HAND; j++) {
             bool isValid;
@@ -430,10 +431,13 @@ void InvidoCore::Mano_End() {
         }
     } else {
         if (_matchStateWithScore.IsManoPatada()) {
+            TRACE_DEBUG("[InvidoCore] Mano Patada \n");
             Uint8 playerIx = _p_PlayersOnTable->GetFirstOnTrick();
             _p_PlayersOnTable->SetCurrentAndFirstOnTrick(playerIx);
         } else {
             Uint8 winnerPlayerIx = _matchStateWithScore.GetManoWinner();
+            TRACE_DEBUG("[InvidoCore] Mano winner is player: %d \n",
+                        winnerPlayerIx);
             _p_PlayersOnTable->SetCurrentAndFirstOnTrick(winnerPlayerIx);
         }
         _p_PlHaveToPlay = _p_PlayersOnTable->SwitchToNextPlayer();
@@ -591,7 +595,8 @@ CardSpec* InvidoCore::checkValidCardPlayed(Uint8 playerIx,
 }
 
 bool InvidoCore::VaDentro(Uint8 playerIx, const CardSpec& cardSpec) {
-    TRACE_DEBUG("[InvidoCore] VaDentro, player %d with card %s \n", playerIx, cardSpec.GetName().c_str());
+    TRACE_DEBUG("[InvidoCore] VaDentro, player %d with card %s \n", playerIx,
+                cardSpec.GetName().c_str());
     CardSpec* pCardplayed = checkValidCardPlayed(playerIx, cardSpec);
     if (pCardplayed == NULL) {
         return false;
@@ -627,7 +632,8 @@ bool InvidoCore::VaDentro(Uint8 playerIx, const CardSpec& cardSpec) {
 void InvidoCore::SetRandomSeed(int iVal) { _p_MyMazzo->SetRandomSeed(iVal); }
 
 bool InvidoCore::PlayCard(Uint8 playerIx, const CardSpec& cardSpec) {
-    TRACE_DEBUG("[InvidoCore] PlayCard, player %d, card: %s \n", playerIx, cardSpec.GetName().c_str());
+    TRACE_DEBUG("[InvidoCore] PlayCard, player %d, card: %s \n", playerIx,
+                cardSpec.GetName().c_str());
     CardSpec* pCardplayed = checkValidCardPlayed(playerIx, cardSpec);
     SDL_assert(pCardplayed);
     if (pCardplayed == NULL) {
@@ -663,7 +669,8 @@ bool InvidoCore::PlayCard(Uint8 playerIx, const CardSpec& cardSpec) {
 }
 
 bool InvidoCore::Say(Uint8 playerIx, eSayPlayer eSay) {
-    TRACE_DEBUG("[InvidoCore] Say, player %d, SAY: %s \n", playerIx, GeteSayPlayerToString(eSay));
+    TRACE_DEBUG("[InvidoCore] Say, player %d, SAY: %s \n", playerIx,
+                GeteSayPlayerToString(eSay));
     bool bRes = false;
     bool sayAccepted = false;
     if (_mano.Player_Say(playerIx, eSay, &sayAccepted)) {

@@ -141,7 +141,7 @@ Mano::Mano() {
 
 LPErrInApp Mano::NextAction(bool& hasAction) {
     hasAction = false;
-    bool hasActionNext  = false;
+    bool hasActionNext = false;
     if (_deqNextAction.empty()) {
         return NULL;
     }
@@ -149,9 +149,8 @@ LPErrInApp Mano::NextAction(bool& hasAction) {
     ActionItemMano Action = _deqNextAction.front();
     _deqNextAction.pop_front();
 
-    const int actionParameter = Action._vctArg.empty()
-                                    ? NOT_VALID_INDEX
-                                    : Action._vctArg.front();
+    const int actionParameter =
+        Action._vctArg.empty() ? NOT_VALID_INDEX : Action._vctArg.front();
     const char* actionName = stalpzActionName[Action._eNextAction];
     if (Action._eNextAction != MANO_NO_ACTION) {
         _manoCb.tc->ActionExecuted(_manoCb.self, actionName, actionParameter);
@@ -658,7 +657,7 @@ void Mano::add_Action(int iPar_0, eFN_MANOACTION eAct) {
     _deqNextAction.push_back(Action);
 
     STRING strActName = _mapActionNames[eAct];
-    TRACE_DEBUG("Mano-> Action scheduled %s, param: %d\n", strActName.c_str(),
+    TRACE_DEBUG("[Mano] Action scheduled %s, param: %d\n", strActName.c_str(),
                 iPar_0);
 }
 
@@ -720,7 +719,7 @@ void Mano::restore_StateBeforeQuest() {
 void Mano::save_StateBeforeQuest() { _eOldManoState = _eManoState; }
 
 void Mano::clearQuestions() {
-    TRACE_DEBUG("Clear all pending questions\n");
+    TRACE_DEBUG("[Mano] Clear all pending questions\n");
     _deqPendingQuestion.clear();
 }
 
