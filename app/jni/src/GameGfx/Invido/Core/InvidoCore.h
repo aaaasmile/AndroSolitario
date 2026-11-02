@@ -5,6 +5,7 @@
 #ifndef _C_INVIDOCORE_H_
 #define _C_INVIDOCORE_H_
 
+#include "ErrorInfo.h"
 #include "GameActionRecorder.h"
 #include "Giocata.h"
 #include "InvidoCoreDef.h"
@@ -62,7 +63,7 @@ class InvidoCore : public I_CORE_Game {
     void PartitaStarted(Uint8 playerIx);
 
     void NewMatch();
-    bool NextAction();
+    LPErrInApp NextAction(bool& HasAction);
     void SetRandomSeed(int iVal);
     void SetRecordingLocation(const std::string& directory,
                               const std::string& gameName);

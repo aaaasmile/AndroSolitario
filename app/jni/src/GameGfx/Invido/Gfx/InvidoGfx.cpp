@@ -780,7 +780,11 @@ LPErrInApp InvidoGfx::Show() {
     //         handleMouseUpEvent(event);
     //         break;
     // }
-    _p_InvidoCore->NextAction();
+    bool hasAction = false;
+    LPErrInApp error = _p_InvidoCore->NextAction(hasAction);
+    if (error != NULL) {
+        return error;
+    }
 
     return NULL;
 }

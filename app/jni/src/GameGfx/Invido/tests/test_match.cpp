@@ -31,7 +31,12 @@ void testSimpleMatch() {
     invidoCore.Init(&playersOnTable, &mazzo);
     invidoCore.NewMatch();
     while (invidoCore.IsMatchOnGoing()) {
-        if (!invidoCore.NextAction()) {
+        bool hasAction = false;
+        LPErrInApp error = invidoCore.NextAction(hasAction);
+        if (error != NULL) {
+            throw std::runtime_error(error->ErrorText);
+        }
+        if (!hasAction) {
             throw std::runtime_error("Match stalled: no game action was taken");
         }
     }
@@ -69,10 +74,17 @@ void testReplayMatch() {
     playersOnTable.AddPlayer(player2);
     invidoCore.SetGameActionReplayer(replayer);
 
+    std::string jsonDir = "matches";
+    invidoCore.SetRecordingLocation(jsonDir, "Invido");
     invidoCore.Init(&playersOnTable, &mazzo);
     invidoCore.NewMatch();
     while (invidoCore.IsMatchOnGoing()) {
-        if (!invidoCore.NextAction()) {
+        bool hasAction = false;
+        LPErrInApp error = invidoCore.NextAction(hasAction);
+        if (error != NULL) {
+            throw std::runtime_error(error->ErrorText);
+        }
+        if (!hasAction) {
             throw std::runtime_error("Match stalled: no game action was taken");
         }
     }

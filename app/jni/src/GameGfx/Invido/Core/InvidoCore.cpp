@@ -151,10 +151,7 @@ void InvidoCore::Init(PlayersOnTable* pPlayersOnTable, Mazzo* pMazzo) {
 
     _numPlayers = _p_PlayersOnTable->GetNumOfPlayers();
 
-    if (_p_GameActionReplayer != NULL) {
-        TRACE_DEBUG(
-            "Invido action replay is configured; recording is disabled\n");
-    } else if (!_recordingDirectory.empty() && !_gameName.empty()) {
+    if (!_recordingDirectory.empty() && !_gameName.empty()) {
         LPErrInApp recorderError = _gameActionRecorder.Initialize(
             *_p_PlayersOnTable, _recordingDirectory, _gameName);
         if (recorderError != NULL) {
@@ -280,12 +277,13 @@ void InvidoCore::NewMatch() {
     _matchStateWithScore.MatchStart(_numPlayers);
 }
 
-bool InvidoCore::NextAction() {
+LPErrInApp InvidoCore::NextAction(bool& HasAction) {
     const bool manoActionTaken = _mano.NextAction();
     const bool giocataActionTaken = _giocata.NextAction();
     const bool partitaActionTaken = _partita.NextAction();
 
-    return manoActionTaken || giocataActionTaken || partitaActionTaken;
+    HasAction = manoActionTaken || giocataActionTaken || partitaActionTaken;
+    return NULL;
 }
 
 void InvidoCore::resetCardInfoPlayers() {
