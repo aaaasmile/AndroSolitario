@@ -35,7 +35,21 @@ void AlgPlayerAuto::ALG_GicataScoreChange(eGiocataScoreState newScore) {}
 void AlgPlayerAuto::ALG_PlayerSaidWrong(Uint8 playerIndex) {}
 
 void AlgPlayerAuto::ALG_HaveToPlay() {
-    PlayNextRecordedAction(GameActionReplayer::PlayerAction::Type::PlayCard);
+    GameActionReplayer::PlayerAction::Type actionType;
+    bool available = false;
+    LPErrInApp error = _replayer.PeekNextPlayerActionType(
+        _playerIndex, actionType, available);
+    if (error != NULL) {
+        StoreError(error);
+        return;
+    }
+    if (!available) {
+        StoreError(ERR_UTIL::ErrorCreate(
+            "Replay has no remaining action for player %d",
+            static_cast<int>(_playerIndex)));
+        return;
+    }
+    PlayNextRecordedAction(actionType);
 }
 
 void AlgPlayerAuto::ALG_HaveToRespond() {

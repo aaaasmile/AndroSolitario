@@ -2,6 +2,7 @@
 #define __CMAZZO_H
 
 #include "CardSpec.h"
+#include "ErrorInfo.h"
 #include "InvidoCoreDef.h"
 
 namespace invido {
@@ -19,6 +20,7 @@ class Mazzo {
         return _vctCardIndex;
     }
     void SetIndexRaw(int index, Uint8 val);
+    LPErrInApp SetCardIndexOrder(const std::vector<Uint8>& cardIndices);
     void SetRandomSeed(int val);
 
    private:

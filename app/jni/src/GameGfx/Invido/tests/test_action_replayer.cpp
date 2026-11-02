@@ -95,6 +95,7 @@ invjson::Value MakeRecording() {
     recording["Players"] = players;
 
     invjson::Value actions = invjson::Value::MakeArray();
+    actions.PushBack(MakeAction("Engine", "MatchStarted", 0, NULL, 0));
     actions.PushBack(MakeAction("Engine", "Say", -1, "Say",
                                 invido::SP_PARTIDA));
     actions.PushBack(MakeAction("Player", "Say", 0, "Say",
@@ -102,7 +103,17 @@ invjson::Value MakeRecording() {
     actions.PushBack(MakeAction("Engine", "Deal", -1, NULL, 0));
     actions.PushBack(MakeAction("Player", "Say", 1, "Say",
                                 invido::SP_VABENE));
-    actions.PushBack(MakeAction("Engine", "ShuffledDeck", -1, NULL, 0));
+    actions.PushBack(MakeAction("Giocata", "Started", 0, NULL, 0));
+    invjson::Value shuffledDeck = MakeAction("Engine", "ShuffledDeck", -1, NULL, 0);
+    invjson::Value deck = invjson::Value::MakeArray();
+    const int cardOrder[] = {27, 16, 15, 12, 32, 0, 10, 8, 25, 37, 36, 18,
+                             17, 1, 30, 31, 29, 39, 38, 26, 9, 35, 20, 22,
+                             2, 6, 11, 19, 28, 5, 21, 7};
+    for (size_t card = 0; card < sizeof(cardOrder) / sizeof(cardOrder[0]); ++card) {
+        deck.PushBack(invjson::Value(cardOrder[card]));
+    }
+    shuffledDeck["Mazzo"] = deck;
+    actions.PushBack(shuffledDeck);
     actions.PushBack(MakeAction("Player", "PlayCard", 0, "Card", 5));
     actions.PushBack(MakeAction("Player", "PlayCard", 1, "Card", 12));
     recording["Actions"] = actions;
@@ -140,6 +151,19 @@ void testGameActionReplayer() {
     assert(playerInfo.name == "Rensu \"Ace\"");
     assert(playerInfo.index == 0);
 
+    Uint8 matchStartPlayer = invido::NOT_VALID_INDEX;
+    error = replayer.GetMatchStartPlayer(matchStartPlayer);
+    assert(error == NULL);
+    assert(matchStartPlayer == 0);
+
+    invido::GameActionReplayer::GiocataData giocataData;
+    error = replayer.GetNextGiocataData(giocataData);
+    assert(error == NULL);
+    assert(giocataData.firstPlayerIndex == 0);
+    assert(giocataData.deckOrder.size() == 32);
+    assert(giocataData.deckOrder.front() == 27);
+    assert(giocataData.deckOrder.back() == 7);
+
     invido::GameActionReplayer::PlayerAction nextAction;
     bool available = false;
     error = replayer.PeekNextPlayerAction(1, nextAction, available);
@@ -157,23 +181,17 @@ void testGameActionReplayer() {
     assert(dynamic_cast<invido::AlgPlayerAuto*>(player0.GetAlg()) != NULL);
     assert(dynamic_cast<invido::AlgPlayerAuto*>(player1.GetAlg()) != NULL);
 
-    invido::GameActionReplayer mismatchReplayer;
-    error = mismatchReplayer.LoadFile(path);
+    invido::GameActionReplayer flexibleTurnReplayer;
+    error = flexibleTurnReplayer.LoadFile(path);
     assert(error == NULL);
-    invido::GameActionReplayer::PlayerAction firstAction;
-    bool firstActionAvailable = false;
-    error = mismatchReplayer.PeekNextPlayerAction(0, firstAction,
-                                                  firstActionAvailable);
-    assert(error == NULL && firstActionAvailable);
-    assert(firstAction.type ==
-           invido::GameActionReplayer::PlayerAction::Type::Say);
-    invido::AlgPlayerAuto wrongTypePlayer(mismatchReplayer, 0);
-    FakeCore wrongTypeCore;
-    wrongTypePlayer.ALG_SetCoreInterface(&wrongTypeCore);
-    wrongTypePlayer.ALG_HaveToPlay();
-    assert(wrongTypePlayer.HasError());
-    assert(wrongTypeCore.Commands().empty());
-    assert(!mismatchReplayer.IsComplete());
+    invido::AlgPlayerAuto flexibleTurnPlayer(flexibleTurnReplayer, 0);
+    FakeCore flexibleTurnCore;
+    flexibleTurnPlayer.ALG_SetCoreInterface(&flexibleTurnCore);
+    flexibleTurnPlayer.ALG_HaveToPlay();
+    assert(!flexibleTurnPlayer.HasError());
+    assert(flexibleTurnCore.Commands().size() == 1);
+    assert(flexibleTurnCore.Commands()[0].name == "Say");
+    assert(!flexibleTurnReplayer.IsComplete());
 
     invjson::Value responseMismatchRecording = MakeRecording();
     invjson::Value responseMismatchActions = invjson::Value::MakeArray();
@@ -260,12 +278,13 @@ void testGameActionReplayer() {
     invido::GameActionReplayer truncatedReplayer;
     error = truncatedReplayer.LoadFile(truncatedPath);
     assert(error == NULL);
-    invido::AlgPlayerAuto playerWaitingForCard(truncatedReplayer, 0);
-    FakeCore cardCore;
-    playerWaitingForCard.ALG_SetCoreInterface(&cardCore);
-    playerWaitingForCard.ALG_HaveToPlay();
-    assert(playerWaitingForCard.HasError());
-    assert(cardCore.Commands().empty());
+    invido::AlgPlayerAuto playerWaitingForRecordedSay(truncatedReplayer, 0);
+    FakeCore sayCore;
+    playerWaitingForRecordedSay.ALG_SetCoreInterface(&sayCore);
+    playerWaitingForRecordedSay.ALG_HaveToPlay();
+    assert(!playerWaitingForRecordedSay.HasError());
+    assert(sayCore.Commands().size() == 1);
+    assert(sayCore.Commands()[0].name == "Say");
 
     assert(SDL_RemovePath(path.c_str()));
     assert(SDL_RemovePath(responseMismatchPath.c_str()));

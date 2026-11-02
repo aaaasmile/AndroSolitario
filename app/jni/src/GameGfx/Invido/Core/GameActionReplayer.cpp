@@ -39,11 +39,20 @@ bool ReadString(const invjson::Value* value, std::string& result) {
 }  // namespace
 
 GameActionReplayer::GameActionReplayer()
-    : _isLoaded(false), _nextActionIndex(0), _hasPendingAction(false) {}
+    : _isLoaded(false),
+      _hasMatchStartPlayer(false),
+      _matchStartPlayerIndex(NOT_VALID_INDEX),
+      _nextGiocataIndex(0),
+      _nextActionIndex(0),
+      _hasPendingAction(false) {}
 
 void GameActionReplayer::Reset() {
     _isLoaded = false;
+    _hasMatchStartPlayer = false;
+    _matchStartPlayerIndex = NOT_VALID_INDEX;
+    _nextGiocataIndex = 0;
     _vctPlayers.clear();
+    _vctGiocateData.clear();
     _vctPlayerActions.clear();
     _nextActionIndex = 0;
     _hasPendingAction = false;
@@ -94,6 +103,7 @@ LPErrInApp GameActionReplayer::LoadJson(const std::string& json) {
     }
 
     std::vector<PlayerInfo> playersToLoad;
+    std::vector<GiocataData> giocateDataToLoad;
     std::vector<PlayerAction> actionsToLoad;
     const invjson::Value* version = parsed.value.Find("FormatVersion");
     int formatVersion = 0;
@@ -131,20 +141,90 @@ LPErrInApp GameActionReplayer::LoadJson(const std::string& json) {
         return InvalidRecording("Actions must be an array");
     }
 
+    bool hasMatchStartPlayer = false;
+    Uint8 matchStartPlayerIndex = NOT_VALID_INDEX;
+    bool hasPendingGiocataStart = false;
+    Uint8 pendingGiocataFirstPlayer = NOT_VALID_INDEX;
     const invjson::Value::Array& actionEntries = actions->AsArray();
     for (size_t i = 0; i < actionEntries.size(); ++i) {
         const invjson::Value& entry = actionEntries[i];
         std::string actionName;
-        if (!ReadString(entry.Find("Action"), actionName)) {
+        std::string source;
+        if (!ReadString(entry.Find("Action"), actionName) ||
+            !ReadString(entry.Find("Source"), source)) {
             Reset();
-            return InvalidRecording("action entry is missing a string Action");
+            return InvalidRecording("action entry is missing Action or Source");
         }
-        if (actionName != "Say" && actionName != "PlayCard") {
+
+        if (source == "Engine" && actionName == "MatchStarted") {
+            int playerIndex = 0;
+            if (hasMatchStartPlayer ||
+                !ReadInteger(entry.Find("Player"), playerIndex) ||
+                playerIndex >= static_cast<int>(playersToLoad.size())) {
+                Reset();
+                return InvalidRecording("MatchStarted has invalid Player index");
+            }
+            matchStartPlayerIndex = static_cast<Uint8>(playerIndex);
+            hasMatchStartPlayer = true;
             continue;
         }
 
-        std::string source;
-        if (!ReadString(entry.Find("Source"), source) || source != "Player") {
+        if (source == "Giocata" && actionName == "EndedWithoutWinner") {
+            continue;
+        }
+
+        if (source == "Giocata" && actionName == "Started") {
+            int playerIndex = 0;
+            if (!ReadInteger(entry.Find("Player"), playerIndex) ||
+                playerIndex >= static_cast<int>(playersToLoad.size())) {
+                Reset();
+                return InvalidRecording("Giocata Started has invalid Player index");
+            }
+            if (hasPendingGiocataStart) {
+                Reset();
+                return InvalidRecording(
+                    "Giocata Started occurred before the previous deck was recorded");
+            }
+            pendingGiocataFirstPlayer = static_cast<Uint8>(playerIndex);
+            hasPendingGiocataStart = true;
+            continue;
+        }
+
+        if (source == "Engine" && actionName == "ShuffledDeck") {
+            if (!hasPendingGiocataStart) {
+                Reset();
+                return InvalidRecording("ShuffledDeck has no preceding Giocata Started");
+            }
+            const invjson::Value* deck = entry.Find("Mazzo");
+            if (deck == NULL || deck->GetType() != invjson::Value::Type::Array) {
+                Reset();
+                return InvalidRecording("ShuffledDeck is missing Mazzo array");
+            }
+            GiocataData giocataData;
+            for (size_t cardPosition = 0;
+                 cardPosition < deck->AsArray().size(); ++cardPosition) {
+                int cardIndex = 0;
+                if (!ReadInteger(&deck->AsArray()[cardPosition], cardIndex) ||
+                    cardIndex >= NUM_CARDS_MAZZBRI) {
+                    Reset();
+                    return InvalidRecording("ShuffledDeck has invalid card index");
+                }
+                giocataData.deckOrder.push_back(
+                    static_cast<Uint8>(cardIndex));
+            }
+            if (deck->AsArray().size() != NUM_CARDS) {
+                Reset();
+                return InvalidRecording("ShuffledDeck must contain the Invido deck");
+            }
+            giocataData.firstPlayerIndex = pendingGiocataFirstPlayer;
+            giocateDataToLoad.push_back(giocataData);
+            hasPendingGiocataStart = false;
+            pendingGiocataFirstPlayer = NOT_VALID_INDEX;
+            continue;
+        }
+
+        if (source != "Player" ||
+            (actionName != "Say" && actionName != "PlayCard")) {
             continue;
         }
 
@@ -178,8 +258,17 @@ LPErrInApp GameActionReplayer::LoadJson(const std::string& json) {
         actionsToLoad.push_back(playerAction);
     }
 
+    if (hasPendingGiocataStart) {
+        Reset();
+        return InvalidRecording("Giocata Started has no following ShuffledDeck");
+    }
+
     _vctPlayers.swap(playersToLoad);
+    _vctGiocateData.swap(giocateDataToLoad);
     _vctPlayerActions.swap(actionsToLoad);
+    _hasMatchStartPlayer = hasMatchStartPlayer;
+    _matchStartPlayerIndex = matchStartPlayerIndex;
+    _nextGiocataIndex = 0;
     _nextActionIndex = 0;
     _hasPendingAction = false;
     _isLoaded = true;
@@ -198,6 +287,58 @@ LPErrInApp GameActionReplayer::GetPlayerInfo(Uint8 playerIndex,
                                      static_cast<int>(playerIndex));
     }
     playerInfo = _vctPlayers[playerIndex];
+    return NULL;
+}
+
+LPErrInApp GameActionReplayer::GetMatchStartPlayer(Uint8& playerIndex) const {
+    if (!_isLoaded) {
+        return ERR_UTIL::ErrorCreate("GameActionReplayer is not loaded");
+    }
+    if (!_hasMatchStartPlayer) {
+        return ERR_UTIL::ErrorCreate("Replay has no MatchStarted player");
+    }
+    playerIndex = _matchStartPlayerIndex;
+    return NULL;
+}
+
+LPErrInApp GameActionReplayer::GetNextGiocataData(
+    GiocataData& giocataData) {
+    if (!_isLoaded) {
+        return ERR_UTIL::ErrorCreate("GameActionReplayer is not loaded");
+    }
+    if (_nextGiocataIndex >= _vctGiocateData.size()) {
+        return ERR_UTIL::ErrorCreate("Replay has no remaining shuffled deck");
+    }
+    giocataData = _vctGiocateData[_nextGiocataIndex];
+    ++_nextGiocataIndex;
+    return NULL;
+}
+
+LPErrInApp GameActionReplayer::PeekNextPlayerActionType(
+    Uint8 playerIndex, PlayerAction::Type& actionType, bool& available) const {
+    if (!_isLoaded) {
+        return ERR_UTIL::ErrorCreate("GameActionReplayer is not loaded");
+    }
+    if (playerIndex >= _vctPlayers.size()) {
+        return ERR_UTIL::ErrorCreate("Replay player index %d is out of range",
+                                     static_cast<int>(playerIndex));
+    }
+    if (_nextActionIndex >= _vctPlayerActions.size()) {
+        available = false;
+        return NULL;
+    }
+
+    const PlayerAction& nextAction = _vctPlayerActions[_nextActionIndex];
+    if (nextAction.playerIndex != playerIndex) {
+        char errorMessage[128];
+        SDL_snprintf(errorMessage, sizeof(errorMessage),
+                     "Replay expects player %d before player %d",
+                     static_cast<int>(nextAction.playerIndex),
+                     static_cast<int>(playerIndex));
+        return ERR_UTIL::ErrorCreate(errorMessage);
+    }
+    actionType = nextAction.type;
+    available = true;
     return NULL;
 }
 

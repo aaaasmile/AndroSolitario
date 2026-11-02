@@ -16,6 +16,7 @@
 
 namespace invido {
 
+class GameActionReplayer;
 class Mazzo;
 class PlayersOnTable;
 
@@ -65,6 +66,7 @@ class InvidoCore : public I_CORE_Game {
     void SetRandomSeed(int iVal);
     void SetRecordingLocation(const std::string& directory,
                               const std::string& gameName);
+    void SetGameActionReplayer(GameActionReplayer& replayer);
     // Interface I_CORE_Game
     bool Say(Uint8 playerIx, eSayPlayer eSay);
     bool PlayCard(Uint8 playerIx, const CardSpec& cardSpec);
@@ -96,6 +98,7 @@ class InvidoCore : public I_CORE_Game {
     Mano _mano;
     MatchStateWithScore _matchStateWithScore;
     GameActionRecorder _gameActionRecorder;
+    GameActionReplayer* _p_GameActionReplayer;
     std::string _recordingDirectory;
     std::string _gameName;
     std::vector<I_ALG_Player*> _vctpAlgPlayer;

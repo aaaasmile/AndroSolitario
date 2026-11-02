@@ -25,6 +25,33 @@ void Mazzo::SetIndexRaw(int index, Uint8 val) {
     }
 }
 
+LPErrInApp Mazzo::SetCardIndexOrder(
+    const std::vector<Uint8>& cardIndices) {
+    if (cardIndices.size() != _vctCardIndex.size()) {
+        char errorMessage[128];
+        SDL_snprintf(errorMessage, sizeof(errorMessage),
+                     "Replay deck size %d does not match %d",
+                     static_cast<int>(cardIndices.size()),
+                     static_cast<int>(_vctCardIndex.size()));
+        return ERR_UTIL::ErrorCreate(errorMessage);
+    }
+
+    std::vector<bool> seen(NUM_CARDS_MAZZBRI, false);
+    for (Uint8 cardIndex : cardIndices) {
+        if (cardIndex >= NUM_CARDS_MAZZBRI || seen[cardIndex]) {
+            char errorMessage[128];
+            SDL_snprintf(errorMessage, sizeof(errorMessage),
+                         "Invalid card index %d in replay deck",
+                         static_cast<int>(cardIndex));
+            return ERR_UTIL::ErrorCreate(errorMessage);
+        }
+        seen[cardIndex] = true;
+    }
+
+    _vctCardIndex = cardIndices;
+    return NULL;
+}
+
 void Mazzo::SetRandomSeed(int val) {
     _rndSeed = val;
     SDL_srand(_rndSeed);

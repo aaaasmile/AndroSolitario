@@ -1,5 +1,6 @@
 #include "InvidoCore.h"
 
+#include "GameActionReplayer.h"
 #include "Mazzo.h"
 #include "Player.h"
 #include "TraceService.h"
@@ -12,6 +13,7 @@ InvidoCore::InvidoCore() {
     _p_StartPlayer = NULL;
     _p_MyMazzo = NULL;
     _p_PlayersOnTable = NULL;
+    _p_GameActionReplayer = NULL;
 }
 
 InvidoCore::~InvidoCore() {}
@@ -77,7 +79,7 @@ void fncBind_Giocata_AMonte(void* self) {
     return pCore->Giocata_AMonte();
 }
 void fncBind_ManoActionExecuted(void* self, const char* actionName,
-                               int parameter) {
+                                int parameter) {
     InvidoCore* pCore = (InvidoCore*)self;
     return pCore->RecordEngineAction(actionName, parameter);
 }
@@ -149,15 +151,21 @@ void InvidoCore::Init(PlayersOnTable* pPlayersOnTable, Mazzo* pMazzo) {
 
     _numPlayers = _p_PlayersOnTable->GetNumOfPlayers();
 
-    if (!_recordingDirectory.empty() && !_gameName.empty()) {
+    if (_p_GameActionReplayer != NULL) {
+        TRACE_DEBUG(
+            "Invido action replay is configured; recording is disabled\n");
+    } else if (!_recordingDirectory.empty() && !_gameName.empty()) {
         LPErrInApp recorderError = _gameActionRecorder.Initialize(
             *_p_PlayersOnTable, _recordingDirectory, _gameName);
         if (recorderError != NULL) {
-            TRACE("[Core-Init] Unable to initialize Invido action recording: %s\n",
-                  recorderError->ErrorText.c_str());
+            TRACE(
+                "[Core-Init] Unable to initialize Invido action recording: "
+                "%s\n",
+                recorderError->ErrorText.c_str());
         }
     } else {
-        TRACE("[Core-Init] Invido action recording location is not configured\n");
+        TRACE(
+            "[Core-Init] Invido action recording location is not configured\n");
     }
 }
 
@@ -165,6 +173,10 @@ void InvidoCore::SetRecordingLocation(const std::string& directory,
                                       const std::string& gameName) {
     _recordingDirectory = directory;
     _gameName = gameName;
+}
+
+void InvidoCore::SetGameActionReplayer(GameActionReplayer& replayer) {
+    _p_GameActionReplayer = &replayer;
 }
 
 void InvidoCore::RecordEngineAction(const char* actionName, int parameter) {
@@ -201,8 +213,19 @@ Player* InvidoCore::GetPlayer(Uint8 iIndex) {
 void InvidoCore::NewMatch() {
     NotifyScript(SCR_NFY_NEWMATCH);
 
-    // extract the first player
-    Uint8 firstPlayerIx = getNewMatchFirstPlayer();
+    Uint8 firstPlayerIx = NOT_VALID_INDEX;
+    if (_p_GameActionReplayer != NULL) {
+        LPErrInApp replayError =
+            _p_GameActionReplayer->GetMatchStartPlayer(firstPlayerIx);
+        SDL_assert(replayError == NULL);
+        if (replayError != NULL) {
+            TRACE("Unable to read replay match-start player: %s\n",
+                  replayError->ErrorText.c_str());
+            return;
+        }
+    } else {
+        firstPlayerIx = getNewMatchFirstPlayer();
+    }
 
     // Keep algorithm and hand vectors aligned with player indices.
     _vctpAlgPlayer.clear();
@@ -255,8 +278,9 @@ void InvidoCore::NewMatch() {
     _p_PlayersOnTable->SetFirstOnMatch(firstPlayerIx);
     _p_StartPlayer = _p_PlayersOnTable->GetPlayerOnIndex(firstPlayerIx);
     _partita.NewPartita(firstPlayerIx);
-    _matchStateWithScore.MatchStart(_numPlayers);  // TODO set Num players, _matchStateWithScore
-                                           // is not for match state
+    _matchStateWithScore.MatchStart(
+        _numPlayers);  // TODO set Num players, _matchStateWithScore
+                       // is not for match state
 }
 
 bool InvidoCore::NextAction() {
@@ -301,12 +325,35 @@ void InvidoCore::Giocata_Start(Uint8 playerIx) {
     // shuffle
 
     _p_MyMazzo->Reset();
-    _p_MyMazzo->Shuffle();
-    LPErrInApp recorderError =
-        _gameActionRecorder.RecordGiocataDeck(_p_MyMazzo->GetCardIndexOrder());
-    if (recorderError != NULL) {
-        TRACE("Unable to flash Invido action recording: %s\n",
-              recorderError->ErrorText.c_str());
+    if (_p_GameActionReplayer != NULL) {
+        GameActionReplayer::GiocataData giocataData;
+        LPErrInApp replayError =
+            _p_GameActionReplayer->GetNextGiocataData(giocataData);
+        if (replayError == NULL && giocataData.firstPlayerIndex != playerIx) {
+            char errorMessage[128];
+            SDL_snprintf(
+                errorMessage, sizeof(errorMessage),
+                "Replay trick starts with player %d, expected player %d",
+                static_cast<int>(giocataData.firstPlayerIndex),
+                static_cast<int>(playerIx));
+            replayError = ERR_UTIL::ErrorCreate(errorMessage);
+        }
+        if (replayError == NULL) {
+            replayError = _p_MyMazzo->SetCardIndexOrder(giocataData.deckOrder);
+        }
+        if (replayError != NULL) {
+            TRACE("Unable to prepare replay deck: %s\n",
+                  replayError->ErrorText.c_str());
+            return;
+        }
+    } else {
+        _p_MyMazzo->Shuffle();
+        LPErrInApp recorderError = _gameActionRecorder.RecordGiocataDeck(
+            _p_MyMazzo->GetCardIndexOrder());
+        if (recorderError != NULL) {
+            TRACE("Unable to flash Invido action recording: %s\n",
+                  recorderError->ErrorText.c_str());
+        }
     }
     NotifyScript(SCR_NFY_SHUFFLEDECK);
     _p_PlayersOnTable->SetFirstOnGiocata(playerIx);
@@ -341,9 +388,10 @@ void InvidoCore::Giocata_Start(Uint8 playerIx) {
         invjson::Value::Object dealDetails;
         dealDetails["Player"] = invjson::Value(static_cast<int>(playerIx));
         invjson::Value dealtCardIndices = invjson::Value::MakeArray();
-        for (size_t cardIndex = 0; cardIndex < vctCardArray.size(); ++cardIndex) {
-            dealtCardIndices.PushBack(invjson::Value(
-                vctCardArray[cardIndex].GetCardIndex()));
+        for (size_t cardIndex = 0; cardIndex < vctCardArray.size();
+             ++cardIndex) {
+            dealtCardIndices.PushBack(
+                invjson::Value(vctCardArray[cardIndex].GetCardIndex()));
         }
         dealDetails["Cards"] = dealtCardIndices;
         _gameActionRecorder.RecordAction("Engine", "Deal", dealDetails);
@@ -606,7 +654,8 @@ bool InvidoCore::Say(Uint8 playerIx, eSayPlayer eSay) {
     if (_mano.Player_Say(playerIx, eSay, &sayAccepted)) {
         if (sayAccepted) {
             invjson::Value::Object actionDetails;
-            actionDetails["Player"] = invjson::Value(static_cast<int>(playerIx));
+            actionDetails["Player"] =
+                invjson::Value(static_cast<int>(playerIx));
             actionDetails["Say"] = invjson::Value(static_cast<int>(eSay));
             _gameActionRecorder.RecordAction("Player", "Say", actionDetails);
         }

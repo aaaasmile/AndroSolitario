@@ -19,17 +19,20 @@ Add `GameActionReplayer` to load a completed JSON match produced by `GameActionR
 - Add `AlgPlayerAuto.h/.cpp` under `app/jni/src/GameGfx/Invido/Core`, implementing `I_ALG_Player` like `AlgPlayer`.
 - `Player::InitFromActionPlayer(GameActionReplayer&, Uint8 playerIx)` creates and owns an `AlgPlayerAuto` configured for that player index and the shared action player.
 - Implement all required `I_ALG_Player` methods. For now, the replayer is only used by unit tests; do not add a replay UI or integrate replay setup into Invido graphics.
-- `ALG_HaveToPlay()` and `ALG_HaveToRespond()` request the next relevant player-input action from `GameActionReplayer` and invoke only the corresponding `I_CORE_Game` method: `Say`, `PlayCard`, or `VaDentro`. `MANO_SAYBUIDA` is an InvidoCore notification about the correctness of a submitted `Say`, not a recorded player action for the replay algorithm.
+- `ALG_HaveToPlay()` and `ALG_HaveToRespond()` request the next relevant player-input action from `GameActionReplayer` and invoke the matching `I_CORE_Game` method (`Say` or `PlayCard`). `MANO_SAYBUIDA` is an InvidoCore notification about the correctness of a submitted `Say`, not a recorded player action for the replay algorithm.
 - `AlgPlayerAuto` consumes only recorder entries whose `Action` is `PlayCard` or `Say`. All other actions—including `VaDentro`, `Abandon`, `Deal`, `ShuffledDeck`, and state-machine events—are irrelevant to `AlgPlayerAuto` and must be skipped without being treated as commands.
 - Use the recorded `Player`, `Say`, and `Card` fields to reconstruct these calls. Resolve card indexes to `CardSpec` before invoking card APIs.
 - Never consume `PlayCard` or `Say` entries for the other player. If the next relevant entry cannot be performed in the current callback/state, return/report a clear replay error rather than silently advancing.
 
 ## Recorder format and replay compatibility
 
-- Use the recorder's `Players` metadata to rebuild the two players through `InitFromActionPlayer`, retaining the recorded indexes and names.
-- `AlgPlayerAuto` ignores deal and state-machine entries, so it does not need to use `Deal` records as player inputs. If replay setup requires card snapshots to keep `InvidoCore` and scoring state consistent, handle that in test/replay initialization or a separate replay coordinator rather than dispatching those events from `AlgPlayerAuto`.
-- Preserve the existing live `AlgPlayer` / `Player::Init` path. `InitFromActionPlayer` is the explicit replay initialization path; normal games remain unchanged.
-- Keep the replayer and `AlgPlayerAuto` available to unit tests only for this phase; do not add UI or production graphics integration.
+- Use the recorder's `Players` metadata to rebuild the players through `InitFromActionPlayer`, retaining the recorded indexes and names.
+- Parse the `Engine` `MatchStarted` action's `Player` field as the match's first player. In replay mode, `InvidoCore::NewMatch()` must use that index instead of choosing a random first player.
+- Parse each `Engine` `ShuffledDeck` action's `Mazzo` array, pairing it with the immediately preceding `Giocata` `Started` player and preserving deck snapshots in order. Add a validated deck-order setter to `Mazzo`. In replay mode, `InvidoCore::Giocata_Start()` consumes the next recorded shuffled order and installs it instead of calling `Shuffle()`; this makes the subsequent deal deterministic.
+- `AlgPlayerAuto` consumes only recorder entries whose source is `Player` and whose action is `Say` or `PlayCard`. `MatchStarted` and `ShuffledDeck` are replayer/core setup data, not algorithm commands. `VaDentro`, `Abandon`, `Deal`, and state-machine events are ignored by `AlgPlayerAuto`.
+- `ALG_HaveToRespond()` executes only `Say`. `ALG_HaveToPlay()` may execute the next recorded `Say` or `PlayCard`: existing recordings can contain a call during a turn notified as “to play.” `InvidoCore::NtyWaitingPlayer_Toplay()` inspects the next recorded action and routes a `Say` to `ALG_HaveToRespond()`; otherwise it routes to `ALG_HaveToPlay()`. A response callback receiving a non-`Say` action is reported without consuming the event.
+- Preserve the existing live `AlgPlayer` / `Player::Init` path. Add `InvidoCore::SetGameActionReplayer(GameActionReplayer&)` for explicit replay mode; normal games continue using a null replayer and the existing random shuffle/start-player logic.
+- Keep the replayer and `AlgPlayerAuto` available to unit tests only for this phase; update `testReplayMatch` to set the replayer directly. Do not add UI or production graphics integration.
 
 ## Integration points
 
@@ -43,9 +46,10 @@ Add `GameActionReplayer` to load a completed JSON match produced by `GameActionR
 
 - JSON loading: valid recording, unsupported format version, missing keys, wrong value types, malformed JSON, and escaped names.
 - Cursor and turn behavior: interleaved `Say` and `PlayCard` entries for two players; verify one player's callback never consumes the other's next relevant action and irrelevant entries are skipped.
-- Action dispatch: `Say` and `PlayCard` entries reconstruct the expected core calls. Confirm `VaDentro`, `Abandon`, `Deal`, `ShuffledDeck`, and state-machine events are ignored by `AlgPlayerAuto`.
+- Action dispatch: `ALG_HaveToPlay()` can replay a recorded `Say` or `PlayCard`, while `ALG_HaveToRespond()` only replays `Say`; a response mismatch does not consume input. Confirm unrelated events are never sent to `I_CORE_Game` by `AlgPlayerAuto`.
+- Replay setup: `MatchStarted.Player` controls the first player; consecutive `ShuffledDeck.Mazzo` snapshots override each shuffled deck in order.
 - Player lifecycle: `InitFromActionPlayer` creates the intended algorithm; cleanup frees owned replay algorithms once and does not free externally owned/shared `GameActionReplayer` state.
-- Unit-test replay: exercise the replay path without integrating it into Invido graphics or adding a user-facing flow.
+- End-to-end replay: replay the checked-in two-player match recording to completion using only unit-test setup, without graphics integration.
 
 ## Recorder compatibility
 

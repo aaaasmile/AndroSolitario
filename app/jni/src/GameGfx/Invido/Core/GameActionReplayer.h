@@ -33,13 +33,23 @@ class GameActionReplayer {
         Uint8 index;
     };
 
+    struct GiocataData {
+        Uint8 firstPlayerIndex;
+        std::vector<Uint8> deckOrder;
+    };
+
     GameActionReplayer();
 
     LPErrInApp LoadFile(const std::string& filePath);
     size_t GetPlayerCount() const;
     LPErrInApp GetPlayerInfo(Uint8 playerIndex, PlayerInfo& playerInfo) const;
+    LPErrInApp GetMatchStartPlayer(Uint8& playerIndex) const;
+    LPErrInApp GetNextGiocataData(GiocataData& giocataData);
     LPErrInApp PeekNextPlayerAction(Uint8 playerIndex, PlayerAction& action,
                                    bool& available);
+    LPErrInApp PeekNextPlayerActionType(Uint8 playerIndex,
+                                        PlayerAction::Type& actionType,
+                                        bool& available) const;
     LPErrInApp ConsumeNextPlayerAction(const PlayerAction& action);
     bool IsComplete() const;
 
@@ -48,7 +58,11 @@ class GameActionReplayer {
     void Reset();
 
     bool _isLoaded;
+    bool _hasMatchStartPlayer;
+    Uint8 _matchStartPlayerIndex;
+    size_t _nextGiocataIndex;
     std::vector<PlayerInfo> _vctPlayers;
+    std::vector<GiocataData> _vctGiocateData;
     std::vector<PlayerAction> _vctPlayerActions;
     size_t _nextActionIndex;
     bool _hasPendingAction;

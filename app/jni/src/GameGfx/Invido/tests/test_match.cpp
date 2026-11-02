@@ -48,12 +48,12 @@ void testReplayMatch() {
     invido::Player player2;
     invido::InvidoCore invidoCore;
     invido::Mazzo mazzo;
+    invido::GameActionReplayer replayer;
 
     mazzo.Init();
 
     const std::string path = "..\\matches\\Invido-match-1511400.json_ref";
 
-    invido::GameActionReplayer replayer;
     LPErrInApp error = replayer.LoadFile(path);
     assert(error == NULL);
     assert(replayer.GetPlayerCount() == 2);
@@ -67,9 +67,7 @@ void testReplayMatch() {
 
     playersOnTable.AddPlayer(player1);
     playersOnTable.AddPlayer(player2);
-
-    std::string jsonDir = "matches";
-    invidoCore.SetRecordingLocation(jsonDir, "Invido");
+    invidoCore.SetGameActionReplayer(replayer);
 
     invidoCore.Init(&playersOnTable, &mazzo);
     invidoCore.NewMatch();

@@ -35,6 +35,7 @@ void MatchStateWithScore::GiocataStart() {
     _isMatchEnd = false;
     _numCardsPlayed = 0;
     _manoRound = 0;
+    _eIsGiocataEnd = GES_ON_GOING;
     _currentScore = SC_CANELA;
     _playerWonsHand = NOT_VALID_INDEX;
     _playerFirstHand = NOT_VALID_INDEX;
@@ -154,6 +155,7 @@ void MatchStateWithScore::GiocataPatada() {
 }
 
 void MatchStateWithScore::GiocataAMonte() {
+    _eIsGiocataEnd = GES_AMONTE;
     GiocataInfo gi = {._score = SC_AMONTE};
     _vctGiocataInfo.push_back(gi);
     _vctManoInfo.clear();
