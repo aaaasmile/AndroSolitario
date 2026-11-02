@@ -63,6 +63,7 @@ void Giocata::Reset() {
 }
 
 void Giocata::PlayerGiocataWins(Uint8 playerWinnerIx) {
+    TRACE_DEBUG("[Giocata] PlayerGiocataWins %d\n", playerWinnerIx);
     SDL_assert(_eGiocataStatus == GIOCATA_ONGOING);
 
     ActionItemGio action = {._eNextAction = GIOC_WITHWIN_ENDED,
@@ -73,18 +74,21 @@ void Giocata::PlayerGiocataWins(Uint8 playerWinnerIx) {
 }
 
 void Giocata::GiocataAMonte() {
+    TRACE_DEBUG("[Giocata] GiocataAMonte \n");
     ActionItemGio action = {._eNextAction = GIOC_NOWINNERS_ENDED};
     _deqNextAction.push_back(action);
     _eGiocataStatus = WAIT_NEW_GIOCATA;
 }
 
 void Giocata::GiocataPatada() {
+    TRACE_DEBUG("[Giocata] GiocataPatada \n");
     ActionItemGio action = {._eNextAction = GIOC_NOWINNERS_ENDED};
     _deqNextAction.push_back(action);
     _eGiocataStatus = WAIT_NEW_GIOCATA;
 }
 
 LPErrInApp Giocata::NewGiocata(Uint8 playerIx) {
+    TRACE_DEBUG("[Giocata] NewGiocata, player start: %d \n", playerIx);
     if (_eGiocataStatus == WAIT_NEW_GIOCATA) {
         _eGiocataStatus = GIOCATA_ONGOING;
         ActionItemGio action = {._eNextAction = GIOC_STARTED,
