@@ -5,9 +5,7 @@
 namespace invido {
 
 AlgPlayerAuto::AlgPlayerAuto(GameActionReplayer& replayer, Uint8 playerIndex)
-    : _replayer(replayer),
-      _p_CoreGame(NULL),
-      _playerIndex(playerIndex) {}
+    : _replayer(replayer), _p_CoreGame(NULL), _playerIndex(playerIndex) {}
 
 AlgPlayerAuto::~AlgPlayerAuto() {}
 
@@ -23,7 +21,7 @@ void AlgPlayerAuto::ALG_SetOpponentIndex(Uint8 playerIndex) {}
 void AlgPlayerAuto::ALG_SetAssociateIndex(Uint8 playerIndex) {}
 void AlgPlayerAuto::ALG_NewMatch(int playerCount) {}
 void AlgPlayerAuto::ALG_NewGiocata(const VCT_CARDSPEC& cards,
-                                  Uint8 playerIndex) {}
+                                   Uint8 playerIndex) {}
 void AlgPlayerAuto::ALG_PlayerHasPlayed(Uint8 playerIndex,
                                         const CardSpec& card) {}
 void AlgPlayerAuto::ALG_PlayerHasVadoDentro(Uint8 playerIndex) {}
@@ -34,49 +32,43 @@ void AlgPlayerAuto::ALG_MatchEnd(I_MatchScore* score) {}
 void AlgPlayerAuto::ALG_GicataScoreChange(eGiocataScoreState newScore) {}
 void AlgPlayerAuto::ALG_PlayerSaidWrong(Uint8 playerIndex) {}
 
-void AlgPlayerAuto::ALG_HaveToPlay() {
+LPErrInApp AlgPlayerAuto::ALG_HaveToPlay() {
     GameActionReplayer::PlayerAction::Type actionType;
     bool available = false;
-    LPErrInApp error = _replayer.PeekNextPlayerActionType(
-        _playerIndex, actionType, available);
+    LPErrInApp error =
+        _replayer.PeekNextPlayerActionType(_playerIndex, actionType, available);
     if (error != NULL) {
-        StoreError(error);
-        return;
+        return error;
     }
     if (!available) {
-        StoreError(ERR_UTIL::ErrorCreate(
+        return ERR_UTIL::ErrorCreate(
             "Replay has no remaining action for player %d",
-            static_cast<int>(_playerIndex)));
-        return;
+            static_cast<int>(_playerIndex));
     }
-    PlayNextRecordedAction(actionType);
+    return PlayNextRecordedAction(actionType);
 }
 
-void AlgPlayerAuto::ALG_HaveToRespond() {
-    PlayNextRecordedAction(GameActionReplayer::PlayerAction::Type::Say);
+LPErrInApp AlgPlayerAuto::ALG_HaveToRespond() {
+    return PlayNextRecordedAction(GameActionReplayer::PlayerAction::Type::Say);
 }
 
-void AlgPlayerAuto::PlayNextRecordedAction(
+LPErrInApp AlgPlayerAuto::PlayNextRecordedAction(
     GameActionReplayer::PlayerAction::Type expectedType) {
-    if (!_lastError.empty() || _p_CoreGame == NULL) {
-        return;
-    }
+    SDL_assert(_p_CoreGame);
 
     GameActionReplayer::PlayerAction action;
     bool available = false;
     LPErrInApp error =
         _replayer.PeekNextPlayerAction(_playerIndex, action, available);
     if (error != NULL) {
-        StoreError(error);
-        return;
+        return error;
     }
     if (!available) {
         char errorMessage[128];
         SDL_snprintf(errorMessage, sizeof(errorMessage),
                      "Replay has no remaining action for player %d",
                      static_cast<int>(_playerIndex));
-        StoreError(ERR_UTIL::ErrorCreate(errorMessage));
-        return;
+        return ERR_UTIL::ErrorCreate(errorMessage);
     }
     if (action.type != expectedType) {
         char errorMessage[128];
@@ -84,15 +76,14 @@ void AlgPlayerAuto::PlayNextRecordedAction(
                      "Replay action %d has the wrong type for player %d",
                      static_cast<int>(action.sequence),
                      static_cast<int>(_playerIndex));
-        StoreError(ERR_UTIL::ErrorCreate(errorMessage));
-        return;
+        return ERR_UTIL::ErrorCreate(errorMessage);
     }
 
     bool accepted = false;
     switch (expectedType) {
         case GameActionReplayer::PlayerAction::Type::Say:
-            accepted = _p_CoreGame->Say(
-                _playerIndex, static_cast<eSayPlayer>(action.value));
+            accepted = _p_CoreGame->Say(_playerIndex,
+                                        static_cast<eSayPlayer>(action.value));
             break;
         case GameActionReplayer::PlayerAction::Type::PlayCard: {
             CardSpec card;
@@ -112,24 +103,9 @@ void AlgPlayerAuto::PlayNextRecordedAction(
                      "Replay %s action %d was rejected for player %d",
                      actionName, static_cast<int>(action.sequence),
                      static_cast<int>(_playerIndex));
-        StoreError(ERR_UTIL::ErrorCreate(errorMessage));
-        return;
+        return ERR_UTIL::ErrorCreate(errorMessage);
     }
-
-    error = _replayer.ConsumeNextPlayerAction(action);
-    if (error != NULL) {
-        StoreError(error);
-    }
+    return _replayer.ConsumeNextPlayerAction(action);
 }
-
-void AlgPlayerAuto::StoreError(LPErrInApp error) {
-    if (error != NULL) {
-        _lastError = error->ErrorText;
-    }
-}
-
-bool AlgPlayerAuto::HasError() const { return !_lastError.empty(); }
-
-const std::string& AlgPlayerAuto::GetLastError() const { return _lastError; }
 
 }  // namespace invido

@@ -54,11 +54,11 @@ void fncBind_ManoEnd(void* self) {
     InvidoCore* pCore = (InvidoCore*)self;
     return pCore->Mano_End();
 }
-void fncBind_NtyWaitingPlayer_Toplay(void* self, Uint8 playerIx) {
+LPErrInApp fncBind_NtyWaitingPlayer_Toplay(void* self, Uint8 playerIx) {
     InvidoCore* pCore = (InvidoCore*)self;
     return pCore->NtyWaitingPlayer_Toplay(playerIx);
 }
-void fncBind_NtyWaitingPlayer_ToResp(void* self, Uint8 playerIx) {
+LPErrInApp fncBind_NtyWaitingPlayer_ToResp(void* self, Uint8 playerIx) {
     InvidoCore* pCore = (InvidoCore*)self;
     return pCore->NtyWaitingPlayer_ToResp(playerIx);
 }
@@ -277,13 +277,26 @@ void InvidoCore::NewMatch() {
     _matchStateWithScore.MatchStart(_numPlayers);
 }
 
-LPErrInApp InvidoCore::NextAction(bool& HasAction) {
-    const bool manoActionTaken = _mano.NextAction();
-    const bool giocataActionTaken = _giocata.NextAction();
-    const bool partitaActionTaken = _partita.NextAction();
+LPErrInApp InvidoCore::NextAction(bool& hasAction) {
+    bool manoActionTaken = false;
+    bool giocataActionTaken = false;
+    bool partitaActionTaken = false;
+    LPErrInApp err = NULL;
+    err = _mano.NextAction(manoActionTaken);
+    if (err != NULL) {
+        return err;
+    }
+    err = _giocata.NextAction(giocataActionTaken);
+    if (err != NULL) {
+        return err;
+    }
+    err = _partita.NextAction(partitaActionTaken);
+    if (err != NULL) {
+        return err;
+    }
 
-    HasAction = manoActionTaken || giocataActionTaken || partitaActionTaken;
-    return NULL;
+    hasAction = manoActionTaken || giocataActionTaken || partitaActionTaken;
+    return err;
 }
 
 void InvidoCore::resetCardInfoPlayers() {
@@ -533,21 +546,21 @@ void InvidoCore::AbandonGame(Uint8 playerIx) {
     }
 }
 
-void InvidoCore::NtyWaitingPlayer_Toplay(Uint8 playerIx) {
+LPErrInApp InvidoCore::NtyWaitingPlayer_Toplay(Uint8 playerIx) {
     SDL_assert(_p_PlHaveToPlay);
     SDL_assert(playerIx == _p_PlHaveToPlay->GetIndex());
 
     I_ALG_Player* pAlg = _vctpAlgPlayer[playerIx];
     SDL_assert(pAlg);
 
-    pAlg->ALG_HaveToPlay();
+    return pAlg->ALG_HaveToPlay();
 }
 
-void InvidoCore::NtyWaitingPlayer_ToResp(Uint8 playerIx) {
+LPErrInApp InvidoCore::NtyWaitingPlayer_ToResp(Uint8 playerIx) {
     I_ALG_Player* pAlg = _vctpAlgPlayer[playerIx];
     SDL_assert(pAlg);
 
-    pAlg->ALG_HaveToRespond();
+    return pAlg->ALG_HaveToRespond();
 }
 
 void InvidoCore::NtyPlayerSayBuiada(Uint8 playerIx) {

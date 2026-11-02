@@ -23,22 +23,17 @@ class AlgPlayerAuto : public I_ALG_Player {
     virtual void ALG_ManoEnd(I_MatchScore* score);
     virtual void ALG_GiocataEnd(I_MatchScore* score);
     virtual void ALG_MatchEnd(I_MatchScore* score);
-    virtual void ALG_HaveToPlay();
-    virtual void ALG_HaveToRespond();
+    virtual LPErrInApp ALG_HaveToPlay();
+    virtual LPErrInApp ALG_HaveToRespond();
     virtual void ALG_GicataScoreChange(eGiocataScoreState newScore);
     virtual void ALG_PlayerSaidWrong(Uint8 playerIndex);
 
-    bool HasError() const;
-    const std::string& GetLastError() const;
-
    private:
-    void PlayNextRecordedAction(GameActionReplayer::PlayerAction::Type expectedType);
-    void StoreError(LPErrInApp error);
-
+    LPErrInApp PlayNextRecordedAction(GameActionReplayer::PlayerAction::Type expectedType);
+    
     GameActionReplayer& _replayer;
     I_CORE_Game* _p_CoreGame;
     Uint8 _playerIndex;
-    std::string _lastError;
 };
 
 }  // namespace invido

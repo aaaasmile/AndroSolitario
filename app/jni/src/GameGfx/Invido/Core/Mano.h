@@ -75,7 +75,7 @@ class Mano {
                     bool* accepted = NULL);
     bool Player_PlayACard(Uint8 playerIx, bool vadoDentro);
     void Reset();
-    bool NextAction();
+    LPErrInApp NextAction(bool& hasAction);
     eManoStatus GetState() { return _eManoState; }
     void Init(int numPlayers);
     void GetAdmittedCommands(VCT_COMMANDS& vct_Commands, Uint8 playerIx);

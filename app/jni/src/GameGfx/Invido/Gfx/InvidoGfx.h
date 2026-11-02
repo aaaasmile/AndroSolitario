@@ -87,8 +87,8 @@ class InvidoGfx : public I_ALG_Player {
     void ALG_ManoEnd(I_MatchScore* pScore);
     void ALG_GiocataEnd(I_MatchScore* pScore);
     void ALG_MatchEnd(I_MatchScore* pScore);
-    void ALG_HaveToPlay();
-    void ALG_HaveToRespond();
+    LPErrInApp ALG_HaveToPlay();
+    LPErrInApp ALG_HaveToRespond();
     void ALG_GicataScoreChange(eGiocataScoreState eNewScore);
     void ALG_PlayerSaidWrong(Uint8 playerIx);
     // I_ALG_Player interface - end

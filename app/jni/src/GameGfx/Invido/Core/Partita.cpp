@@ -9,10 +9,13 @@ using namespace invido;
 
 Partita::Partita() { _PartitaState = ePartitaStatus::WAIT_NEW_PARTITA; }
 
-bool Partita::NextAction() {
+LPErrInApp Partita::NextAction(bool& hasAction) {
+    hasAction = false;
     if (_deqNextAction.empty()) {
-        return false;
+        return NULL;
     }
+    hasAction = true;
+
     ActionItemPartita action = _deqNextAction.front();
     _deqNextAction.pop_front();
 
@@ -46,7 +49,7 @@ bool Partita::NextAction() {
             SDL_assert(0);
             break;
     }
-    return true;
+    return NULL;
 }
 
 void Partita::Reset() {

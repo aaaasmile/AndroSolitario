@@ -2,6 +2,7 @@
 #define ___ALGPLAYER_H_
 
 #include "CardSpec.h"
+#include "ErrorInfo.h"
 #include "InvidoCoreDef.h"
 
 namespace invido {
@@ -57,8 +58,8 @@ class I_ALG_Player {
     virtual void ALG_ManoEnd(I_MatchScore* pScore) = 0;
     virtual void ALG_GiocataEnd(I_MatchScore* pScore) = 0;
     virtual void ALG_MatchEnd(I_MatchScore* pScore) = 0;
-    virtual void ALG_HaveToPlay() = 0;
-    virtual void ALG_HaveToRespond() = 0;
+    virtual LPErrInApp ALG_HaveToPlay() = 0;
+    virtual LPErrInApp ALG_HaveToRespond() = 0;
     virtual void ALG_GicataScoreChange(eGiocataScoreState eNewScore) = 0;
     virtual void ALG_PlayerSaidWrong(Uint8 playerIx) = 0;
 };

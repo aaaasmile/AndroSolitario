@@ -1380,9 +1380,10 @@ void InvidoGfx::ALG_Play() {
     enableCmds();
 }
 
-void InvidoGfx::ALG_HaveToRespond() {
+LPErrInApp InvidoGfx::ALG_HaveToRespond() {
     TRACE_DEBUG("ALG_HaveToResponda\n");
     enableCmds();
+    return NULL;
 }
 
 void InvidoGfx::ALG_PlayerHasSaid(Uint8 playerIx, eSayPlayer SaySomeThing) {
@@ -1668,7 +1669,7 @@ void InvidoGfx::ALG_MatchEnd(I_MatchScore* pScore) {
     _isMatchTerminated = true;
 }
 
-void InvidoGfx::ALG_HaveToPlay() {}
+LPErrInApp InvidoGfx::ALG_HaveToPlay() {}
 
 void InvidoGfx::ALG_GicataScoreChange(eGiocataScoreState eNewScore) {
     GameSettings* pGameSettings = GameSettings::GetSettings();

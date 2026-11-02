@@ -139,10 +139,13 @@ Mano::Mano() {
         eGiocataScoreState::SC_PARTIDA;
 }
 
-bool Mano::NextAction() {
+LPErrInApp Mano::NextAction(bool& hasAction) {
+    hasAction = false;
+    bool hasActionNext  = false;
     if (_deqNextAction.empty()) {
-        return false;
+        return NULL;
     }
+    hasAction = true;
     ActionItemMano Action = _deqNextAction.front();
     _deqNextAction.pop_front();
 
@@ -163,8 +166,13 @@ bool Mano::NextAction() {
             SDL_assert(Action._vctArg.size() > 0);
             // may be _eNextAction is modified
             TRACE_DEBUG("[Mano] Wait play player: %d\n", Action._vctArg[0]);
-            _manoCb.tc->NtyWaitingPlayer_Toplay(_manoCb.self,
-                                                Action._vctArg[0]);
+            {
+                LPErrInApp error = _manoCb.tc->NtyWaitingPlayer_Toplay(
+                    _manoCb.self, Action._vctArg[0]);
+                if (error != NULL) {
+                    return error;
+                }
+            }
             break;
 
         case MANO_AMONTE:
@@ -178,25 +186,38 @@ bool Mano::NextAction() {
             _manoCb.tc->Player_VaVia(_manoCb.self, Action._vctArg[0]);
             break;
 
-        case MANO_WAIPL_TORESP:
-            _manoCb.tc->NtyWaitingPlayer_ToResp(_manoCb.self,
-                                                Action._vctArg[0]);
+        case MANO_WAIPL_TORESP: {
+            LPErrInApp error = _manoCb.tc->NtyWaitingPlayer_ToResp(
+                _manoCb.self, Action._vctArg[0]);
+            if (error != NULL) {
+                return error;
+            }
             break;
+        }
 
         case MANO_END:
             _manoCb.tc->Mano_End(_manoCb.self);
             break;
 
-        case MANO_CHANGESCORE:
+        case MANO_CHANGESCORE: {
             eScore = intToEScore(Action._vctArg[0]);
             _manoCb.tc->ChangeGiocataScore(_manoCb.self, eScore);
             // process the next action without waiting the next trigger
-            NextAction();
-            return true;
+            LPErrInApp error = NextAction(hasActionNext);
+            if (error != NULL) {
+                return error;
+            }
+            break;
+        }
 
-        case MANO_NO_ACTION:
+        case MANO_NO_ACTION: {
             // This sentinel is consumed without executing an action.
-            return NextAction();
+            LPErrInApp error = NextAction(hasActionNext);
+            if (error != NULL) {
+                return error;
+            }
+            break;
+        }
 
         case MANO_SAYBUIDA:
             _manoCb.tc->NtyPlayerSayBuiada(_manoCb.self, Action._vctArg[0]);
@@ -206,7 +227,7 @@ bool Mano::NextAction() {
             SDL_assert(0);
             break;
     }
-    return true;
+    return NULL;
 }
 
 void Mano::GiocataStart() {

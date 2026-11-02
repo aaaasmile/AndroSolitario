@@ -8,10 +8,13 @@ using namespace invido;
 
 Giocata::Giocata() { _eGiocataStatus = WAIT_NEW_GIOCATA; }
 
-bool Giocata::NextAction() {
+LPErrInApp Giocata::NextAction(bool& hasAction) {
+    hasAction = false;
     if (_deqNextAction.empty()) {
-        return false;
+        return NULL;
     }
+    hasAction = true;
+
     ActionItemGio action = _deqNextAction.front();
     _deqNextAction.pop_front();
 
@@ -51,7 +54,7 @@ bool Giocata::NextAction() {
             SDL_assert(0);
             break;
     }
-    return true;
+    return NULL;
 }
 
 void Giocata::Reset() {

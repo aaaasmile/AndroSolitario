@@ -42,7 +42,7 @@ class Giocata {
 
     // void Update_Giocata();
     void Reset();
-    bool NextAction();
+    LPErrInApp NextAction(bool& hasAction);
     void PlayerGiocataWins(Uint8 playerWinnerIx);
     void GiocataAMonte();
     void GiocataPatada();

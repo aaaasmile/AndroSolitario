@@ -45,8 +45,8 @@ class InvidoCore : public I_CORE_Game {
 
     // functions called from Mano
     void Mano_End();
-    void NtyWaitingPlayer_Toplay(Uint8 playerIx);
-    void NtyWaitingPlayer_ToResp(Uint8 playerIx);
+    LPErrInApp NtyWaitingPlayer_Toplay(Uint8 playerIx);
+    LPErrInApp NtyWaitingPlayer_ToResp(Uint8 playerIx);
     void NtyPlayerSayBuiada(Uint8 playerIx);
     void ChangeGiocataScore(eGiocataScoreState eNewScore);
     void Player_VaVia(Uint8 playerIx);
@@ -63,7 +63,7 @@ class InvidoCore : public I_CORE_Game {
     void PartitaStarted(Uint8 playerIx);
 
     void NewMatch();
-    LPErrInApp NextAction(bool& HasAction);
+    LPErrInApp NextAction(bool& hasAction);
     void SetRandomSeed(int iVal);
     void SetRecordingLocation(const std::string& directory,
                               const std::string& gameName);
