@@ -101,9 +101,10 @@ void AlgPlayer::ALG_PlayerHasVadoDentro(Uint8 playerIx) {
 }
 
 void AlgPlayer::doVadoDentro(int cardPos) {
-    CardSpec cardUndef;
+    SDL_assert(cardPos >= 0 && cardPos < _vctMyCards.size());
     _cpuCardDentroPosition = cardPos;
-    SDL_assert(_vctMyCards[cardPos] != cardUndef);
+    SDL_assert(_vctMyCards[cardPos].GetCardIndex() !=
+               eGameConst::NOT_VALID_INDEX);
     _p_CoreGame->VaDentro(_myIndex, _vctMyCards[cardPos]);
 }
 
@@ -520,7 +521,7 @@ void AlgPlayer::PlayAsSecond() {
             same_points_pos = i;
         }
         if (points > pointsFirstCard && points < first_take_points) {
-            first_take_pos = i;  // La carta pi� bassa che pu� prendere
+            first_take_pos = i;  // La carta più bassa che può prendere
             first_take_points = points;
         }
         i++;
@@ -739,7 +740,6 @@ void AlgPlayer::ALG_MatchEnd(I_MatchScore* pScore) {
 
 LPErrInApp AlgPlayer::ALG_HaveToRespond() {
     TRACE_DEBUG("[ALG_HaveToRespond] have to respond");
-    CardSpec cardUndef;
     int lastNumChiamate = _numCallsInGiocata;
     if (_opponentSay == SP_AMONTE && _myResponseSay == eSayPlayer::SP_NO) {
         // a monte was called and it was responded NO, don't change idea

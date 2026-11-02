@@ -84,3 +84,5 @@ un gioco. Poi il gioco dell'Invido deve aggiungere le proprie stringhe usando un
 vedi perché testReplayMatch non va. Non vedo perché testReplayMatch non debba 
 ricreare il file json che dovrebbe essere esattamente uguale a quello di partenza.
 Si pianta sulla seconda giocata, linea 275 del file json di ref. 
+Il replay non funziona perché il file creato dal match è sbagliato. Questo non 
+è emerso per via dell'error handling in VadoDentro che non funziona.

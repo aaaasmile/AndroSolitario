@@ -51,6 +51,7 @@ class Giocata {
     GiocataCb _giocataCb;
     eGiocataStatus _eGiocataStatus;
     DEQ_ACTIT_GIO _deqNextAction;
+    int _numGiocata;
 };
 }  // namespace invido
 

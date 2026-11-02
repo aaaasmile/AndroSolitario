@@ -6,7 +6,10 @@
 
 using namespace invido;
 
-Giocata::Giocata() { _eGiocataStatus = WAIT_NEW_GIOCATA; }
+Giocata::Giocata() {
+    _eGiocataStatus = WAIT_NEW_GIOCATA;
+    _numGiocata = 0;
+}
 
 LPErrInApp Giocata::NextAction(bool& hasAction) {
     hasAction = false;
@@ -60,6 +63,7 @@ LPErrInApp Giocata::NextAction(bool& hasAction) {
 void Giocata::Reset() {
     _eGiocataStatus = WAIT_NEW_GIOCATA;
     _deqNextAction.clear();
+    _numGiocata = 0;
 }
 
 void Giocata::PlayerGiocataWins(Uint8 playerWinnerIx) {
@@ -88,7 +92,9 @@ void Giocata::GiocataPatada() {
 }
 
 LPErrInApp Giocata::NewGiocata(Uint8 playerIx) {
-    TRACE_DEBUG("[Giocata] NewGiocata, player start: %d \n", playerIx);
+    _numGiocata++;
+    TRACE_DEBUG("[Giocata] NewGiocata(%d), player start: %d \n", _numGiocata,
+                playerIx);
     if (_eGiocataStatus == WAIT_NEW_GIOCATA) {
         _eGiocataStatus = GIOCATA_ONGOING;
         ActionItemGio action = {._eNextAction = GIOC_STARTED,
