@@ -8,6 +8,34 @@
 #include "../Core/PlayersOnTable.h"
 #include "../Core/GameActionReplayer.h"
 
+void testSayPlayerToString() {
+    struct SayPlayerName {
+        invido::eSayPlayer value;
+        const char* name;
+    };
+    const SayPlayerName sayPlayerNames[] = {
+        {invido::SP_AMONTE, "SP_AMONTE"},
+        {invido::SP_INVIDO, "SP_INVIDO"},
+        {invido::SP_TRASMAS, "SP_TRASMAS"},
+        {invido::SP_TRASMASNOEF, "SP_TRASMASNOEF"},
+        {invido::SP_FUERAJEUQ, "SP_FUERAJEUQ"},
+        {invido::SP_PARTIDA, "SP_PARTIDA"},
+        {invido::SP_VABENE, "SP_VABENE"},
+        {invido::SP_VADOVIA, "SP_VADOVIA"},
+        {invido::SP_CHIAMADIPIU, "SP_CHIAMADIPIU"},
+        {invido::SP_NO, "SP_NO"},
+        {invido::SP_VADODENTRO, "SP_VADODENTRO"},
+        {invido::SP_GIOCA, "SP_GIOCA"},
+        {invido::SP_CHIAMA_BORTOLO, "SP_CHIAMA_BORTOLO"},
+        {invido::SP_NOTHING, "SP_NOTHING"},
+    };
+
+    for (const SayPlayerName& sayPlayerName : sayPlayerNames) {
+        assert(invido::GeteSayPlayerToString(sayPlayerName.value) ==
+               std::string(sayPlayerName.name));
+    }
+}
+
 void testSimpleMatch() {
     std::cout << "Running Match tests..." << std::endl;
 
@@ -92,7 +120,8 @@ void testReplayMatch() {
     std::cout << "Match replay tests PASSED" << std::endl;
 }
 
-void testMatch() { 
+void testMatch() {
+    testSayPlayerToString();
     testReplayMatch();
-    testSimpleMatch(); 
+    testSimpleMatch();
 }

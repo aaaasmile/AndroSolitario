@@ -87,6 +87,40 @@ enum eSayPlayer {
     SP_NOTHING = 13
 };
 
+inline const char* GeteSayPlayerToString(eSayPlayer say) {
+    switch (say) {
+        case SP_AMONTE:
+            return "SP_AMONTE";
+        case SP_INVIDO:
+            return "SP_INVIDO";
+        case SP_TRASMAS:
+            return "SP_TRASMAS";
+        case SP_TRASMASNOEF:
+            return "SP_TRASMASNOEF";
+        case SP_FUERAJEUQ:
+            return "SP_FUERAJEUQ";
+        case SP_PARTIDA:
+            return "SP_PARTIDA";
+        case SP_VABENE:
+            return "SP_VABENE";
+        case SP_VADOVIA:
+            return "SP_VADOVIA";
+        case SP_CHIAMADIPIU:
+            return "SP_CHIAMADIPIU";
+        case SP_NO:
+            return "SP_NO";
+        case SP_VADODENTRO:
+            return "SP_VADODENTRO";
+        case SP_GIOCA:
+            return "SP_GIOCA";
+        case SP_CHIAMA_BORTOLO:
+            return "SP_CHIAMA_BORTOLO";
+        case SP_NOTHING:
+            return "SP_NOTHING";
+    }
+    return "UNKNOWN_eSayPlayer";
+}
+
 enum eGiocataScoreState {
     SC_AMONTE = 0,
     SC_PATTA = 0,

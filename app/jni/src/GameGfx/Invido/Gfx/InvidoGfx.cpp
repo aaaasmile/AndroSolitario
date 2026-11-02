@@ -1669,7 +1669,7 @@ void InvidoGfx::ALG_MatchEnd(I_MatchScore* pScore) {
     _isMatchTerminated = true;
 }
 
-LPErrInApp InvidoGfx::ALG_HaveToPlay() {}
+LPErrInApp InvidoGfx::ALG_HaveToPlay() { return NULL; }
 
 void InvidoGfx::ALG_GicataScoreChange(eGiocataScoreState eNewScore) {
     GameSettings* pGameSettings = GameSettings::GetSettings();
