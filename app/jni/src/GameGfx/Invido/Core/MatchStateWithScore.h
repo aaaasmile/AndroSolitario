@@ -42,6 +42,7 @@ class MatchStateWithScore : public I_MatchScore {
     void MatchStart(int iNumPlayer);
 
     void GiocataStart();
+    void PlayerVaVia(Uint8);
     void GiocataEndWithWinner(Uint8 playerWinIx);
     void GiocataPatada();
     void GiocataAMonte();

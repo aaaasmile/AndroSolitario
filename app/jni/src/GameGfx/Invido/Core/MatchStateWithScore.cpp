@@ -147,6 +147,10 @@ void MatchStateWithScore::ManoEnd() {
     _numCardsPlayed = 0;
 }
 
+void MatchStateWithScore::PlayerVaVia(Uint8) {
+    _eIsGiocataEnd = GES_HAVE_WINNER;
+}
+
 void MatchStateWithScore::GiocataPatada() {
     GiocataInfo gi = {._score = SC_PATTA};
     _vctGiocataInfo.push_back(gi);

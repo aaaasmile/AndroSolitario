@@ -460,6 +460,7 @@ void InvidoCore::Giocata_AMonte() {
 void InvidoCore::Player_VaVia(Uint8 playerIx) {
     Player* pPlayer = _p_PlayersOnTable->PeekNextPlayerToIx(playerIx);
     Uint8 playerWinnerIx = pPlayer->GetIndex();
+    _matchStateWithScore.PlayerVaVia(playerIx);
     _matchStateWithScore.GiocataEndWithWinner(playerWinnerIx);
     _giocata.PlayerGiocataWins(playerWinnerIx);
 }
