@@ -1,0 +1,3307 @@
+{
+  "Actions": [
+    {
+      "Action": "Started",
+      "Player": 0,
+      "Sequence": 0,
+      "Source": "Partita"
+    },
+    {
+      "Action": "MatchStarted",
+      "Player": 0,
+      "Sequence": 1,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Started",
+      "Player": 0,
+      "Sequence": 2,
+      "Source": "Giocata"
+    },
+    {
+      "Action": "ShuffledDeck",
+      "Mazzo": [
+        27,
+        16,
+        15,
+        12,
+        32,
+        0,
+        10,
+        8,
+        25,
+        37,
+        36,
+        18,
+        17,
+        1,
+        30,
+        31,
+        29,
+        39,
+        38,
+        26,
+        9,
+        35,
+        20,
+        22,
+        2,
+        6,
+        11,
+        19,
+        28,
+        5,
+        21,
+        7
+      ],
+      "Sequence": 3,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Deal",
+      "Cards": [
+        7,
+        21,
+        5
+      ],
+      "Player": 0,
+      "Sequence": 4,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Deal",
+      "Cards": [
+        28,
+        19,
+        11
+      ],
+      "Player": 1,
+      "Sequence": 5,
+      "Source": "Engine"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 0,
+      "Sequence": 6,
+      "Source": "Engine"
+    },
+    {
+      "Action": "PlayCard",
+      "Card": 7,
+      "CardName": "Fante di bastoni",
+      "Player": 0,
+      "Sequence": 7,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 1,
+      "Sequence": 8,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 1,
+      "Say": 1,
+      "SayWhat": "SP_INVIDO",
+      "Sequence": 9,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAIPL_TORESP",
+      "Parameter": 0,
+      "Sequence": 10,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 0,
+      "Say": 11,
+      "SayWhat": "SP_GIOCA",
+      "Sequence": 11,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_CHANGESCORE",
+      "Parameter": 3,
+      "Sequence": 12,
+      "Source": "Engine"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 1,
+      "Sequence": 13,
+      "Source": "Engine"
+    },
+    {
+      "Action": "PlayCard",
+      "Card": 28,
+      "CardName": "Cavallo di  denari",
+      "Player": 1,
+      "Sequence": 14,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_END",
+      "Parameter": 0,
+      "Sequence": 15,
+      "Source": "Engine"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 1,
+      "Sequence": 16,
+      "Source": "Engine"
+    },
+    {
+      "Action": "PlayCard",
+      "Card": 19,
+      "CardName": " Re di  coppe",
+      "Player": 1,
+      "Sequence": 17,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 0,
+      "Sequence": 18,
+      "Source": "Engine"
+    },
+    {
+      "Action": "PlayCard",
+      "Card": 21,
+      "CardName": "Due di  denari",
+      "Player": 0,
+      "Sequence": 19,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_END",
+      "Parameter": 0,
+      "Sequence": 20,
+      "Source": "Engine"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 0,
+      "Sequence": 21,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 0,
+      "Say": 0,
+      "SayWhat": "SP_AMONTE",
+      "Sequence": 22,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAIPL_TORESP",
+      "Parameter": 1,
+      "Sequence": 23,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 1,
+      "Say": 9,
+      "SayWhat": "SP_NO",
+      "Sequence": 24,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 0,
+      "Sequence": 25,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 0,
+      "Say": 0,
+      "SayWhat": "SP_AMONTE",
+      "Sequence": 26,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAIPL_TORESP",
+      "Parameter": 1,
+      "Sequence": 27,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 1,
+      "Say": 9,
+      "SayWhat": "SP_NO",
+      "Sequence": 28,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 0,
+      "Sequence": 29,
+      "Source": "Engine"
+    },
+    {
+      "Action": "PlayCard",
+      "Card": 5,
+      "CardName": "Sei di bastoni",
+      "Player": 0,
+      "Sequence": 30,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 1,
+      "Sequence": 31,
+      "Source": "Engine"
+    },
+    {
+      "Action": "PlayCard",
+      "Card": 11,
+      "CardName": "Due di  coppe",
+      "Player": 1,
+      "Sequence": 32,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_END",
+      "Parameter": 0,
+      "Sequence": 33,
+      "Source": "Engine"
+    },
+    {
+      "Action": "EndedWithWinner",
+      "Player": 1,
+      "Sequence": 34,
+      "Source": "Giocata"
+    },
+    {
+      "Action": "Started",
+      "Player": 1,
+      "Sequence": 35,
+      "Source": "Giocata"
+    },
+    {
+      "Action": "ShuffledDeck",
+      "Mazzo": [
+        35,
+        27,
+        12,
+        22,
+        16,
+        31,
+        21,
+        25,
+        36,
+        7,
+        5,
+        26,
+        2,
+        18,
+        37,
+        20,
+        28,
+        30,
+        17,
+        9,
+        38,
+        39,
+        10,
+        8,
+        1,
+        19,
+        11,
+        15,
+        29,
+        6,
+        32,
+        0
+      ],
+      "Sequence": 36,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Deal",
+      "Cards": [
+        0,
+        32,
+        6
+      ],
+      "Player": 1,
+      "Sequence": 37,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Deal",
+      "Cards": [
+        29,
+        15,
+        11
+      ],
+      "Player": 0,
+      "Sequence": 38,
+      "Source": "Engine"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 1,
+      "Sequence": 39,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 1,
+      "Say": 1,
+      "SayWhat": "SP_INVIDO",
+      "Sequence": 40,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAIPL_TORESP",
+      "Parameter": 0,
+      "Sequence": 41,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 0,
+      "Say": 11,
+      "SayWhat": "SP_GIOCA",
+      "Sequence": 42,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_CHANGESCORE",
+      "Parameter": 3,
+      "Sequence": 43,
+      "Source": "Engine"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 1,
+      "Sequence": 44,
+      "Source": "Engine"
+    },
+    {
+      "Action": "PlayCard",
+      "Card": 32,
+      "CardName": "Tre di  spade",
+      "Player": 1,
+      "Sequence": 45,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 0,
+      "Sequence": 46,
+      "Source": "Engine"
+    },
+    {
+      "Action": "PlayCard",
+      "Card": 15,
+      "CardName": "Sei di  coppe",
+      "Player": 0,
+      "Sequence": 47,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_END",
+      "Parameter": 0,
+      "Sequence": 48,
+      "Source": "Engine"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 1,
+      "Sequence": 49,
+      "Source": "Engine"
+    },
+    {
+      "Action": "PlayCard",
+      "Card": 6,
+      "CardName": "Sette di bastoni",
+      "Player": 1,
+      "Sequence": 50,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 0,
+      "Sequence": 51,
+      "Source": "Engine"
+    },
+    {
+      "Action": "PlayCard",
+      "Card": 29,
+      "CardName": " Re di  denari",
+      "Player": 0,
+      "Sequence": 52,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_END",
+      "Parameter": 0,
+      "Sequence": 53,
+      "Source": "Engine"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 0,
+      "Sequence": 54,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 0,
+      "Say": 2,
+      "SayWhat": "SP_TRASMAS",
+      "Sequence": 55,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAIPL_TORESP",
+      "Parameter": 1,
+      "Sequence": 56,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 1,
+      "Say": 11,
+      "SayWhat": "SP_GIOCA",
+      "Sequence": 57,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_CHANGESCORE",
+      "Parameter": 6,
+      "Sequence": 58,
+      "Source": "Engine"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 0,
+      "Sequence": 59,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 0,
+      "Say": 0,
+      "SayWhat": "SP_AMONTE",
+      "Sequence": 60,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAIPL_TORESP",
+      "Parameter": 1,
+      "Sequence": 61,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 1,
+      "Say": 9,
+      "SayWhat": "SP_NO",
+      "Sequence": 62,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 0,
+      "Sequence": 63,
+      "Source": "Engine"
+    },
+    {
+      "Action": "PlayCard",
+      "Card": 11,
+      "CardName": "Due di  coppe",
+      "Player": 0,
+      "Sequence": 64,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 1,
+      "Sequence": 65,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 1,
+      "Say": 0,
+      "SayWhat": "SP_AMONTE",
+      "Sequence": 66,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAIPL_TORESP",
+      "Parameter": 0,
+      "Sequence": 67,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 0,
+      "Say": 9,
+      "SayWhat": "SP_NO",
+      "Sequence": 68,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 1,
+      "Sequence": 69,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 1,
+      "Say": 0,
+      "SayWhat": "SP_AMONTE",
+      "Sequence": 70,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAIPL_TORESP",
+      "Parameter": 0,
+      "Sequence": 71,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 0,
+      "Say": 9,
+      "SayWhat": "SP_NO",
+      "Sequence": 72,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 1,
+      "Sequence": 73,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 1,
+      "Say": 0,
+      "SayWhat": "SP_AMONTE",
+      "Sequence": 74,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAIPL_TORESP",
+      "Parameter": 0,
+      "Sequence": 75,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 0,
+      "Say": 9,
+      "SayWhat": "SP_NO",
+      "Sequence": 76,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 1,
+      "Sequence": 77,
+      "Source": "Engine"
+    },
+    {
+      "Action": "VaDentro",
+      "Card": 0,
+      "Player": 1,
+      "Sequence": 78,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_END",
+      "Parameter": 0,
+      "Sequence": 79,
+      "Source": "Engine"
+    },
+    {
+      "Action": "EndedWithWinner",
+      "Player": 0,
+      "Sequence": 80,
+      "Source": "Giocata"
+    },
+    {
+      "Action": "Started",
+      "Player": 0,
+      "Sequence": 81,
+      "Source": "Giocata"
+    },
+    {
+      "Action": "ShuffledDeck",
+      "Mazzo": [
+        32,
+        20,
+        26,
+        22,
+        12,
+        8,
+        9,
+        11,
+        1,
+        28,
+        30,
+        5,
+        31,
+        15,
+        19,
+        10,
+        17,
+        7,
+        35,
+        6,
+        37,
+        38,
+        21,
+        39,
+        36,
+        25,
+        0,
+        29,
+        18,
+        27,
+        2,
+        16
+      ],
+      "Sequence": 82,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Deal",
+      "Cards": [
+        16,
+        2,
+        27
+      ],
+      "Player": 0,
+      "Sequence": 83,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Deal",
+      "Cards": [
+        18,
+        29,
+        0
+      ],
+      "Player": 1,
+      "Sequence": 84,
+      "Source": "Engine"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 0,
+      "Sequence": 85,
+      "Source": "Engine"
+    },
+    {
+      "Action": "PlayCard",
+      "Card": 27,
+      "CardName": "Fante di  denari",
+      "Player": 0,
+      "Sequence": 86,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 1,
+      "Sequence": 87,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 1,
+      "Say": 1,
+      "SayWhat": "SP_INVIDO",
+      "Sequence": 88,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAIPL_TORESP",
+      "Parameter": 0,
+      "Sequence": 89,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 0,
+      "Say": 11,
+      "SayWhat": "SP_GIOCA",
+      "Sequence": 90,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_CHANGESCORE",
+      "Parameter": 3,
+      "Sequence": 91,
+      "Source": "Engine"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 1,
+      "Sequence": 92,
+      "Source": "Engine"
+    },
+    {
+      "Action": "PlayCard",
+      "Card": 18,
+      "CardName": "Cavallo di  coppe",
+      "Player": 1,
+      "Sequence": 93,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_END",
+      "Parameter": 0,
+      "Sequence": 94,
+      "Source": "Engine"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 1,
+      "Sequence": 95,
+      "Source": "Engine"
+    },
+    {
+      "Action": "PlayCard",
+      "Card": 29,
+      "CardName": " Re di  denari",
+      "Player": 1,
+      "Sequence": 96,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 0,
+      "Sequence": 97,
+      "Source": "Engine"
+    },
+    {
+      "Action": "PlayCard",
+      "Card": 2,
+      "CardName": "Tre di bastoni",
+      "Player": 0,
+      "Sequence": 98,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_END",
+      "Parameter": 0,
+      "Sequence": 99,
+      "Source": "Engine"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 0,
+      "Sequence": 100,
+      "Source": "Engine"
+    },
+    {
+      "Action": "PlayCard",
+      "Card": 16,
+      "CardName": "Sette di  coppe",
+      "Player": 0,
+      "Sequence": 101,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 1,
+      "Sequence": 102,
+      "Source": "Engine"
+    },
+    {
+      "Action": "PlayCard",
+      "Card": 0,
+      "CardName": "Asso di bastoni",
+      "Player": 1,
+      "Sequence": 103,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_END",
+      "Parameter": 0,
+      "Sequence": 104,
+      "Source": "Engine"
+    },
+    {
+      "Action": "EndedWithWinner",
+      "Player": 1,
+      "Sequence": 105,
+      "Source": "Giocata"
+    },
+    {
+      "Action": "Started",
+      "Player": 1,
+      "Sequence": 106,
+      "Source": "Giocata"
+    },
+    {
+      "Action": "ShuffledDeck",
+      "Mazzo": [
+        28,
+        37,
+        20,
+        17,
+        8,
+        32,
+        10,
+        36,
+        6,
+        7,
+        16,
+        22,
+        30,
+        25,
+        0,
+        29,
+        2,
+        27,
+        39,
+        19,
+        12,
+        11,
+        1,
+        35,
+        18,
+        5,
+        21,
+        26,
+        9,
+        38,
+        15,
+        31
+      ],
+      "Sequence": 107,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Deal",
+      "Cards": [
+        31,
+        15,
+        38
+      ],
+      "Player": 1,
+      "Sequence": 108,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Deal",
+      "Cards": [
+        9,
+        26,
+        21
+      ],
+      "Player": 0,
+      "Sequence": 109,
+      "Source": "Engine"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 1,
+      "Sequence": 110,
+      "Source": "Engine"
+    },
+    {
+      "Action": "PlayCard",
+      "Card": 38,
+      "CardName": "Cavallo di  spade",
+      "Player": 1,
+      "Sequence": 111,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 0,
+      "Sequence": 112,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 0,
+      "Say": 1,
+      "SayWhat": "SP_INVIDO",
+      "Sequence": 113,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAIPL_TORESP",
+      "Parameter": 1,
+      "Sequence": 114,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 1,
+      "Say": 11,
+      "SayWhat": "SP_GIOCA",
+      "Sequence": 115,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_CHANGESCORE",
+      "Parameter": 3,
+      "Sequence": 116,
+      "Source": "Engine"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 0,
+      "Sequence": 117,
+      "Source": "Engine"
+    },
+    {
+      "Action": "PlayCard",
+      "Card": 9,
+      "CardName": " Re di bastoni",
+      "Player": 0,
+      "Sequence": 118,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_END",
+      "Parameter": 0,
+      "Sequence": 119,
+      "Source": "Engine"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 0,
+      "Sequence": 120,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 0,
+      "Say": 0,
+      "SayWhat": "SP_AMONTE",
+      "Sequence": 121,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAIPL_TORESP",
+      "Parameter": 1,
+      "Sequence": 122,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 1,
+      "Say": 9,
+      "SayWhat": "SP_NO",
+      "Sequence": 123,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 0,
+      "Sequence": 124,
+      "Source": "Engine"
+    },
+    {
+      "Action": "PlayCard",
+      "Card": 26,
+      "CardName": "Sette di  denari",
+      "Player": 0,
+      "Sequence": 125,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 1,
+      "Sequence": 126,
+      "Source": "Engine"
+    },
+    {
+      "Action": "PlayCard",
+      "Card": 31,
+      "CardName": "Due di  spade",
+      "Player": 1,
+      "Sequence": 127,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_END",
+      "Parameter": 0,
+      "Sequence": 128,
+      "Source": "Engine"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 1,
+      "Sequence": 129,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 1,
+      "Say": 0,
+      "SayWhat": "SP_AMONTE",
+      "Sequence": 130,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAIPL_TORESP",
+      "Parameter": 0,
+      "Sequence": 131,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 0,
+      "Say": 9,
+      "SayWhat": "SP_NO",
+      "Sequence": 132,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 1,
+      "Sequence": 133,
+      "Source": "Engine"
+    },
+    {
+      "Action": "PlayCard",
+      "Card": 15,
+      "CardName": "Sei di  coppe",
+      "Player": 1,
+      "Sequence": 134,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 0,
+      "Sequence": 135,
+      "Source": "Engine"
+    },
+    {
+      "Action": "PlayCard",
+      "Card": 21,
+      "CardName": "Due di  denari",
+      "Player": 0,
+      "Sequence": 136,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_END",
+      "Parameter": 0,
+      "Sequence": 137,
+      "Source": "Engine"
+    },
+    {
+      "Action": "EndedWithWinner",
+      "Player": 0,
+      "Sequence": 138,
+      "Source": "Giocata"
+    },
+    {
+      "Action": "Started",
+      "Player": 0,
+      "Sequence": 139,
+      "Source": "Giocata"
+    },
+    {
+      "Action": "ShuffledDeck",
+      "Mazzo": [
+        16,
+        27,
+        19,
+        21,
+        10,
+        32,
+        39,
+        9,
+        38,
+        30,
+        6,
+        20,
+        29,
+        11,
+        22,
+        36,
+        26,
+        18,
+        37,
+        35,
+        17,
+        7,
+        12,
+        5,
+        25,
+        15,
+        31,
+        1,
+        8,
+        0,
+        28,
+        2
+      ],
+      "Sequence": 140,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Deal",
+      "Cards": [
+        2,
+        28,
+        0
+      ],
+      "Player": 0,
+      "Sequence": 141,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Deal",
+      "Cards": [
+        8,
+        1,
+        31
+      ],
+      "Player": 1,
+      "Sequence": 142,
+      "Source": "Engine"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 0,
+      "Sequence": 143,
+      "Source": "Engine"
+    },
+    {
+      "Action": "PlayCard",
+      "Card": 2,
+      "CardName": "Tre di bastoni",
+      "Player": 0,
+      "Sequence": 144,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 1,
+      "Sequence": 145,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 1,
+      "Say": 0,
+      "SayWhat": "SP_AMONTE",
+      "Sequence": 146,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAIPL_TORESP",
+      "Parameter": 0,
+      "Sequence": 147,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 0,
+      "Say": 9,
+      "SayWhat": "SP_NO",
+      "Sequence": 148,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 1,
+      "Sequence": 149,
+      "Source": "Engine"
+    },
+    {
+      "Action": "PlayCard",
+      "Card": 8,
+      "CardName": "Cavallo di bastoni",
+      "Player": 1,
+      "Sequence": 150,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_END",
+      "Parameter": 0,
+      "Sequence": 151,
+      "Source": "Engine"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 0,
+      "Sequence": 152,
+      "Source": "Engine"
+    },
+    {
+      "Action": "PlayCard",
+      "Card": 28,
+      "CardName": "Cavallo di  denari",
+      "Player": 0,
+      "Sequence": 153,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 1,
+      "Sequence": 154,
+      "Source": "Engine"
+    },
+    {
+      "Action": "PlayCard",
+      "Card": 1,
+      "CardName": "Due di bastoni",
+      "Player": 1,
+      "Sequence": 155,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_END",
+      "Parameter": 0,
+      "Sequence": 156,
+      "Source": "Engine"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 1,
+      "Sequence": 157,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 1,
+      "Say": 0,
+      "SayWhat": "SP_AMONTE",
+      "Sequence": 158,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAIPL_TORESP",
+      "Parameter": 0,
+      "Sequence": 159,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 0,
+      "Say": 9,
+      "SayWhat": "SP_NO",
+      "Sequence": 160,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 1,
+      "Sequence": 161,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 1,
+      "Say": 0,
+      "SayWhat": "SP_AMONTE",
+      "Sequence": 162,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAIPL_TORESP",
+      "Parameter": 0,
+      "Sequence": 163,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 0,
+      "Say": 9,
+      "SayWhat": "SP_NO",
+      "Sequence": 164,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 1,
+      "Sequence": 165,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 1,
+      "Say": 1,
+      "SayWhat": "SP_INVIDO",
+      "Sequence": 166,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAIPL_TORESP",
+      "Parameter": 0,
+      "Sequence": 167,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 0,
+      "Say": 11,
+      "SayWhat": "SP_GIOCA",
+      "Sequence": 168,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_CHANGESCORE",
+      "Parameter": 3,
+      "Sequence": 169,
+      "Source": "Engine"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 1,
+      "Sequence": 170,
+      "Source": "Engine"
+    },
+    {
+      "Action": "PlayCard",
+      "Card": 31,
+      "CardName": "Due di  spade",
+      "Player": 1,
+      "Sequence": 171,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 0,
+      "Sequence": 172,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 0,
+      "Say": 0,
+      "SayWhat": "SP_AMONTE",
+      "Sequence": 173,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAIPL_TORESP",
+      "Parameter": 1,
+      "Sequence": 174,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 1,
+      "Say": 9,
+      "SayWhat": "SP_NO",
+      "Sequence": 175,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 0,
+      "Sequence": 176,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 0,
+      "Say": 0,
+      "SayWhat": "SP_AMONTE",
+      "Sequence": 177,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAIPL_TORESP",
+      "Parameter": 1,
+      "Sequence": 178,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 1,
+      "Say": 9,
+      "SayWhat": "SP_NO",
+      "Sequence": 179,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 0,
+      "Sequence": 180,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 0,
+      "Say": 0,
+      "SayWhat": "SP_AMONTE",
+      "Sequence": 181,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAIPL_TORESP",
+      "Parameter": 1,
+      "Sequence": 182,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 1,
+      "Say": 9,
+      "SayWhat": "SP_NO",
+      "Sequence": 183,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 0,
+      "Sequence": 184,
+      "Source": "Engine"
+    },
+    {
+      "Action": "VaDentro",
+      "Card": 0,
+      "Player": 0,
+      "Sequence": 185,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_END",
+      "Parameter": 0,
+      "Sequence": 186,
+      "Source": "Engine"
+    },
+    {
+      "Action": "EndedWithWinner",
+      "Player": 1,
+      "Sequence": 187,
+      "Source": "Giocata"
+    },
+    {
+      "Action": "Started",
+      "Player": 1,
+      "Sequence": 188,
+      "Source": "Giocata"
+    },
+    {
+      "Action": "ShuffledDeck",
+      "Mazzo": [
+        2,
+        28,
+        18,
+        26,
+        38,
+        0,
+        22,
+        29,
+        8,
+        5,
+        30,
+        17,
+        16,
+        31,
+        32,
+        7,
+        36,
+        9,
+        11,
+        25,
+        21,
+        35,
+        37,
+        20,
+        39,
+        15,
+        19,
+        10,
+        12,
+        6,
+        1,
+        27
+      ],
+      "Sequence": 189,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Deal",
+      "Cards": [
+        27,
+        1,
+        6
+      ],
+      "Player": 1,
+      "Sequence": 190,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Deal",
+      "Cards": [
+        12,
+        10,
+        19
+      ],
+      "Player": 0,
+      "Sequence": 191,
+      "Source": "Engine"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 1,
+      "Sequence": 192,
+      "Source": "Engine"
+    },
+    {
+      "Action": "PlayCard",
+      "Card": 27,
+      "CardName": "Fante di  denari",
+      "Player": 1,
+      "Sequence": 193,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 0,
+      "Sequence": 194,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 0,
+      "Say": 1,
+      "SayWhat": "SP_INVIDO",
+      "Sequence": 195,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAIPL_TORESP",
+      "Parameter": 1,
+      "Sequence": 196,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 1,
+      "Say": 11,
+      "SayWhat": "SP_GIOCA",
+      "Sequence": 197,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_CHANGESCORE",
+      "Parameter": 3,
+      "Sequence": 198,
+      "Source": "Engine"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 0,
+      "Sequence": 199,
+      "Source": "Engine"
+    },
+    {
+      "Action": "PlayCard",
+      "Card": 19,
+      "CardName": " Re di  coppe",
+      "Player": 0,
+      "Sequence": 200,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_END",
+      "Parameter": 0,
+      "Sequence": 201,
+      "Source": "Engine"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 0,
+      "Sequence": 202,
+      "Source": "Engine"
+    },
+    {
+      "Action": "VaDentro",
+      "Card": 10,
+      "Player": 0,
+      "Sequence": 203,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 1,
+      "Sequence": 204,
+      "Source": "Engine"
+    },
+    {
+      "Action": "PlayCard",
+      "Card": 6,
+      "CardName": "Sette di bastoni",
+      "Player": 1,
+      "Sequence": 205,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_END",
+      "Parameter": 0,
+      "Sequence": 206,
+      "Source": "Engine"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 1,
+      "Sequence": 207,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 1,
+      "Say": 2,
+      "SayWhat": "SP_TRASMAS",
+      "Sequence": 208,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAIPL_TORESP",
+      "Parameter": 0,
+      "Sequence": 209,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 0,
+      "Say": 11,
+      "SayWhat": "SP_GIOCA",
+      "Sequence": 210,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_CHANGESCORE",
+      "Parameter": 6,
+      "Sequence": 211,
+      "Source": "Engine"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 1,
+      "Sequence": 212,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 1,
+      "Say": 0,
+      "SayWhat": "SP_AMONTE",
+      "Sequence": 213,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAIPL_TORESP",
+      "Parameter": 0,
+      "Sequence": 214,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 0,
+      "Say": 9,
+      "SayWhat": "SP_NO",
+      "Sequence": 215,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 1,
+      "Sequence": 216,
+      "Source": "Engine"
+    },
+    {
+      "Action": "PlayCard",
+      "Card": 1,
+      "CardName": "Due di bastoni",
+      "Player": 1,
+      "Sequence": 217,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 0,
+      "Sequence": 218,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 0,
+      "Say": 3,
+      "SayWhat": "SP_TRASMASNOEF",
+      "Sequence": 219,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAIPL_TORESP",
+      "Parameter": 1,
+      "Sequence": 220,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 1,
+      "Say": 11,
+      "SayWhat": "SP_GIOCA",
+      "Sequence": 221,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_CHANGESCORE",
+      "Parameter": 9,
+      "Sequence": 222,
+      "Source": "Engine"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 0,
+      "Sequence": 223,
+      "Source": "Engine"
+    },
+    {
+      "Action": "PlayCard",
+      "Card": 12,
+      "CardName": "Tre di  coppe",
+      "Player": 0,
+      "Sequence": 224,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_END",
+      "Parameter": 0,
+      "Sequence": 225,
+      "Source": "Engine"
+    },
+    {
+      "Action": "EndedWithWinner",
+      "Player": 0,
+      "Sequence": 226,
+      "Source": "Giocata"
+    },
+    {
+      "Action": "Started",
+      "Player": 0,
+      "Sequence": 227,
+      "Source": "Giocata"
+    },
+    {
+      "Action": "ShuffledDeck",
+      "Mazzo": [
+        32,
+        1,
+        18,
+        16,
+        22,
+        12,
+        2,
+        7,
+        19,
+        27,
+        9,
+        35,
+        26,
+        29,
+        5,
+        31,
+        21,
+        30,
+        28,
+        37,
+        8,
+        10,
+        0,
+        39,
+        25,
+        11,
+        6,
+        36,
+        17,
+        20,
+        38,
+        15
+      ],
+      "Sequence": 228,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Deal",
+      "Cards": [
+        15,
+        38,
+        20
+      ],
+      "Player": 0,
+      "Sequence": 229,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Deal",
+      "Cards": [
+        17,
+        36,
+        6
+      ],
+      "Player": 1,
+      "Sequence": 230,
+      "Source": "Engine"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 0,
+      "Sequence": 231,
+      "Source": "Engine"
+    },
+    {
+      "Action": "PlayCard",
+      "Card": 20,
+      "CardName": "Asso di  denari",
+      "Player": 0,
+      "Sequence": 232,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 1,
+      "Sequence": 233,
+      "Source": "Engine"
+    },
+    {
+      "Action": "PlayCard",
+      "Card": 36,
+      "CardName": "Sette di  spade",
+      "Player": 1,
+      "Sequence": 234,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_END",
+      "Parameter": 0,
+      "Sequence": 235,
+      "Source": "Engine"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 0,
+      "Sequence": 236,
+      "Source": "Engine"
+    },
+    {
+      "Action": "VaDentro",
+      "Card": 15,
+      "Player": 0,
+      "Sequence": 237,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 1,
+      "Sequence": 238,
+      "Source": "Engine"
+    },
+    {
+      "Action": "PlayCard",
+      "Card": 6,
+      "CardName": "Sette di bastoni",
+      "Player": 1,
+      "Sequence": 239,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_END",
+      "Parameter": 0,
+      "Sequence": 240,
+      "Source": "Engine"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 1,
+      "Sequence": 241,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 1,
+      "Say": 0,
+      "SayWhat": "SP_AMONTE",
+      "Sequence": 242,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAIPL_TORESP",
+      "Parameter": 0,
+      "Sequence": 243,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 0,
+      "Say": 9,
+      "SayWhat": "SP_NO",
+      "Sequence": 244,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 1,
+      "Sequence": 245,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 1,
+      "Say": 0,
+      "SayWhat": "SP_AMONTE",
+      "Sequence": 246,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAIPL_TORESP",
+      "Parameter": 0,
+      "Sequence": 247,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 0,
+      "Say": 9,
+      "SayWhat": "SP_NO",
+      "Sequence": 248,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 1,
+      "Sequence": 249,
+      "Source": "Engine"
+    },
+    {
+      "Action": "PlayCard",
+      "Card": 17,
+      "CardName": "Fante di  coppe",
+      "Player": 1,
+      "Sequence": 250,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 0,
+      "Sequence": 251,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 0,
+      "Say": 1,
+      "SayWhat": "SP_INVIDO",
+      "Sequence": 252,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAIPL_TORESP",
+      "Parameter": 1,
+      "Sequence": 253,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 1,
+      "Say": 0,
+      "SayWhat": "SP_AMONTE",
+      "Sequence": 254,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAIPL_TORESP",
+      "Parameter": 0,
+      "Sequence": 255,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 0,
+      "Say": 9,
+      "SayWhat": "SP_NO",
+      "Sequence": 256,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAIPL_TORESP",
+      "Parameter": 1,
+      "Sequence": 257,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 1,
+      "Say": 7,
+      "SayWhat": "SP_VADOVIA",
+      "Sequence": 258,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_VADOVIA",
+      "Parameter": 1,
+      "Sequence": 259,
+      "Source": "Engine"
+    },
+    {
+      "Action": "EndedWithWinner",
+      "Player": 0,
+      "Sequence": 260,
+      "Source": "Giocata"
+    },
+    {
+      "Action": "Started",
+      "Player": 0,
+      "Sequence": 261,
+      "Source": "Giocata"
+    },
+    {
+      "Action": "ShuffledDeck",
+      "Mazzo": [
+        5,
+        18,
+        29,
+        11,
+        25,
+        27,
+        7,
+        21,
+        20,
+        9,
+        22,
+        39,
+        12,
+        19,
+        15,
+        2,
+        37,
+        28,
+        26,
+        32,
+        36,
+        17,
+        30,
+        0,
+        16,
+        1,
+        6,
+        31,
+        10,
+        38,
+        35,
+        8
+      ],
+      "Sequence": 262,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Deal",
+      "Cards": [
+        8,
+        35,
+        38
+      ],
+      "Player": 0,
+      "Sequence": 263,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Deal",
+      "Cards": [
+        10,
+        31,
+        6
+      ],
+      "Player": 1,
+      "Sequence": 264,
+      "Source": "Engine"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 0,
+      "Sequence": 265,
+      "Source": "Engine"
+    },
+    {
+      "Action": "PlayCard",
+      "Card": 8,
+      "CardName": "Cavallo di bastoni",
+      "Player": 0,
+      "Sequence": 266,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 1,
+      "Sequence": 267,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 1,
+      "Say": 1,
+      "SayWhat": "SP_INVIDO",
+      "Sequence": 268,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAIPL_TORESP",
+      "Parameter": 0,
+      "Sequence": 269,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 0,
+      "Say": 7,
+      "SayWhat": "SP_VADOVIA",
+      "Sequence": 270,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_VADOVIA",
+      "Parameter": 0,
+      "Sequence": 271,
+      "Source": "Engine"
+    },
+    {
+      "Action": "EndedWithWinner",
+      "Player": 1,
+      "Sequence": 272,
+      "Source": "Giocata"
+    },
+    {
+      "Action": "Started",
+      "Player": 1,
+      "Sequence": 273,
+      "Source": "Giocata"
+    },
+    {
+      "Action": "ShuffledDeck",
+      "Mazzo": [
+        35,
+        29,
+        30,
+        38,
+        22,
+        5,
+        20,
+        15,
+        1,
+        16,
+        6,
+        37,
+        36,
+        18,
+        10,
+        21,
+        9,
+        2,
+        17,
+        25,
+        31,
+        27,
+        39,
+        12,
+        7,
+        32,
+        19,
+        8,
+        28,
+        11,
+        26,
+        0
+      ],
+      "Sequence": 274,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Deal",
+      "Cards": [
+        0,
+        26,
+        11
+      ],
+      "Player": 1,
+      "Sequence": 275,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Deal",
+      "Cards": [
+        28,
+        8,
+        19
+      ],
+      "Player": 0,
+      "Sequence": 276,
+      "Source": "Engine"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 1,
+      "Sequence": 277,
+      "Source": "Engine"
+    },
+    {
+      "Action": "PlayCard",
+      "Card": 11,
+      "CardName": "Due di  coppe",
+      "Player": 1,
+      "Sequence": 278,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 0,
+      "Sequence": 279,
+      "Source": "Engine"
+    },
+    {
+      "Action": "PlayCard",
+      "Card": 28,
+      "CardName": "Cavallo di  denari",
+      "Player": 0,
+      "Sequence": 280,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_END",
+      "Parameter": 0,
+      "Sequence": 281,
+      "Source": "Engine"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 1,
+      "Sequence": 282,
+      "Source": "Engine"
+    },
+    {
+      "Action": "PlayCard",
+      "Card": 26,
+      "CardName": "Sette di  denari",
+      "Player": 1,
+      "Sequence": 283,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 0,
+      "Sequence": 284,
+      "Source": "Engine"
+    },
+    {
+      "Action": "PlayCard",
+      "Card": 8,
+      "CardName": "Cavallo di bastoni",
+      "Player": 0,
+      "Sequence": 285,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_END",
+      "Parameter": 0,
+      "Sequence": 286,
+      "Source": "Engine"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 0,
+      "Sequence": 287,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 0,
+      "Say": 0,
+      "SayWhat": "SP_AMONTE",
+      "Sequence": 288,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAIPL_TORESP",
+      "Parameter": 1,
+      "Sequence": 289,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 1,
+      "Say": 9,
+      "SayWhat": "SP_NO",
+      "Sequence": 290,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 0,
+      "Sequence": 291,
+      "Source": "Engine"
+    },
+    {
+      "Action": "PlayCard",
+      "Card": 19,
+      "CardName": " Re di  coppe",
+      "Player": 0,
+      "Sequence": 292,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 1,
+      "Sequence": 293,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 1,
+      "Say": 1,
+      "SayWhat": "SP_INVIDO",
+      "Sequence": 294,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAIPL_TORESP",
+      "Parameter": 0,
+      "Sequence": 295,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 0,
+      "Say": 11,
+      "SayWhat": "SP_GIOCA",
+      "Sequence": 296,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_CHANGESCORE",
+      "Parameter": 3,
+      "Sequence": 297,
+      "Source": "Engine"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 1,
+      "Sequence": 298,
+      "Source": "Engine"
+    },
+    {
+      "Action": "PlayCard",
+      "Card": 0,
+      "CardName": "Asso di bastoni",
+      "Player": 1,
+      "Sequence": 299,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_END",
+      "Parameter": 0,
+      "Sequence": 300,
+      "Source": "Engine"
+    },
+    {
+      "Action": "EndedWithWinner",
+      "Player": 1,
+      "Sequence": 301,
+      "Source": "Giocata"
+    },
+    {
+      "Action": "Started",
+      "Player": 1,
+      "Sequence": 302,
+      "Source": "Giocata"
+    },
+    {
+      "Action": "ShuffledDeck",
+      "Mazzo": [
+        37,
+        17,
+        5,
+        8,
+        18,
+        6,
+        9,
+        0,
+        20,
+        32,
+        10,
+        15,
+        7,
+        31,
+        30,
+        11,
+        22,
+        1,
+        25,
+        27,
+        38,
+        39,
+        26,
+        19,
+        2,
+        21,
+        29,
+        12,
+        16,
+        36,
+        35,
+        28
+      ],
+      "Sequence": 303,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Deal",
+      "Cards": [
+        28,
+        35,
+        36
+      ],
+      "Player": 1,
+      "Sequence": 304,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Deal",
+      "Cards": [
+        16,
+        12,
+        29
+      ],
+      "Player": 0,
+      "Sequence": 305,
+      "Source": "Engine"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 1,
+      "Sequence": 306,
+      "Source": "Engine"
+    },
+    {
+      "Action": "PlayCard",
+      "Card": 28,
+      "CardName": "Cavallo di  denari",
+      "Player": 1,
+      "Sequence": 307,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 0,
+      "Sequence": 308,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 0,
+      "Say": 1,
+      "SayWhat": "SP_INVIDO",
+      "Sequence": 309,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAIPL_TORESP",
+      "Parameter": 1,
+      "Sequence": 310,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 1,
+      "Say": 7,
+      "SayWhat": "SP_VADOVIA",
+      "Sequence": 311,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_VADOVIA",
+      "Parameter": 1,
+      "Sequence": 312,
+      "Source": "Engine"
+    },
+    {
+      "Action": "EndedWithWinner",
+      "Player": 0,
+      "Sequence": 313,
+      "Source": "Giocata"
+    },
+    {
+      "Action": "Started",
+      "Player": 0,
+      "Sequence": 314,
+      "Source": "Giocata"
+    },
+    {
+      "Action": "ShuffledDeck",
+      "Mazzo": [
+        35,
+        39,
+        31,
+        0,
+        16,
+        36,
+        22,
+        6,
+        29,
+        27,
+        25,
+        1,
+        2,
+        5,
+        30,
+        38,
+        20,
+        10,
+        11,
+        37,
+        8,
+        18,
+        7,
+        28,
+        15,
+        9,
+        17,
+        12,
+        26,
+        19,
+        21,
+        32
+      ],
+      "Sequence": 315,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Deal",
+      "Cards": [
+        32,
+        21,
+        19
+      ],
+      "Player": 0,
+      "Sequence": 316,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Deal",
+      "Cards": [
+        26,
+        12,
+        17
+      ],
+      "Player": 1,
+      "Sequence": 317,
+      "Source": "Engine"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 0,
+      "Sequence": 318,
+      "Source": "Engine"
+    },
+    {
+      "Action": "PlayCard",
+      "Card": 32,
+      "CardName": "Tre di  spade",
+      "Player": 0,
+      "Sequence": 319,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 1,
+      "Sequence": 320,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 1,
+      "Say": 1,
+      "SayWhat": "SP_INVIDO",
+      "Sequence": 321,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAIPL_TORESP",
+      "Parameter": 0,
+      "Sequence": 322,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 0,
+      "Say": 11,
+      "SayWhat": "SP_GIOCA",
+      "Sequence": 323,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_CHANGESCORE",
+      "Parameter": 3,
+      "Sequence": 324,
+      "Source": "Engine"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 1,
+      "Sequence": 325,
+      "Source": "Engine"
+    },
+    {
+      "Action": "PlayCard",
+      "Card": 12,
+      "CardName": "Tre di  coppe",
+      "Player": 1,
+      "Sequence": 326,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_END",
+      "Parameter": 0,
+      "Sequence": 327,
+      "Source": "Engine"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 0,
+      "Sequence": 328,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 0,
+      "Say": 2,
+      "SayWhat": "SP_TRASMAS",
+      "Sequence": 329,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAIPL_TORESP",
+      "Parameter": 1,
+      "Sequence": 330,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 1,
+      "Say": 0,
+      "SayWhat": "SP_AMONTE",
+      "Sequence": 331,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAIPL_TORESP",
+      "Parameter": 0,
+      "Sequence": 332,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 0,
+      "Say": 9,
+      "SayWhat": "SP_NO",
+      "Sequence": 333,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAIPL_TORESP",
+      "Parameter": 1,
+      "Sequence": 334,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 1,
+      "Say": 0,
+      "SayWhat": "SP_AMONTE",
+      "Sequence": 335,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAIPL_TORESP",
+      "Parameter": 0,
+      "Sequence": 336,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 0,
+      "Say": 9,
+      "SayWhat": "SP_NO",
+      "Sequence": 337,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAIPL_TORESP",
+      "Parameter": 1,
+      "Sequence": 338,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 1,
+      "Say": 0,
+      "SayWhat": "SP_AMONTE",
+      "Sequence": 339,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAIPL_TORESP",
+      "Parameter": 0,
+      "Sequence": 340,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 0,
+      "Say": 9,
+      "SayWhat": "SP_NO",
+      "Sequence": 341,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAIPL_TORESP",
+      "Parameter": 1,
+      "Sequence": 342,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 1,
+      "Say": 7,
+      "SayWhat": "SP_VADOVIA",
+      "Sequence": 343,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_VADOVIA",
+      "Parameter": 1,
+      "Sequence": 344,
+      "Source": "Engine"
+    },
+    {
+      "Action": "EndedWithWinner",
+      "Player": 0,
+      "Sequence": 345,
+      "Source": "Giocata"
+    },
+    {
+      "Action": "Started",
+      "Player": 0,
+      "Sequence": 346,
+      "Source": "Giocata"
+    },
+    {
+      "Action": "ShuffledDeck",
+      "Mazzo": [
+        37,
+        20,
+        17,
+        35,
+        0,
+        9,
+        26,
+        30,
+        19,
+        29,
+        27,
+        31,
+        1,
+        38,
+        11,
+        16,
+        6,
+        2,
+        25,
+        8,
+        12,
+        22,
+        18,
+        39,
+        28,
+        5,
+        7,
+        21,
+        36,
+        32,
+        10,
+        15
+      ],
+      "Sequence": 347,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Deal",
+      "Cards": [
+        15,
+        10,
+        32
+      ],
+      "Player": 0,
+      "Sequence": 348,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Deal",
+      "Cards": [
+        36,
+        21,
+        7
+      ],
+      "Player": 1,
+      "Sequence": 349,
+      "Source": "Engine"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 0,
+      "Sequence": 350,
+      "Source": "Engine"
+    },
+    {
+      "Action": "PlayCard",
+      "Card": 32,
+      "CardName": "Tre di  spade",
+      "Player": 0,
+      "Sequence": 351,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 1,
+      "Sequence": 352,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 1,
+      "Say": 0,
+      "SayWhat": "SP_AMONTE",
+      "Sequence": 353,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAIPL_TORESP",
+      "Parameter": 0,
+      "Sequence": 354,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 0,
+      "Say": 9,
+      "SayWhat": "SP_NO",
+      "Sequence": 355,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 1,
+      "Sequence": 356,
+      "Source": "Engine"
+    },
+    {
+      "Action": "PlayCard",
+      "Card": 36,
+      "CardName": "Sette di  spade",
+      "Player": 1,
+      "Sequence": 357,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_END",
+      "Parameter": 0,
+      "Sequence": 358,
+      "Source": "Engine"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 0,
+      "Sequence": 359,
+      "Source": "Engine"
+    },
+    {
+      "Action": "PlayCard",
+      "Card": 15,
+      "CardName": "Sei di  coppe",
+      "Player": 0,
+      "Sequence": 360,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 1,
+      "Sequence": 361,
+      "Source": "Engine"
+    },
+    {
+      "Action": "PlayCard",
+      "Card": 7,
+      "CardName": "Fante di bastoni",
+      "Player": 1,
+      "Sequence": 362,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_END",
+      "Parameter": 0,
+      "Sequence": 363,
+      "Source": "Engine"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 1,
+      "Sequence": 364,
+      "Source": "Engine"
+    },
+    {
+      "Action": "PlayCard",
+      "Card": 21,
+      "CardName": "Due di  denari",
+      "Player": 1,
+      "Sequence": 365,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 0,
+      "Sequence": 366,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 0,
+      "Say": 0,
+      "SayWhat": "SP_AMONTE",
+      "Sequence": 367,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAIPL_TORESP",
+      "Parameter": 1,
+      "Sequence": 368,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 1,
+      "Say": 9,
+      "SayWhat": "SP_NO",
+      "Sequence": 369,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 0,
+      "Sequence": 370,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 0,
+      "Say": 0,
+      "SayWhat": "SP_AMONTE",
+      "Sequence": 371,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAIPL_TORESP",
+      "Parameter": 1,
+      "Sequence": 372,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 1,
+      "Say": 9,
+      "SayWhat": "SP_NO",
+      "Sequence": 373,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 0,
+      "Sequence": 374,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 0,
+      "Say": 0,
+      "SayWhat": "SP_AMONTE",
+      "Sequence": 375,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAIPL_TORESP",
+      "Parameter": 1,
+      "Sequence": 376,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 1,
+      "Say": 9,
+      "SayWhat": "SP_NO",
+      "Sequence": 377,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 0,
+      "Sequence": 378,
+      "Source": "Engine"
+    },
+    {
+      "Action": "VaDentro",
+      "Card": 10,
+      "Player": 0,
+      "Sequence": 379,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_END",
+      "Parameter": 0,
+      "Sequence": 380,
+      "Source": "Engine"
+    },
+    {
+      "Action": "EndedWithWinner",
+      "Player": 1,
+      "Sequence": 381,
+      "Source": "Giocata"
+    },
+    {
+      "Action": "Started",
+      "Player": 1,
+      "Sequence": 382,
+      "Source": "Giocata"
+    },
+    {
+      "Action": "ShuffledDeck",
+      "Mazzo": [
+        12,
+        39,
+        18,
+        7,
+        32,
+        22,
+        26,
+        37,
+        38,
+        36,
+        1,
+        29,
+        17,
+        10,
+        11,
+        28,
+        2,
+        16,
+        5,
+        0,
+        35,
+        8,
+        15,
+        9,
+        31,
+        25,
+        6,
+        30,
+        21,
+        20,
+        27,
+        19
+      ],
+      "Sequence": 383,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Deal",
+      "Cards": [
+        19,
+        27,
+        20
+      ],
+      "Player": 1,
+      "Sequence": 384,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Deal",
+      "Cards": [
+        21,
+        30,
+        6
+      ],
+      "Player": 0,
+      "Sequence": 385,
+      "Source": "Engine"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 1,
+      "Sequence": 386,
+      "Source": "Engine"
+    },
+    {
+      "Action": "PlayCard",
+      "Card": 20,
+      "CardName": "Asso di  denari",
+      "Player": 1,
+      "Sequence": 387,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAITPL_TOPLAY",
+      "Parameter": 0,
+      "Sequence": 388,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 0,
+      "Say": 1,
+      "SayWhat": "SP_INVIDO",
+      "Sequence": 389,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAIPL_TORESP",
+      "Parameter": 1,
+      "Sequence": 390,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 1,
+      "Say": 0,
+      "SayWhat": "SP_AMONTE",
+      "Sequence": 391,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAIPL_TORESP",
+      "Parameter": 0,
+      "Sequence": 392,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 0,
+      "Say": 9,
+      "SayWhat": "SP_NO",
+      "Sequence": 393,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAIPL_TORESP",
+      "Parameter": 1,
+      "Sequence": 394,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 1,
+      "Say": 0,
+      "SayWhat": "SP_AMONTE",
+      "Sequence": 395,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAIPL_TORESP",
+      "Parameter": 0,
+      "Sequence": 396,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 0,
+      "Say": 9,
+      "SayWhat": "SP_NO",
+      "Sequence": 397,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAIPL_TORESP",
+      "Parameter": 1,
+      "Sequence": 398,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 1,
+      "Say": 0,
+      "SayWhat": "SP_AMONTE",
+      "Sequence": 399,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAIPL_TORESP",
+      "Parameter": 0,
+      "Sequence": 400,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 0,
+      "Say": 9,
+      "SayWhat": "SP_NO",
+      "Sequence": 401,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_WAIPL_TORESP",
+      "Parameter": 1,
+      "Sequence": 402,
+      "Source": "Engine"
+    },
+    {
+      "Action": "Say",
+      "Player": 1,
+      "Say": 7,
+      "SayWhat": "SP_VADOVIA",
+      "Sequence": 403,
+      "Source": "Player"
+    },
+    {
+      "Action": "MANO_VADOVIA",
+      "Parameter": 1,
+      "Sequence": 404,
+      "Source": "Engine"
+    },
+    {
+      "Action": "EndedWithWinner",
+      "Player": 0,
+      "Sequence": 405,
+      "Source": "Giocata"
+    },
+    {
+      "Action": "Ended",
+      "Sequence": 406,
+      "Source": "Partita"
+    }
+  ],
+  "FormatVersion": 1,
+  "Outcome": "Completed",
+  "Players": [
+    {
+      "Ix": 0,
+      "Name": "Guido"
+    },
+    {
+      "Ix": 1,
+      "Name": "Rensu"
+    }
+  ]
+}

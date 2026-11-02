@@ -653,6 +653,7 @@ bool InvidoCore::PlayCard(Uint8 playerIx, const CardSpec& cardSpec) {
         invjson::Value::Object actionDetails;
         actionDetails["Player"] = invjson::Value(static_cast<int>(playerIx));
         actionDetails["Card"] = invjson::Value(pCardplayed->GetCardIndex());
+        actionDetails["CardName"] = invjson::Value(pCardplayed->GetName());
         _gameActionRecorder.RecordAction("Player", "PlayCard", actionDetails);
 
         for (I_ALG_Player* pIAlgPlayer : _vctpAlgPlayer) {
@@ -680,6 +681,8 @@ bool InvidoCore::Say(Uint8 playerIx, eSayPlayer eSay) {
             actionDetails["Player"] =
                 invjson::Value(static_cast<int>(playerIx));
             actionDetails["Say"] = invjson::Value(static_cast<int>(eSay));
+            actionDetails["SayWhat"] =
+                invjson::Value(GeteSayPlayerToString(eSay));
             _gameActionRecorder.RecordAction("Player", "Say", actionDetails);
         }
 

@@ -85,7 +85,7 @@ void testReplayMatch() {
 
     mazzo.Init();
 
-    const std::string path = "..\\matches\\Invido-match-1511400.json_ref";
+    const std::string path = "..\\matches\\Invido-match-1015600.json_ref";
 
     LPErrInApp error = replayer.LoadFile(path);
     assert(error == NULL);
