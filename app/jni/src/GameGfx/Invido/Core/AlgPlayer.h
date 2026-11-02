@@ -25,8 +25,8 @@ class AlgPlayer : public I_ALG_Player {
     virtual void ALG_ManoEnd(I_MatchScore* pScore);
     virtual void ALG_GiocataEnd(I_MatchScore* pScore);
     virtual void ALG_MatchEnd(I_MatchScore* pScore);
-    virtual void ALG_HaveToPlay();
-    virtual void ALG_HaveToRespond();
+    virtual LPErrInApp ALG_HaveToPlay();
+    virtual LPErrInApp ALG_HaveToRespond();
     virtual void ALG_GicataScoreChange(eGiocataScoreState eNewScore);
     virtual void ALG_PlayerSaidWrong(Uint8 playerIx);
     // interface I_ALG_Player - end

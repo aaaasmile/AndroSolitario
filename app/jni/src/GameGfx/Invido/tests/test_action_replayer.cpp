@@ -187,8 +187,8 @@ void testGameActionReplayer() {
     invido::AlgPlayerAuto flexibleTurnPlayer(flexibleTurnReplayer, 0);
     FakeCore flexibleTurnCore;
     flexibleTurnPlayer.ALG_SetCoreInterface(&flexibleTurnCore);
-    flexibleTurnPlayer.ALG_HaveToPlay();
-    assert(!flexibleTurnPlayer.HasError());
+    error = flexibleTurnPlayer.ALG_HaveToPlay();
+    assert(error == NULL);
     assert(flexibleTurnCore.Commands().size() == 1);
     assert(flexibleTurnCore.Commands()[0].name == "Say");
     assert(!flexibleTurnReplayer.IsComplete());
@@ -207,8 +207,8 @@ void testGameActionReplayer() {
     invido::AlgPlayerAuto wrongResponsePlayer(responseMismatchReplayer, 0);
     FakeCore wrongResponseCore;
     wrongResponsePlayer.ALG_SetCoreInterface(&wrongResponseCore);
-    wrongResponsePlayer.ALG_HaveToRespond();
-    assert(wrongResponsePlayer.HasError());
+    error = wrongResponsePlayer.ALG_HaveToRespond();
+    assert(error == NULL);
     assert(wrongResponseCore.Commands().empty());
     assert(!responseMismatchReplayer.IsComplete());
 
@@ -236,8 +236,6 @@ void testGameActionReplayer() {
     player0.CleanUp();
     assert(player0.GetAlg() == NULL);
     assert(copiedPlayer.GetAlg() != NULL);
-    assert(!dynamic_cast<invido::AlgPlayerAuto*>(copiedPlayer.GetAlg())
-                ->HasError());
     copiedPlayer.CleanUp();
 
     invjson::Value rejectedRecording = invjson::Value::MakeObject();
@@ -255,8 +253,8 @@ void testGameActionReplayer() {
     invido::AlgPlayerAuto rejectingPlayer(rejectedReplayer, 0);
     FakeCore rejectingCore(false);
     rejectingPlayer.ALG_SetCoreInterface(&rejectingCore);
-    rejectingPlayer.ALG_HaveToPlay();
-    assert(rejectingPlayer.HasError());
+    error = rejectingPlayer.ALG_HaveToPlay();
+    assert(error == NULL);
     assert(!rejectedReplayer.IsComplete());
 
     invjson::Value unsupportedRecording = MakeRecording();
@@ -281,8 +279,8 @@ void testGameActionReplayer() {
     invido::AlgPlayerAuto playerWaitingForRecordedSay(truncatedReplayer, 0);
     FakeCore sayCore;
     playerWaitingForRecordedSay.ALG_SetCoreInterface(&sayCore);
-    playerWaitingForRecordedSay.ALG_HaveToPlay();
-    assert(!playerWaitingForRecordedSay.HasError());
+    error = playerWaitingForRecordedSay.ALG_HaveToPlay();
+    assert(error == NULL);
     assert(sayCore.Commands().size() == 1);
     assert(sayCore.Commands()[0].name == "Say");
 

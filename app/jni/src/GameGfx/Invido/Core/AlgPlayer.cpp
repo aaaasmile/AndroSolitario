@@ -678,12 +678,13 @@ bool AlgPlayer::IsPlayerFirst() {
 // Ritorna: 1,2,3 a seconda della mano
 int AlgPlayer::NumMano() { return _currentManoIndex + 1; }
 
-void AlgPlayer::ALG_HaveToPlay() {
+LPErrInApp AlgPlayer::ALG_HaveToPlay() {
     if (IsPlayerFirst()) {
         PlayAsFirst();
     } else {
         PlayAsSecond();
     }
+    return NULL;
 }
 
 void AlgPlayer::ALG_ManoEnd(I_MatchScore* pScore) {
@@ -736,7 +737,7 @@ void AlgPlayer::ALG_MatchEnd(I_MatchScore* pScore) {
         pScore->GetPointsPlayer(_opponentIndex));
 }
 
-void AlgPlayer::ALG_HaveToRespond() {
+LPErrInApp AlgPlayer::ALG_HaveToRespond() {
     TRACE_DEBUG("[ALG_HaveToRespond] have to respond");
     CardSpec cardUndef;
     int lastNumChiamate = _numCallsInGiocata;
@@ -744,7 +745,7 @@ void AlgPlayer::ALG_HaveToRespond() {
         // a monte was called and it was responded NO, don't change idea
         Chiama(_myResponseSay, lastNumChiamate);
         TRACE_DEBUG("[ALG_HaveToRespond] Say R1");
-        return;
+        return NULL;
     }
 
     size_t iRndIndex;
@@ -787,6 +788,7 @@ void AlgPlayer::ALG_HaveToRespond() {
         Chiama(vct_cmd[iRndIndex], lastNumChiamate);
         TRACE_DEBUG("[ALG_HaveToRespond] Say R18");
     }
+    return NULL;
 }
 
 void AlgPlayer::handleSayPopints(int curr_mano, int pointsFirstCard,
