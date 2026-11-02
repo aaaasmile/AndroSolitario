@@ -121,7 +121,7 @@ void testReplayMatch() {
 }
 
 void testMatch() {
-    testSimpleMatch();
     testReplayMatch();
+    testSimpleMatch();
     testSayPlayerToString();
 }
