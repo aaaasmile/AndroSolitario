@@ -273,14 +273,11 @@ void InvidoCore::NewMatch() {
         }
     }
 
-    _mano.Init(
-        _numPlayers);  // TODO set Num players, _mano is not for match state
+    _mano.Init(_numPlayers);
     _p_PlayersOnTable->SetFirstOnMatch(firstPlayerIx);
     _p_StartPlayer = _p_PlayersOnTable->GetPlayerOnIndex(firstPlayerIx);
     _partita.NewPartita(firstPlayerIx);
-    _matchStateWithScore.MatchStart(
-        _numPlayers);  // TODO set Num players, _matchStateWithScore
-                       // is not for match state
+    _matchStateWithScore.MatchStart(_numPlayers);
 }
 
 bool InvidoCore::NextAction() {

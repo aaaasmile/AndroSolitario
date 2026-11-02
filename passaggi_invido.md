@@ -80,3 +80,7 @@ non vanno bene. [DONE]
 per il solitario.
 - Languages. Nella App iniziale vanno messe solo le stringhe che non sono specifiche di
 un gioco. Poi il gioco dell'Invido deve aggiungere le proprie stringhe usando una callback.
+- AlgPlayerAuto è "Match stalled: no game action was taken". Metti i traces e 
+vedi perché testReplayMatch non va. Non vedo perché testReplayMatch non debba 
+ricreare il file json che dovrebbe essere esattamente uguale a quello di partenza.
+Si pianta sulla seconda giocata, linea 275 del file json di ref. 
