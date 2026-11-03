@@ -356,12 +356,12 @@ void InvidoCore::Giocata_Start(Uint8 playerIx) {
         }
     } else {
         _p_MyMazzo->Shuffle();
-        LPErrInApp recorderError = _gameActionRecorder.RecordGiocataDeck(
-            _p_MyMazzo->GetCardIndexOrder());
-        if (recorderError != NULL) {
-            TRACE("[InvidoCore] Unable to flash Invido action recording: %s\n",
-                  recorderError->ErrorText.c_str());
-        }
+    }
+    LPErrInApp recorderError =
+        _gameActionRecorder.RecordGiocataDeck(_p_MyMazzo->GetCardIndexOrder());
+    if (recorderError != NULL) {
+        TRACE("[InvidoCore] Unable to flash Invido action recording: %s\n",
+              recorderError->ErrorText.c_str());
     }
     NotifyScript(SCR_NFY_SHUFFLEDECK);
     _p_PlayersOnTable->SetFirstOnGiocata(playerIx);
@@ -500,8 +500,7 @@ void InvidoCore::Giocata_End() {
 void InvidoCore::PartitaEnded() {
     TRACE_DEBUG("[InvidoCore] PartitaEnded \n");
     const Uint8 winnerPlayerIx = _matchStateWithScore.GetMatchWinner();
-    const Uint8 otherPlayerIx =
-        winnerPlayerIx == PLAYER1 ? PLAYER2 : PLAYER1;
+    const Uint8 otherPlayerIx = winnerPlayerIx == PLAYER1 ? PLAYER2 : PLAYER1;
     const std::string outcome =
         _p_PlayersOnTable->GetPlayerOnIndex(winnerPlayerIx)->GetName() +
         " wins " +
