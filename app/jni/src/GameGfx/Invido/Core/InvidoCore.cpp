@@ -499,7 +499,16 @@ void InvidoCore::Giocata_End() {
 // Partita CB - start
 void InvidoCore::PartitaEnded() {
     TRACE_DEBUG("[InvidoCore] PartitaEnded \n");
-    LPErrInApp recorderError = _gameActionRecorder.Finalize("Completed");
+    const Uint8 winnerPlayerIx = _matchStateWithScore.GetMatchWinner();
+    const Uint8 otherPlayerIx =
+        winnerPlayerIx == PLAYER1 ? PLAYER2 : PLAYER1;
+    const std::string outcome =
+        _p_PlayersOnTable->GetPlayerOnIndex(winnerPlayerIx)->GetName() +
+        " wins " +
+        std::to_string(_matchStateWithScore.GetPointsPlayer(winnerPlayerIx)) +
+        ":" +
+        std::to_string(_matchStateWithScore.GetPointsPlayer(otherPlayerIx));
+    LPErrInApp recorderError = _gameActionRecorder.Finalize(outcome);
     if (recorderError != NULL) {
         TRACE("Unable to finalize Invido action recording: %s\n",
               recorderError->ErrorText.c_str());
