@@ -103,7 +103,7 @@ void testReplayMatch() {
     invidoCore.SetGameActionReplayer(replayer);
 
     std::string jsonDir = "matches";
-    invidoCore.SetRecordingLocation(jsonDir, "Invido");
+    invidoCore.SetRecordingLocation(jsonDir, "InvidoR");
     invidoCore.Init(&playersOnTable, &mazzo);
     invidoCore.NewMatch();
     while (invidoCore.IsMatchOnGoing()) {

@@ -85,19 +85,33 @@ LPErrInApp AlgPlayerAuto::PlayNextRecordedAction(
             accepted = _p_CoreGame->Say(_playerIndex,
                                         static_cast<eSayPlayer>(action.value));
             break;
-        case GameActionReplayer::PlayerAction::Type::PlayCard: {
+        case GameActionReplayer::PlayerAction::Type::PlayCard:
+        case GameActionReplayer::PlayerAction::Type::VaDentro: {
             CardSpec card;
             card.SetCardIndex(static_cast<Uint8>(action.value));
-            accepted = _p_CoreGame->PlayCard(_playerIndex, card);
+            if (expectedType ==
+                GameActionReplayer::PlayerAction::Type::VaDentro) {
+                accepted = _p_CoreGame->VaDentro(_playerIndex, card);
+            } else {
+                accepted = _p_CoreGame->PlayCard(_playerIndex, card);
+            }
             break;
         }
     }
 
     if (!accepted) {
-        const char* actionName =
-            expectedType == GameActionReplayer::PlayerAction::Type::Say
-                ? "Say"
-                : "PlayCard";
+        const char* actionName = "";
+        switch (expectedType) {
+            case GameActionReplayer::PlayerAction::Type::Say:
+                actionName = "Say";
+                break;
+            case GameActionReplayer::PlayerAction::Type::PlayCard:
+                actionName = "PlayCard";
+                break;
+            case GameActionReplayer::PlayerAction::Type::VaDentro:
+                actionName = "VaDentro";
+                break;
+        }
         char errorMessage[128];
         SDL_snprintf(errorMessage, sizeof(errorMessage),
                      "Replay %s action %d was rejected for player %d",

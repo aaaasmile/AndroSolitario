@@ -234,7 +234,8 @@ LPErrInApp GameActionReplayer::LoadJson(const std::string& json) {
         }
 
         if (source != "Player" ||
-            (actionName != "Say" && actionName != "PlayCard")) {
+            (actionName != "Say" && actionName != "PlayCard" &&
+             actionName != "VaDentro")) {
             continue;
         }
 
@@ -256,14 +257,23 @@ LPErrInApp GameActionReplayer::LoadJson(const std::string& json) {
             return InvalidRecording(
                 "Say action value is outside the enum range");
         }
-        if (actionName == "PlayCard" && value >= NUM_CARDS_MAZZBRI) {
+        if (actionName != "Say" && value >= NUM_CARDS_MAZZBRI) {
             Reset();
-            return InvalidRecording("PlayCard index is outside the deck range");
+            if (actionName == "PlayCard") {
+                return InvalidRecording(
+                    "PlayCard index is outside the deck range");
+            }
+            return InvalidRecording("VaDentro index is outside the deck range");
         }
 
         PlayerAction playerAction;
-        playerAction.type = actionName == "Say" ? PlayerAction::Type::Say
-                                                : PlayerAction::Type::PlayCard;
+        if (actionName == "Say") {
+            playerAction.type = PlayerAction::Type::Say;
+        } else if (actionName == "PlayCard") {
+            playerAction.type = PlayerAction::Type::PlayCard;
+        } else {
+            playerAction.type = PlayerAction::Type::VaDentro;
+        }
         playerAction.playerIndex = static_cast<Uint8>(playerIndex);
         playerAction.value = value;
         playerAction.sequence = i;

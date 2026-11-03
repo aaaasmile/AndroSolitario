@@ -14,7 +14,7 @@ namespace invido {
 class GameActionReplayer {
    public:
     struct PlayerAction {
-        enum class Type { Say, PlayCard };
+        enum class Type { Say, PlayCard, VaDentro };
 
         PlayerAction()
             : type(Type::Say),

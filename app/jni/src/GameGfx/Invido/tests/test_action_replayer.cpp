@@ -116,6 +116,7 @@ invjson::Value MakeRecording() {
     actions.PushBack(shuffledDeck);
     actions.PushBack(MakeAction("Player", "PlayCard", 0, "Card", 5));
     actions.PushBack(MakeAction("Player", "PlayCard", 1, "Card", 12));
+    actions.PushBack(MakeAction("Player", "VaDentro", 0, "Card", 9));
     recording["Actions"] = actions;
     return recording;
 }
@@ -219,9 +220,10 @@ void testGameActionReplayer() {
     player1.GetAlg()->ALG_HaveToRespond();
     player0.GetAlg()->ALG_HaveToPlay();
     player1.GetAlg()->ALG_HaveToPlay();
+    player0.GetAlg()->ALG_HaveToPlay();
 
     const std::vector<CoreCommand>& commands = core.Commands();
-    assert(commands.size() == 4);
+    assert(commands.size() == 5);
     assert(commands[0].name == "Say" && commands[0].playerIndex == 0 &&
            commands[0].value == invido::SP_INVIDO);
     assert(commands[1].name == "Say" && commands[1].playerIndex == 1 &&
@@ -230,6 +232,8 @@ void testGameActionReplayer() {
            commands[2].value == 5);
     assert(commands[3].name == "PlayCard" && commands[3].playerIndex == 1 &&
            commands[3].value == 12);
+    assert(commands[4].name == "VaDentro" && commands[4].playerIndex == 0 &&
+           commands[4].value == 9);
     assert(replayer.IsComplete());
 
     invido::Player copiedPlayer = player0;
