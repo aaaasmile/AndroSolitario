@@ -28,6 +28,7 @@ static void traceInitialize() {
     LPTraceService pTracer = TraceService::Instance();
     _tracer._pTracer = pTracer;
     pTracer->SetOutputChannel(0, TraceService::eOutType::OT_FILE, logpath);
+    pTracer->SetOutputChannel(1, TraceService::eOutType::OT_STDOUT, logpath);
     _tracer._initialized = true;
 #ifdef _DEBUG
     _tracer._debugEnabled = true;
