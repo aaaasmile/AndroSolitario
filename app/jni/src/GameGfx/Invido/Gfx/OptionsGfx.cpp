@@ -398,7 +398,6 @@ LPErrInApp OptionsGfx::HandleEvent(SDL_Event* pEvent,
         _p_btToggleKeyboard->FingerDown(pEvent);
         _p_checkMusic->FingerDown(pEvent);
         _p_comboLang->FingerDown(pEvent);
-        _p_comboBackground->FingerDown(pEvent);
         _p_comboDeck->FingerDown(pEvent);
     }
 #endif
@@ -412,7 +411,6 @@ LPErrInApp OptionsGfx::HandleEvent(SDL_Event* pEvent,
             _p_btToggleKeyboard->MouseUp(pEvent, targetPos);
             _p_comboLang->MouseUp(pEvent, targetPos);
             _p_checkMusic->MouseUp(pEvent, targetPos);
-            _p_comboBackground->MouseUp(pEvent, targetPos);
             _p_comboDeck->MouseUp(pEvent, targetPos);
             _mouseDownRec = false;
         }
@@ -421,7 +419,6 @@ LPErrInApp OptionsGfx::HandleEvent(SDL_Event* pEvent,
         _p_buttonOK->MouseMove(pEvent, targetPos);
         _p_btToggleKeyboard->MouseMove(pEvent, targetPos);
         _p_comboLang->MouseMove(pEvent, targetPos);
-        _p_comboBackground->MouseMove(pEvent, targetPos);
         _p_comboDeck->MouseMove(pEvent, targetPos);
     }
 #endif
@@ -514,15 +511,6 @@ LPErrInApp OptionsGfx::HandleIterate(bool& done) {
 
     // Checkbox music
     _p_checkMusic->DrawButton(_p_ShadowSrf);
-
-    // Combo Background: Label and control
-    STRING strSelectBackGround =
-        pLanguages->GetStringId(Languages::ID_CHOOSEBACKGROUND);
-    GFX_UTIL::DrawString(_p_ShadowSrf, strSelectBackGround.c_str(),
-                         _p_comboBackground->PosX(),
-                         _p_comboBackground->PosY() - _labelOffsetY,
-                         GFX_UTIL_COLOR::CustomLbl, _p_fontText);
-    _p_comboBackground->DrawButton(_p_ShadowSrf);
 
     // player name
     _p_textInput->DrawCtrl(_p_ShadowSrf);
@@ -646,10 +634,7 @@ LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
     _p_checkMusic->SetVisibleState(CheckBoxGfx::VISIBLE);
     _p_checkMusic->SetCheckState(_p_GameSettings->MusicEnabled);
 
-    // combobox background selection
-    _p_comboBackground->SetVisibleState(ComboGfx::VISIBLE);
-    _p_comboBackground->SelectIndex(_p_GameSettings->BackgroundType);
-
+    // Invido always uses its game-specific background images.
     // player name
     _p_textInput->SetText(_p_GameSettings->PlayerName);
     _p_textInput->SetVisibleState(TextInputGfx::VISIBLE);
@@ -705,14 +690,6 @@ void OptionsGfx::setControlLocalCaptions() {
     strTextBt = pLanguages->GetStringId(Languages::ID_SOUNDOPT);
     _p_checkMusic->SetWindowText(strTextBt.c_str());
 
-    // combobox background selection
-    _p_comboBackground->ClearLines();
-    strTextBt = pLanguages->GetStringId(Languages::ID_COMMESSAGGIO);
-    _p_comboBackground->AddLineText(strTextBt.c_str());
-    strTextBt = pLanguages->GetStringId(Languages::ID_MANTOVA);
-    _p_comboBackground->AddLineText(strTextBt.c_str());
-    strTextBt = pLanguages->GetStringId(Languages::ID_BLACK);
-    _p_comboBackground->AddLineText(strTextBt.c_str());
 }
 
 LPErrInApp OptionsGfx::OptionsEnd() {
@@ -720,7 +697,6 @@ LPErrInApp OptionsGfx::OptionsEnd() {
     _inProgress = false;
 
     setLanguageInGameSettings();
-    setBackgoundTypeInGameSettings();
 
     DeckType dt;
     dt.SetTypeIndex(_p_comboDeck->GetSelectedIndex());
@@ -730,7 +706,7 @@ LPErrInApp OptionsGfx::OptionsEnd() {
 
     if ((_p_GameSettings->MusicEnabled != _prevMusicEnabled) ||
         (_p_GameSettings->DeckTypeVal.GetType() != _prevDeckType) ||
-        (_p_GameSettings->BackgroundType != _prevBackgroundType) ||
+        _p_GameSettings->BackgroundType != _prevBackgroundType ||
         (_p_GameSettings->PlayerName != _prevName) ||
         (_p_GameSettings->CurrentLanguage != _prevLangId)) {
         TRACE("Settings are changed\n");

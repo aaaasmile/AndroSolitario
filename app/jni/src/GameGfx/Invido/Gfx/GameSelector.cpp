@@ -456,3 +456,26 @@ GameHelpPagesCb GameSelector::PrepareGameHelpPages() {
 enum Languages::eStringID GameSelector::GetGameTitle() {
     return Languages::ID_INVIDO;
 }
+
+const char* GameSelector::GetTitleImageFile() const {
+    return DATA_PREFIX "images/title.png";
+}
+
+const char* GameSelector::GetSceneBackgroundFile(
+    SceneBackgroundContext context) const {
+    if (context == SceneBackgroundContext::MainScreen) {
+        return DATA_PREFIX "images/invido/modify_01.jpg";
+    }
+    if (context == SceneBackgroundContext::GameScreen) {
+        return DATA_PREFIX "images/invido/im000740.jpg";
+    }
+    return NULL;
+}
+
+void GameSelector::InitializeGameSettings() {
+    GameSettings::GetSettings()->BackgroundType = BackgroundTypeEnum::Image;
+}
+
+void GameSelector::ApplyLoadedSettings() {
+    GameSettings::GetSettings()->BackgroundType = BackgroundTypeEnum::Image;
+}

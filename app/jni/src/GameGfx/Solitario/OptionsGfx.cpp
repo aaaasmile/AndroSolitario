@@ -398,7 +398,9 @@ LPErrInApp OptionsGfx::HandleEvent(SDL_Event* pEvent,
         _p_btToggleKeyboard->FingerDown(pEvent);
         _p_checkMusic->FingerDown(pEvent);
         _p_comboLang->FingerDown(pEvent);
-        _p_comboBackground->FingerDown(pEvent);
+        if (supportsBackgroundSelection()) {
+            _p_comboBackground->FingerDown(pEvent);
+        }
         _p_comboDeck->FingerDown(pEvent);
     }
 #endif
@@ -412,7 +414,9 @@ LPErrInApp OptionsGfx::HandleEvent(SDL_Event* pEvent,
             _p_btToggleKeyboard->MouseUp(pEvent, targetPos);
             _p_comboLang->MouseUp(pEvent, targetPos);
             _p_checkMusic->MouseUp(pEvent, targetPos);
-            _p_comboBackground->MouseUp(pEvent, targetPos);
+            if (supportsBackgroundSelection()) {
+                _p_comboBackground->MouseUp(pEvent, targetPos);
+            }
             _p_comboDeck->MouseUp(pEvent, targetPos);
             _mouseDownRec = false;
         }
@@ -421,7 +425,9 @@ LPErrInApp OptionsGfx::HandleEvent(SDL_Event* pEvent,
         _p_buttonOK->MouseMove(pEvent, targetPos);
         _p_btToggleKeyboard->MouseMove(pEvent, targetPos);
         _p_comboLang->MouseMove(pEvent, targetPos);
-        _p_comboBackground->MouseMove(pEvent, targetPos);
+        if (supportsBackgroundSelection()) {
+            _p_comboBackground->MouseMove(pEvent, targetPos);
+        }
         _p_comboDeck->MouseMove(pEvent, targetPos);
     }
 #endif
@@ -445,17 +451,9 @@ LPErrInApp OptionsGfx::HandleIterate(bool& done) {
         _p_GameSettings->SetCurrentLang();
         setControlLocalCaptions();
     }
-    if (_p_comboBackground->GetSelectedIndex() !=
-        _p_GameSettings->BackgroundType) {
-        TRACE_DEBUG("Backaground selection changed to %d \n",
-                    _p_comboBackground->GetSelectedIndex());
-        setBackgoundTypeInGameSettings();
-
-        err = _optDlgt.tc->ChangeSceneBackground(_optDlgt.self,
-                                                 &_p_Scene_background);
-        if (err != NULL) {
-            return err;
-        }
+    err = updateBackgroundSelection();
+    if (err != NULL) {
+        return err;
     }
     //  center the background
     SDL_Rect rctTarget;
@@ -630,6 +628,11 @@ LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
     _prevDeckType = _p_GameSettings->DeckTypeVal.GetType();
     _prevMusicEnabled = _p_GameSettings->MusicEnabled;
     _prevBackgroundType = _p_GameSettings->BackgroundType;
+    std::map<std::string, std::string>::const_iterator background =
+        _p_GameSettings->GameOptions.find(GAMESET::SceneBackgroundOptionKey);
+    _prevSceneBackground = background == _p_GameSettings->GameOptions.end()
+                               ? ""
+                               : background->second;
     _prevName = _p_GameSettings->PlayerName;
 
     // combo language
@@ -647,8 +650,9 @@ LPErrInApp OptionsGfx::Show(SDL_Surface* pScene_background,
     _p_checkMusic->SetCheckState(_p_GameSettings->MusicEnabled);
 
     // combobox background selection
-    _p_comboBackground->SetVisibleState(ComboGfx::VISIBLE);
-    _p_comboBackground->SelectIndex(_p_GameSettings->BackgroundType);
+    _p_comboBackground->SetVisibleState(
+        supportsBackgroundSelection() ? ComboGfx::VISIBLE : ComboGfx::INVISIBLE);
+    selectBackgroundOptions();
 
     // player name
     _p_textInput->SetText(_p_GameSettings->PlayerName);
@@ -705,14 +709,8 @@ void OptionsGfx::setControlLocalCaptions() {
     strTextBt = pLanguages->GetStringId(Languages::ID_SOUNDOPT);
     _p_checkMusic->SetWindowText(strTextBt.c_str());
 
-    // combobox background selection
-    _p_comboBackground->ClearLines();
-    strTextBt = pLanguages->GetStringId(Languages::ID_COMMESSAGGIO);
-    _p_comboBackground->AddLineText(strTextBt.c_str());
-    strTextBt = pLanguages->GetStringId(Languages::ID_MANTOVA);
-    _p_comboBackground->AddLineText(strTextBt.c_str());
-    strTextBt = pLanguages->GetStringId(Languages::ID_BLACK);
-    _p_comboBackground->AddLineText(strTextBt.c_str());
+    populateBackgroundOptions();
+    hideBackgroundSelection();
 }
 
 LPErrInApp OptionsGfx::OptionsEnd() {
@@ -720,7 +718,9 @@ LPErrInApp OptionsGfx::OptionsEnd() {
     _inProgress = false;
 
     setLanguageInGameSettings();
-    setBackgoundTypeInGameSettings();
+    if (supportsBackgroundSelection()) {
+        setBackgoundTypeInGameSettings();
+    }
 
     DeckType dt;
     dt.SetTypeIndex(_p_comboDeck->GetSelectedIndex());
@@ -730,16 +730,16 @@ LPErrInApp OptionsGfx::OptionsEnd() {
 
     if ((_p_GameSettings->MusicEnabled != _prevMusicEnabled) ||
         (_p_GameSettings->DeckTypeVal.GetType() != _prevDeckType) ||
-        (_p_GameSettings->BackgroundType != _prevBackgroundType) ||
-        (_p_GameSettings->PlayerName != _prevName) ||
+        isBackgroundChanged() || (_p_GameSettings->PlayerName != _prevName) ||
         (_p_GameSettings->CurrentLanguage != _prevLangId)) {
         TRACE("Settings are changed\n");
         _p_GameSettings->SetCurrentLang();
 
+        const bool backgroundChanged = isBackgroundChanged();
+        const bool languageChanged =
+            _p_GameSettings->CurrentLanguage != _prevLangId;
         LPErrInApp err = _optDlgt.tc->SettingsChanged(
-            _optDlgt.self,
-            (_p_GameSettings->BackgroundType != _prevBackgroundType),
-            (_p_GameSettings->CurrentLanguage != _prevLangId));
+            _optDlgt.self, backgroundChanged, languageChanged);
         if (err) {
             return err;
         }
@@ -765,20 +765,81 @@ void OptionsGfx::setLanguageInGameSettings() {
     }
 }
 
-void OptionsGfx::setBackgoundTypeInGameSettings() {
-    switch (_p_comboBackground->GetSelectedIndex()) {
-        case 0:
-            _p_GameSettings->BackgroundType = BackgroundTypeEnum::Commessaggio;
-            break;
-        case 1:
-            _p_GameSettings->BackgroundType = BackgroundTypeEnum::Mantova;
-            break;
-        case 2:
-            _p_GameSettings->BackgroundType = BackgroundTypeEnum::Black;
-            break;
-        default:
-            break;
+bool OptionsGfx::isBackgroundChanged() const {
+    std::map<std::string, std::string>::const_iterator background =
+        _p_GameSettings->GameOptions.find(GAMESET::SceneBackgroundOptionKey);
+    const std::string backgroundName =
+        background == _p_GameSettings->GameOptions.end()
+            ? ""
+            : background->second;
+    return _p_GameSettings->BackgroundType != _prevBackgroundType ||
+           backgroundName != _prevSceneBackground;
+}
+
+bool OptionsGfx::supportsBackgroundSelection() const {
+    return _p_GameSettings->GetGameTypeGfx() == GameTypeEnum::Solitario;
+}
+
+void OptionsGfx::hideBackgroundSelection() {
+    if (!supportsBackgroundSelection()) {
+        _p_comboBackground->ClearLines();
+        _p_comboBackground->SetVisibleState(ComboGfx::INVISIBLE);
     }
+}
+
+int OptionsGfx::currentBackgroundOptionIndex() const {
+    if (_p_GameSettings->BackgroundType == BackgroundTypeEnum::Black) {
+        return 2;
+    }
+    std::map<std::string, std::string>::const_iterator background =
+        _p_GameSettings->GameOptions.find(GAMESET::SceneBackgroundOptionKey);
+    return background != _p_GameSettings->GameOptions.end() &&
+                   background->second == "Commessaggio"
+               ? 0
+               : 1;
+}
+
+LPErrInApp OptionsGfx::updateBackgroundSelection() {
+    if (!supportsBackgroundSelection()) {
+        return NULL;
+    }
+    if (_p_comboBackground->GetSelectedIndex() ==
+        currentBackgroundOptionIndex()) {
+        return NULL;
+    }
+    setBackgoundTypeInGameSettings();
+    return _optDlgt.tc->ChangeSceneBackground(_optDlgt.self,
+                                              &_p_Scene_background);
+}
+
+void OptionsGfx::populateBackgroundOptions() {
+    _p_comboBackground->ClearLines();
+    LPLanguages languages = _p_GameSettings->GetLanguageMan();
+    STRING line = languages->GetStringId(Languages::ID_COMMESSAGGIO);
+    _p_comboBackground->AddLineText(line.c_str());
+    line = languages->GetStringId(Languages::ID_MANTOVA);
+    _p_comboBackground->AddLineText(line.c_str());
+    line = languages->GetStringId(Languages::ID_BLACK);
+    _p_comboBackground->AddLineText(line.c_str());
+}
+
+void OptionsGfx::selectBackgroundOptions() {
+    _p_comboBackground->SelectIndex(currentBackgroundOptionIndex());
+}
+
+void OptionsGfx::setBackgoundTypeInGameSettings() {
+    const int selectedIndex = _p_comboBackground->GetSelectedIndex();
+    if (selectedIndex == 2) {
+        _p_GameSettings->BackgroundType = BackgroundTypeEnum::Black;
+        return;
+    }
+    if (selectedIndex != 0 && selectedIndex != 1) {
+        return;
+    }
+
+    _p_GameSettings->BackgroundType = BackgroundTypeEnum::Image;
+    _p_GameSettings->GameOptions[GAMESET::SceneBackgroundOptionKey] =
+        selectedIndex == 0 ? "Commessaggio" : "Mantova";
 }
 
 void OptionsGfx::CheckboxMusicClicked(bool state) {

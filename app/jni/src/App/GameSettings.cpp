@@ -1,7 +1,9 @@
 #include "GameSettings.h"
 
 #include <SDL3/SDL.h>
+#include <limits>
 #include <string.h>
+#include <vector>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -49,6 +51,49 @@ static const char* g_lpszIniFontAriblkFname =
 static const char* g_lpszFontSymbFname = DATA_PREFIX "font/notosans-sym.ttf";
 static const char* g_lpszFontDejFname = DATA_PREFIX "font/DejaVuSans.ttf";
 
+static const char g_lpszSettingsExtension[] = "GOPT";
+static const uint8_t g_settingsExtensionVersion = 1;
+
+static LPErrInApp readSettingsData(SDL_IOStream* src, void* data,
+                                   size_t size) {
+    if (SDL_ReadIO(src, data, size) != size) {
+        return ERR_UTIL::ErrorCreate("SDL_ReadIO error %s\n", SDL_GetError());
+    }
+    return NULL;
+}
+
+static LPErrInApp writeSettingsData(SDL_IOStream* dst, const void* data,
+                                    size_t size) {
+    if (SDL_WriteIO(dst, data, size) != size) {
+        return ERR_UTIL::ErrorCreate("SDL_WriteIO error %s\n", SDL_GetError());
+    }
+    return NULL;
+}
+
+static LPErrInApp migrateLegacyBackground(GameSettings* settings,
+                                          uint8_t legacyBackgroundType) {
+    switch (legacyBackgroundType) {
+        case 0:
+            settings->BackgroundType = BackgroundTypeEnum::Image;
+            settings->GameOptions[GAMESET::SceneBackgroundOptionKey] =
+                "Commessaggio";
+            break;
+        case 1:
+            settings->BackgroundType = BackgroundTypeEnum::Image;
+            settings->GameOptions[GAMESET::SceneBackgroundOptionKey] =
+                "Mantova";
+            break;
+        case 2:
+            settings->BackgroundType = BackgroundTypeEnum::Black;
+            break;
+        default:
+            return ERR_UTIL::ErrorCreate(
+                "Background type %d in settings is not supported\n",
+                legacyBackgroundType);
+    }
+    return NULL;
+}
+
 LPGameSettings GameSettings::GetSettings() {
     if (_p_GameSettings == NULL) {
         _p_GameSettings = new GameSettings();
@@ -63,7 +108,7 @@ GameSettings::GameSettings() {
     CurrentLanguage = Languages::LANG_ENG;
     MusicEnabled = true;
     SettingsDir = "";
-    BackgroundType = BackgroundTypeEnum::Mantova;
+    BackgroundType = BackgroundTypeEnum::Image;
     _p_Languages = NULL;
     _p_MusicManager = NULL;
     _p_fontDejUnderscoreSmall = NULL;
@@ -130,28 +175,49 @@ static void saveGameSetting(const char* key, const char* value) {
 LPErrInApp GameSettings::LoadSettings() {
 #if PLATFORM_EMS
     std::string defval = MusicEnabled ? "true" : "false";
-    std::string result = loadGameSetting("MusicEnabled", defval.c_str());
-    // TRACE_DEBUG("Read setting result '%s'\n", result.c_str());
-    MusicEnabled = result == "true" ? true : false;
+    MusicEnabled = loadGameSetting("MusicEnabled", defval.c_str()) == "true";
 
     defval = std::to_string(CurrentLanguage);
-    result = loadGameSetting("CurrentLanguage", defval.c_str());
-    int langId = std::stoi(result);
-    CurrentLanguage = (Languages::eLangId)langId;
+    CurrentLanguage = static_cast<Languages::eLangId>(
+        std::stoi(loadGameSetting("CurrentLanguage", defval.c_str())));
 
     defval = std::to_string(DeckTypeVal.GetTypeIndex());
-    result = loadGameSetting("DeckTypeVal", defval.c_str());
-    int deckId = std::stoi(result);
-    DeckTypeVal.SetTypeIndex(deckId);
+    DeckTypeVal.SetTypeIndex(
+        std::stoi(loadGameSetting("DeckTypeVal", defval.c_str())));
 
-    defval = std::to_string(BackgroundType);
-    result = loadGameSetting("BackgroundType", defval.c_str());
-    int bt = std::stoi(result);
-    BackgroundType = (BackgroundTypeEnum)bt;
+    for (std::map<std::string, std::string>::iterator option =
+             GameOptions.begin();
+         option != GameOptions.end(); ++option) {
+        const std::string storageKey = "GameOption_" + option->first;
+        option->second = loadGameSetting(storageKey.c_str(),
+                                         option->second.c_str());
+    }
 
-    defval = PlayerName;
-    PlayerName = loadGameSetting("PlayerName", defval.c_str());
+    const std::string storedBackground =
+        loadGameSetting("BackgroundType", "Image");
+    bool migratedLegacyBackground = false;
+    if (storedBackground == "Black") {
+        BackgroundType = BackgroundTypeEnum::Black;
+    } else if (storedBackground == "Image") {
+        BackgroundType = BackgroundTypeEnum::Image;
+    } else if (storedBackground == "0" || storedBackground == "1" ||
+               storedBackground == "2") {
+        LPErrInApp err = migrateLegacyBackground(
+            this, static_cast<uint8_t>(storedBackground[0] - '0'));
+        if (err != NULL) {
+            return err;
+        }
+        migratedLegacyBackground = true;
+    } else {
+        return ERR_UTIL::ErrorCreate("Background setting '%s' is invalid\n",
+                                     storedBackground.c_str());
+    }
 
+    PlayerName = loadGameSetting("PlayerName", PlayerName.c_str());
+    if (migratedLegacyBackground) {
+        return SaveSettings();
+    }
+    return NULL;
 #else
     LPErrInApp err = setSettingFileName();
     if (err != NULL) {
@@ -160,7 +226,7 @@ LPErrInApp GameSettings::LoadSettings() {
 
     TRACE("Load setting file %s\n", g_filepath);
     SDL_IOStream* src = SDL_IOFromFile(g_filepath, "rb");
-    if (src == 0) {
+    if (src == NULL) {
         TRACE("No setting file found, no problem ignore it and use default\n");
         return NULL;
     }
@@ -168,122 +234,255 @@ LPErrInApp GameSettings::LoadSettings() {
     uint8_t deckId;
     uint8_t langId;
     uint8_t musEnabled;
-    uint8_t backgroudType;
+    uint8_t legacyBackgroundType;
     uint8_t nameSize;
+    err = readSettingsData(src, &deckId, sizeof(deckId));
+    if (err == NULL) {
+        err = readSettingsData(src, &langId, sizeof(langId));
+    }
+    if (err == NULL) {
+        err = readSettingsData(src, &musEnabled, sizeof(musEnabled));
+    }
+    if (err == NULL) {
+        err = readSettingsData(src, &legacyBackgroundType,
+                               sizeof(legacyBackgroundType));
+    }
+    if (err == NULL) {
+        err = readSettingsData(src, &nameSize, sizeof(nameSize));
+    }
+    if (err != NULL) {
+        SDL_CloseIO(src);
+        return err;
+    }
 
-    if (SDL_ReadIO(src, &deckId, 1) == 0) {
-        return ERR_UTIL::ErrorCreate(
-            "SDL_RWread on setting file error (file %s): %s\n", g_filepath,
-            SDL_GetError());
-    }
-    if (SDL_ReadIO(src, &langId, 1) == 0) {
-        return ERR_UTIL::ErrorCreate(
-            "SDL_RWread on setting file error (file %s): %s\n", g_filepath,
-            SDL_GetError());
-    }
-    if (SDL_ReadIO(src, &musEnabled, 1) == 0) {
-        return ERR_UTIL::ErrorCreate(
-            "SDL_RWread on setting file error (file %s): %s\n", g_filepath,
-            SDL_GetError());
-    }
-    if (SDL_ReadIO(src, &backgroudType, 1) == 0) {
-        return ERR_UTIL::ErrorCreate(
-            "SDL_RWread on setting file error (file %s): %s\n", g_filepath,
-            SDL_GetError());
-    }
-    // player name
-    if (SDL_ReadIO(src, &nameSize, 1) == 0) {
-        return ERR_UTIL::ErrorCreate(
-            "SDL_RWread on setting file error (file %s): %s\n", g_filepath,
-            SDL_GetError());
-    }
-    std::string playername;
+    std::string playerName(nameSize, '\0');
     if (nameSize > 0) {
-        playername.resize(nameSize);
-        if (SDL_ReadIO(src, (void*)playername.data(), nameSize) == 0) {
-            return ERR_UTIL::ErrorCreate(
-                "SDL_RWread on setting file error (file %s): %s\n", g_filepath,
-                SDL_GetError());
+        err = readSettingsData(src, &playerName[0], nameSize);
+        if (err != NULL) {
+            SDL_CloseIO(src);
+            return err;
         }
     }
 
-    SDL_CloseIO(src);
+    const Sint64 extensionOffset = SDL_TellIO(src);
+    if (extensionOffset < 0) {
+        SDL_CloseIO(src);
+        return ERR_UTIL::ErrorCreate("Unable to locate settings extension");
+    }
+
+    const size_t extensionMagicSize = sizeof(g_lpszSettingsExtension) - 1;
+    char extensionMagic[sizeof(g_lpszSettingsExtension) - 1];
+    const size_t bytesRead = SDL_ReadIO(src, extensionMagic,
+                                        extensionMagicSize);
+    const bool hasExtension =
+        bytesRead == extensionMagicSize &&
+        memcmp(extensionMagic, g_lpszSettingsExtension, extensionMagicSize) ==
+            0;
+    uint8_t extensionVersion = 0;
+    if (hasExtension) {
+        err = readSettingsData(src, &extensionVersion,
+                               sizeof(extensionVersion));
+        if (err != NULL) {
+            SDL_CloseIO(src);
+            return err;
+        }
+        if (extensionVersion != g_settingsExtensionVersion) {
+            SDL_CloseIO(src);
+            return ERR_UTIL::ErrorCreate(
+                "Settings extension version %d is not supported\n",
+                extensionVersion);
+        }
+
+        uint16_t optionCount;
+        err = readSettingsData(src, &optionCount, sizeof(optionCount));
+        if (err != NULL) {
+            SDL_CloseIO(src);
+            return err;
+        }
+        for (uint16_t index = 0; index < optionCount; ++index) {
+            uint8_t keySize;
+            uint16_t valueSize;
+            err = readSettingsData(src, &keySize, sizeof(keySize));
+            if (err == NULL) {
+                err = readSettingsData(src, &valueSize, sizeof(valueSize));
+            }
+            if (err != NULL) {
+                SDL_CloseIO(src);
+                return err;
+            }
+
+            std::string key(keySize, '\0');
+            std::string value(valueSize, '\0');
+            if (keySize > 0) {
+                err = readSettingsData(src, &key[0], keySize);
+            }
+            if (err == NULL && valueSize > 0) {
+                err = readSettingsData(src, &value[0], valueSize);
+            }
+            if (err != NULL) {
+                SDL_CloseIO(src);
+                return err;
+            }
+            GameOptions[key] = value;
+        }
+
+        uint8_t backgroundType;
+        err = readSettingsData(src, &backgroundType, sizeof(backgroundType));
+        if (err != NULL) {
+            SDL_CloseIO(src);
+            return err;
+        }
+        if (backgroundType != BackgroundTypeEnum::Black &&
+            backgroundType != BackgroundTypeEnum::Image) {
+            SDL_CloseIO(src);
+            return ERR_UTIL::ErrorCreate("Background type %d is invalid\n",
+                                         backgroundType);
+        }
+        BackgroundType = static_cast<BackgroundTypeEnum>(backgroundType);
+        SDL_CloseIO(src);
+        src = NULL;
+    } else {
+        if (SDL_SeekIO(src, extensionOffset, SDL_IO_SEEK_SET) < 0) {
+            SDL_CloseIO(src);
+            return ERR_UTIL::ErrorCreate("Unable to rewind settings file");
+        }
+    }
+    if (src != NULL) {
+        SDL_CloseIO(src);
+    }
 
     DeckTypeVal.SetTypeIndex(deckId);
-    CurrentLanguage = (Languages::eLangId)langId;
-    MusicEnabled = musEnabled;
-    BackgroundType = (BackgroundTypeEnum)backgroudType;
-    PlayerName = playername;
-#endif
+    CurrentLanguage = static_cast<Languages::eLangId>(langId);
+    MusicEnabled = musEnabled != 0;
+    PlayerName = playerName;
+    if (!hasExtension) {
+        err = migrateLegacyBackground(this, legacyBackgroundType);
+        if (err != NULL) {
+            return err;
+        }
+        return SaveSettings();
+    }
     return NULL;
+#endif
 }
 
 LPErrInApp GameSettings::SaveSettings() {
 #if PLATFORM_EMS
-    std::string val = MusicEnabled ? "true" : "false";
-    saveGameSetting("MusicEnabled", val.c_str());
-    val = std::to_string(CurrentLanguage);
-    saveGameSetting("CurrentLanguage", val.c_str());
-    val = std::to_string(DeckTypeVal.GetTypeIndex());
-    saveGameSetting("DeckTypeVal", val.c_str());
-    val = std::to_string(BackgroundType);
-    saveGameSetting("BackgroundType", val.c_str());
+    std::string value = MusicEnabled ? "true" : "false";
+    saveGameSetting("MusicEnabled", value.c_str());
+    value = std::to_string(CurrentLanguage);
+    saveGameSetting("CurrentLanguage", value.c_str());
+    value = std::to_string(DeckTypeVal.GetTypeIndex());
+    saveGameSetting("DeckTypeVal", value.c_str());
+    value = BackgroundType == BackgroundTypeEnum::Black ? "Black" : "Image";
+    saveGameSetting("BackgroundType", value.c_str());
+    for (std::map<std::string, std::string>::const_iterator option =
+             GameOptions.begin();
+         option != GameOptions.end(); ++option) {
+        const std::string storageKey = "GameOption_" + option->first;
+        saveGameSetting(storageKey.c_str(), option->second.c_str());
+    }
     saveGameSetting("PlayerName", PlayerName.c_str());
+    return NULL;
 #else
     LPErrInApp err = setSettingFileName();
     if (err != NULL) {
         return err;
     }
+    if (PlayerName.size() > std::numeric_limits<uint8_t>::max()) {
+        return ERR_UTIL::ErrorCreate("Player name is too long to save");
+    }
+    if (GameOptions.size() > std::numeric_limits<uint16_t>::max()) {
+        return ERR_UTIL::ErrorCreate("Too many game settings");
+    }
 
-    TRACE("Save setting file %s\n", g_filepath);
-    uint8_t deckId;
-    uint8_t langId;
-    uint8_t musEnabled;
-    uint8_t backgroudType;
-
-    deckId = (uint8_t)DeckTypeVal.GetTypeIndex();
-    langId = (uint8_t)CurrentLanguage;
-    musEnabled = (uint8_t)MusicEnabled;
-    backgroudType = (uint8_t)BackgroundType;
+    const uint8_t deckId =
+        static_cast<uint8_t>(DeckTypeVal.GetTypeIndex());
+    const uint8_t langId = static_cast<uint8_t>(CurrentLanguage);
+    const uint8_t musicEnabled = static_cast<uint8_t>(MusicEnabled);
+    const uint8_t backgroundType = static_cast<uint8_t>(BackgroundType);
+    const uint8_t nameSize = static_cast<uint8_t>(PlayerName.size());
+    const uint16_t optionCount = static_cast<uint16_t>(GameOptions.size());
 
     SDL_IOStream* dst = SDL_IOFromFile(g_filepath, "wb");
-    if (dst == 0) {
+    if (dst == NULL) {
         return ERR_UTIL::ErrorCreate("Unable to save setting file %s",
                                      g_filepath);
     }
-    int numWritten = SDL_WriteIO(dst, &deckId, 1);
-    if (numWritten < 1) {
-        return ERR_UTIL::ErrorCreate("SDL_WriteIO error %s\n", SDL_GetError());
-    }
-    numWritten = SDL_WriteIO(dst, &langId, 1);
-    if (numWritten < 1) {
-        return ERR_UTIL::ErrorCreate("SDL_WriteIO error %s\n", SDL_GetError());
-    }
-    numWritten = SDL_WriteIO(dst, &musEnabled, 1);
-    if (numWritten < 1) {
-        return ERR_UTIL::ErrorCreate("SDL_WriteIO error %s\n", SDL_GetError());
-    }
-    numWritten = SDL_WriteIO(dst, &backgroudType, 1);
-    if (numWritten < 1) {
-        return ERR_UTIL::ErrorCreate("SDL_WriteIO error %s\n", SDL_GetError());
-    }
 
-    // save len + string
-    uint8_t nameSize = PlayerName.size();
-    numWritten = SDL_WriteIO(dst, &nameSize, 1);
-    if (numWritten < 1) {
-        return ERR_UTIL::ErrorCreate("SDL_WriteIO error %s\n", SDL_GetError());
+    err = writeSettingsData(dst, &deckId, sizeof(deckId));
+    if (err == NULL) {
+        err = writeSettingsData(dst, &langId, sizeof(langId));
     }
+    if (err == NULL) {
+        err = writeSettingsData(dst, &musicEnabled, sizeof(musicEnabled));
+    }
+    if (err == NULL) {
+        err = writeSettingsData(dst, &backgroundType, sizeof(backgroundType));
+    }
+    if (err == NULL) {
+        err = writeSettingsData(dst, &nameSize, sizeof(nameSize));
+    }
+    if (err == NULL && nameSize > 0) {
+        err = writeSettingsData(dst, PlayerName.data(), nameSize);
+    }
+    if (err == NULL) {
+        err = writeSettingsData(dst, g_lpszSettingsExtension,
+                                sizeof(g_lpszSettingsExtension) - 1);
+    }
+    if (err == NULL) {
+        err = writeSettingsData(dst, &g_settingsExtensionVersion,
+                                sizeof(g_settingsExtensionVersion));
+    }
+    if (err == NULL) {
+        err = writeSettingsData(dst, &optionCount, sizeof(optionCount));
+    }
+    for (std::map<std::string, std::string>::const_iterator option =
+             GameOptions.begin();
+         err == NULL && option != GameOptions.end(); ++option) {
+        if (option->first.size() > std::numeric_limits<uint8_t>::max() ||
+            option->second.size() > std::numeric_limits<uint16_t>::max()) {
+            SDL_CloseIO(dst);
+            return ERR_UTIL::ErrorCreate("Game setting is too long to save");
+        }
 
-    numWritten = SDL_WriteIO(dst, PlayerName.c_str(), nameSize);
-    if (numWritten < 1) {
-        return ERR_UTIL::ErrorCreate("SDL_WriteIO error %s\n", SDL_GetError());
+        const uint8_t keySize = static_cast<uint8_t>(option->first.size());
+        const uint16_t valueSize =
+            static_cast<uint16_t>(option->second.size());
+        err = writeSettingsData(dst, &keySize, sizeof(keySize));
+        if (err == NULL) {
+            err = writeSettingsData(dst, &valueSize, sizeof(valueSize));
+        }
+        if (err == NULL && keySize > 0) {
+            err = writeSettingsData(dst, option->first.data(), keySize);
+        }
+        if (err == NULL && valueSize > 0) {
+            err = writeSettingsData(dst, option->second.data(), valueSize);
+        }
     }
-    SDL_CloseIO(dst);
+    const bool closed = SDL_CloseIO(dst);
+    if (!closed && err == NULL) {
+        return ERR_UTIL::ErrorCreate("Unable to close settings file: %s\n",
+                                     SDL_GetError());
+    }
+    return err;
 #endif
-    return NULL;
 }
 
+LPErrInApp GameSettings::SaveGameOptions() {
+#if PLATFORM_EMS
+    std::string value = BackgroundType == BackgroundTypeEnum::Black ? "Black" : "Image";
+    saveGameSetting("BackgroundType", value.c_str());
+    for (std::map<std::string, std::string>::const_iterator option = GameOptions.begin();
+         option != GameOptions.end(); ++option) {
+        const std::string storageKey = "GameOption_" + option->first;
+        saveGameSetting(storageKey.c_str(), option->second.c_str());
+    }
+    return NULL;
+#else
+    return SaveSettings();
+#endif
+}
 void GameSettings::SetGameTypeGfx(enum GameTypeEnum gmType) {
     _gameType = gmType;
     switch (gmType) {

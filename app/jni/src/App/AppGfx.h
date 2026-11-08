@@ -68,11 +68,13 @@ class AppGfx {
     UpdateHighScoreCb prepHighScoreCb();
 
     void clearBackground();
-    LPErrInApp loadSceneBackground();
+    LPErrInApp loadSceneBackground(SDL_Surface** ppSceneBackground,
+                                   SceneBackgroundContext context);
 
    private:
     SDL_Surface* _p_Screen;
     SDL_Surface* _p_SceneBackground;
+    SDL_Surface* _p_GameSceneBackground;
     SDL_Surface* _p_CreditTitle;
     SDL_Texture* _p_ScreenTexture;
     SDL_Window* _p_Window;

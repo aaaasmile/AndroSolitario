@@ -55,7 +55,14 @@ class OptionsGfx {
     CheckboxClickCb prepCheckBoxClickMusic();
     ClickKeyboardCb prepareClickKeyboardCb();
     void setBackgoundTypeInGameSettings();
+    LPErrInApp updateBackgroundSelection();
     void setLanguageInGameSettings();
+    bool supportsBackgroundSelection() const;
+    bool isBackgroundChanged() const;
+    int currentBackgroundOptionIndex() const;
+    void populateBackgroundOptions();
+    void hideBackgroundSelection();
+    void selectBackgroundOptions();
     void setControlLocalCaptions();
     LPErrInApp initDeck(int comboOffsetX);
 
@@ -91,6 +98,7 @@ class OptionsGfx {
     eDeckType _prevDeckType;
     bool _prevMusicEnabled;
     BackgroundTypeEnum _prevBackgroundType;
+    std::string _prevSceneBackground;
     std::string _prevName;
     KeyboardGfx* _p_KeyboardGfx;
     SDL_Window* _p_Window;

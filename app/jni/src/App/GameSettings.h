@@ -4,14 +4,20 @@
 #include <SDL3/SDL.h>
 #include <SDL3_ttf/SDL_ttf.h>
 
+#include <map>
 #include <string>
 
 #include "DeckType.h"
 #include "ErrorInfo.h"
 #include "Languages.h"
 
-enum BackgroundTypeEnum { Commessaggio = 0, Mantova = 1, Black = 2 };
+enum BackgroundTypeEnum { Black = 0, Image = 1 };
+enum SceneBackgroundContext { MainScreen, GameScreen };
 enum InputTypeEnum { Mouse = 0, TouchWithoutMouse = 1 };
+
+namespace GAMESET {
+static const char* const SceneBackgroundOptionKey = "SceneBackground";
+}
 enum GameTypeEnum { Undef, Solitario, Invido };
 
 class MusicManager;
@@ -24,6 +30,7 @@ class GameSettings {
     bool MusicEnabled;
     std::string SettingsDir;
     std::string GameName;
+    std::map<std::string, std::string> GameOptions;
     BackgroundTypeEnum BackgroundType;
     InputTypeEnum InputType;
 
@@ -33,6 +40,7 @@ class GameSettings {
 
     LPErrInApp LoadSettings();
     LPErrInApp SaveSettings();
+    LPErrInApp SaveGameOptions();
     LPErrInApp LoadFonts();
     void SetDisplaySize(int w, int h);
     void GetTouchPoint(SDL_TouchFingerEvent& tfinger, SDL_Point* pPoint);

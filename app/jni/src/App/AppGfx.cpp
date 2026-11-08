@@ -22,11 +22,6 @@
 #include "OptionsGfx.h"
 
 static const char* g_lpszIconProgFile = DATA_PREFIX "images/icona_asso.bmp";
-static const char* g_lpszTitleFile = DATA_PREFIX "images/title.png";
-
-static const char* g_lpszImageSplashComm =
-    DATA_PREFIX "images/commessaggio.jpg";
-static const char* g_lpszImageSplashMantova = DATA_PREFIX "images/mantova.jpg";
 
 typedef struct ResolutionMgr {
     int targetWidth, targetHeight;
@@ -139,6 +134,7 @@ AppGfx::AppGfx() {
     _fnGameGfxCb.self = NULL;
     _fnGameGfxCb.tc = NULL;
     _p_SceneBackground = NULL;
+    _p_GameSceneBackground = NULL;
     _p_Screen = NULL;
     _lastMainLoopticks = 0;
     _Bpp = 0;
@@ -170,6 +166,8 @@ LPErrInApp AppGfx::Init() {
 #ifdef ANDROID
     _p_GameSettings->InputType = InputTypeEnum::TouchWithoutMouse;
 #endif
+
+    _p_GameSelector->InitializeGameSettings();
 
     LPErrInApp err = loadProfile();
     if (err != NULL) {
@@ -222,13 +220,19 @@ LPErrInApp AppGfx::Init() {
                                      SDL_GetError());
     }
 #endif
-    _p_CreditTitle = IMG_Load(g_lpszTitleFile);
+    _p_CreditTitle = IMG_Load(_p_GameSelector->GetTitleImageFile());
     if (_p_CreditTitle == 0) {
         return ERR_UTIL::ErrorCreate("Title image not found");
     }
     TRACE_DEBUG("Credit loaded OK\n");
 
-    err = loadSceneBackground();
+    err = loadSceneBackground(&_p_SceneBackground,
+                              SceneBackgroundContext::MainScreen);
+    if (err != NULL) {
+        return err;
+    }
+    err = loadSceneBackground(&_p_GameSceneBackground,
+                              SceneBackgroundContext::GameScreen);
     if (err != NULL) {
         return err;
     }
@@ -272,57 +276,71 @@ LPErrInApp AppGfx::Init() {
 }
 
 LPErrInApp AppGfx::ChangeSceneBackground(SDL_Surface** ppSceneBackground) {
-    LPErrInApp err;
-    err = loadSceneBackground();
+    SDL_Surface* mainBackground = NULL;
+    SDL_Surface* gameBackground = NULL;
+    LPErrInApp err = loadSceneBackground(
+        &mainBackground, SceneBackgroundContext::MainScreen);
+    if (err == NULL) {
+        err = loadSceneBackground(&gameBackground,
+                                  SceneBackgroundContext::GameScreen);
+    }
     if (err != NULL) {
+        SDL_DestroySurface(mainBackground);
+        SDL_DestroySurface(gameBackground);
         return err;
     }
-    _p_MenuMgr->SetBackground(_p_SceneBackground);
 
+    SDL_DestroySurface(_p_SceneBackground);
+    SDL_DestroySurface(_p_GameSceneBackground);
+    _p_SceneBackground = mainBackground;
+    _p_GameSceneBackground = gameBackground;
+    _p_MenuMgr->SetBackground(_p_SceneBackground);
     *ppSceneBackground = _p_SceneBackground;
     return NULL;
 }
 
-LPErrInApp AppGfx::loadSceneBackground() {
-    if (_p_SceneBackground != NULL) {
-        SDL_DestroySurface(_p_SceneBackground);
-        _p_SceneBackground = NULL;
+LPErrInApp AppGfx::loadSceneBackground(
+    SDL_Surface** ppSceneBackground, SceneBackgroundContext context) {
+    if (*ppSceneBackground != NULL) {
+        SDL_DestroySurface(*ppSceneBackground);
+        *ppSceneBackground = NULL;
     }
-    if (_p_GameSettings->BackgroundType != BackgroundTypeEnum::Black) {
-        std::string strFileName;
-        if (_p_GameSettings->BackgroundType ==
-            BackgroundTypeEnum::Commessaggio) {
-            strFileName = g_lpszImageSplashComm;
-        } else if (_p_GameSettings->BackgroundType ==
-                   BackgroundTypeEnum::Mantova) {
-            strFileName = g_lpszImageSplashMantova;
-        } else {
-            return ERR_UTIL::ErrorCreate("Backgound Type %d not supported\n",
-                                         _p_GameSettings->BackgroundType);
-        }
-        SDL_IOStream* srcBack = SDL_IOFromFile(strFileName.c_str(), "rb");
 
-        if (srcBack == 0) {
-            return ERR_UTIL::ErrorCreate("Unable to load %s background image\n",
-                                         strFileName.c_str());
-        }
-        _p_SceneBackground = IMG_LoadTyped_IO(srcBack, false, "JPG");
-        if (_p_SceneBackground == 0) {
-            return ERR_UTIL::ErrorCreate("Unable to create splash");
-        }
-        SDL_CloseIO(srcBack);
-    } else {
-        _p_SceneBackground = GFX_UTIL::SDL_CreateRGBSurface(
+    if (_p_GameSettings->BackgroundType == BackgroundTypeEnum::Black) {
+        *ppSceneBackground = GFX_UTIL::SDL_CreateRGBSurface(
             _p_Screen->w, _p_Screen->h, 32, 0, 0, 0, 0);
-
+        if (*ppSceneBackground == NULL) {
+            return ERR_UTIL::ErrorCreate("Unable to create background: %s\n",
+                                         SDL_GetError());
+        }
         SDL_Rect clipRect;
-        SDL_GetSurfaceClipRect(_p_SceneBackground, &clipRect);
+        SDL_GetSurfaceClipRect(*ppSceneBackground, &clipRect);
         SDL_FillSurfaceRect(
-            _p_SceneBackground, &clipRect,
-            SDL_MapRGB(SDL_GetPixelFormatDetails(_p_SceneBackground->format),
-                       NULL, 0, 0, 0));
+            *ppSceneBackground, &clipRect,
+            SDL_MapRGB(
+                SDL_GetPixelFormatDetails((*ppSceneBackground)->format), NULL,
+                0, 0, 0));
+        return NULL;
     }
 
+    const char* backgroundFile =
+        _p_GameSelector->GetSceneBackgroundFile(context);
+    if (backgroundFile == NULL) {
+        return ERR_UTIL::ErrorCreate("No background for context %d\n",
+                                     context);
+    }
+    SDL_IOStream* srcBack = SDL_IOFromFile(backgroundFile, "rb");
+    if (srcBack == NULL) {
+        return ERR_UTIL::ErrorCreate("Unable to load background image %s\n",
+                                     backgroundFile);
+    }
+
+    *ppSceneBackground = IMG_LoadTyped_IO(srcBack, false, "JPG");
+    SDL_CloseIO(srcBack);
+    if (*ppSceneBackground == NULL) {
+        return ERR_UTIL::ErrorCreate("Unable to create background from %s",
+                                     backgroundFile);
+    }
     return NULL;
 }
 
@@ -480,6 +498,10 @@ void AppGfx::terminate() {
         SDL_DestroySurface(_p_SceneBackground);
         _p_SceneBackground = NULL;
     }
+    if (_p_GameSceneBackground) {
+        SDL_DestroySurface(_p_GameSceneBackground);
+        _p_GameSceneBackground = NULL;
+    }
     if (_p_CreditTitle) {
         SDL_DestroySurface(_p_CreditTitle);
         _p_CreditTitle = NULL;
@@ -516,6 +538,7 @@ LPErrInApp AppGfx::loadProfile() {
     if (err != NULL) {
         TRACE("Ignore settings because error: %s\n", err->ErrorText.c_str());
     }
+    _p_GameSelector->ApplyLoadedSettings();
     return NULL;
 }
 
@@ -871,7 +894,7 @@ LPErrInApp AppGfx::startGameLoop() {
 
     err = (_fnGameGfxCb.tc)
               ->Initialize(_fnGameGfxCb.self, _p_Screen, screenUpdater,
-                           _p_Window, _p_SceneBackground, highScoreCb);
+                           _p_Window, _p_GameSceneBackground, highScoreCb);
     if (err != NULL)
         return err;
     err = (_fnGameGfxCb.tc)->Show(_fnGameGfxCb.self);

@@ -455,7 +455,53 @@ GameHelpPagesCb GameSelector::PrepareGameHelpPages() {
     }
 }
 
-enum Languages::eStringID GameSelector::GetGameTitle(){
+enum Languages::eStringID GameSelector::GetGameTitle() {
     return Languages::ID_SOLITARIO;
 }
- 
+
+const char* GameSelector::GetTitleImageFile() const {
+    return DATA_PREFIX "images/title.png";
+}
+
+const char* GameSelector::GetSceneBackgroundFile(
+    SceneBackgroundContext context) const {
+    if (context != SceneBackgroundContext::MainScreen &&
+        context != SceneBackgroundContext::GameScreen) {
+        return NULL;
+    }
+
+    const GameSettings* settings = GameSettings::GetSettings();
+    std::map<std::string, std::string>::const_iterator backgroundOption =
+        settings->GameOptions.find(GAMESET::SceneBackgroundOptionKey);
+    if (backgroundOption == settings->GameOptions.end()) {
+        return NULL;
+    }
+    if (backgroundOption->second == "Commessaggio") {
+        return DATA_PREFIX "images/commessaggio.jpg";
+    }
+    if (backgroundOption->second == "Mantova") {
+        return DATA_PREFIX "images/mantova.jpg";
+    }
+    return NULL;
+}
+
+void GameSelector::InitializeGameSettings() {
+    GameSettings* settings = GameSettings::GetSettings();
+    if (settings->GameOptions.find(GAMESET::SceneBackgroundOptionKey) ==
+        settings->GameOptions.end()) {
+        settings->GameOptions[GAMESET::SceneBackgroundOptionKey] = "Mantova";
+    }
+}
+
+void GameSelector::ApplyLoadedSettings() {
+    GameSettings* settings = GameSettings::GetSettings();
+    if (settings->BackgroundType != BackgroundTypeEnum::Black &&
+        settings->BackgroundType != BackgroundTypeEnum::Image) {
+        settings->BackgroundType = BackgroundTypeEnum::Image;
+    }
+    if (settings->GameOptions[GAMESET::SceneBackgroundOptionKey] !=
+            "Commessaggio" &&
+        settings->GameOptions[GAMESET::SceneBackgroundOptionKey] != "Mantova") {
+        settings->GameOptions[GAMESET::SceneBackgroundOptionKey] = "Mantova";
+    }
+}
