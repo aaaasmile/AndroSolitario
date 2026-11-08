@@ -586,32 +586,37 @@ const char* GAMESET::GetExeAppFolder() {
     return _exeRootDir;
 }
 
-const char* GAMESET::GetHomeFolder() {
+const char* GAMESET::GetHomeSettingFolder() {
     if (strlen(_settingsRootDir) > 0) {
         return _settingsRootDir;
     }
+
+    const std::string& gameName = GameSettings::GetSettings()->GameName;
 #ifdef ANDROID
-    sprintf(_settingsRootDir, "%s/.solitario%s",
-            SDL_GetAndroidInternalStoragePath(), VERSION_HOME);
+    snprintf(_settingsRootDir, sizeof(_settingsRootDir), "%s/.%s%s",
+             SDL_GetAndroidInternalStoragePath(), gameName.c_str(),
+             VERSION_HOME);
     return _settingsRootDir;
 #endif
 #ifdef WIN32
-    sprintf(_settingsRootDir, "%s/%s/.solitario%s", getenv("HOMEDRIVE"),
-            getenv("HOMEPATH"), VERSION_HOME);
+    snprintf(_settingsRootDir, sizeof(_settingsRootDir), "%s/%s/.%s%s",
+             getenv("HOMEDRIVE"), getenv("HOMEPATH"), gameName.c_str(),
+             VERSION_HOME);
 #else
-    sprintf(_settingsRootDir, "%s/.solitario%s", getenv("HOME"), VERSION_HOME);
+    snprintf(_settingsRootDir, sizeof(_settingsRootDir), "%s/.%s%s",
+             getenv("HOME"), gameName.c_str(), VERSION_HOME);
 #endif
     return _settingsRootDir;
 }
 
-LPErrInApp GAMESET::CreateHomeFolderIfNotExists(bool& dirCreated) {
+LPErrInApp GAMESET::CreateHomeSettingFolderIfNotExists(bool& dirCreated) {
     dirCreated = false;
 #if PLATFORM_EMS
     return NULL;
 #endif
     struct stat st = {0};
     int io_res;
-    GetHomeFolder();
+    GetHomeSettingFolder();
     if (stat(_settingsRootDir, &st) == -1) {
 #ifdef WIN32
         io_res = mkdir(_settingsRootDir);

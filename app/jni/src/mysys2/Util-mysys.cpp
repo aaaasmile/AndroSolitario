@@ -17,8 +17,8 @@ static void traceInitialize() {
     char logpath[1024];
 
     snprintf(logpath, sizeof(logpath), "%s/solitario.log",
-             GAMESET::GetHomeFolder());
-    LPErrInApp err = GAMESET::CreateHomeFolderIfNotExists(dirCreated);
+             GAMESET::GetHomeSettingFolder());
+    LPErrInApp err = GAMESET::CreateHomeSettingFolderIfNotExists(dirCreated);
     if (err != NULL) {
         fprintf(stderr, "Fatal Trace init error: %s\n", err->ErrorText.c_str());
         exit(1);

@@ -523,8 +523,8 @@ void AppGfx::terminate() {
 LPErrInApp AppGfx::loadProfile() {
     bool dirCreated = false;
     char dirpath[PATH_MAX];
-    snprintf(dirpath, sizeof(dirpath), "%s", GAMESET::GetHomeFolder());
-    LPErrInApp err = GAMESET::CreateHomeFolderIfNotExists(dirCreated);
+    snprintf(dirpath, sizeof(dirpath), "%s", GAMESET::GetHomeSettingFolder());
+    LPErrInApp err = GAMESET::CreateHomeSettingFolderIfNotExists(dirCreated);
     if (err != NULL) {
         return err;
     }

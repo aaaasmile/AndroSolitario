@@ -126,8 +126,8 @@ class GameSettings {
 typedef GameSettings* LPGameSettings;
 
 namespace GAMESET {
-const char* GetHomeFolder();
-LPErrInApp CreateHomeFolderIfNotExists(bool& dirCreated);
+const char* GetHomeSettingFolder();
+LPErrInApp CreateHomeSettingFolderIfNotExists(bool& dirCreated);
 const char* GetExeAppFolder();
 void GetNameWithAssets(const char* src_path, std::string& res);
 }  // namespace GAMESET
