@@ -6,7 +6,7 @@
 
 GameSelector::GameSelector() {
     GameSettings* pGameSettings = GameSettings::GetSettings();
-    pGameSettings->SetGameTypeGfx(GameTypeEnum::Solitario);
+    pGameSettings->SetGameTypeGfx(GameTypeEnum::Solitario, "Solitario");
     _p_Gfx = NULL;
 }
 

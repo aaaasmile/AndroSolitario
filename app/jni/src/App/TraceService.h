@@ -59,7 +59,7 @@ class TraceService {
     void AddCommentToLastEntry(LPCSTR lpszForm, ...);
     void EnableChannel(int iChann, bool bVal) {
         if (iChann >= 0 && iChann < NUM_OF_CHANN)
-            m_abChannelMask[iChann] = bVal;
+            _abChannelMask[iChann] = bVal;
     }
     void SetOutputChannel(int iChannel, eOutType eVal, LPCSTR lpszFileName);
     void AddTrace(EntryTraceDetail::eType traceDet, LPCSTR lpszForm, ...);
@@ -68,14 +68,14 @@ class TraceService {
     void flashTheEntry();
 
    private:
-    EntryTraceDetail m_mtxEntryTraceDetails[NUM_OF_CHANN][NUM_OF_ENTRIES];
-    bool m_abChannelMask[NUM_OF_CHANN];
-    eOutType m_aeChannelOut[NUM_OF_CHANN];
-    int m_aiChannelCursor[NUM_OF_CHANN];
-    int m_iLastEntryUsed;
-    int m_iLastChannelUsed;
-    std::ofstream m_aChannelFiles[NUM_OF_CHANN];
-    I_GuiTracer* m_pICustomTracer;
+    EntryTraceDetail _mtxEntryTraceDetails[NUM_OF_CHANN][NUM_OF_ENTRIES];
+    bool _abChannelMask[NUM_OF_CHANN];
+    eOutType _aeChannelOut[NUM_OF_CHANN];
+    int _aiChannelCursor[NUM_OF_CHANN];
+    int _lastEntryUsed;
+    int m_lastChannelUsed;
+    std::ofstream _aChannelFiles[NUM_OF_CHANN];
+    I_GuiTracer* _p_ICustomTracer;
 };
 
 #endif

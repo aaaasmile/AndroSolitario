@@ -78,13 +78,13 @@
             ]
         },
         {
-            "name": "Windows solitario Debug MySys2",
+            "name": "solitario - Windows  Debug MySys2",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/solitario.exe",
+            "program": "${workspaceFolder}/buildsolitario/solitario.exe",
             "args": [],
             "stopAtEntry": false,
-            "cwd": "${workspaceFolder}/build/",
+            "cwd": "${workspaceFolder}/buildsolitario/",
             "environment": [
                 {
                     "name": "PATH",
@@ -108,7 +108,7 @@
             ]
         },
         {
-            "name": "Windows Debug MySys2 - InvidoTESTS",
+            "name": "InvidoTESTS - Windows Debug MySys2",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/buildinvido/InvidoTests.exe",

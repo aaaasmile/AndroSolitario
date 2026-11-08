@@ -7,7 +7,7 @@
 GameSelector::GameSelector() {
     _p_Gfx = NULL;
     GameSettings* pGameSettings = GameSettings::GetSettings();
-    pGameSettings->SetGameTypeGfx(GameTypeEnum::Invido);
+    pGameSettings->SetGameTypeGfx(GameTypeEnum::Invido, "Invido");
 }
 
 GameSelector::~GameSelector() {

@@ -182,7 +182,7 @@ Nella dir buildrelease\Installer compare ora il nuovo setup.
 - Quando scopre una carta sulla pila impiega troppo tempo per scoprirla. (ho dovuto mettere dei delay 
  tra le varie update dello screen, per esempio nel drag e drop) [DONE]
 - L'animazione finale della vittoria è troppo veloce [DONE]
-- Highscore non funziona
+- Highscore non funziona [DONE]
 
 ## Target web (Emscripten-1)
 Come riferimento per SDL3, vedi app/jni/SDL/docs/README-emscripten.md

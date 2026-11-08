@@ -94,7 +94,7 @@ class GameSettings {
     bool IsDEVPortrait() { return _portraitDevMode; }
 
     GameTypeEnum GetGameTypeGfx() { return _gameType; };
-    void SetGameTypeGfx(enum GameTypeEnum gmType);
+    void SetGameTypeGfx(enum GameTypeEnum gmType, const std::string& gameName);
 
    private:
     GameSettings();

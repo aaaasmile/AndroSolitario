@@ -483,19 +483,10 @@ LPErrInApp GameSettings::SaveGameOptions() {
     return SaveSettings();
 #endif
 }
-void GameSettings::SetGameTypeGfx(enum GameTypeEnum gmType) {
+void GameSettings::SetGameTypeGfx(enum GameTypeEnum gmType,
+                                  const std::string& gameName) {
     _gameType = gmType;
-    switch (gmType) {
-        case GameTypeEnum::Invido:
-            GameName = "Invido";
-            break;
-        case GameTypeEnum::Solitario:
-            GameName = "Solitario";
-            break;
-
-        default:
-            break;
-    }
+    GameName = gameName;
 }
 
 LPErrInApp GameSettings::LoadFonts() {
