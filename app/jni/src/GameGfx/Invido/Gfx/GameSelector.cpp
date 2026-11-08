@@ -458,7 +458,7 @@ enum Languages::eStringID GameSelector::GetGameTitle() {
 }
 
 const char* GameSelector::GetTitleImageFile() const {
-    return DATA_PREFIX "images/title.png";
+    return DATA_PREFIX "images/invido/titlecredits.png";
 }
 
 const char* GameSelector::GetSceneBackgroundFile(

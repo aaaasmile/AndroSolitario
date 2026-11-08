@@ -744,10 +744,12 @@ void OptionsGfx::setLanguageInGameSettings() {
 void OptionsGfx::setBackgoundTypeInGameSettings() {
     switch (_p_comboBackground->GetSelectedIndex()) {
         case 0:
-            _p_GameSettings->BackgroundType = BackgroundTypeEnum::Commessaggio;
+            _p_GameSettings->BackgroundType = BackgroundTypeEnum::Image;
+            _p_GameSettings->GameOptions[GAMESET::SceneBackgroundOptionKey] = "Commessaggio";
             break;
         case 1:
-            _p_GameSettings->BackgroundType = BackgroundTypeEnum::Mantova;
+            _p_GameSettings->BackgroundType = BackgroundTypeEnum::Image;
+            _p_GameSettings->GameOptions[GAMESET::SceneBackgroundOptionKey] = "Mantova";
             break;
         case 2:
             _p_GameSettings->BackgroundType = BackgroundTypeEnum::Black;
