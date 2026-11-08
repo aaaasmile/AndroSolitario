@@ -12,18 +12,18 @@
 
 
 char const* credit_text[] = {
-    "-SOLITARIO", /* '-' at beginning makes highlighted: */
+    "-INVIDO", /* '-' at beginning makes highlighted: */
     "",
     "PART OF THE 'CUPERATIVA' PROJECT",
     "",
     "",
     "",
-    "-CONTRIBUTING ",
-    "FABIO SPATARO",
+    "-INVIDO TECHNICAL GURU",
+    "REALDO SARTORI",
     "",
     "",
-    "-SPECIAL THANK",
-    "IL SAN",
+    "",
+    "",
     "",
     "",
     "-MUSIC",
