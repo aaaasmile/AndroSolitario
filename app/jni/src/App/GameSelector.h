@@ -12,16 +12,17 @@ class GameSelector {
     GameSelector();
     ~GameSelector();
     GameGfxCb PrepGameGfx();
+    OptionsGfxCb PrepOptionsGfx();
     GameHelpPagesCb PrepareGameHelpPages();
     enum Languages::eStringID GetGameTitle();
     const char* GetTitleImageFile() const;
-    const char* GetSceneBackgroundFile(
-        SceneBackgroundContext context) const;
+    const char* GetSceneBackgroundFile(SceneBackgroundContext context) const;
     void InitializeGameSettings();
     void ApplyLoadedSettings();
 
    private:
     void* _p_Gfx;
+    void* _p_OptionsGfx;
 };
 
 #endif

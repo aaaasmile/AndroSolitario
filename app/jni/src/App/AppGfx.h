@@ -18,7 +18,6 @@ class MusicManager;
 class HighScore;
 class MenuMgr;
 class CreditsView;
-class OptionsGfx;
 class GameSelector;
 class GameHelp;
 
@@ -85,7 +84,7 @@ class AppGfx {
     HighScore* _p_HighScore;
     MenuMgr* _p_MenuMgr;
     CreditsView* _p_CreditsView;
-    OptionsGfx* _p_OptGfx;
+    OptionsGfxCb _p_OptGfx;
     GameHelp* _p_GameHelp;
 
     int _Bpp;

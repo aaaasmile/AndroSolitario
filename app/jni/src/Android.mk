@@ -27,6 +27,8 @@ LOCAL_SRC_FILES := $(APP_PATH)/Main.cpp \
 			$(GAMEGFX_PATH)/Solitario/CardRegionGfx.cpp \
             $(GAMEGFX_PATH)/Solitario/CardStackGfx.cpp \
             $(GAMEGFX_PATH)/Solitario/SolitarioGfx.cpp \
+            $(GAMEGFX_PATH)/Solitario/OptionsSolitarioGfx.cpp \
+            $(GAMEGFX_PATH)/GameSelector.cpp \
             $(APP_PATH)/CurrentTime.cpp \
             $(APP_PATH)/MusicManager.cpp \
             $(APP_PATH)/AppGfx.cpp \
@@ -39,11 +41,9 @@ LOCAL_SRC_FILES := $(APP_PATH)/Main.cpp \
             $(APP_PATH)/Credits.cpp \
             $(APP_PATH)/ErrorInfo.cpp \
             $(APP_PATH)/MenuMgr.cpp \
-            $(APP_PATH)/OptionsGfx.cpp \
             $(APP_PATH)/TraceService.cpp \
             $(APP_PATH)/HighScore.cpp \
             $(APP_PATH)/GameHelp.cpp \
-            $(APP_PATH)/GameSelector.cpp \
             $(COMPGFX_PATH)/LabelLinkGfx.cpp \
             $(COMPGFX_PATH)/ButtonGfx.cpp \
             $(COMPGFX_PATH)/CheckBoxGfx.cpp \

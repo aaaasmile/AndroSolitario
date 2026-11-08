@@ -19,7 +19,6 @@
 #include "HighScore.h"
 #include "MenuMgr.h"
 #include "MusicManager.h"
-#include "OptionsGfx.h"
 
 static const char* g_lpszIconProgFile = DATA_PREFIX "images/icona_asso.bmp";
 
@@ -144,9 +143,11 @@ AppGfx::AppGfx() {
     _p_GameSettings = GameSettings::GetSettings();
     _p_MenuMgr = NULL;
     _p_CreditsView = NULL;
-    _p_OptGfx = new OptionsGfx();
+    _p_OptGfx.tc = NULL;
+    _p_OptGfx.self = NULL;
     _p_HighScore = NULL;
     _p_GameSelector = new GameSelector();
+    _p_OptGfx = _p_GameSelector->PrepOptionsGfx();
     _p_GameHelp = NULL;
 }
 
@@ -278,8 +279,8 @@ LPErrInApp AppGfx::Init() {
 LPErrInApp AppGfx::ChangeSceneBackground(SDL_Surface** ppSceneBackground) {
     SDL_Surface* mainBackground = NULL;
     SDL_Surface* gameBackground = NULL;
-    LPErrInApp err = loadSceneBackground(
-        &mainBackground, SceneBackgroundContext::MainScreen);
+    LPErrInApp err = loadSceneBackground(&mainBackground,
+                                         SceneBackgroundContext::MainScreen);
     if (err == NULL) {
         err = loadSceneBackground(&gameBackground,
                                   SceneBackgroundContext::GameScreen);
@@ -299,8 +300,8 @@ LPErrInApp AppGfx::ChangeSceneBackground(SDL_Surface** ppSceneBackground) {
     return NULL;
 }
 
-LPErrInApp AppGfx::loadSceneBackground(
-    SDL_Surface** ppSceneBackground, SceneBackgroundContext context) {
+LPErrInApp AppGfx::loadSceneBackground(SDL_Surface** ppSceneBackground,
+                                       SceneBackgroundContext context) {
     if (*ppSceneBackground != NULL) {
         SDL_DestroySurface(*ppSceneBackground);
         *ppSceneBackground = NULL;
@@ -317,17 +318,15 @@ LPErrInApp AppGfx::loadSceneBackground(
         SDL_GetSurfaceClipRect(*ppSceneBackground, &clipRect);
         SDL_FillSurfaceRect(
             *ppSceneBackground, &clipRect,
-            SDL_MapRGB(
-                SDL_GetPixelFormatDetails((*ppSceneBackground)->format), NULL,
-                0, 0, 0));
+            SDL_MapRGB(SDL_GetPixelFormatDetails((*ppSceneBackground)->format),
+                       NULL, 0, 0, 0));
         return NULL;
     }
 
     const char* backgroundFile =
         _p_GameSelector->GetSceneBackgroundFile(context);
     if (backgroundFile == NULL) {
-        return ERR_UTIL::ErrorCreate("No background for context %d\n",
-                                     context);
+        return ERR_UTIL::ErrorCreate("No background for context %d\n", context);
     }
     SDL_IOStream* srcBack = SDL_IOFromFile(backgroundFile, "rb");
     if (srcBack == NULL) {
@@ -483,7 +482,6 @@ LPErrInApp AppGfx::createScreenLayout() {
 
 void AppGfx::terminate() {
     delete _p_CreditsView;
-    delete _p_OptGfx;
     delete _p_GameSelector;
     delete _p_HighScore;
     delete _p_GameHelp;
@@ -770,7 +768,7 @@ LPErrInApp AppGfx::MainLoopEvent(SDL_Event* pEvent, SDL_AppResult& res) {
             break;
 
         case MenuItemEnum::MENU_OPTIONS:
-            err = _p_OptGfx->HandleEvent(pEvent, targetPos);
+            err = _p_OptGfx.tc->HandleEvent(_p_OptGfx.self, pEvent, targetPos);
             if (err != NULL)
                 return err;
             break;
@@ -858,7 +856,7 @@ LPErrInApp AppGfx::MainLoopIterate() {
             break;
 
         case MenuItemEnum::MENU_OPTIONS:
-            err = _p_OptGfx->HandleIterate(done);
+            err = _p_OptGfx.tc->HandleIterate(_p_OptGfx.self, done);
             if (err != NULL)
                 return err;
             if (done) {
@@ -965,25 +963,24 @@ LPErrInApp AppGfx::showCredits() {
 
 LPErrInApp AppGfx::showGeneralOptions() {
     TRACE("Show general Options\n");
-    if (_p_OptGfx->IsOngoing()) {
+    if (!_p_OptGfx.tc || !_p_OptGfx.self) {
+        return ERR_UTIL::ErrorCreate("Options graphics not initialized");
+    }
+    if (_p_OptGfx.tc->IsOngoing(_p_OptGfx.self)) {
         return ERR_UTIL::ErrorCreate("General Options already started");
     }
 
     UpdateScreenCb screenUpdater = prepScreenUpdater();
     OptionDelegator optionDelegator = prepOptionDelegator();
-    LPErrInApp err = _p_OptGfx->Initialize(_p_Screen, screenUpdater,
-                                           optionDelegator, _p_Window);
-    if (err) {
+    LPErrInApp err = _p_OptGfx.tc->Initialize(
+        _p_OptGfx.self, _p_Screen, screenUpdater, optionDelegator, _p_Window);
+    if (err != NULL) {
         return err;
     }
 
     LPLanguages pLanguages = _p_GameSettings->GetLanguageMan();
     STRING caption = pLanguages->GetStringId(Languages::ID_MEN_OPTIONS);
-    err = _p_OptGfx->Show(_p_SceneBackground, caption);
-    if (err) {
-        return err;
-    }
-    return NULL;
+    return _p_OptGfx.tc->Show(_p_OptGfx.self, _p_SceneBackground, caption);
 }
 
 void AppGfx::backToMenuRootWithMusic() {
@@ -996,7 +993,7 @@ void AppGfx::backToMenuRootWithMusic() {
 void AppGfx::backToMenuRootSameMusic() {
     TRACE("Back to root menu same music\n");
     LeaveMenu();
-    _p_OptGfx->Reset();
+    _p_OptGfx.tc->Reset(_p_OptGfx.self);
 }
 
 LPErrInApp AppGfx::SettingsChanged(bool backGroundChanged,
@@ -1052,8 +1049,9 @@ LPErrInApp AppGfx::updateComponentsScreen() {
         _p_MenuMgr->UpdateScreen(_p_Screen);
     if (_p_HighScore != NULL)
         _p_HighScore->UpdateScreen(_p_Screen);
-    if (_p_OptGfx != NULL) {
-        err = _p_OptGfx->UpdateScreen(_p_Screen, _p_SceneBackground);
+    if (_p_OptGfx.tc != NULL && _p_OptGfx.self != NULL) {
+        err = _p_OptGfx.tc->UpdateScreen(_p_OptGfx.self, _p_Screen,
+                                         _p_SceneBackground);
         if (err != NULL) {
             return err;
         }

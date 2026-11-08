@@ -3,17 +3,18 @@
 #include "Config.h"
 #include "GameSettings.h"
 #include "InvidoGfx.h"
+#include "OptionsInvidoGfx.h"
 
 GameSelector::GameSelector() {
     _p_Gfx = NULL;
+    _p_OptionsGfx = NULL;
     GameSettings* pGameSettings = GameSettings::GetSettings();
     pGameSettings->SetGameTypeGfx(GameTypeEnum::Invido, "Invido");
 }
 
 GameSelector::~GameSelector() {
-    if (_p_Gfx != NULL) {
-        delete (invido::InvidoGfx*)_p_Gfx;
-    }
+    delete (invido::InvidoGfx*)_p_Gfx;
+    delete (OptionsInvidoGfx*)_p_OptionsGfx;
 }
 
 LPErrInApp fncBind_HandleEvent(void* self, SDL_Event* pEvent,
@@ -425,6 +426,56 @@ LPErrInApp fncBind_Show(void* self) {
 LPErrInApp fncBind_OnResize(void* self, SDL_Surface* pScreen) {
     invido::InvidoGfx* pInvidoGfx = (invido::InvidoGfx*)self;
     return pInvidoGfx->OnResize(pScreen);
+}
+
+static LPErrInApp optionsInvidoHandleEvent(void* self, SDL_Event* pEvent,
+                                           const SDL_Point& targetPos) {
+    return ((OptionsInvidoGfx*)self)->HandleEvent(pEvent, targetPos);
+}
+
+static LPErrInApp optionsInvidoHandleIterate(void* self, bool& done) {
+    return ((OptionsInvidoGfx*)self)->HandleIterate(done);
+}
+
+static bool optionsInvidoIsOngoing(void* self) {
+    return ((OptionsInvidoGfx*)self)->IsOngoing();
+}
+
+static LPErrInApp optionsInvidoInitialize(void* self, SDL_Surface* pScreen,
+                                          UpdateScreenCb& fnUpdateScreen,
+                                          OptionDelegator& optDlg,
+                                          SDL_Window* pWindow) {
+    return ((OptionsInvidoGfx*)self)
+        ->Initialize(pScreen, fnUpdateScreen, optDlg, pWindow);
+}
+
+static LPErrInApp optionsInvidoShow(void* self, SDL_Surface* pSceneBackground,
+                                    std::string& caption) {
+    return ((OptionsInvidoGfx*)self)->Show(pSceneBackground, caption);
+}
+
+static void optionsInvidoReset(void* self) {
+    ((OptionsInvidoGfx*)self)->Reset();
+}
+
+static LPErrInApp optionsInvidoUpdateScreen(void* self, SDL_Surface* pScreen,
+                                            SDL_Surface* pSceneBackground) {
+    return ((OptionsInvidoGfx*)self)->UpdateScreen(pScreen, pSceneBackground);
+}
+
+OptionsGfxCb GameSelector::PrepOptionsGfx() {
+    delete (OptionsInvidoGfx*)_p_OptionsGfx;
+    _p_OptionsGfx = new OptionsInvidoGfx();
+
+    static VOptionsGfxCb const tc = {
+        .HandleEvent = (&optionsInvidoHandleEvent),
+        .HandleIterate = (&optionsInvidoHandleIterate),
+        .IsOngoing = (&optionsInvidoIsOngoing),
+        .Initialize = (&optionsInvidoInitialize),
+        .Show = (&optionsInvidoShow),
+        .Reset = (&optionsInvidoReset),
+        .UpdateScreen = (&optionsInvidoUpdateScreen)};
+    return (OptionsGfxCb){.tc = &tc, .self = _p_OptionsGfx};
 }
 
 GameGfxCb GameSelector::PrepGameGfx() {

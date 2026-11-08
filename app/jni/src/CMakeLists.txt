@@ -46,7 +46,7 @@ if(INVIDOPRJ)
 # Invido Sources
 list(APPEND SOURCES
         GameGfx/Invido/Gfx/Credits.cpp
-        GameGfx/Invido/Gfx/OptionsGfx.cpp
+        GameGfx/Invido/Gfx/OptionsInvidoGfx.cpp
         GameGfx/Invido/Gfx/HighScore.cpp
         GameGfx/Invido/Gfx/GameSelector.cpp
         GameGfx/Invido/Core/AlgPlayer.cpp
@@ -72,7 +72,7 @@ if(SOLITARIOPRJ)
 # Solitario Sources
 list(APPEND SOURCES
         GameGfx/Solitario/Credits.cpp
-        GameGfx/Solitario/OptionsGfx.cpp
+        GameGfx/Solitario/OptionsSolitarioGfx.cpp
         GameGfx/Solitario/HighScore.cpp
         GameGfx/Solitario/GameSelector.cpp
         GameGfx/Solitario/CardRegionGfx.cpp

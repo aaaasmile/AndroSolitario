@@ -3,6 +3,7 @@
 
 #include <SDL3_ttf/SDL_ttf.h>
 
+#include <string>
 #include <vector>
 
 #include "ErrorInfo.h"
@@ -99,10 +100,34 @@ typedef struct {
     void* self;
 } UpdateScreenCb, *LPUpdateScreenCb;
 
+// trait for game-specific options graphics
+// This trait keeps AppGfx independent of each game's options implementation.
+typedef struct {
+    LPErrInApp (*const HandleEvent)(void* self, SDL_Event* pEvent,
+                                    const SDL_Point& targetPos);
+    LPErrInApp (*const HandleIterate)(void* self, bool& done);
+    bool (*const IsOngoing)(void* self);
+    LPErrInApp (*const Initialize)(void* self, SDL_Surface* pScreen,
+                                   UpdateScreenCb& fnUpdateScreen,
+                                   OptionDelegator& optDlg,
+                                   SDL_Window* pWindow);
+    LPErrInApp (*const Show)(void* self, SDL_Surface* pSceneBackground,
+                             std::string& caption);
+    void (*const Reset)(void* self);
+    LPErrInApp (*const UpdateScreen)(void* self, SDL_Surface* pScreen,
+                                     SDL_Surface* pSceneBackground);
+} VOptionsGfxCb, *LPVOptionsGfxCb;
+
+typedef struct {
+    VOptionsGfxCb const* tc;
+    void* self;
+} OptionsGfxCb, *LPOptionsGfxCb;
+
 // trait for update high score
 typedef struct {
     LPErrInApp (*const SaveScore)(void* self, int64_t score, int numCard);
-    LPErrInApp (*const SaveScoreWinLost)(void* self, uint16_t wins, uint16_t losts);
+    LPErrInApp (*const SaveScoreWinLost)(void* self, uint16_t wins,
+                                         uint16_t losts);
 } VUpdateHighScoreCb, *LPVUpdateHighScoreCb;
 
 typedef struct {

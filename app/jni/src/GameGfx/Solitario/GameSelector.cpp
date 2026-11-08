@@ -3,17 +3,18 @@
 #include "Config.h"
 #include "GameGfx/Solitario/SolitarioGfx.h"
 #include "GameSettings.h"
+#include "OptionsSolitarioGfx.h"
 
 GameSelector::GameSelector() {
     GameSettings* pGameSettings = GameSettings::GetSettings();
     pGameSettings->SetGameTypeGfx(GameTypeEnum::Solitario, "Solitario");
     _p_Gfx = NULL;
+    _p_OptionsGfx = NULL;
 }
 
 GameSelector::~GameSelector() {
-    if (_p_Gfx != NULL) {
-        delete (SolitarioGfx*)_p_Gfx;
-    }
+    delete (SolitarioGfx*)_p_Gfx;
+    delete (OptionsSolitarioGfx*)_p_OptionsGfx;
 }
 
 LPErrInApp fncBind_HandleEvent(void* self, SDL_Event* pEvent,
@@ -427,6 +428,58 @@ LPErrInApp fncBind_Show(void* self) {
 LPErrInApp fncBind_OnResize(void* self, SDL_Surface* pScreen) {
     SolitarioGfx* pSolitarioGfx = (SolitarioGfx*)self;
     return pSolitarioGfx->OnResize(pScreen);
+}
+
+static LPErrInApp optionsSolitarioHandleEvent(void* self, SDL_Event* pEvent,
+                                              const SDL_Point& targetPos) {
+    return ((OptionsSolitarioGfx*)self)->HandleEvent(pEvent, targetPos);
+}
+
+static LPErrInApp optionsSolitarioHandleIterate(void* self, bool& done) {
+    return ((OptionsSolitarioGfx*)self)->HandleIterate(done);
+}
+
+static bool optionsSolitarioIsOngoing(void* self) {
+    return ((OptionsSolitarioGfx*)self)->IsOngoing();
+}
+
+static LPErrInApp optionsSolitarioInitialize(void* self, SDL_Surface* pScreen,
+                                             UpdateScreenCb& fnUpdateScreen,
+                                             OptionDelegator& optDlg,
+                                             SDL_Window* pWindow) {
+    return ((OptionsSolitarioGfx*)self)
+        ->Initialize(pScreen, fnUpdateScreen, optDlg, pWindow);
+}
+
+static LPErrInApp optionsSolitarioShow(void* self,
+                                       SDL_Surface* pSceneBackground,
+                                       std::string& caption) {
+    return ((OptionsSolitarioGfx*)self)->Show(pSceneBackground, caption);
+}
+
+static void optionsSolitarioReset(void* self) {
+    ((OptionsSolitarioGfx*)self)->Reset();
+}
+
+static LPErrInApp optionsSolitarioUpdateScreen(void* self, SDL_Surface* pScreen,
+                                               SDL_Surface* pSceneBackground) {
+    return ((OptionsSolitarioGfx*)self)
+        ->UpdateScreen(pScreen, pSceneBackground);
+}
+
+OptionsGfxCb GameSelector::PrepOptionsGfx() {
+    delete (OptionsSolitarioGfx*)_p_OptionsGfx;
+    _p_OptionsGfx = new OptionsSolitarioGfx();
+
+    static VOptionsGfxCb const tc = {
+        .HandleEvent = (&optionsSolitarioHandleEvent),
+        .HandleIterate = (&optionsSolitarioHandleIterate),
+        .IsOngoing = (&optionsSolitarioIsOngoing),
+        .Initialize = (&optionsSolitarioInitialize),
+        .Show = (&optionsSolitarioShow),
+        .Reset = (&optionsSolitarioReset),
+        .UpdateScreen = (&optionsSolitarioUpdateScreen)};
+    return (OptionsGfxCb){.tc = &tc, .self = _p_OptionsGfx};
 }
 
 GameGfxCb GameSelector::PrepGameGfx() {
