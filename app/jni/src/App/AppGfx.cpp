@@ -16,7 +16,6 @@
 #include "GameHelp.h"
 #include "GameSelector.h"
 #include "GfxUtil.h"
-#include "HighScore.h"
 #include "MenuMgr.h"
 #include "MusicManager.h"
 
@@ -145,9 +144,12 @@ AppGfx::AppGfx() {
     _p_CreditsView = NULL;
     _p_OptGfx.tc = NULL;
     _p_OptGfx.self = NULL;
-    _p_HighScore = NULL;
+    _p_HighScore.tc = NULL;
+    _p_HighScore.self = NULL;
+    _highScoreLoaded = false;
     _p_GameSelector = new GameSelector();
     _p_OptGfx = _p_GameSelector->PrepOptionsGfx();
+    _p_HighScore = _p_GameSelector->PrepHighScoreGfx();
     _p_GameHelp = NULL;
 }
 
@@ -483,7 +485,6 @@ LPErrInApp AppGfx::createScreenLayout() {
 void AppGfx::terminate() {
     delete _p_CreditsView;
     delete _p_GameSelector;
-    delete _p_HighScore;
     delete _p_GameHelp;
 
     SDL_ShowCursor();
@@ -540,6 +541,20 @@ LPErrInApp AppGfx::loadProfile() {
     return NULL;
 }
 
+void AppGfx::loadHighScore() {
+    if (_highScoreLoaded || _p_HighScore.tc == NULL ||
+        _p_HighScore.self == NULL) {
+        return;
+    }
+
+    LPErrInApp err = _p_HighScore.tc->Load(_p_HighScore.self);
+    if (err != NULL) {
+        TRACE("Unable to load high scores: %s\n", err->ErrorText.c_str());
+        return;
+    }
+    _highScoreLoaded = true;
+}
+
 LPErrInApp fncBind_LeaveMenu(void* self) {
     AppGfx* pApp = (AppGfx*)self;
     return pApp->LeaveMenu();
@@ -572,16 +587,6 @@ static void fncBind_RenderTexture(void* self, SDL_Texture* pScreenTexture) {
     return pApp->RenderTexture(pScreenTexture);
 }
 
-LPErrInApp fncBind_SaveScore(void* self, int64_t score, int numCard) {
-    HighScore* pHighScore = (HighScore*)self;
-    return pHighScore->SaveScore(score, numCard);
-}
-
-LPErrInApp fncBind_SaveScoreWinLost(void* self, uint16_t wins, uint16_t losts) {
-    HighScore* pHighScore = (HighScore*)self;
-    return pHighScore->SaveScoreWinLost(wins, losts);
-}
-
 MenuDelegator AppGfx::prepMenuDelegator() {
     // Use only static otherwise you loose it
     static VMenuDelegator const tc = {.LeaveMenu = (&fncBind_LeaveMenu),
@@ -595,18 +600,6 @@ UpdateScreenCb AppGfx::prepScreenUpdater() {
         .UpdateScreen = (&fncBind_UpdateScreen),
         .RenderTexture = (&fncBind_RenderTexture)};
     return (UpdateScreenCb){.tc = &tc, .self = this};
-}
-
-UpdateHighScoreCb AppGfx::prepHighScoreCb() {
-    if (_p_HighScore == NULL) {
-        _p_HighScore = new HighScore();
-        _p_HighScore->Load();
-    }
-    static VUpdateHighScoreCb const tc = {
-        .SaveScore = (&fncBind_SaveScore),
-        .SaveScoreWinLost = (&fncBind_SaveScoreWinLost),
-    };
-    return (UpdateHighScoreCb){.tc = &tc, .self = _p_HighScore};
 }
 
 OptionDelegator AppGfx::prepOptionDelegator() {
@@ -762,7 +755,7 @@ LPErrInApp AppGfx::MainLoopEvent(SDL_Event* pEvent, SDL_AppResult& res) {
             break;
 
         case MenuItemEnum::MENU_HIGHSCORE:
-            err = _p_HighScore->HandleEvent(pEvent);
+            err = _p_HighScore.tc->HandleEvent(_p_HighScore.self, pEvent);
             if (err != NULL)
                 return err;
             break;
@@ -847,7 +840,7 @@ LPErrInApp AppGfx::MainLoopIterate() {
             break;
 
         case MenuItemEnum::MENU_HIGHSCORE:
-            err = _p_HighScore->HandleIterate(done);
+            err = _p_HighScore.tc->HandleIterate(_p_HighScore.self, done);
             if (err != NULL)
                 return err;
             if (done) {
@@ -886,13 +879,17 @@ LPErrInApp AppGfx::startGameLoop() {
     if (_fnGameGfxCb.tc == NULL || _fnGameGfxCb.self == NULL) {
         return ERR_UTIL::ErrorCreate("[startGameLoop] unable to get game Gfx");
     }
+    if (_p_HighScore.tc == NULL || _p_HighScore.self == NULL) {
+        return ERR_UTIL::ErrorCreate(
+            "[startGameLoop] unable to get high score Gfx");
+    }
+    loadHighScore();
 
     UpdateScreenCb screenUpdater = prepScreenUpdater();
-    UpdateHighScoreCb highScoreCb = prepHighScoreCb();
 
     err = (_fnGameGfxCb.tc)
               ->Initialize(_fnGameGfxCb.self, _p_Screen, screenUpdater,
-                           _p_Window, _p_GameSceneBackground, highScoreCb);
+                           _p_Window, _p_GameSceneBackground);
     if (err != NULL)
         return err;
     err = (_fnGameGfxCb.tc)->Show(_fnGameGfxCb.self);
@@ -925,22 +922,22 @@ LPErrInApp AppGfx::showHelp() {
 
 LPErrInApp AppGfx::showHighScore() {
     TRACE("Show HighScore\n");
-    if (_p_HighScore == NULL) {
-        _p_HighScore = new HighScore();
-        _p_HighScore->Load();
+    if (!_p_HighScore.tc || !_p_HighScore.self) {
+        return ERR_UTIL::ErrorCreate("High score graphics not initialized");
     }
-    if (_p_HighScore->IsOngoing()) {
+    if (_p_HighScore.tc->IsOngoing(_p_HighScore.self)) {
         return ERR_UTIL::ErrorCreate("Credit already started");
     }
-    _p_HighScore->Reset();
+
+    loadHighScore();
+    _p_HighScore.tc->Reset(_p_HighScore.self);
 
     if (_p_MusicManager->IsPlayingMusic()) {
         _p_MusicManager->StopMusic(600);
     }
     UpdateScreenCb screenUpdater = prepScreenUpdater();
-    _p_HighScore->Show(_p_Screen, _p_CreditTitle, screenUpdater);
-
-    return NULL;
+    return _p_HighScore.tc->Show(_p_HighScore.self, _p_Screen, _p_CreditTitle,
+                                 screenUpdater);
 }
 
 LPErrInApp AppGfx::showCredits() {
@@ -1047,8 +1044,8 @@ LPErrInApp AppGfx::updateComponentsScreen() {
     LPErrInApp err = NULL;
     if (_p_MenuMgr != NULL)
         _p_MenuMgr->UpdateScreen(_p_Screen);
-    if (_p_HighScore != NULL)
-        _p_HighScore->UpdateScreen(_p_Screen);
+    if (_p_HighScore.tc != NULL && _p_HighScore.self != NULL)
+        _p_HighScore.tc->UpdateScreen(_p_HighScore.self, _p_Screen);
     if (_p_OptGfx.tc != NULL && _p_OptGfx.self != NULL) {
         err = _p_OptGfx.tc->UpdateScreen(_p_OptGfx.self, _p_Screen,
                                          _p_SceneBackground);

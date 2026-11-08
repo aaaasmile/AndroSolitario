@@ -123,17 +123,23 @@ typedef struct {
     void* self;
 } OptionsGfxCb, *LPOptionsGfxCb;
 
-// trait for update high score
+// trait for game-specific high score graphics and score persistence
 typedef struct {
-    LPErrInApp (*const SaveScore)(void* self, int64_t score, int numCard);
-    LPErrInApp (*const SaveScoreWinLost)(void* self, uint16_t wins,
-                                         uint16_t losts);
-} VUpdateHighScoreCb, *LPVUpdateHighScoreCb;
+    LPErrInApp (*const Load)(void* self);
+    LPErrInApp (*const HandleEvent)(void* self, SDL_Event* pEvent);
+    LPErrInApp (*const HandleIterate)(void* self, bool& done);
+    bool (*const IsOngoing)(void* self);
+    void (*const Reset)(void* self);
+    LPErrInApp (*const Show)(void* self, SDL_Surface* pScreen,
+                             SDL_Surface* pSurfTitle,
+                             UpdateScreenCb& fnUpdateScreen);
+    void (*const UpdateScreen)(void* self, SDL_Surface* pScreen);
+} VHighScoreGfxCb, *LPVHighScoreGfxCb;
 
 typedef struct {
-    VUpdateHighScoreCb const* tc;
+    VHighScoreGfxCb const* tc;
     void* self;
-} UpdateHighScoreCb, *LPUpdateHighScoreCb;
+} HighScoreGfxCb, *LPHighScoreGfxCb;
 
 // trait for GameHelp pages
 typedef struct {
@@ -153,8 +159,7 @@ typedef struct {
     LPErrInApp (*const Initialize)(void* self, SDL_Surface* pScreen,
                                    UpdateScreenCb& fnUpdateScreen,
                                    SDL_Window* pWindow,
-                                   SDL_Surface* pSceneBackground,
-                                   UpdateHighScoreCb& fnHighScore);
+                                   SDL_Surface* pSceneBackground);
     LPErrInApp (*const Show)(void* self);
     LPErrInApp (*const OnResize)(void* self, SDL_Surface* pScreen);
 } VGameGfxCb, *LPVGameGfxCb;

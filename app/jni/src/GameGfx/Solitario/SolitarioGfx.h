@@ -13,7 +13,7 @@
 using namespace traits;
 class ButtonGfx;
 class CurrentTime;
-class HighScore;
+class HighScoreSolitarioGfx;
 class MusicManager;
 class FadeAction;
 class MesgBoxGfx;
@@ -78,8 +78,10 @@ class SolitarioGfx {
     ~SolitarioGfx();
 
     LPErrInApp Initialize(SDL_Surface* pScreen, UpdateScreenCb& fnUpdateScreen,
-                          SDL_Window* pWindow, SDL_Surface* pSceneBackground,
-                          UpdateHighScoreCb& fnUpdateHighScore);
+                          SDL_Window* pWindow, SDL_Surface* pSceneBackground);
+    void SetHighScore(HighScoreSolitarioGfx* pHighScore) {
+        _p_HighScoreGfx = pHighScore;
+    }
     LPErrInApp OnResize(SDL_Surface* pScreen);
     LPErrInApp HandleEvent(SDL_Event* pEvent, const SDL_Point& targetPos);
     LPErrInApp HandleIterate(bool& done);
@@ -239,7 +241,7 @@ class SolitarioGfx {
     SDL_Surface* _p_Dragface;
     SDL_Surface* _p_SceneBackground;
     UpdateScreenCb _fnUpdateScreen;
-    UpdateHighScoreCb _fnUpdateHighScore;
+    HighScoreSolitarioGfx* _p_HighScoreGfx;
     SDL_Window* _p_Window;
     TTF_Font* _p_FontBigText;
     MusicManager* _p_MusicManager;
@@ -277,7 +279,7 @@ class SolitarioGfx {
     bool _isInitDrag;
     int _doubleTapWait;
     float _scaleFactor;
-    DeckLoader *_p_DeckLoader;
+    DeckLoader* _p_DeckLoader;
 };
 
 #endif

@@ -7,12 +7,12 @@
 #include <map>
 
 #include "../Core/AlgCoreInterface.h"
+#include "../Core/InvidoCore.h"
+#include "../Core/Mazzo.h"
 #include "CardGfx.h"
 #include "Config.h"
 #include "DeckType.h"
 #include "ErrorInfo.h"
-#include "../Core/InvidoCore.h"
-#include "../Core/Mazzo.h"
 #include "Traits.h"
 
 using namespace traits;
@@ -23,6 +23,7 @@ class Languages;
 class MusicManager;
 class DeckLoader;
 class MesgBoxGfx;
+class HighScoreInvidoGfx;
 
 namespace invido {
 
@@ -60,8 +61,10 @@ class InvidoGfx : public I_ALG_Player {
     InvidoGfx();
     ~InvidoGfx();
     LPErrInApp Initialize(SDL_Surface* pScreen, UpdateScreenCb& fnUpdateScreen,
-                          SDL_Window* pWindow, SDL_Surface* pSceneBackground,
-                          UpdateHighScoreCb& fnUpdateHighScore);
+                          SDL_Window* pWindow, SDL_Surface* pSceneBackground);
+    void SetHighScore(HighScoreInvidoGfx* pHighScore) {
+        _p_HighScoreGfx = pHighScore;
+    }
     LPErrInApp OnResize(SDL_Surface* pScreen);
     LPErrInApp HandleEvent(SDL_Event* pEvent, const SDL_Point& targetPos);
     LPErrInApp HandleIterate(bool& done);
@@ -122,6 +125,7 @@ class InvidoGfx : public I_ALG_Player {
     void animateBeginGiocata();
     void showOkMsgBox(LPCSTR strText);
     void showYesNoMsgBox(LPCSTR strText);
+    LPErrInApp saveMatchHighScore(I_MatchScore* pScore);
     void animateManoEnd(Uint8 playerIx);
     void showPopUpCallMenu(int iX, int iY, eSayPlayer* peSay);
     void opponentHasPlayedCard(const CardSpec& card, bool vadoDentro);
@@ -169,6 +173,7 @@ class InvidoGfx : public I_ALG_Player {
     bool _isMatchTerminated;
     UpdateScreenCb _fnUpdateScreen;
     SDL_Window* _p_Window;
+    HighScoreInvidoGfx* _p_HighScoreGfx;
     DeckLoader* _p_DeckLoader;
     MesgBoxGfx* _p_MsgBox;
 };

@@ -15,7 +15,6 @@
 #include "Traits.h"
 
 class MusicManager;
-class HighScore;
 class MenuMgr;
 class CreditsView;
 class GameSelector;
@@ -51,6 +50,7 @@ class AppGfx {
     LPErrInApp createScreenLayout();
     void terminate();
     LPErrInApp loadProfile();
+    void loadHighScore();
     void updateScreenTexture();
     LPErrInApp showHelp();
     LPErrInApp showCredits();
@@ -64,7 +64,6 @@ class AppGfx {
     MenuDelegator prepMenuDelegator();
     OptionDelegator prepOptionDelegator();
     UpdateScreenCb prepScreenUpdater();
-    UpdateHighScoreCb prepHighScoreCb();
 
     void clearBackground();
     LPErrInApp loadSceneBackground(SDL_Surface** ppSceneBackground,
@@ -81,7 +80,8 @@ class AppGfx {
     GameSettings* _p_GameSettings;
     GameSelector* _p_GameSelector;
     MusicManager* _p_MusicManager;
-    HighScore* _p_HighScore;
+    HighScoreGfxCb _p_HighScore;
+    bool _highScoreLoaded;
     MenuMgr* _p_MenuMgr;
     CreditsView* _p_CreditsView;
     OptionsGfxCb _p_OptGfx;

@@ -13,6 +13,7 @@ class GameSelector {
     ~GameSelector();
     GameGfxCb PrepGameGfx();
     OptionsGfxCb PrepOptionsGfx();
+    HighScoreGfxCb PrepHighScoreGfx();
     GameHelpPagesCb PrepareGameHelpPages();
     enum Languages::eStringID GetGameTitle();
     const char* GetTitleImageFile() const;
@@ -23,6 +24,7 @@ class GameSelector {
    private:
     void* _p_Gfx;
     void* _p_OptionsGfx;
+    void* _p_HighScoreGfx;
 };
 
 #endif

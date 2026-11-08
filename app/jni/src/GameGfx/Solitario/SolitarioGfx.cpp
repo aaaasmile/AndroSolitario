@@ -11,6 +11,7 @@
 #include "DeckLoader.h"
 #include "Fading.h"
 #include "GfxUtil.h"
+#include "HighScoreSolitarioGfx.h"
 #include "MusicManager.h"
 
 const int MYIDQUIT = 0;
@@ -19,6 +20,7 @@ const int MYIDTOGGLESOUND = 2;
 const int MYIDTOGGLEFULLSCREEN = 3;
 
 SolitarioGfx::SolitarioGfx() {
+    _p_HighScoreGfx = NULL;
     _p_ScreenBackbufferDrag = NULL;
     _startdrag = false;
     _p_Dragface = NULL;
@@ -134,14 +136,11 @@ ClickCb SolitarioGfx::prepClickToggleFullscreenCb() {
 LPErrInApp SolitarioGfx::Initialize(SDL_Surface* pScreen,
                                     UpdateScreenCb& fnUpdateScreen,
                                     SDL_Window* pWindow,
-                                    SDL_Surface* pSceneBackground,
-                                    UpdateHighScoreCb& fnUpdateHighScore) {
+                                    SDL_Surface* pSceneBackground) {
     TRACE("Initialize Solitario\n");
     LPGameSettings pGameSettings = GameSettings::GetSettings();
     setDeckType(pGameSettings->DeckTypeVal);
     _p_MusicManager = pGameSettings->GetMusicManager();
-    //_p_HighScore = pHighScore;
-    _fnUpdateHighScore = fnUpdateHighScore;
     _sceneBackgroundIsBlack =
         pGameSettings->BackgroundType == BackgroundTypeEnum::Black;
     _p_FontBigText = pGameSettings->GetFontDjvBig();
@@ -795,7 +794,7 @@ LPErrInApp SolitarioGfx::DrawCardPac(int x, int y, int nCdIndex, SDL_Surface* s,
     srcCard.y = cardIx * _p_DeckLoader->GetCardHeight();
     srcCard.w = _p_DeckLoader->GetCardWidth();
     srcCard.h = _p_DeckLoader->GetCardHeight();
-    SDL_Surface* pDeck = _p_DeckLoader->GetDeckSurface();        
+    SDL_Surface* pDeck = _p_DeckLoader->GetDeckSurface();
     SDL_Rect dest;
     dest.x = x;
     dest.y = y;
@@ -862,13 +861,14 @@ LPErrInApp SolitarioGfx::DrawCardBackPac(int x, int y, SDL_Surface* s,
     if (scaleFactor != 0.0f) {
         dest.w = (int)(_p_DeckLoader->GetCardWidth() * scaleFactor);
         dest.h = (int)(_p_DeckLoader->GetCardHeight() * scaleFactor);
-        if (!SDL_BlitSurfaceScaled(_p_DeckLoader->GetSymbolSurface(), &srcBack, s, &dest,
-                                   SDL_SCALEMODE_NEAREST)) {
+        if (!SDL_BlitSurfaceScaled(_p_DeckLoader->GetSymbolSurface(), &srcBack,
+                                   s, &dest, SDL_SCALEMODE_NEAREST)) {
             return ERR_UTIL::ErrorCreate(
                 "SDL_BlitSurfaceScaled in DrawCardBackPac error: %s\n",
                 SDL_GetError());
         }
-    } else if (!SDL_BlitSurface(_p_DeckLoader->GetSymbolSurface(), &srcBack, s, &dest)) {
+    } else if (!SDL_BlitSurface(_p_DeckLoader->GetSymbolSurface(), &srcBack, s,
+                                &dest)) {
         return ERR_UTIL::ErrorCreate(
             "SDL_BlitSurface in DrawCardBackPac error: %s\n", SDL_GetError());
     }
@@ -910,13 +910,14 @@ LPErrInApp SolitarioGfx::DrawSymbolPac(int x, int y, int nSymbol,
     if (scaleFactor != 0.0) {
         dest.w = (int)(srcSymb.w * scaleFactor);
         dest.h = (int)(srcSymb.h * scaleFactor);
-        if (!SDL_BlitSurfaceScaled(_p_DeckLoader->GetSymbolSurface(), &srcSymb, s, &dest,
-                                   SDL_SCALEMODE_NEAREST)) {
+        if (!SDL_BlitSurfaceScaled(_p_DeckLoader->GetSymbolSurface(), &srcSymb,
+                                   s, &dest, SDL_SCALEMODE_NEAREST)) {
             return ERR_UTIL::ErrorCreate(
                 "SDL_BlitSurfaceScaled in DrawSymbol error: %s\n",
                 SDL_GetError());
         }
-    } else if (!SDL_BlitSurface(_p_DeckLoader->GetSymbolSurface(), &srcSymb, s, &dest)) {
+    } else if (!SDL_BlitSurface(_p_DeckLoader->GetSymbolSurface(), &srcSymb, s,
+                                &dest)) {
         return ERR_UTIL::ErrorCreate(
             "SDL_BlitSurface in DrawSymbol error: %s\n", SDL_GetError());
     }
@@ -1005,7 +1006,8 @@ LPErrInApp SolitarioGfx::VictoryAnimationIterate() {
         }
         updateTextureAsFlipScreen();
 
-        if ((g_pVict->x + _p_DeckLoader->GetCardWidth() <= 0) || (g_pVict->x >= _p_Screen->w)) {
+        if ((g_pVict->x + _p_DeckLoader->GetCardWidth() <= 0) ||
+            (g_pVict->x >= _p_Screen->w)) {
             _state = SolitarioGfx::NEW_CARD_VICTORY;
         }
     }
@@ -1400,9 +1402,11 @@ LPErrInApp SolitarioGfx::checkForVictoryEvent() {
         _p_currentTime->StopTimer();
         bonusScore();
         DrawStaticScene();
-        err = (_fnUpdateHighScore.tc)
-                  ->SaveScore(_fnUpdateHighScore.self, _scoreGame,
-                              _deckType.GetNumCards());
+        if (_p_HighScoreGfx == NULL) {
+            return ERR_UTIL::ErrorCreate(
+                "High score graphics not initialized");
+        }
+        err = _p_HighScoreGfx->SaveScore(_scoreGame, _deckType.GetNumCards());
         if (err != NULL) {
             return err;
         }

@@ -42,7 +42,7 @@ LOCAL_SRC_FILES := $(APP_PATH)/Main.cpp \
             $(APP_PATH)/ErrorInfo.cpp \
             $(APP_PATH)/MenuMgr.cpp \
             $(APP_PATH)/TraceService.cpp \
-            $(APP_PATH)/HighScore.cpp \
+            $(GAMEGFX_PATH)/Solitario/HighScoreSolitarioGfx.cpp \
             $(APP_PATH)/GameHelp.cpp \
             $(COMPGFX_PATH)/LabelLinkGfx.cpp \
             $(COMPGFX_PATH)/ButtonGfx.cpp \

@@ -3,6 +3,7 @@
 #include "Config.h"
 #include "GameGfx/Solitario/SolitarioGfx.h"
 #include "GameSettings.h"
+#include "HighScoreSolitarioGfx.h"
 #include "OptionsSolitarioGfx.h"
 
 GameSelector::GameSelector() {
@@ -10,11 +11,13 @@ GameSelector::GameSelector() {
     pGameSettings->SetGameTypeGfx(GameTypeEnum::Solitario, "Solitario");
     _p_Gfx = NULL;
     _p_OptionsGfx = NULL;
+    _p_HighScoreGfx = NULL;
 }
 
 GameSelector::~GameSelector() {
     delete (SolitarioGfx*)_p_Gfx;
     delete (OptionsSolitarioGfx*)_p_OptionsGfx;
+    delete (HighScoreSolitarioGfx*)_p_HighScoreGfx;
 }
 
 LPErrInApp fncBind_HandleEvent(void* self, SDL_Event* pEvent,
@@ -31,11 +34,10 @@ LPErrInApp fncBind_HandleIterate(void* self, bool& done) {
 LPErrInApp fncBind_Initialize(void* self, SDL_Surface* pScreen,
                               UpdateScreenCb& fnUpdateScreen,
                               SDL_Window* pWindow,
-                              SDL_Surface* pSceneBackground,
-                              UpdateHighScoreCb& fnHighScore) {
+                              SDL_Surface* pSceneBackground) {
     SolitarioGfx* pSolitarioGfx = (SolitarioGfx*)self;
     return pSolitarioGfx->Initialize(pScreen, fnUpdateScreen, pWindow,
-                                     pSceneBackground, fnHighScore);
+                                     pSceneBackground);
 }
 
 void fncBind_GetHelpPagesSolitarioENG(void* self,
@@ -467,6 +469,37 @@ static LPErrInApp optionsSolitarioUpdateScreen(void* self, SDL_Surface* pScreen,
         ->UpdateScreen(pScreen, pSceneBackground);
 }
 
+static LPErrInApp highScoreSolitarioLoad(void* self) {
+    return ((HighScoreSolitarioGfx*)self)->Load();
+}
+
+static LPErrInApp highScoreSolitarioHandleEvent(void* self, SDL_Event* pEvent) {
+    return ((HighScoreSolitarioGfx*)self)->HandleEvent(pEvent);
+}
+
+static LPErrInApp highScoreSolitarioHandleIterate(void* self, bool& done) {
+    return ((HighScoreSolitarioGfx*)self)->HandleIterate(done);
+}
+
+static bool highScoreSolitarioIsOngoing(void* self) {
+    return ((HighScoreSolitarioGfx*)self)->IsOngoing();
+}
+
+static void highScoreSolitarioReset(void* self) {
+    ((HighScoreSolitarioGfx*)self)->Reset();
+}
+
+static LPErrInApp highScoreSolitarioShow(void* self, SDL_Surface* pScreen,
+                                         SDL_Surface* pSurfTitle,
+                                         UpdateScreenCb& fnUpdateScreen) {
+    return ((HighScoreSolitarioGfx*)self)
+        ->Show(pScreen, pSurfTitle, fnUpdateScreen);
+}
+
+static void highScoreSolitarioUpdateScreen(void* self, SDL_Surface* pScreen) {
+    ((HighScoreSolitarioGfx*)self)->UpdateScreen(pScreen);
+}
+
 OptionsGfxCb GameSelector::PrepOptionsGfx() {
     delete (OptionsSolitarioGfx*)_p_OptionsGfx;
     _p_OptionsGfx = new OptionsSolitarioGfx();
@@ -482,11 +515,28 @@ OptionsGfxCb GameSelector::PrepOptionsGfx() {
     return (OptionsGfxCb){.tc = &tc, .self = _p_OptionsGfx};
 }
 
+HighScoreGfxCb GameSelector::PrepHighScoreGfx() {
+    if (_p_HighScoreGfx == NULL) {
+        _p_HighScoreGfx = new HighScoreSolitarioGfx();
+    }
+    static VHighScoreGfxCb const tc = {
+        .Load = (&highScoreSolitarioLoad),
+        .HandleEvent = (&highScoreSolitarioHandleEvent),
+        .HandleIterate = (&highScoreSolitarioHandleIterate),
+        .IsOngoing = (&highScoreSolitarioIsOngoing),
+        .Reset = (&highScoreSolitarioReset),
+        .Show = (&highScoreSolitarioShow),
+        .UpdateScreen = (&highScoreSolitarioUpdateScreen)};
+    return (HighScoreGfxCb){.tc = &tc, .self = _p_HighScoreGfx};
+}
+
 GameGfxCb GameSelector::PrepGameGfx() {
     if (_p_Gfx != NULL) {
         delete (SolitarioGfx*)_p_Gfx;
     }
     _p_Gfx = new SolitarioGfx();
+    ((SolitarioGfx*)_p_Gfx)
+        ->SetHighScore((HighScoreSolitarioGfx*)_p_HighScoreGfx);
     static VGameGfxCb const tc = {.HandleEvent = (&fncBind_HandleEvent),
                                   .HandleIterate = (&fncBind_HandleIterate),
                                   .Initialize = (&fncBind_Initialize),

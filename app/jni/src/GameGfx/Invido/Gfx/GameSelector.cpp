@@ -2,12 +2,14 @@
 
 #include "Config.h"
 #include "GameSettings.h"
+#include "HighScoreInvidoGfx.h"
 #include "InvidoGfx.h"
 #include "OptionsInvidoGfx.h"
 
 GameSelector::GameSelector() {
     _p_Gfx = NULL;
     _p_OptionsGfx = NULL;
+    _p_HighScoreGfx = NULL;
     GameSettings* pGameSettings = GameSettings::GetSettings();
     pGameSettings->SetGameTypeGfx(GameTypeEnum::Invido, "Invido");
 }
@@ -15,6 +17,7 @@ GameSelector::GameSelector() {
 GameSelector::~GameSelector() {
     delete (invido::InvidoGfx*)_p_Gfx;
     delete (OptionsInvidoGfx*)_p_OptionsGfx;
+    delete (HighScoreInvidoGfx*)_p_HighScoreGfx;
 }
 
 LPErrInApp fncBind_HandleEvent(void* self, SDL_Event* pEvent,
@@ -31,11 +34,10 @@ LPErrInApp fncBind_HandleIterate(void* self, bool& done) {
 LPErrInApp fncBind_Initialize(void* self, SDL_Surface* pScreen,
                               UpdateScreenCb& fnUpdateScreen,
                               SDL_Window* pWindow,
-                              SDL_Surface* pSceneBackground,
-                              UpdateHighScoreCb& fnHighScore) {
+                              SDL_Surface* pSceneBackground) {
     invido::InvidoGfx* pInvidoGfx = (invido::InvidoGfx*)self;
     return pInvidoGfx->Initialize(pScreen, fnUpdateScreen, pWindow,
-                                  pSceneBackground, fnHighScore);
+                                  pSceneBackground);
 }
 
 void fncBind_GetHelpPagesInvidoENG(void* self, std::vector<HelpPage>& pages) {
@@ -478,11 +480,59 @@ OptionsGfxCb GameSelector::PrepOptionsGfx() {
     return (OptionsGfxCb){.tc = &tc, .self = _p_OptionsGfx};
 }
 
+static LPErrInApp highScoreInvidoLoad(void* self) {
+    return ((HighScoreInvidoGfx*)self)->Load();
+}
+
+static LPErrInApp highScoreInvidoHandleEvent(void* self, SDL_Event* pEvent) {
+    return ((HighScoreInvidoGfx*)self)->HandleEvent(pEvent);
+}
+
+static LPErrInApp highScoreInvidoHandleIterate(void* self, bool& done) {
+    return ((HighScoreInvidoGfx*)self)->HandleIterate(done);
+}
+
+static bool highScoreInvidoIsOngoing(void* self) {
+    return ((HighScoreInvidoGfx*)self)->IsOngoing();
+}
+
+static void highScoreInvidoReset(void* self) {
+    ((HighScoreInvidoGfx*)self)->Reset();
+}
+
+static LPErrInApp highScoreInvidoShow(void* self, SDL_Surface* pScreen,
+                                      SDL_Surface* pSurfTitle,
+                                      UpdateScreenCb& fnUpdateScreen) {
+    return ((HighScoreInvidoGfx*)self)
+        ->Show(pScreen, pSurfTitle, fnUpdateScreen);
+}
+
+static void highScoreInvidoUpdateScreen(void* self, SDL_Surface* pScreen) {
+    ((HighScoreInvidoGfx*)self)->UpdateScreen(pScreen);
+}
+
+HighScoreGfxCb GameSelector::PrepHighScoreGfx() {
+    if (_p_HighScoreGfx == NULL) {
+        _p_HighScoreGfx = new HighScoreInvidoGfx();
+    }
+    static VHighScoreGfxCb const tc = {
+        .Load = (&highScoreInvidoLoad),
+        .HandleEvent = (&highScoreInvidoHandleEvent),
+        .HandleIterate = (&highScoreInvidoHandleIterate),
+        .IsOngoing = (&highScoreInvidoIsOngoing),
+        .Reset = (&highScoreInvidoReset),
+        .Show = (&highScoreInvidoShow),
+        .UpdateScreen = (&highScoreInvidoUpdateScreen)};
+    return (HighScoreGfxCb){.tc = &tc, .self = _p_HighScoreGfx};
+}
+
 GameGfxCb GameSelector::PrepGameGfx() {
     if (_p_Gfx != NULL) {
         delete (invido::InvidoGfx*)_p_Gfx;
     }
     _p_Gfx = new invido::InvidoGfx();
+    ((invido::InvidoGfx*)_p_Gfx)
+        ->SetHighScore((HighScoreInvidoGfx*)_p_HighScoreGfx);
     static VGameGfxCb const tc = {.HandleEvent = (&fncBind_HandleEvent),
                                   .HandleIterate = (&fncBind_HandleIterate),
                                   .Initialize = (&fncBind_Initialize),

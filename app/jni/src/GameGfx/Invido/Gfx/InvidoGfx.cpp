@@ -14,6 +14,7 @@
 #include "DeckType.h"
 #include "GameSettings.h"
 #include "GfxUtil.h"
+#include "HighScoreInvidoGfx.h"
 #include "Languages.h"
 #include "MesgBoxGfx.h"
 #include "MusicManager.h"
@@ -73,6 +74,7 @@ InvidoGfx::InvidoGfx() {
     _p_MusicMgr = NULL;
     _isMatchTerminated = false;
     _p_AlphaDisplay = NULL;
+    _p_HighScoreGfx = NULL;
     _p_DeckLoader = new DeckLoader();
     _fnUpdateScreen.tc = NULL;
     _fnUpdateScreen.self = NULL;
@@ -83,8 +85,7 @@ InvidoGfx::~InvidoGfx() { cleanup(); }
 LPErrInApp InvidoGfx::Initialize(SDL_Surface* pScreen,
                                  UpdateScreenCb& fnUpdateScreen,
                                  SDL_Window* pWindow,
-                                 SDL_Surface* pSceneBackground,
-                                 UpdateHighScoreCb& fnUpdateHighScore) {
+                                 SDL_Surface* pSceneBackground) {
     TRACE("Initialize Invido\n");
     LPErrInApp err = NULL;
     _fnUpdateScreen = fnUpdateScreen;
@@ -712,7 +713,6 @@ void InvidoGfx::showYesNoMsgBox(LPCSTR strText) {
 
 void InvidoGfx::InitInvidoVsCPU() {
     GameSettings* pGameSettings = GameSettings::GetSettings();
-    
 
     Player player1;
     Player player2;
@@ -1637,7 +1637,28 @@ void InvidoGfx::ALG_GiocataEnd(I_MatchScore* pScore) {
     showOkMsgBox(strMsgFinGiocata.c_str());
 }
 
+LPErrInApp InvidoGfx::saveMatchHighScore(I_MatchScore* pScore) {
+    if (_p_HighScoreGfx == NULL || pScore == NULL) {
+        return ERR_UTIL::ErrorCreate(
+            "High score or match score not initialized");
+    }
+
+    const Uint8 matchWinner = pScore->GetMatchWinner();
+    const bool playerWon = matchWinner == _playerGuiIndex;
+    const uint16_t wins = static_cast<uint16_t>(
+        pScore->GetPointsPlayer(playerWon ? _playerGuiIndex : _opponentIndex));
+    const uint16_t losts = static_cast<uint16_t>(
+        pScore->GetPointsPlayer(playerWon ? _opponentIndex : _playerGuiIndex));
+    return _p_HighScoreGfx->SaveScoreWinLost(wins, losts);
+}
+
 void InvidoGfx::ALG_MatchEnd(I_MatchScore* pScore) {
+    LPErrInApp highScoreError = saveMatchHighScore(pScore);
+    if (highScoreError != NULL) {
+        TRACE("Unable to save Invido high score: %s\n",
+              highScoreError->ErrorText.c_str());
+    }
+
     GameSettings* pGameSettings = GameSettings::GetSettings();
     Languages* pLang = pGameSettings->GetLanguageMan();
 

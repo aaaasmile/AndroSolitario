@@ -1,4 +1,4 @@
-#include "HighScore.h"
+#include "HighScoreInvidoGfx.h"
 
 #include <memory.h>
 #include <stdlib.h>
@@ -21,7 +21,7 @@ static char g_filepath[1024];
 
 using namespace std;
 
-HighScore::HighScore() {
+HighScoreInvidoGfx::HighScoreInvidoGfx() {
     _p_FadeAction = new FadeAction();
     _p_surfScreen = NULL;
     _p_SurfTitle = NULL;
@@ -30,29 +30,43 @@ HighScore::HighScore() {
     _p_GameSettings = NULL;
     _p_MusicManager = NULL;
     _lastUpTimestamp = 0;
-    _state = HighScore::READY_TO_START;
+    _state = HighScoreInvidoGfx::READY_TO_START;
 
-    for (int k = 0; k < 10; k++) {
-        _scoreInfo[k].Score = 5940 - (k * 250);
+    for (uint16_t k = 0; k < 10; k++) {
+        _scoreInfo[k].Wins = 16 - k;
+        _scoreInfo[k].Losts = 0;
+        if (k > 0) {
+            _scoreInfo[k].Wins = 14 - k;
+            _scoreInfo[k].Losts = 1;
+        }
         if (k > 1) {
-            _scoreInfo[k].Score = _scoreInfo[k].Score - (k - 1) * 50;
+            _scoreInfo[k].Wins = 12 - k;
+            _scoreInfo[k].Losts = k + 2;
         }
         if (k > 2) {
-            _scoreInfo[k].Score = _scoreInfo[k].Score - (k - 2) * 20;
+            _scoreInfo[k].Wins -= 1;
+            _scoreInfo[k].Losts = k + 1;
         }
-        _scoreInfo[k].Name = "Re dal sulitari";
-        _scoreInfo[k].NumCard = 40;
+        if (k > 5) {
+            _scoreInfo[k].Wins -= 1;
+            _scoreInfo[k].Losts = k + 2;
+        }
+        if (k > 8) {
+            _scoreInfo[k].Wins = 0;
+            _scoreInfo[k].Losts = k + 5;
+        }
+        _scoreInfo[k].Name = "Re Invido";
     }
 }
 
-HighScore::~HighScore() {
-    TRACE_DEBUG("HighScore destructor\n");
+HighScoreInvidoGfx::~HighScoreInvidoGfx() {
+    TRACE_DEBUG("HighScoreInvidoGfx destructor\n");
     delete _p_FadeAction;
 }
 
 #if PLATFORM_EMS
-static std::string loadGameHighScore(const char* key,
-                                     const char* defaultValue) {
+static std::string loadGameHighScoreInvidoGfx(const char* key,
+                                              const char* defaultValue) {
     char js_command[256];
     snprintf(js_command, sizeof(js_command),
              "localStorage.getItem('high_%s') || '%s'", key, defaultValue);
@@ -60,7 +74,7 @@ static std::string loadGameHighScore(const char* key,
     return result != NULL ? std::string(result) : std::string(defaultValue);
 }
 
-static void saveGameHighScore(const char* key, const char* value) {
+static void saveGameHighScoreInvidoGfx(const char* key, const char* value) {
     char js_cmd[256];
     snprintf(js_cmd, sizeof(js_cmd), "localStorage.setItem('high_%s', '%s')",
              key, value);
@@ -80,15 +94,17 @@ std::vector<std::string> splitString(const std::string& str, char delimiter) {
 }
 #endif
 
-LPErrInApp HighScore::Save() {
+LPErrInApp HighScoreInvidoGfx::Save() {
 #if PLATFORM_EMS
-    TRACE_DEBUG("[saveGameHighScore] save highscore in the browser storage \n");
+    TRACE_DEBUG(
+        "[saveGameHighScoreInvidoGfx] save highscore in the browser storage "
+        "\n");
     for (int k = 0; k < NUMOFSCORE; k++) {
         std::string kstr = std::to_string(k);
         std::string val = _scoreInfo[k].Name + ":" +
-                          std::to_string(_scoreInfo[k].Score) + ":" +
-                          std::to_string(_scoreInfo[k].NumCard);
-        saveGameHighScore(kstr.c_str(), val.c_str());
+                          std::to_string(_scoreInfo[k].Wins) + ":" +
+                          std::to_string(_scoreInfo[k].Losts);
+        saveGameHighScoreInvidoGfx(kstr.c_str(), val.c_str());
     }
 #else
     LPGameSettings pGameSettings = GameSettings::GetSettings();
@@ -116,13 +132,12 @@ LPErrInApp HighScore::Save() {
             return ERR_UTIL::ErrorCreate("SDL_RWwrite name highscore %s\n",
                                          SDL_GetError());
         }
-        if (SDL_WriteU16LE(dst, _scoreInfo[k].Score) == 0) {
-            return ERR_UTIL::ErrorCreate("SDL_RWwrite score highscore %s\n",
+        if (SDL_WriteU16LE(dst, _scoreInfo[k].Wins) == 0) {
+            return ERR_UTIL::ErrorCreate("SDL_RWwrite wins highscore %s\n",
                                          SDL_GetError());
         }
-        numWritten = SDL_WriteIO(dst, &_scoreInfo[k].NumCard, 1);
-        if (numWritten < 1) {
-            return ERR_UTIL::ErrorCreate("SDL_RWwrite numCard highscore %s\n",
+        if (SDL_WriteU16LE(dst, _scoreInfo[k].Losts) == 0) {
+            return ERR_UTIL::ErrorCreate("SDL_RWwrite losts highscore %s\n",
                                          SDL_GetError());
         }
     }
@@ -131,13 +146,13 @@ LPErrInApp HighScore::Save() {
     return NULL;
 }
 
-LPErrInApp HighScore::SaveScore(int64_t score, int numCard) {
-    if (score < 0 || score > 1000000) {
+LPErrInApp HighScoreInvidoGfx::SaveScoreWinLost(uint16_t wins, uint16_t losts) {
+    if (wins < 0 || losts < 0) {
         return NULL;
     }
     int j = -1;
     for (int i = 0; i < NUMOFSCORE; i++) {
-        if (score > _scoreInfo[i].Score) {
+        if (wins > _scoreInfo[i].Wins) {
             j = i;
             break;
         }
@@ -150,8 +165,8 @@ LPErrInApp HighScore::SaveScore(int64_t score, int numCard) {
             if (i == j) {
                 prev = _scoreInfo[i];
                 _scoreInfo[i].Name = pGameSettings->PlayerName;
-                _scoreInfo[i].Score = score;
-                _scoreInfo[i].NumCard = numCard;
+                _scoreInfo[i].Wins = wins;
+                _scoreInfo[i].Losts = losts;
             } else {
                 ScoreInfo temp = _scoreInfo[i];
                 _scoreInfo[i] = prev;
@@ -163,34 +178,30 @@ LPErrInApp HighScore::SaveScore(int64_t score, int numCard) {
     return NULL;
 }
 
-LPErrInApp HighScore::SaveScoreWinLost(uint16_t wins, uint16_t losts) {
-    return ERR_UTIL::ErrorCreate("Not supported\n");
-}
-
-LPErrInApp HighScore::Load() {
+LPErrInApp HighScoreInvidoGfx::Load() {
 #if PLATFORM_EMS
-    TRACE_DEBUG("[loadGameHighScore] from the browser storage \n");
+    TRACE_DEBUG("[loadGameHighScoreInvidoGfx] from the browser storage \n");
     for (int k = 0; k < NUMOFSCORE; k++) {
         std::string kstr = std::to_string(k);
-        std::string result = loadGameHighScore(kstr.c_str(), "");
+        std::string result = loadGameHighScoreInvidoGfx(kstr.c_str(), "");
         if (result == "") {
             TRACE_DEBUG("No high score in storage found, use defaults \n");
             return NULL;
         }
-        int numCard = 40;
         std::string name = "";
-        int score = 0;
+        int wins = 0;
+        int losts = 0;
         std::vector<std::string> parts = splitString(result, ':');
         if (parts.size() >= 2) {
             name = parts[0];
-            score = std::stoi(parts[1]);
+            wins = std::stoi(parts[1]);
             if (parts.size() >= 3) {
-                numCard = std::stoi(parts[2]);
+                losts = std::stoi(parts[2]);
             }
         }
         _scoreInfo[k].Name = name;
-        _scoreInfo[k].Score = score;
-        _scoreInfo[k].NumCard = numCard;
+        _scoreInfo[k].Wins = wins;
+        _scoreInfo[k].Losts = losts;
     }
 #else
     LPGameSettings pGameSettings = GameSettings::GetSettings();
@@ -207,62 +218,67 @@ LPErrInApp HighScore::Load() {
 
     for (int k = 0; k < 10; k++) {
         char name[16];
-        uint16_t score = 0;
-        uint8_t numCard;
+        uint16_t wins = 0;
+        uint16_t losts;
         if (SDL_ReadIO(src, &name, 16) == 0) {
             return ERR_UTIL::ErrorCreate(
                 "SDL_RWread on highscore file error (file %s): %s\n",
                 g_filepath, SDL_GetError());
         }
-        SDL_ReadU16LE(src, &score);
-        if (SDL_ReadIO(src, &numCard, 1) == 0) {
+        if (!SDL_ReadU16LE(src, &wins)) {
+            return ERR_UTIL::ErrorCreate(
+                "SDL_RWread on highscore file error (file %s): %s\n",
+                g_filepath, SDL_GetError());
+        }
+        if (!SDL_ReadU16LE(src, &losts)) {
             return ERR_UTIL::ErrorCreate(
                 "SDL_RWread on highscore file error (file %s): %s\n",
                 g_filepath, SDL_GetError());
         }
 
         _scoreInfo[k].Name = name;
-        _scoreInfo[k].Score = score;
-        _scoreInfo[k].NumCard = numCard;
+        _scoreInfo[k].Wins = wins;
+        _scoreInfo[k].Losts = losts;
     }
     SDL_CloseIO(src);
 #endif
     return NULL;
 }
 
-LPErrInApp HighScore::HandleEvent(SDL_Event* pEvent) {
-    if (_state != HighScore::IN_PROGRESS &&
-        _state != HighScore::IN_PROGRESS_WAIT) {
+LPErrInApp HighScoreInvidoGfx::HandleEvent(SDL_Event* pEvent) {
+    if (_state != HighScoreInvidoGfx::IN_PROGRESS &&
+        _state != HighScoreInvidoGfx::IN_PROGRESS_WAIT) {
         return NULL;
     }
     if (pEvent->type == SDL_EVENT_KEY_DOWN) {
         if (pEvent->key.key == SDLK_ESCAPE || pEvent->key.key == SDLK_RETURN) {
-            _state = HighScore::DONE;
+            _state = HighScoreInvidoGfx::DONE;
         }
     }
     if (pEvent->type == SDL_EVENT_FINGER_DOWN) {
-        _state = HighScore::DONE;
+        _state = HighScoreInvidoGfx::DONE;
     }
     if (pEvent->type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
         if (_ignoreMouseEvent) {
             return NULL;
         }
-        _state = HighScore::DONE;
+        _state = HighScoreInvidoGfx::DONE;
     }
     return NULL;
 }
 
-LPErrInApp HighScore::HandleIterate(bool& done) {
+LPErrInApp HighScoreInvidoGfx::HandleIterate(bool& done) {
     SDL_Rect src, dest;
-    if (_state == HighScore::READY_TO_START) {
+    if (_state == HighScoreInvidoGfx::READY_TO_START) {
         return NULL;
     }
-    if (_state == HighScore::WAIT_FOR_FADING) {
+    if (_state == HighScoreInvidoGfx::WAIT_FOR_FADING) {
         if (_p_FadeAction->IsInProgress()) {
             _p_FadeAction->Iterate();
             return NULL;
         }
-        TRACE("HighScore - fade end, next state is %d \n", _stateAfter);
+        TRACE("HighScoreInvidoGfx - fade end, next state is %d \n",
+              _stateAfter);
         if (_state == _stateAfter) {
             return ERR_UTIL::ErrorCreate(
                 "Next state could not be WAIT_FOR_FADING\n");
@@ -271,24 +287,24 @@ LPErrInApp HighScore::HandleIterate(bool& done) {
         return NULL;
     }
 
-    if (_state == HighScore::INIT) {
-        TRACE("HighScore Init \n");
+    if (_state == HighScoreInvidoGfx::INIT) {
+        TRACE("HighScoreInvidoGfx Init \n");
         if (!_ignoreMouseEvent) {
-            TRACE("HighScore Init - fade start \n");
+            TRACE("HighScoreInvidoGfx Init - fade start \n");
             _p_FadeAction->Fade(_p_surfScreen, _p_surfScreen, 2, true,
                                 _fnUpdateScreen, NULL);
-            _state = HighScore::WAIT_FOR_FADING;
-            _stateAfter = HighScore::IN_PROGRESS;
+            _state = HighScoreInvidoGfx::WAIT_FOR_FADING;
+            _stateAfter = HighScoreInvidoGfx::IN_PROGRESS;
         } else {
             _p_FadeAction->InstantFade(_p_surfScreen);
-            _state = HighScore::IN_PROGRESS;
+            _state = HighScoreInvidoGfx::IN_PROGRESS;
         }
         _p_MusicManager->PlayMusic(MusicManager::MUSIC_CREDITS_SND,
                                    MusicManager::LOOP_ON);
         return NULL;
     }
 
-    if (_state == HighScore::IN_PROGRESS) {
+    if (_state == HighScoreInvidoGfx::IN_PROGRESS) {
         dest.x = (_p_surfScreen->w - _p_SurfTitle->w) / 2;
         dest.y = 0;
         dest.w = _p_SurfTitle->w;
@@ -340,11 +356,11 @@ LPErrInApp HighScore::HandleIterate(bool& done) {
                              xIni + xOff, yIni + yOff, txtColor, pFont2);
         xOff += bx;
         GFX_UTIL::DrawString(_p_surfScreen,
-                             pLanguages->GetCStringId(Languages::POINTS),
+                             pLanguages->GetCStringId(Languages::WINS),
                              xIni + xOff, yIni + yOff, txtColor, pFont2);
         xOff += cx;
         GFX_UTIL::DrawString(_p_surfScreen,
-                             pLanguages->GetCStringId(Languages::CARDDECK),
+                             pLanguages->GetCStringId(Languages::LOSTS),
                              xIni + xOff, yIni + yOff, txtColor, pFont2);
         yOff += dx;
         xOff = 0;
@@ -366,21 +382,21 @@ LPErrInApp HighScore::HandleIterate(bool& done) {
             GFX_UTIL::DrawString(_p_surfScreen, _scoreInfo[i].Name.c_str(),
                                  xIni + xOff, yIni + yOff, txtColor, pFont);
             xOff += bx;
-            snprintf(buff, sizeof(buff), "%d", _scoreInfo[i].Score);
+            snprintf(buff, sizeof(buff), "%d", _scoreInfo[i].Wins);
             GFX_UTIL::DrawString(_p_surfScreen, buff, xIni + xOff, yIni + yOff,
                                  txtColor, pFont);
             xOff += cx;
-            snprintf(buff, sizeof(buff), "%d", _scoreInfo[i].NumCard);
+            snprintf(buff, sizeof(buff), "%d", _scoreInfo[i].Losts);
             GFX_UTIL::DrawString(_p_surfScreen, buff, xIni + xOff, yIni + yOff,
                                  txtColor, pFont);
             yOff += ex;
             xOff = 0;
         }
 
-        _state = HighScore::IN_PROGRESS_WAIT;
+        _state = HighScoreInvidoGfx::IN_PROGRESS_WAIT;
         // TRACE_DEBUG("[HandleIterate] next state is IN_PROGRESS_WAIT \n");
     }
-    if (_state == HighScore::IN_PROGRESS_WAIT) {
+    if (_state == HighScoreInvidoGfx::IN_PROGRESS_WAIT) {
         Uint64 now_time = SDL_GetTicks();
         if (_lastUpTimestamp + 30 > now_time) {
             // TRACE_DEBUG("Ignore iteration because too fast \n");
@@ -393,35 +409,36 @@ LPErrInApp HighScore::HandleIterate(bool& done) {
         uint32_t elapsed_sec = (now_time / 1000) - (_start_time / 1000);
         if (elapsed_sec > 20) {
             TRACE_DEBUG("after 20 sec, time to exit from high score\n");
-            _state = HighScore::DONE;
+            _state = HighScoreInvidoGfx::DONE;
             return NULL;
         }
 
         return NULL;
     }
 
-    if (_state == HighScore::DONE) {
-        TRACE("HighScore done \n");
+    if (_state == HighScoreInvidoGfx::DONE) {
+        TRACE("HighScoreInvidoGfx done \n");
         _p_FadeAction->Fade(_p_surfScreen, _p_surfScreen, 1, true,
                             _fnUpdateScreen, NULL);
-        _state = HighScore::WAIT_FOR_FADING;
-        _stateAfter = HighScore::TERMINATED;
+        _state = HighScoreInvidoGfx::WAIT_FOR_FADING;
+        _stateAfter = HighScoreInvidoGfx::TERMINATED;
         return NULL;
     }
 
-    if (_state == HighScore::TERMINATED) {
-        TRACE("HighScore terminated \n");
+    if (_state == HighScoreInvidoGfx::TERMINATED) {
+        TRACE("HighScoreInvidoGfx terminated \n");
         done = true;
-        _state = HighScore::READY_TO_START;
+        _state = HighScoreInvidoGfx::READY_TO_START;
         return NULL;
     }
 
     return NULL;
 }
 
-LPErrInApp HighScore::Show(SDL_Surface* p_surf_screen, SDL_Surface* pSurfTitle,
-                           UpdateScreenCb& fnUpdateScreen) {
-    TRACE("HighScore Show \n");
+LPErrInApp HighScoreInvidoGfx::Show(SDL_Surface* p_surf_screen,
+                                    SDL_Surface* pSurfTitle,
+                                    UpdateScreenCb& fnUpdateScreen) {
+    TRACE("HighScoreInvidoGfx Show \n");
     _fnUpdateScreen = fnUpdateScreen;
     _p_surfScreen = p_surf_screen;
     _p_SurfTitle = pSurfTitle;
@@ -432,13 +449,13 @@ LPErrInApp HighScore::Show(SDL_Surface* p_surf_screen, SDL_Surface* pSurfTitle,
     _p_MusicManager = _p_GameSettings->GetMusicManager();
     _ignoreMouseEvent =
         _p_GameSettings->InputType == InputTypeEnum::TouchWithoutMouse;
-    _state = HighScore::INIT;
+    _state = HighScoreInvidoGfx::INIT;
     return NULL;
 }
 
-void HighScore::UpdateScreen(SDL_Surface* pScreen) {
+void HighScoreInvidoGfx::UpdateScreen(SDL_Surface* pScreen) {
     if (pScreen == NULL)
         return;
-    TRACE("HighScore::UpdateScreen\n");
+    TRACE("HighScoreInvidoGfx::UpdateScreen\n");
     _p_surfScreen = pScreen;
 }
