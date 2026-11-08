@@ -55,6 +55,7 @@ class OptionsGfx {
     CheckboxClickCb prepCheckBoxClickMusic();
     ClickKeyboardCb prepareClickKeyboardCb();
     void setBackgoundTypeInGameSettings();
+    bool isSelectedBackGroundDifferentToGameSetting() const;
     LPErrInApp updateBackgroundSelection();
     void setLanguageInGameSettings();
     bool supportsBackgroundSelection() const;

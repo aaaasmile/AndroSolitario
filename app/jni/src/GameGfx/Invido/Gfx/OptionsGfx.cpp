@@ -442,8 +442,7 @@ LPErrInApp OptionsGfx::HandleIterate(bool& done) {
         _p_GameSettings->SetCurrentLang();
         setControlLocalCaptions();
     }
-    if (_p_comboBackground->GetSelectedIndex() !=
-        _p_GameSettings->BackgroundType) {
+    if (isSelectedBackGroundDifferentToGameSetting()) {
         TRACE_DEBUG("Backaground selection changed to %d \n",
                     _p_comboBackground->GetSelectedIndex());
         setBackgoundTypeInGameSettings();
@@ -739,6 +738,31 @@ void OptionsGfx::setLanguageInGameSettings() {
         default:
             break;
     }
+}
+
+bool OptionsGfx::isSelectedBackGroundDifferentToGameSetting() const {
+    const int selectedIndex = _p_comboBackground->GetSelectedIndex();
+    const char* selectedBackgroundName;
+    switch (selectedIndex) {
+        case 0:
+            selectedBackgroundName = "Commessaggio";
+            break;
+        case 1:
+            selectedBackgroundName = "Mantova";
+            break;
+        case 2:
+            return _p_GameSettings->BackgroundType != BackgroundTypeEnum::Black;
+        default:
+            return true;
+    }
+
+    if (_p_GameSettings->BackgroundType != BackgroundTypeEnum::Image) {
+        return true;
+    }
+    const std::map<std::string, std::string>::const_iterator background =
+        _p_GameSettings->GameOptions.find(GAMESET::SceneBackgroundOptionKey);
+    return background == _p_GameSettings->GameOptions.end() ||
+           background->second != selectedBackgroundName;
 }
 
 void OptionsGfx::setBackgoundTypeInGameSettings() {
