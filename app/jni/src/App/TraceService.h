@@ -22,12 +22,12 @@ class EntryTraceDetail {
     STRING ToString();
 
    public:
-    unsigned long m_ulTimeStamp;
-    int m_iID;
-    eType m_eTrType;
-    STRING m_strFileName;
-    int m_iLineNumber;
-    STRING m_strComment;
+    unsigned long _timeStamp;
+    int _ID;
+    eType _eTrType;
+    STRING _strFileName;
+    int _lineNumber;
+    STRING _strComment;
 };
 
 class TraceService {
@@ -73,7 +73,7 @@ class TraceService {
     eOutType _aeChannelOut[NUM_OF_CHANN];
     int _aiChannelCursor[NUM_OF_CHANN];
     int _lastEntryUsed;
-    int m_lastChannelUsed;
+    int _lastChannelUsed;
     std::ofstream _aChannelFiles[NUM_OF_CHANN];
     I_GuiTracer* _p_ICustomTracer;
 };
