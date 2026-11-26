@@ -7,6 +7,7 @@
 #include "../Core/Player.h"
 #include "../Core/PlayersOnTable.h"
 #include "../Core/GameActionReplayer.h"
+#include "../Core/MatchStateWithScore.h"
 
 void testSayPlayerToString() {
     struct SayPlayerName {
@@ -120,7 +121,27 @@ void testReplayMatch() {
     std::cout << "Match replay tests PASSED" << std::endl;
 }
 
+void testMatchStateWithScoreDefaults() {
+    invido::MatchStateWithScore matchState;
+    Uint8 playerIndex;
+    bool isPlayed;
+    bool isPata;
+
+    matchState.GetManoInfo(0, &playerIndex, &isPlayed, &isPata);
+    assert(playerIndex == invido::NOT_VALID_INDEX);
+    assert(!isPlayed);
+    assert(!isPata);
+
+    matchState.GiocataStart();
+    matchState.GiocataPatada();
+    matchState.GetManoInfo(0, &playerIndex, &isPlayed, &isPata);
+    assert(playerIndex == invido::NOT_VALID_INDEX);
+    assert(!isPlayed);
+    assert(!isPata);
+}
+
 void testMatch() {
+    testMatchStateWithScoreDefaults();
     testReplayMatch();
     testSimpleMatch();
     testSayPlayerToString();

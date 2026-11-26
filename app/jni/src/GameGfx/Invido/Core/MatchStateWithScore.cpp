@@ -4,13 +4,27 @@
 
 using namespace invido;
 
-MatchStateWithScore::MatchStateWithScore() {
-    _numPlayers = NUM_PLAY_INVIDO_2;
-    _playerChangeScore = NOT_VALID_INDEX;
-    _isGameAbandoned = false;
-    _isMatchEnd = false;
-   _currentScore = SC_CANELA;
-}
+MatchStateWithScore::MatchStateWithScore()
+    : _vctManoInfo(NUM_CARDS_HAND,
+                   ManoInfo{NOT_VALID_INDEX, false, false}),
+      _currentScore(SC_CANELA),
+      _eIsGiocataEnd(GES_ON_GOING),
+      _numCardsPlayed(0),
+      _manoRound(0),
+      _numPlayers(NUM_PLAY_INVIDO_2),
+      _scoreGoal(SCORE_GOAL),
+      _playerWonsHand(NOT_VALID_INDEX),
+      _playerChangeScore(NOT_VALID_INDEX),
+      _playerFirstHand(NOT_VALID_INDEX),
+      _playerGiocataWin(NOT_VALID_INDEX),
+      _playerMatchWin(NOT_VALID_INDEX),
+      _isMatchInSpecialScore(false),
+      _isOldManoPatada(false),
+      _isGameAbandoned(false),
+      _isGiocataPatada(false),
+      _isGiocataAMonte(false),
+      _isMatchEnd(false),
+      _isManoPatatda(false) {}
 
 MatchStateWithScore::~MatchStateWithScore() {}
 
@@ -199,16 +213,23 @@ void MatchStateWithScore::beginSpecialTurn() {
     _isMatchInSpecialScore = true;
 }
 
-void MatchStateWithScore::GetManoInfo(int manoNum, Uint8* pplayerIx, bool* pisPlayed,
-                              bool* pisPata) {
+void MatchStateWithScore::GetManoInfo(int manoNum, Uint8* pplayerIx,
+                                      bool* pisPlayed, bool* pisPata) {
     SDL_assert(pisPata);
     SDL_assert(pisPlayed);
     SDL_assert(pplayerIx);
-    if (manoNum >= 0 && manoNum < NUM_CARDS_HAND) {
+
+    *pplayerIx = NOT_VALID_INDEX;
+    *pisPlayed = false;
+    *pisPata = false;
+    if (_vctManoInfo.empty()) {
+        return;
+    }
+
+    if (manoNum >= 0 && manoNum < static_cast<int>(_vctManoInfo.size())) {
         *pisPata = _vctManoInfo[manoNum]._isPata;
         *pisPlayed = _vctManoInfo[manoNum]._isPlayed;
         *pplayerIx = _vctManoInfo[manoNum]._playerIndex;
-
     } else {
         SDL_assert(0);
     }
