@@ -327,10 +327,15 @@ LPErrInApp GameSettings::LoadSettings() {
         }
 
         uint8_t backgroundType;
-        err = readSettingsData(src, &backgroundType, sizeof(backgroundType));
-        if (err != NULL) {
+        const size_t backgroundBytesRead =
+            SDL_ReadIO(src, &backgroundType, sizeof(backgroundType));
+        if (backgroundBytesRead == 0 &&
+            SDL_GetIOStatus(src) == SDL_IO_STATUS_EOF) {
+            // Files from the previous writer ended after the options list.
+            backgroundType = legacyBackgroundType;
+        } else if (backgroundBytesRead != sizeof(backgroundType)) {
             SDL_CloseIO(src);
-            return err;
+            return ERR_UTIL::ErrorCreate("Unable to read background setting\n");
         }
         if (backgroundType != BackgroundTypeEnum::Black &&
             backgroundType != BackgroundTypeEnum::Image) {

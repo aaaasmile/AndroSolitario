@@ -29,10 +29,18 @@ include_directories(
     ${TEST_INVIDO_DIR}
     ${TEST_APP_DIR}
     ${SDL3_INCLUDE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../../SDL_mixer/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../../SDL_ttf/include
 )
 
 # Implementation files needed for linking
 set(TEST_IMPL_SOURCES
+    ${TEST_APP_DIR}/DeckType.cpp
+    ${TEST_APP_DIR}/GameSettings.cpp
+    ${TEST_APP_DIR}/Languages.cpp
+    ${TEST_APP_DIR}/MusicManager.cpp
+    ${TEST_APP_DIR}/ErrorInfo.cpp
+    ${TEST_APP_DIR}/../UnixSys/UnixsysTrace.cpp
     ${TEST_INVIDO_DIR}/Core/GameActionRecorder.cpp
     ${TEST_INVIDO_DIR}/Core/GameActionReplayer.cpp
     ${TEST_INVIDO_DIR}/Core/AlgPlayerAuto.cpp
@@ -48,12 +56,11 @@ set(TEST_IMPL_SOURCES
     ${TEST_INVIDO_DIR}/Core/Mano.cpp
     ${TEST_INVIDO_DIR}/Core/Partita.cpp
     ${TEST_INVIDO_DIR}/Core/MatchStateWithScore.cpp
-    ${TEST_APP_DIR}/ErrorInfo.cpp
-    ${TEST_APP_DIR}/../UnixSys/UnixsysTrace.cpp
 )
 
 set(TEST_SOURCES
     main_test.cpp
+    test_settings.cpp
     test_error_info.cpp
     test_json.cpp
     test_recorder.cpp
@@ -66,14 +73,17 @@ set(TEST_SOURCES
 )
 
 add_executable(${PROJECT_NAME} ${TEST_SOURCES})
+target_compile_definitions(${PROJECT_NAME} PRIVATE DATA_PREFIX="data/")
 
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${TEST_INVIDO_DIR}
     ${TEST_APP_DIR}
 )
 
-target_link_libraries(${PROJECT_NAME} 
+target_link_libraries(${PROJECT_NAME}
     SDL3::SDL3
+    SDL3_mixer::SDL3_mixer
+    SDL3_ttf::SDL3_ttf
 )
 
 enable_testing()

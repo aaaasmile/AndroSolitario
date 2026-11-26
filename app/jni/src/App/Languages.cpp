@@ -99,7 +99,7 @@ Languages::Languages() {
     _mtxLangString[LANG_ITA][ID_HARDER] = "Non facile";
     _mtxLangString[LANG_ITA][ID_BACK] = "Torna indietro";
     _mtxLangString[LANG_ITA][ID_SELECTDISPLAYSETTINGS] = "Seleziona il display";
-    _mtxLangString[LANG_ITA][ID_INVIDO] = "Invidu";
+    _mtxLangString[LANG_ITA][ID_INVIDO] = "Invido";
     _mtxLangString[LANG_ITA][ID_CHOOSELANGUA] = "Seleziona la lingua";
     _mtxLangString[LANG_ITA][ID_ENGLISH] = "Inglese";
     _mtxLangString[LANG_ITA][ID_DIALETMN] = "Dialetto Bredese";

@@ -8,12 +8,14 @@ void testJson();
 void testGameActionRecorder();
 void testGameActionReplayer();
 void testErrorInfo();
+void testSettingsPersistence();
 
 int main(int argc, char* argv[]) {
     std::cout << "=== Invido Unit Tests Runner ===" << std::endl;
 
     try {
         testErrorInfo();
+        testSettingsPersistence();
         testJson();
         testGameActionRecorder();
         testGameActionReplayer();
