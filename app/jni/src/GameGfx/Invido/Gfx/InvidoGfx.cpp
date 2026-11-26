@@ -75,7 +75,7 @@ InvidoGfx::InvidoGfx() {
     _isMatchTerminated = false;
     _p_AlphaDisplay = NULL;
     _p_HighScoreGfx = NULL;
-    _p_DeckLoader = new DeckLoader();
+    _p_DeckLoader = NULL;
     _fnUpdateScreen.tc = NULL;
     _fnUpdateScreen.self = NULL;
 }
@@ -93,6 +93,7 @@ LPErrInApp InvidoGfx::Initialize(SDL_Surface* pScreen,
     _p_Window = pWindow;
 
     cleanup();
+    _p_DeckLoader = new DeckLoader();
 
     GameSettings* pGameSettings = GameSettings::GetSettings();
     setDeckType(pGameSettings->DeckTypeVal);
