@@ -262,7 +262,8 @@ LPErrInApp AppGfx::Init() {
     MenuDelegator menuDelegator = prepMenuDelegator();
     UpdateScreenCb screenUpdater = prepScreenUpdater();
     _p_MenuMgr = new MenuMgr();
-    err = _p_MenuMgr->Initialize(_p_Screen, screenUpdater, menuDelegator);
+    err = _p_MenuMgr->Initialize(_p_Screen, screenUpdater, menuDelegator,
+                                 _p_GameSelector);
     if (err != NULL) {
         return err;
     }

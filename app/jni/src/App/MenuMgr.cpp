@@ -11,6 +11,7 @@
 #include "CompGfx/LabelLinkGfx.h"
 #include "Config.h"
 #include "ErrorInfo.h"
+#include "GameSelector.h"
 #include "GameSettings.h"
 #include "GfxUtil.h"
 #include "MusicManager.h"
@@ -143,6 +144,7 @@ MenuMgr::MenuMgr() {
     _focusedMenuItem = MenuItemEnum::MENU_GAME;
     _p_MenuBox = 0;
     _p_SceneBackground = 0;
+    _p_GameSelector = NULL;
     _p_homeUrl = NULL;
     _p_LabelVersion = NULL;
 }
@@ -162,10 +164,15 @@ MenuMgr::~MenuMgr() {
 
 LPErrInApp MenuMgr::Initialize(SDL_Surface* pScreen,
                                UpdateScreenCb& fnUpdateScreen,
-                               MenuDelegator& menuDelegator) {
+                               MenuDelegator& menuDelegator,
+                               GameSelector* pGameSelector) {
     if (pScreen == NULL) {
         return ERR_UTIL::ErrorCreate("Screen is not initialized\n");
     }
+    if (pGameSelector == NULL) {
+        return ERR_UTIL::ErrorCreate("Game selector is not initialized\n");
+    }
+    _p_GameSelector = pGameSelector;
 
     if (_p_ScreenBackbuffer != NULL) {
         SDL_DestroySurface(_p_ScreenBackbuffer);
@@ -306,7 +313,7 @@ LPErrInApp MenuMgr::drawStaticScene() {
     SDL_Color color = g_color_gray;
     err = drawMenuText(
         _p_ScreenBackbuffer,
-        pLanguages->GetStringId(Languages::ID_WELCOMETITLEBAR).c_str(),
+        pLanguages->GetStringId(_p_GameSelector->GetGameTitle()).c_str(),
         _box_X + bar_x, _box_Y + bar_y - hbar / 2, color, _p_fontDejBoldBig);
     _hBar = hbar;
     return err;

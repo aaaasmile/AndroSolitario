@@ -59,8 +59,6 @@ Languages::Languages() {
     _mtxLangString[LANG_DIAL_BREDA][ID_SICILIA] = "Siciliani";
     _mtxLangString[LANG_DIAL_BREDA][ID_CREDITS] = "Ringrasiament";
 
-    _mtxLangString[LANG_DIAL_BREDA][ID_WELCOMETITLEBAR] =
-        "At capiti giost al Sulitari";
     _mtxLangString[LANG_DIAL_BREDA][ID_MEN_OPTIONS] = "Upsion";
     _mtxLangString[LANG_DIAL_BREDA][ID_MN_HELP] = "Ad du nà man";
     _mtxLangString[LANG_DIAL_BREDA][ID_OK] = "Ukei";
@@ -135,7 +133,6 @@ Languages::Languages() {
     _mtxLangString[LANG_ITA][ID_TRIESTE] = "Triestine";
     _mtxLangString[LANG_ITA][ID_SICILIA] = "Siciliane";
     _mtxLangString[LANG_ITA][ID_CREDITS] = "Credits";
-    _mtxLangString[LANG_ITA][ID_WELCOMETITLEBAR] = "Il Solitario";
     _mtxLangString[LANG_ITA][ID_MEN_OPTIONS] = "Opzioni";
     _mtxLangString[LANG_ITA][ID_MN_HELP] = "Guida";
     _mtxLangString[LANG_ITA][ID_OK] = "OK";
@@ -210,7 +207,6 @@ Languages::Languages() {
     _mtxLangString[LANG_ENG][ID_TRIESTE] = "Triestine";
     _mtxLangString[LANG_ENG][ID_SICILIA] = "Siciliane";
     _mtxLangString[LANG_ENG][ID_CREDITS] = "Credits";
-    _mtxLangString[LANG_ENG][ID_WELCOMETITLEBAR] = "The Solitaire";
     _mtxLangString[LANG_ENG][ID_MEN_OPTIONS] = "Options";
     _mtxLangString[LANG_ENG][ID_MN_HELP] = "Help";
     _mtxLangString[LANG_ENG][ID_OK] = "OK";

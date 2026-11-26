@@ -11,6 +11,7 @@ class Languages;
 class LabelLinkGfx;
 class LabelGfx;
 class GameSettings;
+class GameSelector;
 class MusicManager;
 
 using namespace traits;
@@ -22,7 +23,8 @@ class MenuMgr {
     MenuMgr();
     virtual ~MenuMgr();
     LPErrInApp Initialize(SDL_Surface* pScreen, UpdateScreenCb& fnUpdateScreen,
-                          MenuDelegator& menuDelegator);
+                          MenuDelegator& menuDelegator,
+                          GameSelector* pGameSelector);
     LPErrInApp HandleRootMenuEvent(SDL_Event* pEvent,
                                    const SDL_Point& targetPos);
     LPErrInApp HandleRootMenuIterate();
@@ -58,6 +60,7 @@ class MenuMgr {
     LabelGfx* _p_LabelVersion;
     LabelLinkGfx* _p_homeUrl;
     GameSettings* _p_GameSettings;
+    GameSelector* _p_GameSelector;
     MusicManager* _p_MusicManager;
     bool _ignoreMouseEvent;
 };
